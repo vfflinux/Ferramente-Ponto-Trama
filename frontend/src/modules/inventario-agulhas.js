@@ -963,9 +963,13 @@ const InventarioAgulhas = (() => {
 
     const attr = itemEdicao?.atributos || {};
 
-    // Preenche campos de Agulha
+    // Preenche campos de Agulha (respeita Técnica Principal nas Configurações)
+    const tipoAgulhaPadrao =
+      typeof Configuracoes !== "undefined" && Configuracoes.obter("tecnicaPrincipal") === "trico"
+        ? "trico-reto"
+        : "croche";
     document.getElementById("bib-agulha-tipo").value =
-      attr.tipo || (subtipoAgulhaAtivo !== "todos" ? subtipoAgulhaAtivo : "croche");
+      attr.tipo || (subtipoAgulhaAtivo !== "todos" ? subtipoAgulhaAtivo : tipoAgulhaPadrao);
     document.getElementById("bib-agulha-mm").value = attr.espessura_mm ?? "";
     document.getElementById("bib-agulha-material").value = attr.material || "";
     document.getElementById("bib-agulha-cabo").value = attr.comprimento_cabo_cm ?? "";

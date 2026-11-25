@@ -8,18 +8,17 @@
    1. CONTAINER PRINCIPAL DO INVENTÁRIO
    ========================================================================== */
 #secao-fios.secao-ferramenta {
-  height: 100%;
-  max-height: 100vh;
+  flex: 1;
+  min-height: 0;
   overflow: hidden;
   flex-direction: column;
 }
 
 .conteiner-inventario-fios {
   flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
-  height: calc(100vh - var(--altura-cabecalho-min));
-  max-height: calc(100vh - var(--altura-cabecalho-min));
   overflow: hidden;
   padding: 18px 24px 20px 24px;
   box-sizing: border-box;
@@ -408,7 +407,6 @@
   border-radius: 20px;
   letter-spacing: 0.3px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px);
 }
 
 .status-em-estoque {
@@ -640,7 +638,6 @@
   width: 100vw;
   height: 100vh;
   background-color: rgba(1, 7, 54, 0.78);
-  backdrop-filter: blur(5px);
   z-index: var(--z-index-modal);
   display: flex;
   align-items: center;

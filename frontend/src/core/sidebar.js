@@ -47,6 +47,12 @@ const BarraLateral = (() => {
       if (secaoContador) secaoContador.style.display = "flex";
       if (conteinerContador) conteinerContador.style.display = "flex";
     }
+
+    window.dispatchEvent(
+      new CustomEvent("ponto-trama:ferramenta-alterada", {
+        detail: { ferramenta }
+      })
+    );
   }
 
   // ==========================================================================

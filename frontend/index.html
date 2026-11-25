@@ -9,31 +9,35 @@
     <link rel="stylesheet" href="styles/layout/barra-lateral.css" />
     <link rel="stylesheet" href="styles/modules/home.css" />
     <link rel="stylesheet" href="styles/modules/contador-carreiras.css" />
+    <link rel="stylesheet" href="styles/modules/leitor-receitas.css" />
     <link rel="stylesheet" href="styles/modules/calculadora-precificacao.css" />
+    <link rel="stylesheet" href="styles/modules/gerenciador-projetos.css" />
     <link rel="stylesheet" href="styles/modules/inventario-fios.css" />
     <link rel="stylesheet" href="styles/modules/inventario-agulhas.css" />
     <link rel="stylesheet" href="styles/modules/calculadora-amostra.css" />
     <link rel="stylesheet" href="styles/modules/banco-amostras.css" />
+    <link rel="stylesheet" href="styles/modules/configuracoes.css" />
 
     <!-- Core da aplicação -->
-    <script src="src/core/database.js" defer></script>
+    <script src="src/core/database.js?v=4" defer></script>
+    <script src="src/core/projeto-contexto.js?v=4" defer></script>
     <script src="src/core/animations.js" defer></script>
-    <script src="src/core/sidebar.js" defer></script>
+    <script src="src/core/sidebar.js?v=4" defer></script>
 
     <!-- Módulos de ferramentas -->
-    <script src="src/modules/home.js" defer></script>
-    <script src="src/modules/contador-carreiras.js" defer></script>
-    <script src="src/modules/calculadora-precificacao.js" defer></script>
-    <script src="src/modules/leitor-receitas.js" defer></script>
-    <script src="src/modules/gerenciador-projetos.js" defer></script>
+    <script src="src/modules/home.js?v=4" defer></script>
+    <script src="src/modules/contador-carreiras.js?v=4" defer></script>
+    <script src="src/modules/calculadora-precificacao.js?v=4" defer></script>
+    <script src="src/modules/leitor-receitas.js?v=4" defer></script>
+    <script src="src/modules/gerenciador-projetos.js?v=4" defer></script>
     <script src="src/modules/inventario-fios.js" defer></script>
     <script src="src/modules/inventario-agulhas.js" defer></script>
     <script src="src/modules/calculadora-amostra.js" defer></script>
     <script src="src/modules/banco-amostras.js" defer></script>
-    <script src="src/modules/configuracoes.js" defer></script>
+    <script src="src/modules/configuracoes.js?v=4" defer></script>
 
     <!-- Bootstrap principal -->
-    <script src="src/main.js" defer></script>
+    <script src="src/main.js?v=4" defer></script>
   </head>
   <body>
     <input type="checkbox" id="opcao-menu" />
@@ -43,10 +47,10 @@
         <img class="logoImagem" src="assets/images/logo.png" alt="logomarca" width="60" height="60" decoding="async" />
         <p class="nomeLogo">Ñanduobyeté</p>
       </div>
+      <div class="icon">
+        <label for="opcao-menu" class="botaoNavegar" aria-label="Alternar menu lateral" title="Alternar menu lateral">☰</label>
+      </div>
       <div class="listaNavegacao">
-        <div class="icon">
-          <label for="opcao-menu" class="botaoNavegar" aria-label="Alternar menu lateral" title="Alternar menu lateral">☰</label>
-        </div>
         <button
           type="button"
           class="botaoFerramenta ativo"
@@ -287,6 +291,26 @@
       </div>
     </header>
     <main id="conteudo-principal">
+      <!-- BARRA GLOBAL DE PROJETO ATIVO ("NA BANCADA") -->
+      <div id="barra-projeto-ativo-global" class="barra-projeto-ativo" style="display: none" role="status" aria-live="polite">
+        <div class="barra-ativo-info">
+          <span class="barra-ativo-icone" aria-hidden="true">📂</span>
+          <span class="barra-ativo-rotulo">Na bancada:</span>
+          <span class="barra-ativo-status-dot" id="barra-ativo-status-dot"></span>
+          <strong class="barra-ativo-nome" id="barra-ativo-nome">Projeto</strong>
+          <span class="barra-ativo-progresso" id="barra-ativo-progresso">0%</span>
+          <span class="barra-ativo-sync" id="barra-ativo-sync">✓ Salvo na pasta</span>
+        </div>
+        <div class="barra-ativo-acoes">
+          <button type="button" class="btn-barra-ativo" id="btn-barra-abrir-workspace" title="Abrir workspace completo do projeto">
+            Abrir Pasta
+          </button>
+          <button type="button" class="btn-barra-ativo secundario" id="btn-barra-guardar-projeto" title="Guardar pasta e desativar vínculo automático">
+            Guardar
+          </button>
+        </div>
+      </div>
+
       <!-- SEÇÃO INICIAL (HOME SIMPLES) -->
       <div id="secao-home" class="secao-ferramenta">
         <div class="cabecalho">
@@ -482,15 +506,87 @@
             <div class="cabecalho-info">
               <h1 class="titulo-ferramenta">Receitas e Anotações</h1>
               <span class="subtitulo-ferramenta"
-                >Importe receitas em PDF ou fotos, use marcador de linha e faça
-                anotações</span
+                >Importe receitas em PDF ou fotos, marque a linha onde parou e salve direto no projeto</span
               >
+            </div>
+            <div class="cabecalho-acoes-receitas">
+              <div class="switch-modo-receita" role="tablist" aria-label="Modo da receita">
+                <button type="button" class="btn-modo-receita ativo" data-modo-receita="texto" role="tab" aria-selected="true">
+                  📝 Texto &amp; Passos
+                </button>
+                <button type="button" class="btn-modo-receita" data-modo-receita="arquivo" role="tab" aria-selected="false">
+                  📄 PDF / Foto
+                </button>
+              </div>
             </div>
           </div>
         </div>
-        <div class="conteiner-ferramenta" id="conteiner-receitas">
-          <div class="placeholder-ferramenta">
-            <p>Espaço reservado para o Leitor e Anotador de Receitas.</p>
+        <div class="conteiner-ferramenta conteiner-receitas" id="conteiner-receitas">
+          <!-- Modo Texto + Marcador de Linha Atual -->
+          <div class="painel-receita-texto" id="painel-receita-texto">
+            <div class="coluna-editor-receita">
+              <div class="topo-card-receita">
+                <div>
+                  <h2 class="titulo-card-receita">Anotações e Passo a Passo</h2>
+                  <span class="sub-card-receita">Escreva uma carreira ou instrução por linha para acompanhar com o marcador</span>
+                </div>
+                <button type="button" class="btn-receita-suave" id="btn-receita-limpar-texto" title="Limpar texto da receita">
+                  Limpar
+                </button>
+              </div>
+              <textarea
+                id="input-receita-texto-global"
+                class="textarea-receita-global"
+                placeholder="Ex:&#10;Carr 1: 6 pb no anel mágico (6)&#10;Carr 2: 6 aum (12)&#10;Carr 3: (1 pb, 1 aum) x6 (18)&#10;Carr 4-8: 18 pb..."
+                aria-label="Texto da receita e anotações"
+              ></textarea>
+            </div>
+
+            <div class="coluna-leitor-linhas">
+              <div class="topo-card-receita">
+                <div>
+                  <h2 class="titulo-card-receita">Onde Parei (Marcador de Linha)</h2>
+                  <span class="sub-card-receita" id="info-linha-atual-global">Clique em qualquer linha para marcar seu progresso</span>
+                </div>
+                <div class="controles-linha-receita">
+                  <button type="button" class="btn-receita-suave" id="btn-receita-linha-ant" title="Linha anterior">↑</button>
+                  <button type="button" class="btn-receita-primario" id="btn-receita-linha-prox" title="Avançar para a próxima linha">Próxima ↓</button>
+                </div>
+              </div>
+              <div class="lista-linhas-interativas" id="lista-linhas-receita-global">
+                <div class="vazio-linhas-receita">Digite sua receita ao lado para ativar o marcador interativo de linha.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Modo Arquivo (PDF / Imagem + Régua Marcadora) -->
+          <div class="painel-receita-arquivo" id="painel-receita-arquivo" style="display: none">
+            <div class="barra-arquivo-receita">
+              <label class="btn-receita-primario" for="input-receita-arquivo-global">
+                <span>📤 Carregar PDF ou Foto</span>
+                <input type="file" id="input-receita-arquivo-global" accept="image/*,.pdf,application/pdf" style="display: none" />
+              </label>
+              <span class="nome-arquivo-receita" id="nome-arquivo-receita-global">Nenhum arquivo carregado</span>
+              <div class="controle-regua-receita" id="controle-regua-global" style="display: none">
+                <label for="slider-regua-receita-global">Régua de leitura:</label>
+                <input type="range" id="slider-regua-receita-global" min="4" max="94" value="18" />
+                <button type="button" class="btn-receita-suave" id="btn-remover-arquivo-receita-global">Remover</button>
+              </div>
+            </div>
+            <div class="area-viewer-receita" id="area-viewer-receita-global">
+              <div class="vazio-viewer-receita" id="vazio-viewer-receita-global">
+                <span class="icone-vazio-rec">📖</span>
+                <strong>Importe o PDF ou foto da sua receita</strong>
+                <p>Use a régua destacada para nunca perder a linha onde parou.</p>
+              </div>
+              <div class="palco-arquivo-receita" id="palco-arquivo-receita-global" style="display: none">
+                <img id="img-receita-global" class="img-receita-viewer" alt="Receita importada" style="display: none" />
+                <iframe id="pdf-receita-global" class="pdf-receita-viewer" title="Visualizador de PDF da receita" style="display: none"></iframe>
+                <div class="regua-marcadora-receita" id="regua-marcadora-global" style="top: 18%">
+                  <span class="etiqueta-regua">📍 Onde parei</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -872,7 +968,7 @@
       </div>
 
       <!-- ================================================================= -->
-      <!-- 4. GERENCIADOR DE PROJETOS -->
+      <!-- 4. GERENCIADOR DE PROJETOS (ESTILO PASTA / FICHÁRIO + WORKSPACE)  -->
       <!-- ================================================================= -->
       <div id="secao-projetos" class="secao-ferramenta" style="display: none">
         <div class="cabecalho">
@@ -880,16 +976,728 @@
             <div class="cabecalho-info">
               <h1 class="titulo-ferramenta">Gerenciador de Projetos</h1>
               <span class="subtitulo-ferramenta"
-                >Cadastre clientes, datas de entrega e acompanhe suas
-                encomendas</span
+                >Pastas completas ligadas ao contador, receitas, materiais, amostra e precificação</span
               >
+            </div>
+            <div class="cabecalho-acoes-projetos">
+              <button type="button" class="btn-novo-projeto-primario" id="btn-novo-projeto-header" title="Criar novo projeto">
+                <span class="icone-mais">+</span>
+                <span>Novo Projeto</span>
+              </button>
             </div>
           </div>
         </div>
-        <div class="conteiner-ferramenta" id="conteiner-projetos">
-          <div class="placeholder-ferramenta">
-            <p>Espaço reservado para o Gerenciador de Projetos.</p>
+
+        <div class="conteiner-ferramenta conteiner-projetos" id="conteiner-projetos">
+          <!-- =============================================================== -->
+          <!-- VISÃO 1: DASHBOARD DE PASTAS / FICHÁRIOS                        -->
+          <!-- =============================================================== -->
+          <div class="projetos-visao-dashboard" id="projetos-visao-dashboard">
+            <!-- Barra de Busca, Filtros e Chips Rápidos -->
+            <section class="barra-controle-projetos" aria-label="Busca e filtros de projetos">
+              <div class="linha-topo-filtros-proj">
+                <div class="campo-busca-proj">
+                  <svg class="icone-busca-proj" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                  </svg>
+                  <input
+                    type="search"
+                    id="busca-projetos"
+                    class="input-busca-proj"
+                    placeholder="Buscar por projeto, fio, cliente ou agulha..."
+                    aria-label="Buscar projetos"
+                  />
+                </div>
+
+                <div class="seletores-filtro-proj">
+                  <select id="filtro-categoria-projetos" class="select-filtro-proj" aria-label="Filtrar por categoria">
+                    <option value="">Todas as categorias</option>
+                    <option value="amigurumi">🧸 Amigurumi</option>
+                    <option value="vestuario">🧶 Vestuário</option>
+                    <option value="decoracao">🏡 Decoração</option>
+                    <option value="acessorios">👜 Acessórios</option>
+                  </select>
+
+                  <select id="filtro-fio-projetos" class="select-filtro-proj" aria-label="Filtrar por fio utilizado">
+                    <option value="">Todos os fios</option>
+                  </select>
+
+                  <button type="button" class="btn-limpar-filtros-proj" id="btn-limpar-filtros-projetos" style="display: none">
+                    Limpar
+                  </button>
+                </div>
+              </div>
+
+              <!-- Chips rápidos de Status -->
+              <div class="chips-status-projetos" id="chips-status-projetos" role="group" aria-label="Filtrar por status">
+                <button type="button" class="chip-status-proj ativo" data-status="todos">
+                  <span>Todos</span>
+                  <span class="badge-cont-chip" data-cont="todos">0</span>
+                </button>
+                <button type="button" class="chip-status-proj" data-status="em_andamento">
+                  <span class="dot-status dot-andamento"></span>
+                  <span>Em Andamento</span>
+                  <span class="badge-cont-chip" data-cont="em_andamento">0</span>
+                </button>
+                <button type="button" class="chip-status-proj" data-status="na_fila">
+                  <span class="dot-status dot-fila"></span>
+                  <span>Na Fila</span>
+                  <span class="badge-cont-chip" data-cont="na_fila">0</span>
+                </button>
+                <button type="button" class="chip-status-proj" data-status="pausado">
+                  <span class="dot-status dot-pausado"></span>
+                  <span>Pausado</span>
+                  <span class="badge-cont-chip" data-cont="pausado">0</span>
+                </button>
+                <button type="button" class="chip-status-proj" data-status="concluido">
+                  <span class="dot-status dot-concluido"></span>
+                  <span>Concluídos</span>
+                  <span class="badge-cont-chip" data-cont="concluido">0</span>
+                </button>
+                <button type="button" class="chip-status-proj" data-status="arquivados">
+                  <span>📦 Arquivados</span>
+                  <span class="badge-cont-chip" data-cont="arquivados">0</span>
+                </button>
+              </div>
+            </section>
+
+            <!-- Área da Grade de Pastas -->
+            <div class="area-grade-projetos" id="area-grade-projetos">
+              <!-- Skeleton Loading -->
+              <div class="grade-projetos skeleton-projetos" id="projetos-skeleton" style="display: none" aria-hidden="true">
+                <div class="card-skeleton-pasta"></div>
+                <div class="card-skeleton-pasta"></div>
+                <div class="card-skeleton-pasta"></div>
+              </div>
+
+              <!-- Grid Responsivo de Cards em Estilo Pasta / Fichário -->
+              <div class="grade-projetos" id="grade-projetos"></div>
+
+              <!-- Empty State Ilustrado -->
+              <div class="estado-vazio-projetos" id="estado-vazio-projetos" style="display: none">
+                <div class="ilustracao-vazio-pasta" aria-hidden="true">
+                  <svg viewBox="0 0 120 92" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 24C12 18.5 16.5 14 22 14H46L54 24H98C103.5 24 108 28.5 108 34V74C108 79.5 103.5 84 98 84H22C16.5 84 12 79.5 12 74V24Z" fill="rgba(34,57,111,0.55)" stroke="rgba(252,241,208,0.45)" stroke-width="2.5"/>
+                    <rect x="28" y="20" width="64" height="22" rx="4" fill="rgba(252,241,208,0.16)" stroke="rgba(252,241,208,0.35)" stroke-width="1.5"/>
+                    <circle cx="60" cy="54" r="14" stroke="#fcf1d0" stroke-width="2.2"/>
+                    <path d="M51 51C55 48 63 48 69 52" stroke="#fcf1d0" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M50 58C56 61 64 61 70 57" stroke="#fcf1d0" stroke-width="2" stroke-linecap="round"/>
+                  </svg>
+                </div>
+                <h3 class="titulo-vazio-proj" id="titulo-vazio-proj">Sua estante de projetos está vazia</h3>
+                <p class="texto-vazio-proj" id="texto-vazio-proj">
+                  Crie seu primeiro fichário de crochê ou tricô. Todas as ferramentas do Ponto &amp; Trama se conectam à pasta e salvam automaticamente!
+                </p>
+                <button type="button" class="btn-novo-projeto-primario" id="btn-vazio-novo-projeto">
+                  <span class="icone-mais">+</span>
+                  <span>Criar Primeiro Projeto</span>
+                </button>
+              </div>
+            </div>
           </div>
+
+          <!-- =============================================================== -->
+          <!-- VISÃO 2: WORKSPACE DO PROJETO (2 COLUNAS DESKTOP / ABAS MOBILE) -->
+          <!-- =============================================================== -->
+          <div class="projetos-visao-workspace" id="projetos-visao-workspace" style="display: none">
+            <!-- Topo do Workspace -->
+            <header class="workspace-topo">
+              <div class="workspace-topo-esq">
+                <button type="button" class="btn-voltar-pastas" id="btn-ws-voltar" title="Voltar para todas as pastas">
+                  <span>← Pastas</span>
+                </button>
+                <div class="workspace-titulos">
+                  <div class="workspace-linha-badges">
+                    <span class="ws-badge-categoria" id="ws-categoria-badge">🧸 Amigurumi</span>
+                    <span class="ws-badge-finalizado" id="ws-badge-finalizado" style="display: none">🎉 Peça Finalizada!</span>
+                    <span class="ws-badge-datas" id="ws-datas-resumo"></span>
+                  </div>
+                  <h2 class="workspace-nome" id="ws-nome-projeto">Nome do Projeto</h2>
+                </div>
+              </div>
+
+              <div class="workspace-topo-dir">
+                <!-- Dropdown de Status com Bolinhas Coloridas -->
+                <div class="dropdown-status-ws" id="ws-dropdown-status">
+                  <button type="button" class="btn-status-ws" id="btn-ws-status-toggle" aria-haspopup="listbox" aria-expanded="false">
+                    <span class="dot-status" id="ws-status-dot"></span>
+                    <span id="ws-status-texto">Em Andamento</span>
+                    <span class="seta-status">▾</span>
+                  </button>
+                  <div class="menu-status-ws" id="ws-menu-status" role="listbox" style="display: none">
+                    <button type="button" class="opcao-status-ws" data-status="na_fila" role="option">
+                      <span class="dot-status dot-fila"></span><span>Na Fila (Planejado)</span>
+                    </button>
+                    <button type="button" class="opcao-status-ws" data-status="em_andamento" role="option">
+                      <span class="dot-status dot-andamento"></span><span>Em Andamento</span>
+                    </button>
+                    <button type="button" class="opcao-status-ws" data-status="pausado" role="option">
+                      <span class="dot-status dot-pausado"></span><span>Pausado</span>
+                    </button>
+                    <button type="button" class="opcao-status-ws" data-status="concluido" role="option">
+                      <span class="dot-status dot-concluido"></span><span>Concluído</span>
+                    </button>
+                  </div>
+                </div>
+
+                <button type="button" class="btn-retirar-ws" id="btn-ws-retirar" title="Colocar os arquivos deste projeto nas ferramentas">
+                  <span aria-hidden="true">📤</span>
+                  <span>Retirar</span>
+                </button>
+
+                <button type="button" class="btn-editar-ws" id="btn-ws-editar" title="Editar dados da pasta">
+                  ✏️ Editar
+                </button>
+              </div>
+            </header>
+
+            <!-- Barra de Progresso Geral do Workspace -->
+            <div class="workspace-progresso-bar">
+              <div class="ws-progresso-info">
+                <span class="ws-progresso-label">Progresso da peça</span>
+                <strong class="ws-progresso-pct" id="ws-progresso-pct">0%</strong>
+              </div>
+              <div class="trilha-progresso-ws">
+                <div class="preenchimento-progresso-ws" id="ws-progresso-fill" style="width: 0%"></div>
+              </div>
+            </div>
+
+            <!-- Abas Exclusivas do Mobile -->
+            <div class="workspace-abas-mobile" id="ws-abas-mobile" role="tablist">
+              <button type="button" class="ws-aba-mob ativa" data-aba-ws="execucao" role="tab" aria-selected="true">
+                ⚡ Execução (Contador &amp; Receita)
+              </button>
+              <button type="button" class="ws-aba-mob" data-aba-ws="metadados" role="tab" aria-selected="false">
+                📋 Etapas, Materiais &amp; Fotos
+              </button>
+            </div>
+
+            <!-- Corpo em 2 Colunas (Desktop) / Abas (Mobile) -->
+            <div class="workspace-grid" id="ws-grid">
+              <!-- COLUNA ESQUERDA: FOCO NA EXECUÇÃO -->
+              <div class="ws-coluna ws-coluna-execucao ativa-mobile" id="ws-col-execucao">
+                <!-- Bloco 1: Contadores Integrados (RF07) -->
+                <section class="ws-card ws-card-contadores">
+                  <div class="ws-card-cabecalho">
+                    <div>
+                      <h3 class="ws-card-titulo">🔢 Contadores Integrados</h3>
+                      <span class="ws-card-dica">Atalhos: <kbd>Espaço</kbd> ou <kbd>↑</kbd> para +1 • <kbd>↓</kbd> para −1</span>
+                    </div>
+                    <div class="ws-card-acoes">
+                      <button type="button" class="btn-ws-chip" id="btn-ws-add-contador">+ Contador</button>
+                      <button type="button" class="btn-ws-link" id="btn-ws-ir-contadores" title="Abrir na aba Contador de Carreiras">Abrir ferramenta ↗</button>
+                    </div>
+                  </div>
+
+                  <!-- Abas dos múltiplos contadores do projeto -->
+                  <div class="ws-tabs-contadores" id="ws-tabs-contadores"></div>
+
+                  <!-- Painel grande e ergonômico do contador selecionado -->
+                  <div class="ws-contador-principal" id="ws-contador-principal">
+                    <div class="ws-contador-nome-row">
+                      <input type="text" id="ws-contador-nome" class="ws-input-inline" placeholder="Nome do contador (ex.: Corpo, Braço...)" aria-label="Nome do contador ativo" />
+                      <button type="button" class="btn-ws-icone-perigo" id="btn-ws-remover-contador" title="Remover este contador" style="display: none">🗑️</button>
+                    </div>
+
+                    <div class="ws-contador-controles">
+                      <button type="button" class="btn-ws-contador menos" id="btn-ws-cont-menos" aria-label="Diminuir 1 carreira">−1</button>
+                      <div class="ws-contador-display">
+                        <span class="ws-contador-numero" id="ws-contador-numero">0</span>
+                        <span class="ws-contador-unidade">carreiras / pontos</span>
+                      </div>
+                      <button type="button" class="btn-ws-contador mais" id="btn-ws-cont-mais" aria-label="Adicionar 1 carreira">+1</button>
+                    </div>
+
+                    <div class="ws-contador-rodape">
+                      <label class="ws-mini-campo">
+                        <span>Pts/carr:</span>
+                        <input type="number" id="ws-contador-pts-carr" min="0" value="0" />
+                      </label>
+                      <label class="ws-mini-campo">
+                        <span>Meta:</span>
+                        <input type="number" id="ws-contador-meta" min="0" placeholder="0" />
+                      </label>
+                      <span class="ws-contador-total-pts" id="ws-contador-total-pts">0 pts</span>
+                      <button type="button" class="btn-ws-chip" id="btn-ws-cont-zerar">Zerar</button>
+                    </div>
+                  </div>
+                </section>
+
+                <!-- Bloco 2: Cronômetro de Trabalho (RF04) -->
+                <section class="ws-card ws-card-cronometro">
+                  <div class="ws-card-cabecalho">
+                    <div>
+                      <h3 class="ws-card-titulo">⏱️ Cronômetro de Trabalho</h3>
+                      <span class="ws-card-dica">Registra o tempo real para usar na Precificação</span>
+                    </div>
+                    <button type="button" class="btn-ws-link" id="btn-ws-tempo-precificacao" title="Enviar tempo para a Calculadora de Precificação">
+                      Usar na Precificação ↗
+                    </button>
+                  </div>
+
+                  <div class="ws-cronometro-corpo">
+                    <div class="ws-cronometro-visor" id="ws-cronometro-visor">00:00:00</div>
+                    <div class="ws-cronometro-botoes">
+                      <button type="button" class="btn-ws-play" id="btn-ws-cronometro-toggle" aria-pressed="false">
+                        <span class="icone-play" id="ws-crono-icone">▶</span>
+                        <span id="ws-crono-texto">Iniciar</span>
+                      </button>
+                      <button type="button" class="btn-ws-chip" id="btn-ws-crono-mais15" title="Somar 15 minutos">+15m</button>
+                      <button type="button" class="btn-ws-chip" id="btn-ws-crono-zerar" title="Zerar cronômetro">Zerar</button>
+                    </div>
+                  </div>
+                </section>
+
+                <!-- Bloco 3: Leitor e Anotações da Receita (RF06) -->
+                <section class="ws-card ws-card-receita">
+                  <div class="ws-card-cabecalho">
+                    <div>
+                      <h3 class="ws-card-titulo">📖 Receita &amp; Anotações</h3>
+                      <span class="ws-card-dica" id="ws-receita-status-linha">Clique em uma linha para marcar onde parou</span>
+                    </div>
+                    <div class="ws-card-acoes">
+                      <div class="ws-switch-mini" role="tablist">
+                        <button type="button" class="btn-ws-switch ativo" data-ws-rec-modo="texto">Texto</button>
+                        <button type="button" class="btn-ws-switch" data-ws-rec-modo="arquivo">PDF/Foto</button>
+                      </div>
+                      <button type="button" class="btn-ws-link" id="btn-ws-ir-receitas">Tela cheia ↗</button>
+                    </div>
+                  </div>
+
+                  <!-- Sub-painel Texto -->
+                  <div class="ws-receita-texto-wrap" id="ws-receita-texto-wrap">
+                    <div class="ws-receita-barra-marcador">
+                      <button type="button" class="btn-ws-chip" id="btn-ws-rec-editar-toggle">✏️ Editar texto</button>
+                      <div class="ws-receita-nav-linhas">
+                        <button type="button" class="btn-ws-chip" id="btn-ws-rec-linha-ant" title="Linha anterior">↑</button>
+                        <button type="button" class="btn-ws-chip destaque" id="btn-ws-rec-linha-prox" title="Próxima linha">Próxima linha ↓</button>
+                      </div>
+                    </div>
+                    <textarea
+                      id="ws-receita-textarea"
+                      class="ws-receita-textarea"
+                      rows="6"
+                      placeholder="Cole ou escreva a receita aqui (uma carreira/etapa por linha)..."
+                      style="display: none"
+                    ></textarea>
+                    <div class="ws-receita-linhas" id="ws-receita-linhas"></div>
+                  </div>
+
+                  <!-- Sub-painel PDF / Foto -->
+                  <div class="ws-receita-arquivo-wrap" id="ws-receita-arquivo-wrap" style="display: none">
+                    <div class="ws-receita-arquivo-barra">
+                      <label class="btn-ws-chip destaque" for="ws-receita-arquivo-input">
+                        <span>📤 Subir PDF ou Foto</span>
+                        <input type="file" id="ws-receita-arquivo-input" accept="image/*,.pdf,application/pdf" style="display: none" />
+                      </label>
+                      <span class="ws-arquivo-nome" id="ws-receita-arquivo-nome">Nenhum arquivo</span>
+                      <button type="button" class="btn-ws-chip" id="btn-ws-rec-rem-arquivo" style="display: none">Remover</button>
+                    </div>
+                    <div class="ws-regua-slider-wrap" id="ws-regua-slider-wrap" style="display: none">
+                      <label for="ws-regua-slider">Régua:</label>
+                      <input type="range" id="ws-regua-slider" min="4" max="94" value="18" />
+                    </div>
+                    <div class="ws-receita-viewer" id="ws-receita-viewer">
+                      <p class="ws-vazio-mini">Nenhum PDF ou imagem anexado a esta receita.</p>
+                    </div>
+                  </div>
+                </section>
+              </div>
+
+              <!-- COLUNA DIREITA: METADADOS, ETAPAS, MATERIAIS E GALERIA -->
+              <div class="ws-coluna ws-coluna-metadados" id="ws-col-metadados">
+                <!-- Bloco 4: Checklist de Etapas e Progresso (RF03) -->
+                <section class="ws-card ws-card-etapas">
+                  <div class="ws-card-cabecalho">
+                    <div>
+                      <h3 class="ws-card-titulo">✅ Checklist de Etapas</h3>
+                      <span class="ws-card-dica" id="ws-etapas-resumo">0 de 0 partes concluídas</span>
+                    </div>
+                    <div class="ws-switch-mini" role="group" aria-label="Modo de progresso">
+                      <button type="button" class="btn-ws-switch ativo" data-ws-prog-modo="auto">Auto</button>
+                      <button type="button" class="btn-ws-switch" data-ws-prog-modo="manual">Manual %</button>
+                    </div>
+                  </div>
+
+                  <div class="ws-progresso-manual-box" id="ws-progresso-manual-box" style="display: none">
+                    <label for="ws-slider-progresso-manual">Progresso manual: <strong id="ws-valor-prog-manual">0%</strong></label>
+                    <input type="range" id="ws-slider-progresso-manual" min="0" max="100" step="5" value="0" />
+                  </div>
+
+                  <ul class="ws-lista-etapas" id="ws-lista-etapas"></ul>
+
+                  <form class="ws-form-nova-etapa" id="ws-form-nova-etapa">
+                    <input type="text" id="ws-input-nova-etapa" class="ws-input-inline" placeholder="Adicionar etapa (ex.: Braços, Acabamento...)" />
+                    <button type="submit" class="btn-ws-chip destaque">+ Adicionar</button>
+                  </form>
+                </section>
+
+                <!-- Bloco 5: Ficha Técnica & Ligações com Ferramentas (RF05) -->
+                <section class="ws-card ws-card-materiais">
+                  <div class="ws-card-cabecalho">
+                    <div>
+                      <h3 class="ws-card-titulo">🧶 Ficha Técnica &amp; Ferramentas</h3>
+                      <span class="ws-card-dica">Fios, lotes, agulha, amostra e orçamento da pasta</span>
+                    </div>
+                  </div>
+
+                  <div class="ws-bloco-agulha">
+                    <div class="ws-subtitulo-secao">AGULHA PRINCIPAL</div>
+                    <div class="ws-agulha-linha">
+                      <span class="ws-agulha-valor" id="ws-agulha-resumo">Não informada</span>
+                      <button type="button" class="btn-ws-link" id="btn-ws-ir-agulhas">Ver agulhas ↗</button>
+                    </div>
+                  </div>
+
+                  <div class="ws-bloco-fios">
+                    <div class="ws-subtitulo-linha">
+                      <span class="ws-subtitulo-secao">FIOS E LOTES UTILIZADOS</span>
+                      <button type="button" class="btn-ws-chip" id="btn-ws-toggle-add-fio">+ Fio</button>
+                    </div>
+                    <div class="ws-lista-fios" id="ws-lista-fios"></div>
+
+                    <!-- Mini-form para vincular fio do estoque ou manual -->
+                    <div class="ws-add-fio-box" id="ws-add-fio-box" style="display: none">
+                      <select id="ws-select-fio-estoque" class="ws-select-inline">
+                        <option value="">Selecionar do Inventário de Fios...</option>
+                      </select>
+                      <div class="ws-add-fio-grid">
+                        <input type="text" id="ws-fio-nome" class="ws-input-inline" placeholder="Fio / Marca" />
+                        <input type="text" id="ws-fio-cor" class="ws-input-inline" placeholder="Cor" />
+                        <input type="text" id="ws-fio-lote" class="ws-input-inline" placeholder="Lote" />
+                        <input type="number" id="ws-fio-qtd" class="ws-input-inline" placeholder="Novelos" min="0.1" step="0.5" value="1" />
+                      </div>
+                      <div class="ws-add-fio-acoes">
+                        <button type="button" class="btn-ws-chip" id="btn-ws-cancelar-fio">Cancelar</button>
+                        <button type="button" class="btn-ws-chip destaque" id="btn-ws-confirmar-fio">Salvar Fio</button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Cards resumo ligados à Calculadora de Amostra e Precificação -->
+                  <div class="ws-atalhos-integrados">
+                    <button type="button" class="ws-atalho-card" id="btn-ws-ir-amostra">
+                      <span class="ws-atalho-icone">📐</span>
+                      <div class="ws-atalho-info">
+                        <strong>Amostra / Tensão</strong>
+                        <span id="ws-resumo-amostra">Abrir na Calculadora de Amostra</span>
+                      </div>
+                    </button>
+                    <button type="button" class="ws-atalho-card" id="btn-ws-ir-precificacao">
+                      <span class="ws-atalho-icone">💰</span>
+                      <div class="ws-atalho-info">
+                        <strong>Precificação</strong>
+                        <span id="ws-resumo-precificacao">Calcular preço desta peça</span>
+                      </div>
+                    </button>
+                  </div>
+                </section>
+
+                <!-- Bloco 6: Galeria de Progresso (RF09) -->
+                <section class="ws-card ws-card-galeria">
+                  <div class="ws-card-cabecalho">
+                    <div>
+                      <h3 class="ws-card-titulo">📸 Galeria de Progresso</h3>
+                      <span class="ws-card-dica">Fotos intermediárias com data da evolução</span>
+                    </div>
+                    <label class="btn-ws-chip destaque" for="ws-galeria-input">
+                      <span>+ Foto</span>
+                      <input type="file" id="ws-galeria-input" accept="image/*" style="display: none" />
+                    </label>
+                  </div>
+
+                  <div class="ws-grade-galeria" id="ws-grade-galeria"></div>
+                </section>
+              </div>
+            </div>
+          </div>
+
+          <!-- =============================================================== -->
+          <!-- OVERLAY 1: ABERTURA DA PASTA / FICHÁRIO (ANIMAÇÃO + "RETIRAR")  -->
+          <!-- =============================================================== -->
+          <div class="overlay-pasta-aberta" id="modal-pasta-aberta" style="display: none">
+            <div class="palco-pasta-aberta" id="palco-pasta-aberta" role="dialog" aria-modal="true" aria-labelledby="pasta-aberta-titulo">
+              <!-- Telinha formada pelas fichas que saíram da pasta -->
+              <div class="telinha-dossie-pasta" id="telinha-dossie-pasta">
+                <header class="dossie-topo">
+                  <div class="dossie-capa-thumb" id="dossie-capa-thumb"></div>
+                  <div class="dossie-titulos">
+                    <div class="dossie-tags-topo">
+                      <span class="dossie-cat-pill" id="dossie-categoria">🧸 Amigurumi</span>
+                      <span class="dossie-status-pill" id="dossie-status">
+                        <span class="dot-status" id="dossie-status-dot"></span>
+                        <span id="dossie-status-texto">Em Andamento</span>
+                      </span>
+                      <span class="dossie-ativo-pill" id="dossie-ativo-pill" style="display: none">📂 Na bancada</span>
+                    </div>
+                    <h2 class="dossie-titulo" id="pasta-aberta-titulo">Nome do Projeto</h2>
+                    <div class="dossie-subinfo" id="dossie-subinfo"></div>
+                  </div>
+                  <button type="button" class="btn-fechar-dossie" id="btn-fechar-pasta-aberta" aria-label="Fechar pasta">&times;</button>
+                </header>
+
+                <!-- Barra de progresso na telinha -->
+                <div class="dossie-progresso">
+                  <div class="dossie-progresso-trilha">
+                    <div class="dossie-progresso-fill" id="dossie-progresso-fill" style="width: 0%"></div>
+                  </div>
+                  <span class="dossie-progresso-pct" id="dossie-progresso-pct">0%</span>
+                </div>
+
+                <!-- Fichas / Arquivos retirados de dentro da pasta (saem com animação em leque) -->
+                <div class="dossie-fichas-grid" id="dossie-fichas-grid">
+                  <div class="ficha-arquivo ficha-contadores" style="--ordem-ficha: 0">
+                    <div class="ficha-aba">Contadores</div>
+                    <div class="ficha-conteudo" id="dossie-ficha-contadores">—</div>
+                  </div>
+                  <div class="ficha-arquivo ficha-receita" style="--ordem-ficha: 1">
+                    <div class="ficha-aba">Receita &amp; Notas</div>
+                    <div class="ficha-conteudo" id="dossie-ficha-receita">—</div>
+                  </div>
+                  <div class="ficha-arquivo ficha-materiais" style="--ordem-ficha: 2">
+                    <div class="ficha-aba">Fios &amp; Agulha</div>
+                    <div class="ficha-conteudo" id="dossie-ficha-materiais">—</div>
+                  </div>
+                  <div class="ficha-arquivo ficha-etapas" style="--ordem-ficha: 3">
+                    <div class="ficha-aba">Etapas</div>
+                    <div class="ficha-conteudo" id="dossie-ficha-etapas">—</div>
+                  </div>
+                  <div class="ficha-arquivo ficha-amostra" style="--ordem-ficha: 4">
+                    <div class="ficha-aba">Amostra</div>
+                    <div class="ficha-conteudo" id="dossie-ficha-amostra">—</div>
+                  </div>
+                  <div class="ficha-arquivo ficha-precificacao" style="--ordem-ficha: 5">
+                    <div class="ficha-aba">Tempo &amp; Preço</div>
+                    <div class="ficha-conteudo" id="dossie-ficha-precificacao">—</div>
+                  </div>
+                </div>
+
+                <!-- Rodapé com botão principal RETIRAR e Abrir Workspace -->
+                <footer class="dossie-rodape">
+                  <div class="dossie-rodape-esq">
+                    <button type="button" class="btn-dossie-secundario" id="btn-dossie-editar">✏️ Editar</button>
+                  </div>
+                  <div class="dossie-rodape-dir">
+                    <button type="button" class="btn-dossie-workspace" id="btn-dossie-abrir-workspace">
+                      <span>Abrir Workspace</span>
+                    </button>
+                    <button type="button" class="btn-dossie-retirar" id="btn-dossie-retirar" title="Coloca as informações para fora e distribui para cada ferramenta">
+                      <span class="icone-retirar" aria-hidden="true">📤</span>
+                      <span>Retirar</span>
+                    </button>
+                  </div>
+                </footer>
+              </div>
+
+              <!-- Base visual da pasta aberta (dá a sensação física dos arquivos saindo de dentro dela) -->
+              <div class="bolso-pasta-animada" aria-hidden="true">
+                <div class="bolso-pasta-aba" id="bolso-pasta-etiqueta">FICHÁRIO</div>
+                <div class="bolso-pasta-frente"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- =============================================================== -->
+          <!-- OVERLAY 2: DRAWER LATERAL CRIAR / EDITAR COM ACCORDIONS         -->
+          <!-- =============================================================== -->
+          <div class="drawer-overlay-proj" id="modal-form-projeto" style="display: none">
+            <aside class="drawer-form-proj" role="dialog" aria-modal="true" aria-labelledby="titulo-form-projeto">
+              <div class="drawer-proj-topo">
+                <div>
+                  <h2 class="drawer-proj-titulo" id="titulo-form-projeto">Novo Projeto</h2>
+                  <span class="drawer-proj-subtitulo">Todas as ferramentas serão ligadas a esta pasta automaticamente</span>
+                </div>
+                <button type="button" class="btn-fechar-drawer-proj" id="btn-fechar-form-projeto" aria-label="Fechar formulário">&times;</button>
+              </div>
+
+              <form id="form-projeto" class="form-projeto" novalidate>
+                <input type="hidden" id="proj-id" value="" />
+                <div class="aviso-erro-proj" id="aviso-erro-proj" style="display: none"></div>
+
+                <!-- ACCORDION 1: BÁSICO (OBRIGATÓRIO - ABERTO POR PADRÃO) -->
+                <details class="accordion-proj" open>
+                  <summary class="accordion-proj-header">
+                    <div class="accordion-titulo-grupo">
+                      <span class="accordion-num">1</span>
+                      <div>
+                        <strong>Informações Básicas</strong>
+                        <span>Nome, categoria, status e foto de capa (obrigatório)</span>
+                      </div>
+                    </div>
+                    <span class="accordion-seta" aria-hidden="true">▾</span>
+                  </summary>
+                  <div class="accordion-proj-corpo">
+                    <div class="campo-form-proj">
+                      <label for="proj-nome">Nome do Projeto <span class="obrigatorio">*</span></label>
+                      <input type="text" id="proj-nome" class="input-proj" placeholder="Ex.: Ursinho Amigurumi, Blusa Verão..." required />
+                    </div>
+
+                    <div class="linha-dupla-proj">
+                      <div class="campo-form-proj">
+                        <label for="proj-tecnica">Técnica</label>
+                        <select id="proj-tecnica" class="input-proj">
+                          <option value="croche">Crochê</option>
+                          <option value="trico">Tricô</option>
+                        </select>
+                      </div>
+
+                      <div class="campo-form-proj">
+                        <label for="proj-categoria">Categoria <span class="obrigatorio">*</span></label>
+                        <select id="proj-categoria" class="input-proj">
+                          <option value="amigurumi">🧸 Amigurumi</option>
+                          <option value="vestuario">🧶 Vestuário</option>
+                          <option value="decoracao">🏡 Decoração</option>
+                          <option value="acessorios">👜 Acessórios</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div class="campo-form-proj">
+                      <label for="proj-status">Status Inicial</label>
+                      <select id="proj-status" class="input-proj">
+                        <option value="em_andamento">🟡 Em Andamento</option>
+                        <option value="na_fila">🔵 Na Fila (Planejado)</option>
+                        <option value="pausado">🟣 Pausado</option>
+                        <option value="concluido">🟢 Concluído</option>
+                      </select>
+                    </div>
+
+                    <div class="campo-form-proj">
+                      <label>Foto de Capa</label>
+                      <div class="upload-capa-proj" id="upload-capa-proj">
+                        <input type="file" id="proj-capa-input" accept="image/*" class="input-arquivo-oculto" />
+                        <div class="upload-capa-placeholder" id="upload-capa-placeholder">
+                          <span>📷 Clique ou arraste a foto de capa</span>
+                          <small>Opcional — se vazio, usamos uma capa ilustrada da pasta</small>
+                        </div>
+                        <div class="upload-capa-preview" id="upload-capa-preview" style="display: none">
+                          <img id="upload-capa-img" src="" alt="Capa do projeto" />
+                          <button type="button" class="btn-remover-capa" id="btn-remover-capa-proj" title="Remover foto">&times;</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </details>
+
+                <!-- ACCORDION 2: MATERIAIS E PRAZOS (OPCIONAL - RECOLHÍVEL) -->
+                <details class="accordion-proj" id="accordion-materiais-prazos">
+                  <summary class="accordion-proj-header">
+                    <div class="accordion-titulo-grupo">
+                      <span class="accordion-num">2</span>
+                      <div>
+                        <strong>Materiais, Etapas e Prazos</strong>
+                        <span>Datas, fios, agulha, amostra e checklist inicial (opcional)</span>
+                      </div>
+                    </div>
+                    <span class="accordion-seta" aria-hidden="true">▾</span>
+                  </summary>
+                  <div class="accordion-proj-corpo">
+                    <div class="linha-dupla-proj">
+                      <div class="campo-form-proj">
+                        <label for="proj-data-inicio">Data de Início</label>
+                        <input type="date" id="proj-data-inicio" class="input-proj" />
+                      </div>
+                      <div class="campo-form-proj">
+                        <label for="proj-prazo">Prazo Estimado</label>
+                        <input type="date" id="proj-prazo" class="input-proj" />
+                      </div>
+                    </div>
+
+                    <div class="campo-form-proj">
+                      <label for="proj-cliente">Cliente / Destinatário</label>
+                      <input type="text" id="proj-cliente" class="input-proj" placeholder="Opcional (ex.: Encomenda Maria, Uso próprio...)" />
+                    </div>
+
+                    <div class="linha-dupla-proj">
+                      <div class="campo-form-proj">
+                        <label for="proj-agulha-select">Agulha (do Inventário)</label>
+                        <select id="proj-agulha-select" class="input-proj">
+                          <option value="">Selecionar agulha cadastrada...</option>
+                        </select>
+                      </div>
+                      <div class="campo-form-proj">
+                        <label for="proj-agulha-mm">ou Tamanho (mm)</label>
+                        <input type="text" id="proj-agulha-mm" class="input-proj" placeholder="Ex.: 3.5mm" />
+                      </div>
+                    </div>
+
+                    <div class="campo-form-proj">
+                      <label for="proj-fio-principal-select">Fio Principal (do Inventário)</label>
+                      <select id="proj-fio-principal-select" class="input-proj">
+                        <option value="">Selecionar fio do estoque...</option>
+                      </select>
+                    </div>
+
+                    <div class="campo-form-proj">
+                      <label for="proj-amostra-select">Vincular Modelo do Banco de Amostras</label>
+                      <select id="proj-amostra-select" class="input-proj">
+                        <option value="">Nenhum modelo vinculado</option>
+                      </select>
+                    </div>
+
+                    <div class="campo-form-proj">
+                      <div class="label-etapas-form">
+                        <label for="proj-etapas-iniciais">Etapas Iniciais (uma por linha)</label>
+                        <button type="button" class="btn-sugerir-etapas" id="btn-sugerir-etapas-cat">✨ Sugerir por categoria</button>
+                      </div>
+                      <textarea
+                        id="proj-etapas-iniciais"
+                        class="input-proj textarea-proj"
+                        rows="3"
+                        placeholder="Ex.:&#10;Cabeça&#10;Corpo&#10;Braços e Pernas&#10;Acabamento"
+                      ></textarea>
+                    </div>
+
+                    <div class="campo-form-proj">
+                      <label for="proj-observacoes">Observações Gerais</label>
+                      <textarea id="proj-observacoes" class="input-proj textarea-proj" rows="2" placeholder="Notas de encomenda, ajustes de tamanho..."></textarea>
+                    </div>
+                  </div>
+                </details>
+
+                <div class="drawer-proj-rodape">
+                  <button type="button" class="btn-cancelar-proj" id="btn-cancelar-form-projeto">Cancelar</button>
+                  <button type="submit" class="btn-salvar-proj" id="btn-salvar-projeto">Salvar Pasta do Projeto</button>
+                </div>
+              </form>
+            </aside>
+          </div>
+
+          <!-- =============================================================== -->
+          <!-- OVERLAY 3: MODAL CONFIRMAÇÃO DE EXCLUSÃO                        -->
+          <!-- =============================================================== -->
+          <div class="modal-overlay-proj" id="modal-excluir-projeto" style="display: none">
+            <div class="modal-confirmar-proj" role="dialog" aria-modal="true" aria-labelledby="titulo-excluir-proj">
+              <div class="icone-confirmar-proj" aria-hidden="true">🗑️</div>
+              <h3 id="titulo-excluir-proj">Excluir pasta do projeto?</h3>
+              <p id="texto-excluir-proj">Esta ação apagará permanentemente este projeto, suas etapas, contadores e galeria.</p>
+              <div class="acoes-confirmar-proj">
+                <button type="button" class="btn-cancelar-proj" id="btn-cancelar-exclusao-proj">Cancelar</button>
+                <button type="button" class="btn-excluir-proj-confirmar" id="btn-confirmar-exclusao-proj">Sim, Excluir</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- =============================================================== -->
+          <!-- OVERLAY 4: LIGHTBOX DA GALERIA DE PROGRESSO                     -->
+          <!-- =============================================================== -->
+          <div class="modal-overlay-proj" id="modal-lightbox-galeria" style="display: none">
+            <div class="lightbox-proj-box" role="dialog" aria-modal="true" aria-label="Foto de progresso ampliada">
+              <button type="button" class="btn-fechar-lightbox" id="btn-fechar-lightbox-proj" aria-label="Fechar foto">&times;</button>
+              <img id="lightbox-proj-img" src="" alt="Progresso do projeto" />
+              <div class="lightbox-proj-meta">
+                <span id="lightbox-proj-data"></span>
+                <strong id="lightbox-proj-legenda"></strong>
+              </div>
+            </div>
+          </div>
+
+          <!-- Camada de Confetes Sutis (Celebração de Conclusão) -->
+          <div class="camada-confetes-proj" id="camada-confetes-projeto" aria-hidden="true"></div>
+
+          <!-- Toast de Feedback -->
+          <div class="toast-projetos" id="toast-projetos" role="status" aria-live="polite"></div>
         </div>
       </div>
 
@@ -2976,7 +3784,7 @@
       </div>
 
       <!-- ================================================================= -->
-      <!-- 9. CONFIGURAÇÕES -->
+      <!-- 9. CONFIGURAÇÕES                                                  -->
       <!-- ================================================================= -->
       <div
         id="secao-configuracoes"
@@ -2988,16 +3796,587 @@
             <div class="cabecalho-info">
               <h1 class="titulo-ferramenta">Configurações</h1>
               <span class="subtitulo-ferramenta"
-                >Preferências do aplicativo, temas e opções de
-                personalização</span
+                >Personalize aparência, padrões das ferramentas, som, backup e dados locais</span
               >
+            </div>
+            <div class="cabecalho-acoes-config">
+              <span class="badge-salvo-config" id="badge-salvo-config" role="status" aria-live="polite">
+                ✓ Salvo automaticamente
+              </span>
             </div>
           </div>
         </div>
-        <div class="conteiner-ferramenta" id="conteiner-configuracoes">
-          <div class="placeholder-ferramenta">
-            <p>Espaço reservado para as Configurações.</p>
+
+        <div class="conteiner-ferramenta conteiner-configuracoes" id="conteiner-configuracoes">
+          <div class="layout-configuracoes">
+            <!-- Coluna Esquerda: Busca + Navegação por Categoria -->
+            <aside class="nav-configuracoes" aria-label="Categorias de configurações">
+              <div class="campo-busca-config">
+                <svg class="icone-busca-cfg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input
+                  type="search"
+                  id="busca-configuracoes"
+                  class="input-busca-config"
+                  placeholder="Buscar configuração..."
+                  aria-label="Buscar configuração"
+                />
+              </div>
+
+              <nav class="lista-abas-config" id="lista-abas-config" role="tablist">
+                <button type="button" class="aba-config ativa" data-sec-cfg="todas" role="tab" aria-selected="true">
+                  <span>✨</span><span>Todas</span>
+                </button>
+                <button type="button" class="aba-config" data-sec-cfg="atelie" role="tab" aria-selected="false">
+                  <span>🏪</span><span>Ateliê e Perfil</span>
+                </button>
+                <button type="button" class="aba-config" data-sec-cfg="aparencia" role="tab" aria-selected="false">
+                  <span>🎨</span><span>Aparência e Leitura</span>
+                </button>
+                <button type="button" class="aba-config" data-sec-cfg="ferramentas" role="tab" aria-selected="false">
+                  <span>🧶</span><span>Ferramentas</span>
+                </button>
+                <button type="button" class="aba-config" data-sec-cfg="dados" role="tab" aria-selected="false">
+                  <span>💾</span><span>Dados e Backup</span>
+                </button>
+                <button type="button" class="aba-config" data-sec-cfg="perigo" role="tab" aria-selected="false">
+                  <span>⚠️</span><span>Redefinição</span>
+                </button>
+                <button type="button" class="aba-config" data-sec-cfg="sobre" role="tab" aria-selected="false">
+                  <span>ℹ️</span><span>Sobre e Atalhos</span>
+                </button>
+              </nav>
+            </aside>
+
+            <!-- Coluna Direita: Conteúdo Rolável -->
+            <div class="painel-configuracoes" id="painel-configuracoes">
+              <!-- SEÇÃO 1: ATELIÊ E PERFIL (RF01) -->
+              <section class="bloco-config" data-categoria-cfg="atelie">
+                <header class="bloco-config-topo">
+                  <h2>🏪 Ateliê e Perfil</h2>
+                  <p>Identidade usada nos orçamentos copiados e na personalização do aplicativo</p>
+                </header>
+
+                <div class="linha-config" data-busca="nome atelie artesao perfil assinatura">
+                  <div class="info-linha-config">
+                    <strong>Nome do Ateliê / Artesã(o)</strong>
+                    <span>Aparece no cabeçalho dos orçamentos copiados na Precificação</span>
+                  </div>
+                  <div class="controle-linha-config largo">
+                    <input type="text" id="cfg-nome-atelie" class="input-cfg" placeholder="Ex.: Ponto & Trama Ateliê" />
+                  </div>
+                </div>
+
+                <div class="linha-config" data-busca="assinatura orcamento rodape contato whatsapp instagram">
+                  <div class="info-linha-config">
+                    <strong>Assinatura de Orçamento</strong>
+                    <span>Mensagem curta adicionada ao final do orçamento (ex.: Instagram ou WhatsApp)</span>
+                  </div>
+                  <div class="controle-linha-config largo">
+                    <input type="text" id="cfg-assinatura-orcamento" class="input-cfg" placeholder="Ex.: Feito à mão com carinho • @meuatelie" />
+                  </div>
+                </div>
+
+                <div class="linha-config" data-busca="tecnica principal croche trico ambos">
+                  <div class="info-linha-config">
+                    <strong>Técnica Principal</strong>
+                    <span>Define a técnica sugerida por padrão nas calculadoras e amostras</span>
+                  </div>
+                  <div class="controle-linha-config">
+                    <div class="segmented-cfg" id="cfg-tecnica-principal" role="group" aria-label="Técnica principal">
+                      <button type="button" class="btn-seg-cfg ativo" data-valor="croche">Crochê</button>
+                      <button type="button" class="btn-seg-cfg" data-valor="trico">Tricô</button>
+                      <button type="button" class="btn-seg-cfg" data-valor="ambos">Ambos</button>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <!-- SEÇÃO 2: APARÊNCIA E LEITURA (RF02, RF03, RF04, RF05) -->
+              <section class="bloco-config" data-categoria-cfg="aparencia">
+                <header class="bloco-config-topo">
+                  <h2>🎨 Aparência e Leitura</h2>
+                  <p>Ajuste cores, conforto visual, animações e o menu lateral</p>
+                </header>
+
+                <div class="linha-config vertical" data-busca="tema cores escuro claro pergaminho alto contraste azul marinho">
+                  <div class="info-linha-config">
+                    <strong>Tema Visual</strong>
+                    <span>Troca a paleta de cores instantaneamente em todo o aplicativo</span>
+                  </div>
+                  <div class="grade-temas-cfg" id="cfg-grade-temas" role="radiogroup" aria-label="Tema visual">
+                    <button type="button" class="card-tema-cfg ativo" data-tema-val="classico" role="radio" aria-checked="true">
+                      <div class="preview-tema-mini tema-prev-classico">
+                        <span class="prev-bar"></span>
+                        <span class="prev-card"></span>
+                        <span class="prev-dot"></span>
+                      </div>
+                      <div class="meta-tema-cfg">
+                        <strong>Azul Marinho Clássico</strong>
+                        <span>Paleta oficial Ponto &amp; Trama</span>
+                      </div>
+                      <span class="check-tema">✓</span>
+                    </button>
+
+                    <button type="button" class="card-tema-cfg" data-tema-val="noite" role="radio" aria-checked="false">
+                      <div class="preview-tema-mini tema-prev-noite">
+                        <span class="prev-bar"></span>
+                        <span class="prev-card"></span>
+                        <span class="prev-dot"></span>
+                      </div>
+                      <div class="meta-tema-cfg">
+                        <strong>Noite Profunda</strong>
+                        <span>Alto contraste para baixa luz</span>
+                      </div>
+                      <span class="check-tema">✓</span>
+                    </button>
+
+                    <button type="button" class="card-tema-cfg" data-tema-val="claro" role="radio" aria-checked="false">
+                      <div class="preview-tema-mini tema-prev-claro">
+                        <span class="prev-bar"></span>
+                        <span class="prev-card"></span>
+                        <span class="prev-dot"></span>
+                      </div>
+                      <div class="meta-tema-cfg">
+                        <strong>Ateliê Claro</strong>
+                        <span>Fundo pergaminho suave</span>
+                      </div>
+                      <span class="check-tema">✓</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="linha-config" data-busca="tamanho fonte leitura texto zoom acessibilidade compacto grande">
+                  <div class="info-linha-config">
+                    <strong>Tamanho da Fonte</strong>
+                    <span>Amplia ou compacta os textos e números das receitas e contadores</span>
+                  </div>
+                  <div class="controle-linha-config">
+                    <div class="segmented-cfg" id="cfg-tamanho-fonte" role="group" aria-label="Tamanho da fonte">
+                      <button type="button" class="btn-seg-cfg" data-valor="compacto">Compacto</button>
+                      <button type="button" class="btn-seg-cfg ativo" data-valor="padrao">Padrão</button>
+                      <button type="button" class="btn-seg-cfg" data-valor="grande">Grande</button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="linha-config" data-busca="animacoes reduzir movimento acessibilidade transicoes">
+                  <div class="info-linha-config">
+                    <strong>Reduzir Animações</strong>
+                    <span>Desativa efeitos decorativos e transições para resposta mais direta</span>
+                  </div>
+                  <div class="controle-linha-config">
+                    <label class="switch-cfg">
+                      <input type="checkbox" id="cfg-reduzir-animacoes" />
+                      <span class="trilha-switch"></span>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="linha-config" data-busca="barra lateral menu recolhido expandido iniciar">
+                  <div class="info-linha-config">
+                    <strong>Barra Lateral ao Iniciar</strong>
+                    <span>Escolha se o menu lateral abre expandido ou recolhido</span>
+                  </div>
+                  <div class="controle-linha-config">
+                    <div class="segmented-cfg" id="cfg-sidebar-inicial" role="group" aria-label="Estado inicial da barra lateral">
+                      <button type="button" class="btn-seg-cfg ativo" data-valor="expandido">Expandido</button>
+                      <button type="button" class="btn-seg-cfg" data-valor="recolhido">Recolhido</button>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <!-- SEÇÃO 3: PREFERÊNCIAS DAS FERRAMENTAS (RF06, RF07, RF08, RF09) -->
+              <section class="bloco-config" data-categoria-cfg="ferramentas">
+                <header class="bloco-config-topo">
+                  <h2>🧶 Padrões das Ferramentas</h2>
+                  <p>Ajuste alertas do contador, valores padrão da precificação, medidas e projetos</p>
+                </header>
+
+                <!-- Contador de Carreiras -->
+                <div class="subgrupo-titulo-cfg">CONTADOR DE CARREIRAS &amp; EXECUÇÃO</div>
+
+                <div class="linha-config" data-busca="som alarme meta contador audio bip testar">
+                  <div class="info-linha-config">
+                    <strong>Alerta Sonoro na Meta de Carreiras</strong>
+                    <span>Emite um sinal sonoro suave offline ao atingir a meta programada</span>
+                  </div>
+                  <div class="controle-linha-config grupo-inline">
+                    <button type="button" class="btn-cfg-suave" id="btn-cfg-testar-som" title="Ouvir o som de alerta">
+                      <span class="icone-sino-cfg" id="icone-sino-cfg">🔔</span>
+                      <span>Testar som</span>
+                    </button>
+                    <label class="switch-cfg">
+                      <input type="checkbox" id="cfg-som-alarme" checked />
+                      <span class="trilha-switch"></span>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="linha-config" data-busca="piscar alerta visual tela contador meta">
+                  <div class="info-linha-config">
+                    <strong>Alerta Visual Pulsante na Tela</strong>
+                    <span>Destaca o fundo e exibe o banner vermelho quando a meta for atingida</span>
+                  </div>
+                  <div class="controle-linha-config">
+                    <label class="switch-cfg">
+                      <input type="checkbox" id="cfg-alerta-visual" checked />
+                      <span class="trilha-switch"></span>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="linha-config" data-busca="vibracao tatil celular android contador">
+                  <div class="info-linha-config">
+                    <strong>Vibração Tátil (Celular)</strong>
+                    <span>Vibra brevemente ao somar carreira ou atingir a meta no Android</span>
+                  </div>
+                  <div class="controle-linha-config">
+                    <label class="switch-cfg">
+                      <input type="checkbox" id="cfg-vibracao" checked />
+                      <span class="trilha-switch"></span>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="linha-config" data-busca="manter tela acesa wake lock bloqueio celular">
+                  <div class="info-linha-config">
+                    <strong>Manter Tela Acesa Durante o Trabalho</strong>
+                    <span>Evita que a tela apague enquanto o aplicativo estiver aberto (quando suportado)</span>
+                  </div>
+                  <div class="controle-linha-config">
+                    <label class="switch-cfg">
+                      <input type="checkbox" id="cfg-manter-tela-acesa" />
+                      <span class="trilha-switch"></span>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="linha-config" data-busca="atalhos teclado espaco seta contador workspace">
+                  <div class="info-linha-config">
+                    <strong>Atalhos de Teclado no Contador</strong>
+                    <span>Permite usar Espaço ou ↑ (+1) e ↓ (−1) no Workspace do projeto</span>
+                  </div>
+                  <div class="controle-linha-config">
+                    <label class="switch-cfg">
+                      <input type="checkbox" id="cfg-atalhos-teclado" checked />
+                      <span class="trilha-switch"></span>
+                    </label>
+                  </div>
+                </div>
+
+                <!-- Precificação -->
+                <div class="subgrupo-titulo-cfg">CALCULADORA DE PRECIFICAÇÃO</div>
+
+                <div class="linha-config" data-busca="valor hora mao de obra precificacao padrao reais">
+                  <div class="info-linha-config">
+                    <strong>Valor da Hora Padrão</strong>
+                    <span>Preenchido automaticamente na Calculadora de Precificação</span>
+                  </div>
+                  <div class="controle-linha-config">
+                    <input type="number" id="cfg-valor-hora-padrao" class="input-cfg compacto" min="0" step="0.5" placeholder="25.00" />
+                  </div>
+                </div>
+
+                <div class="linha-config" data-busca="margem lucro porcentagem precificacao padrao">
+                  <div class="info-linha-config">
+                    <strong>Margem de Lucro Padrão (%)</strong>
+                    <span>Percentual inicial aplicado sobre o custo total da peça</span>
+                  </div>
+                  <div class="controle-linha-config">
+                    <input type="number" id="cfg-margem-padrao" class="input-cfg compacto" min="0" max="500" step="5" value="30" />
+                  </div>
+                </div>
+
+                <div class="linha-config" data-busca="moeda real dolar euro brl usd eur precificacao">
+                  <div class="info-linha-config">
+                    <strong>Moeda de Exibição</strong>
+                    <span>Símbolo monetário usado nos orçamentos</span>
+                  </div>
+                  <div class="controle-linha-config">
+                    <select id="cfg-moeda" class="select-cfg" aria-label="Moeda de exibição">
+                      <option value="BRL">R$ — Real (BRL)</option>
+                      <option value="USD">$ — Dólar (USD)</option>
+                      <option value="EUR">€ — Euro (EUR)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <!-- Amostra & Projetos -->
+                <div class="subgrupo-titulo-cfg">AMOSTRA &amp; GERENCIADOR DE PROJETOS</div>
+
+                <div class="linha-config" data-busca="unidade medida centimetros polegadas cm pol amostra">
+                  <div class="info-linha-config">
+                    <strong>Unidade de Medida Padrão</strong>
+                    <span>Unidade inicial na Calculadora de Amostra</span>
+                  </div>
+                  <div class="controle-linha-config">
+                    <div class="segmented-cfg" id="cfg-unidade-medida" role="group" aria-label="Unidade de medida padrão">
+                      <button type="button" class="btn-seg-cfg ativo" data-valor="cm">cm</button>
+                      <button type="button" class="btn-seg-cfg" data-valor="pol">pol</button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="linha-config" data-busca="vincular projeto automaticamente ferramentas pasta criar">
+                  <div class="info-linha-config">
+                    <strong>Vincular Novo Projeto Automaticamente</strong>
+                    <span>Ao criar uma pasta de projeto, já a coloca na bancada das ferramentas</span>
+                  </div>
+                  <div class="controle-linha-config">
+                    <label class="switch-cfg">
+                      <input type="checkbox" id="cfg-auto-vincular-projeto" checked />
+                      <span class="trilha-switch"></span>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="linha-config" data-busca="agulha em uso automatico projeto retirar">
+                  <div class="info-linha-config">
+                    <strong>Marcar Agulha como "Em Uso" Automaticamente</strong>
+                    <span>Atualiza o status da agulha no inventário ao retirar uma pasta</span>
+                  </div>
+                  <div class="controle-linha-config">
+                    <label class="switch-cfg">
+                      <input type="checkbox" id="cfg-auto-agulha-uso" checked />
+                      <span class="trilha-switch"></span>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="linha-config" data-busca="confetes celebracao concluido 100 projetos">
+                  <div class="info-linha-config">
+                    <strong>Celebração ao Concluir Peça (100%)</strong>
+                    <span>Dispara confetes sutis quando um projeto chega a 100% ou Concluído</span>
+                  </div>
+                  <div class="controle-linha-config">
+                    <label class="switch-cfg">
+                      <input type="checkbox" id="cfg-confetes" checked />
+                      <span class="trilha-switch"></span>
+                    </label>
+                  </div>
+                </div>
+              </section>
+
+              <!-- SEÇÃO 4: DADOS E BACKUP UNIFICADO (RF10, RF11) -->
+              <section class="bloco-config" data-categoria-cfg="dados">
+                <header class="bloco-config-topo">
+                  <h2>💾 Dados e Backup Unificado</h2>
+                  <p>Veja o status do banco local e transfira seus dados entre Web, Ubuntu e Android</p>
+                </header>
+
+                <!-- Card Diagnóstico do Banco -->
+                <div class="diagnostico-banco-cfg" data-busca="banco sqlite indexeddb armazenamento espaco projetos fios agulhas amostras">
+                  <div class="diag-topo-row">
+                    <div>
+                      <span class="diag-label">MOTOR DE DADOS ATIVO</span>
+                      <strong class="diag-valor" id="cfg-diag-modo">Detectando...</strong>
+                    </div>
+                    <div class="diag-tamanho-box">
+                      <span class="diag-label">TAMANHO ESTIMADO</span>
+                      <strong class="diag-valor" id="cfg-diag-tamanho">—</strong>
+                    </div>
+                    <button type="button" class="btn-cfg-suave" id="btn-cfg-atualizar-diag" title="Recontar registros">
+                      ↻ Atualizar
+                    </button>
+                  </div>
+
+                  <div class="diag-badges-grid">
+                    <div class="diag-stat-pill">
+                      <span>📂 Projetos</span>
+                      <strong id="cfg-cont-projetos">0</strong>
+                    </div>
+                    <div class="diag-stat-pill">
+                      <span>🧶 Fios</span>
+                      <strong id="cfg-cont-fios">0</strong>
+                    </div>
+                    <div class="diag-stat-pill">
+                      <span>🪡 Agulhas/Acess.</span>
+                      <strong id="cfg-cont-biblioteca">0</strong>
+                    </div>
+                    <div class="diag-stat-pill">
+                      <span>📐 Amostras</span>
+                      <strong id="cfg-cont-amostras">0</strong>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="linha-config" data-busca="exportar backup json salvar tudo transferir celular pc">
+                  <div class="info-linha-config">
+                    <strong>Exportar Backup Completo (.json)</strong>
+                    <span>Salva projetos, fios, agulhas, amostras e preferências em um único arquivo</span>
+                  </div>
+                  <div class="controle-linha-config">
+                    <button type="button" class="btn-cfg-primario" id="btn-cfg-exportar-tudo">
+                      <span>📥 Exportar Tudo</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="linha-config" data-busca="importar restaurar backup json mesclar substituir">
+                  <div class="info-linha-config">
+                    <strong>Importar Backup (.json)</strong>
+                    <span>Restaure um backup escolhendo entre mesclar ou substituir seus dados</span>
+                  </div>
+                  <div class="controle-linha-config">
+                    <label class="btn-cfg-suave" for="input-cfg-importar-tudo">
+                      <span>📤 Importar Arquivo</span>
+                      <input type="file" id="input-cfg-importar-tudo" accept=".json,application/json" style="display: none" />
+                    </label>
+                  </div>
+                </div>
+              </section>
+
+              <!-- SEÇÃO 5: ZONA DE PERIGO / REDEFINIÇÃO (RF12) -->
+              <section class="bloco-config bloco-perigo-cfg" data-categoria-cfg="perigo">
+                <header class="bloco-config-topo">
+                  <h2>⚠️ Redefinição (Zona de Perigo)</h2>
+                  <p>Ações de restauração de preferências ou limpeza permanente do banco local</p>
+                </header>
+
+                <div class="linha-config" data-busca="restaurar padroes fabrica resetar preferencias">
+                  <div class="info-linha-config">
+                    <strong>Restaurar Preferências Padrão</strong>
+                    <span>Volta tema, fonte, som e padrões das ferramentas ao original (não apaga seus dados)</span>
+                  </div>
+                  <div class="controle-linha-config">
+                    <button type="button" class="btn-cfg-aviso" id="btn-cfg-restaurar-padroes">
+                      Restaurar Padrões
+                    </button>
+                  </div>
+                </div>
+
+                <div class="linha-config" data-busca="apagar limpar dados zerar banco excluir tudo">
+                  <div class="info-linha-config">
+                    <strong>Limpar Dados Locais</strong>
+                    <span>Permite apagar categorias específicas ou zerar todo o banco (ação irreversível)</span>
+                  </div>
+                  <div class="controle-linha-config">
+                    <button type="button" class="btn-cfg-perigo" id="btn-cfg-abrir-limpar-dados">
+                      🗑️ Limpar Dados...
+                    </button>
+                  </div>
+                </div>
+              </section>
+
+              <!-- SEÇÃO 6: SOBRE E ATALHOS (RF13) -->
+              <section class="bloco-config" data-categoria-cfg="sobre">
+                <header class="bloco-config-topo">
+                  <h2>ℹ️ Sobre o Ponto &amp; Trama</h2>
+                  <p>Informações do aplicativo, privacidade offline e atalhos rápidos de teclado</p>
+                </header>
+
+                <div class="sobre-grid-cfg" data-busca="sobre versao offline ambiente ubuntu android web">
+                  <div class="sobre-item-cfg">
+                    <span>Versão</span>
+                    <strong>1.0.0</strong>
+                  </div>
+                  <div class="sobre-item-cfg">
+                    <span>Ambiente</span>
+                    <strong id="cfg-sobre-ambiente">Web (Navegador)</strong>
+                  </div>
+                  <div class="sobre-item-cfg">
+                    <span>Privacidade</span>
+                    <strong>100% Offline / Local</strong>
+                  </div>
+                </div>
+
+                <div class="atalhos-lista-cfg" data-busca="atalhos teclado f5 f11 espaco esc setas">
+                  <div class="subgrupo-titulo-cfg">ATALHOS DE TECLADO</div>
+                  <div class="grade-atalhos-cfg">
+                    <div class="item-atalho-cfg"><kbd>Espaço</kbd> / <kbd>↑</kbd><span>+1 carreira no Workspace</span></div>
+                    <div class="item-atalho-cfg"><kbd>↓</kbd><span>−1 carreira no Workspace</span></div>
+                    <div class="item-atalho-cfg"><kbd>Esc</kbd><span>Fecha modais e gavetas</span></div>
+                    <div class="item-atalho-cfg"><kbd>F11</kbd><span>Tela cheia (App Ubuntu)</span></div>
+                    <div class="item-atalho-cfg"><kbd>F5</kbd><span>Recarregar interface</span></div>
+                  </div>
+                </div>
+              </section>
+
+              <!-- Estado vazio da busca de configurações -->
+              <div class="vazio-busca-cfg" id="vazio-busca-cfg" style="display: none">
+                <span>🔍</span>
+                <strong>Nenhuma configuração encontrada</strong>
+                <p>Tente pesquisar por "tema", "som", "backup", "fonte" ou "moeda".</p>
+              </div>
+            </div>
           </div>
+
+          <!-- MODAL 1: IMPORTAR BACKUP (MESCLAR OU SUBSTITUIR) -->
+          <div class="modal-overlay-cfg" id="modal-cfg-importar" style="display: none">
+            <div class="modal-box-cfg" role="dialog" aria-modal="true" aria-labelledby="titulo-modal-import-cfg">
+              <div class="modal-cfg-topo">
+                <h3 id="titulo-modal-import-cfg">📤 Restaurar Backup</h3>
+                <button type="button" class="btn-fechar-cfg" id="btn-fechar-import-cfg" aria-label="Fechar">&times;</button>
+              </div>
+              <div class="modal-cfg-corpo">
+                <p class="texto-modal-cfg" id="resumo-import-cfg">Resumo do arquivo selecionado:</p>
+                <div class="badges-import-cfg" id="badges-import-cfg"></div>
+                <p class="dica-modal-cfg">
+                  <strong>Mesclar:</strong> adiciona os registros sem apagar o que você já tem.<br />
+                  <strong>Substituir tudo:</strong> limpa o banco atual e restaura exatamente este backup.
+                </p>
+              </div>
+              <div class="modal-cfg-rodape">
+                <button type="button" class="btn-cfg-suave" id="btn-cancelar-import-cfg">Cancelar</button>
+                <button type="button" class="btn-cfg-aviso" id="btn-import-substituir-cfg">Substituir Tudo</button>
+                <button type="button" class="btn-cfg-primario" id="btn-import-mesclar-cfg">Mesclar Dados</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- MODAL 2: CONFIRMAR RESTAURAÇÃO DE PADRÕES -->
+          <div class="modal-overlay-cfg" id="modal-cfg-padroes" style="display: none">
+            <div class="modal-box-cfg compacto" role="dialog" aria-modal="true" aria-labelledby="titulo-modal-padroes-cfg">
+              <div class="modal-cfg-topo">
+                <h3 id="titulo-modal-padroes-cfg">Restaurar preferências padrão?</h3>
+                <button type="button" class="btn-fechar-cfg" id="btn-fechar-padroes-cfg" aria-label="Fechar">&times;</button>
+              </div>
+              <div class="modal-cfg-corpo">
+                <p class="texto-modal-cfg">
+                  Tema, tamanho da fonte, alertas e padrões das calculadoras voltarão para a configuração original. Seus projetos, fios, agulhas e amostras <strong>não</strong> serão apagados.
+                </p>
+              </div>
+              <div class="modal-cfg-rodape">
+                <button type="button" class="btn-cfg-suave" id="btn-cancelar-padroes-cfg">Cancelar</button>
+                <button type="button" class="btn-cfg-aviso" id="btn-confirmar-padroes-cfg">Sim, Restaurar</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- MODAL 3: LIMPAR DADOS (CONFIRMAÇÃO DUPLA) -->
+          <div class="modal-overlay-cfg" id="modal-cfg-limpar" style="display: none">
+            <div class="modal-box-cfg" role="dialog" aria-modal="true" aria-labelledby="titulo-modal-limpar-cfg">
+              <div class="modal-cfg-topo perigo">
+                <h3 id="titulo-modal-limpar-cfg">🗑️ Limpar Dados Locais</h3>
+                <button type="button" class="btn-fechar-cfg" id="btn-fechar-limpar-cfg" aria-label="Fechar">&times;</button>
+              </div>
+              <div class="modal-cfg-corpo">
+                <p class="texto-modal-cfg">Selecione quais módulos deseja apagar permanentemente:</p>
+                <div class="checklist-limpar-cfg">
+                  <label><input type="checkbox" class="chk-limpar-col" value="projetos" /> <span>📂 Projetos (pastas, etapas, contadores e galeria)</span></label>
+                  <label><input type="checkbox" class="chk-limpar-col" value="fios" /> <span>🧶 Inventário de Fios</span></label>
+                  <label><input type="checkbox" class="chk-limpar-col" value="itens_biblioteca" /> <span>🪡 Agulhas, Ferramentas e Aviamentos</span></label>
+                  <label><input type="checkbox" class="chk-limpar-col" value="banco_amostras" /> <span>📐 Banco de Amostras</span></label>
+                </div>
+
+                <div class="campo-confirmacao-dupla">
+                  <label for="input-confirmar-limpar-cfg">Digite <strong>LIMPAR</strong> para confirmar esta ação irreversível:</label>
+                  <input type="text" id="input-confirmar-limpar-cfg" class="input-cfg" placeholder="LIMPAR" autocomplete="off" />
+                </div>
+              </div>
+              <div class="modal-cfg-rodape">
+                <button type="button" class="btn-cfg-suave" id="btn-cancelar-limpar-cfg">Cancelar</button>
+                <button type="button" class="btn-cfg-perigo" id="btn-confirmar-limpar-cfg" disabled>Apagar Selecionados</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Toast de Configurações -->
+          <div class="toast-configuracoes" id="toast-configuracoes" role="status" aria-live="polite"></div>
         </div>
       </div>
     </main>

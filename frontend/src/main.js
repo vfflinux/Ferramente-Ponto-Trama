@@ -30,10 +30,19 @@ const PontoTramaApp = (() => {
     }
   }
 
-  return { garantirModulo };
+  function estaInicializado(chaveFerramenta) {
+    return modulosInicializados.has(chaveFerramenta);
+  }
+
+  return { garantirModulo, estaInicializado };
 })();
 
 document.addEventListener("DOMContentLoaded", () => {
+  // 0. Aplica imediatamente tema, fonte, animações e estado da barra lateral salvos
+  if (typeof Configuracoes !== "undefined" && typeof Configuracoes.aplicarPreferenciasIniciais === "function") {
+    Configuracoes.aplicarPreferenciasIniciais();
+  }
+
   // 1. Navegação da barra lateral (instantânea)
   if (typeof BarraLateral !== "undefined" && typeof BarraLateral.init === "function") {
     BarraLateral.init();
@@ -42,8 +51,14 @@ document.addEventListener("DOMContentLoaded", () => {
   // 2. Inicializa imediatamente apenas a tela inicial visível (Home)
   PontoTramaApp.garantirModulo("home");
 
-  // 3. Pré-aquece o cache em RAM do IndexedDB em 1 única transação (não bloqueia a UI)
+  // 3. Pré-aquece o cache em RAM do banco e restaura projeto ativo na bancada
   if (typeof BancoDadosPT !== "undefined" && typeof BancoDadosPT.precarregarTudo === "function") {
-    BancoDadosPT.precarregarTudo();
+    BancoDadosPT.precarregarTudo().finally(() => {
+      if (typeof ProjetoContexto !== "undefined" && typeof ProjetoContexto.init === "function") {
+        ProjetoContexto.init();
+      }
+    });
+  } else if (typeof ProjetoContexto !== "undefined" && typeof ProjetoContexto.init === "function") {
+    ProjetoContexto.init();
   }
 });

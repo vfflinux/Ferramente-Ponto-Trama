@@ -19,7 +19,9 @@ const Home = (() => {
     if (btnNovo) {
       btnNovo.addEventListener("click", () => {
         irParaFerramenta("projetos");
-        window.dispatchEvent(new CustomEvent("ponto-trama:novo-projeto"));
+        setTimeout(() => {
+          window.dispatchEvent(new CustomEvent("ponto-trama:novo-projeto"));
+        }, 30);
       });
     }
 

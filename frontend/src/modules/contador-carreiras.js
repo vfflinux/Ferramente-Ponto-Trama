@@ -84,6 +84,7 @@ const ContadorCarreiras = (() => {
     const inputCarreiras = card.querySelector(".input-carreiras");
     let val = parseInt(inputCarreiras.value, 10) || 0;
     inputCarreiras.value = val + 1;
+    if (typeof Configuracoes !== "undefined") Configuracoes.vibrar(18);
     atualizarContador(card);
   }
 
@@ -92,6 +93,7 @@ const ContadorCarreiras = (() => {
     let val = parseInt(inputCarreiras.value, 10) || 0;
     if (val > 0) {
       inputCarreiras.value = val - 1;
+      if (typeof Configuracoes !== "undefined") Configuracoes.vibrar(12);
       atualizarContador(card);
     }
   }
@@ -107,8 +109,16 @@ const ContadorCarreiras = (() => {
   // ==========================================================================
 
   function dispararAlarmeCard(card, mensagem) {
+    const jaDisparado = card.classList.contains("alarme-disparado");
     card.classList.add("alarme-disparado");
-    Animacoes.dispararAlarmeVisual(mensagem);
+    const visualAtivo = typeof Configuracoes === "undefined" || Configuracoes.obter("alertaVisual") !== false;
+    if (visualAtivo) {
+      Animacoes.dispararAlarmeVisual(mensagem);
+    }
+    if (!jaDisparado && typeof Configuracoes !== "undefined") {
+      Configuracoes.tocarSomAlarme(false);
+      Configuracoes.vibrar([100, 60, 100]);
+    }
   }
 
   function removerAlarmeCard(card) {
@@ -254,9 +264,66 @@ const ContadorCarreiras = (() => {
       });
 
       localStorage.setItem(CHAVE_STORAGE, JSON.stringify(dados));
+
+      if (
+        typeof ProjetoContexto !== "undefined" &&
+        !ProjetoContexto.estaHidratando() &&
+        ProjetoContexto.obterProjetoAtivo()
+      ) {
+        ProjetoContexto.atualizarSecaoAtiva("contadores", dados, { origem: "contador-carreiras" });
+      }
     } catch (e) {
       console.warn("Erro ao persistir contadores no localStorage:", e);
     }
+  }
+
+  function renderizarListaContadores(dados) {
+    if (!Array.isArray(dados) || dados.length === 0) return false;
+    const areaContadores = document.getElementById("area-contadores");
+    if (!areaContadores) return false;
+
+    areaContadores.innerHTML = "";
+    let maxId = 1;
+
+    dados.forEach((item, index) => {
+      const idStr = String(item.id || index + 1);
+      const numId = parseInt(idStr, 10);
+      if (!isNaN(numId) && numId > maxId) maxId = numId;
+
+      const card = criarElementoContador(idStr);
+      const inputNome = card.querySelector(".nome-contador");
+      if (inputNome && item.nome) inputNome.value = item.nome;
+
+      const inputCarreiras = card.querySelector(".input-carreiras");
+      if (inputCarreiras) inputCarreiras.value = item.carreiras || 0;
+
+      const inputPontos = card.querySelector(".input-pontos-carreira");
+      if (inputPontos) inputPontos.value = item.pontosPorCarreira || 0;
+
+      const inputMeta = card.querySelector(".input-meta");
+      if (inputMeta && item.meta > 0) inputMeta.value = item.meta;
+
+      const btnRemover = card.querySelector(".btn-remover-contador");
+      if (btnRemover && dados.length === 1) {
+        btnRemover.style.display = "none";
+      }
+
+      areaContadores.appendChild(card);
+      configurarEventosCard(card);
+    });
+
+    contadorIdCounter = maxId;
+    atualizarVisibilidadeBotoesRemover();
+    return true;
+  }
+
+  function carregarDoProjeto(projeto) {
+    if (!projeto) return;
+    const lista =
+      Array.isArray(projeto.contadores) && projeto.contadores.length > 0
+        ? projeto.contadores
+        : [{ id: "1", nome: projeto.nome || "Carreiras", carreiras: 0, pontosPorCarreira: 0, meta: 0 }];
+    renderizarListaContadores(lista);
   }
 
   function carregarEstadoContadores() {
@@ -264,44 +331,7 @@ const ContadorCarreiras = (() => {
       const salvo = localStorage.getItem(CHAVE_STORAGE);
       if (!salvo) return false;
       const dados = JSON.parse(salvo);
-      if (!Array.isArray(dados) || dados.length === 0) return false;
-
-      const areaContadores = document.getElementById("area-contadores");
-      if (!areaContadores) return false;
-
-      areaContadores.innerHTML = "";
-      let maxId = 1;
-
-      dados.forEach((item, index) => {
-        const numId = parseInt(item.id, 10);
-        if (!isNaN(numId) && numId > maxId) maxId = numId;
-
-        const card = criarElementoContador(item.id);
-        const inputNome = card.querySelector(".nome-contador");
-        if (inputNome && item.nome) inputNome.value = item.nome;
-
-        const inputCarreiras = card.querySelector(".input-carreiras");
-        if (inputCarreiras) inputCarreiras.value = item.carreiras;
-
-        const inputPontos = card.querySelector(".input-pontos-carreira");
-        if (inputPontos) inputPontos.value = item.pontosPorCarreira;
-
-        const inputMeta = card.querySelector(".input-meta");
-        if (inputMeta && item.meta > 0) inputMeta.value = item.meta;
-
-        // Se for o único card, esconde o botão de remover; se houver mais, mantém
-        const btnRemover = card.querySelector(".btn-remover-contador");
-        if (btnRemover && dados.length === 1) {
-          btnRemover.style.display = "none";
-        }
-
-        areaContadores.appendChild(card);
-        configurarEventosCard(card);
-      });
-
-      contadorIdCounter = maxId;
-      atualizarVisibilidadeBotoesRemover();
-      return true;
+      return renderizarListaContadores(dados);
     } catch (e) {
       console.warn("Erro ao carregar contadores do localStorage:", e);
       return false;
@@ -413,6 +443,13 @@ const ContadorCarreiras = (() => {
       btnSilenciarAlarme.addEventListener("click", () => Animacoes.silenciarAlarmeVisual());
     }
 
+    // Se houver um projeto ativo na bancada, carrega os contadores dele
+    const projAtivo = typeof ProjetoContexto !== "undefined" ? ProjetoContexto.obterProjetoAtivo() : null;
+    if (projAtivo) {
+      carregarDoProjeto(projAtivo);
+      return;
+    }
+
     // Tenta restaurar contadores salvos; caso não existam, inicializa o card estático do HTML
     const restaurado = carregarEstadoContadores();
     if (!restaurado) {
@@ -426,6 +463,7 @@ const ContadorCarreiras = (() => {
 
   return {
     init,
+    carregarDoProjeto,
     atualizarContador,
     incrementarCarreiras,
     decrementarCarreiras,

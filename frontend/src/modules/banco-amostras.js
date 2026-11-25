@@ -524,7 +524,11 @@ const BancoAmostras = (() => {
 
     document.getElementById("banco-amostra-id").value = isEdicao ? dados.id : "";
     document.getElementById("banco-nome").value = dados?.nome || "";
-    document.getElementById("banco-tecnica").value = dados?.tecnica || "croche";
+    const tecPadrao =
+      typeof Configuracoes !== "undefined" && typeof Configuracoes.obterTecnicaEfetiva === "function"
+        ? Configuracoes.obterTecnicaEfetiva()
+        : "croche";
+    document.getElementById("banco-tecnica").value = dados?.tecnica || tecPadrao;
     document.getElementById("banco-categoria").value = dados?.categoria || "basico";
     document.getElementById("banco-tensao").value = dados?.tensao || "medio";
     document.getElementById("banco-fio").value = dados?.fio || "";

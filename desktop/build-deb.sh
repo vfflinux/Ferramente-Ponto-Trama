@@ -34,6 +34,9 @@ mkdir -p \
 
 # Copia frontend, backend (sem .db pessoal) e desktop/app.py para /opt/ponto-e-trama
 cp -r "$ROOT_DIR/frontend/." "$OPT_DIR/frontend/"
+if [ -f "$ROOT_DIR/scripts/otimizar-build.py" ]; then
+  python3 "$ROOT_DIR/scripts/otimizar-build.py" "$OPT_DIR/frontend"
+fi
 cp "$ROOT_DIR/backend/server.py" "$OPT_DIR/backend/server.py"
 cp "$ROOT_DIR/backend/database/schema.sql" "$OPT_DIR/backend/database/schema.sql"
 cp "$ROOT_DIR/desktop/app.py" "$OPT_DIR/desktop/app.py"
@@ -113,8 +116,8 @@ find "$PKG_ROOT" -type d -exec chmod 755 {} +
 chmod 644 "$PKG_ROOT/DEBIAN/control" "$PKG_ROOT/usr/share/applications/${PKG_NAME}.desktop"
 chmod 755 "$PKG_ROOT/DEBIAN/postinst" "$PKG_ROOT/DEBIAN/postrm" "$PKG_ROOT/usr/bin/$PKG_NAME" "$OPT_DIR/desktop/app.py" "$OPT_DIR/backend/server.py"
 
-# Gera o pacote .deb oficial do Ubuntu
-dpkg-deb --build --root-owner-group "$PKG_ROOT" "$DEB_FILE"
+# Gera o pacote .deb oficial do Ubuntu (compressão xz nível 9)
+dpkg-deb -Zxz -z9 --build --root-owner-group "$PKG_ROOT" "$DEB_FILE"
 
 # Gera os dois lançadores clicáveis dentro de dist/ com a imagem da logo
 LOGO_ABS="$ROOT_DIR/frontend/assets/images/logo.png"

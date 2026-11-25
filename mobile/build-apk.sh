@@ -48,10 +48,9 @@ echo "🔄 Sincronizando frontend/ -> mobile/android/assets/frontend/..."
 rm -rf "$ASSETS_FRONTEND"
 mkdir -p "$ASSETS_FRONTEND"
 cp -r "$ROOT_DIR/frontend/." "$ASSETS_FRONTEND/"
-# Remove imagens extras não usadas pelo app para deixar o APK bem leve (~500 KB)
-rm -f "$ASSETS_FRONTEND/assets/images/logo-alt.jpeg" \
-      "$ASSETS_FRONTEND/assets/images/logo-nandu.jpeg" \
-      "$ASSETS_FRONTEND/assets/images/logo-nandu.png"
+if [ -f "$ROOT_DIR/scripts/otimizar-build.py" ]; then
+  python3 "$ROOT_DIR/scripts/otimizar-build.py" "$ASSETS_FRONTEND"
+fi
 
 BUILD_TMP="$(mktemp -d)"
 trap 'rm -rf "$BUILD_TMP"' EXIT

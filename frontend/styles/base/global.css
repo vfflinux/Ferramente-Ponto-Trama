@@ -174,5 +174,102 @@ p {
   min-height: var(--altura-cabecalho-min);
   max-height: var(--altura-cabecalho-max);
   display: flex;
-  transition: width var(--transicao-suave);
+  transition: width var(--transicao-suave), background-color 0.22s ease;
+}
+
+/* ==========================================================================
+   TEMAS VISUAIS, ESCALA DE FONTE E REDUÇÃO DE ANIMAÇÕES (CONFIGURAÇÕES)
+   ========================================================================== */
+:root.transicao-tema,
+:root.transicao-tema body,
+:root.transicao-tema .cabecalho,
+:root.transicao-tema .barraLateral {
+  transition: background-color 0.22s ease, color 0.22s ease, border-color 0.22s ease;
+}
+
+/* Tema 2: Noite Profunda / Alto Contraste */
+:root[data-tema="noite"] {
+  --cor-fundo-profundo: #02040f;
+  --cor-fundo-base: #02040f;
+  --cor-fundo-principal: #070d1f;
+  --cor-destaque: #14224a;
+  --cor-destaque-hover: #213a78;
+  --cor-destaque-ativo: #0c1736;
+  --cor-texto-principal: #fff9e6;
+  --cor-borda-suave: rgba(255, 249, 230, 0.26);
+  --cor-foco-destaque: #7aa8ff;
+}
+
+/* Tema 3: Ateliê Claro / Pergaminho */
+:root[data-tema="claro"] {
+  --cor-fundo-profundo: #1c2f5c;
+  --cor-fundo-base: #e7dec8;
+  --cor-fundo-principal: #f5efe0;
+  --cor-destaque: #22396f;
+  --cor-destaque-hover: #2f4e96;
+  --cor-destaque-ativo: #d8ccb0;
+  --cor-texto-principal: #13224a;
+  --cor-borda-suave: rgba(19, 34, 74, 0.22);
+  --cor-foco-destaque: #2f5cc9;
+  --creme-opacidade-85: rgba(19, 34, 74, 0.88);
+  --creme-opacidade-75: rgba(19, 34, 74, 0.78);
+  --creme-opacidade-70: rgba(19, 34, 74, 0.72);
+  --creme-opacidade-65: rgba(19, 34, 74, 0.65);
+  --creme-opacidade-50: rgba(19, 34, 74, 0.55);
+  --creme-opacidade-45: rgba(19, 34, 74, 0.48);
+  --creme-opacidade-40: rgba(19, 34, 74, 0.42);
+  --creme-opacidade-30: rgba(19, 34, 74, 0.3);
+  --creme-opacidade-25: rgba(19, 34, 74, 0.25);
+  --creme-opacidade-20: rgba(19, 34, 74, 0.2);
+  --creme-opacidade-15: rgba(19, 34, 74, 0.14);
+  --creme-opacidade-12: rgba(19, 34, 74, 0.11);
+}
+
+/* Mantém texto creme legível dentro da barra lateral e cabeçalho escuros no tema Claro */
+:root[data-tema="claro"] .barraLateral,
+:root[data-tema="claro"] .barraLateral .nomeLogo,
+:root[data-tema="claro"] .barraLateral .botaoFerramenta,
+:root[data-tema="claro"] .barraLateral .botaoNavegar,
+:root[data-tema="claro"] .cabecalho,
+:root[data-tema="claro"] .cabecalho .titulo-ferramenta,
+:root[data-tema="claro"] .cabecalho .subtitulo-ferramenta,
+:root[data-tema="claro"] .barra-projeto-ativo,
+:root[data-tema="claro"] .barra-projeto-ativo .barra-ativo-nome,
+:root[data-tema="claro"] .barra-projeto-ativo .barra-ativo-rotulo,
+:root[data-tema="claro"] .barra-projeto-ativo .barra-ativo-progresso {
+  color: #fcf1d0;
+}
+
+:root[data-tema="claro"] input,
+:root[data-tema="claro"] select,
+:root[data-tema="claro"] textarea {
+  background-color: rgba(255, 255, 255, 0.82);
+  color: #13224a;
+}
+
+/* Escala de Fonte para Leitura Confortável */
+:root[data-fonte="compacto"] {
+  font-size: 14px;
+}
+
+:root[data-fonte="compacto"] main {
+  zoom: 0.94;
+}
+
+:root[data-fonte="grande"] {
+  font-size: 18px;
+}
+
+:root[data-fonte="grande"] main {
+  zoom: 1.09;
+}
+
+/* Redução de animações por preferência do usuário */
+:root[data-reduzir-animacoes="true"] *,
+:root[data-reduzir-animacoes="true"] *::before,
+:root[data-reduzir-animacoes="true"] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
 }

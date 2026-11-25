@@ -6,12 +6,12 @@ Aplicação multiplataforma **100% offline** para organização de artesanato em
 
 ## Downloads (App Android e App Linux)
 
-| Plataforma | Arquivo | Onde baixar | Como instalar |
-| :--- | :--- | :--- | :--- |
-| **Android (Celular)** | `ponto-e-trama.apk` | [Baixar APK (`mobile/ponto-e-trama.apk`)](https://github.com/vfflinux/Ferramente-Ponto-Trama/raw/main/mobile/ponto-e-trama.apk) | Copie o `.apk` para o celular (Android 7.0+), toque no arquivo e autorize a instalação. |
-| **Linux / Ubuntu (Instalador `.deb`)** | `ponto-e-trama_1.0.0_all.deb` | [Baixar `.deb` (`dist/ponto-e-trama_1.0.0_all.deb`)](https://github.com/vfflinux/Ferramente-Ponto-Trama/raw/main/dist/ponto-e-trama_1.0.0_all.deb) | Clique duas vezes no `.deb` (abre a Central de Aplicativos do Ubuntu) ou rode `sudo apt install ./dist/ponto-e-trama_1.0.0_all.deb`. |
-| **Linux / Ubuntu (Direto da pasta)** | `PontoETrama` + Instalador GTK | `dist/Ponto & Trama.desktop` e `dist/Instalar Ponto & Trama.desktop` | Após clonar o repositório, clique com o botão direito → *Permitir iniciar* ou execute `./PontoETrama` / `./desktop/instalar-ubuntu.sh`. |
-| **Web (Navegador)** | `frontend/index.html` | Pasta [`frontend/`](frontend/index.html) | Abra `frontend/index.html` diretamente no navegador ou hospede a pasta `frontend/` (não precisa de servidor SQL). |
+| Plataforma | Arquivo | Tamanho | Onde baixar | Como instalar |
+| :--- | :--- | :---: | :--- | :--- |
+| **Android (Celular)** | `ponto-e-trama.apk` | `220 KB` | [Baixar APK (`mobile/ponto-e-trama.apk`)](https://github.com/vfflinux/Ferramente-Ponto-Trama/raw/main/mobile/ponto-e-trama.apk) | Copie o `.apk` para o celular (Android 7.0+), toque no arquivo e autorize a instalação. |
+| **Linux / Ubuntu (Instalador `.deb`)** | `ponto-e-trama_1.0.0_all.deb` | `136 KB` | [Baixar `.deb` (`dist/ponto-e-trama_1.0.0_all.deb`)](https://github.com/vfflinux/Ferramente-Ponto-Trama/raw/main/dist/ponto-e-trama_1.0.0_all.deb) | Clique duas vezes no `.deb` (abre a Central de Aplicativos do Ubuntu) ou rode `sudo apt install ./dist/ponto-e-trama_1.0.0_all.deb`. |
+| **Linux / Ubuntu (Direto da pasta)** | `PontoETrama` + Instalador GTK | — | `dist/Ponto & Trama.desktop` e `dist/Instalar Ponto & Trama.desktop` | Após clonar o repositório, clique com o botão direito → *Permitir iniciar* ou execute `./PontoETrama` / `./desktop/instalar-ubuntu.sh`. |
+| **Web (Navegador)** | `frontend/index.html` | — | Pasta [`frontend/`](frontend/index.html) | Abra `frontend/index.html` diretamente no navegador ou hospede a pasta `frontend/` (não precisa de servidor SQL). |
 
 ---
 
@@ -21,44 +21,58 @@ Aplicação multiplataforma **100% offline** para organização de artesanato em
 - Tela **Início** adicionada como entrada padrão (no Web, App Ubuntu e Android) com o cabeçalho do sistema e acesso direto aos botões **`+ Novo projeto`** e **`Ver meus projetos`**.
 - Clique na logo da barra lateral para voltar rapidamente à Home.
 
-### 2. Contador de Carreiras
-- Contadores simultâneos com incremento/decremento rápido, cálculo automático do total de pontos no trabalho, meta de carreiras com alarme visual e persistência automática.
+### 2. Gerenciador de Projetos (Estilo Pasta / Fichário + Integração Total)
+- **Pastas / Fichários no Dashboard**: cards em formato de pasta com aba superior, folhinhas internas que sobem no hover, foto de capa (ou placeholder ilustrado), badge de status colorido (*Na Fila*, *Em Andamento*, *Pausado*, *Concluído*), menu `⋯` (Workspace, Retirar, Editar, Duplicar, Arquivar e Excluir com confirmação) e barra de progresso fina na base.
+- **Abertura Animada da Pasta + Botão `Retirar`**:
+  - Ao clicar em uma pasta, as **6 fichas** (*Contadores*, *Receita & Notas*, *Fios & Agulha*, *Etapas*, *Amostra* e *Tempo & Preço*) saem animadas de dentro do fichário formando uma telinha de dossiê.
+  - O botão **`Retirar`** distribui as informações do projeto para **todas as ferramentas** do sistema e exibe a barra **"📂 Na bancada"** no topo — qualquer alteração feita em qualquer ferramenta é salva automaticamente dentro da pasta ativa.
+  - Ao criar um novo projeto (com suporte a **Crochê** e **Tricô** em drawer lateral com *Accordions*), ele já fica vinculado automaticamente às ferramentas.
+- **Workspace do Projeto (2 Colunas Desktop / Abas Mobile)**:
+  - **Execução**: múltiplos contadores integrados (`+1` / `-1`, atalhos `Espaço`, `↑`, `↓`), cronômetro de trabalho (**Play / Pause** pulsante + envio do tempo para a Precificação) e leitor/anotador de receita integrado.
+  - **Metadados**: checklist de etapas com cálculo automático ou manual de progresso (`0–100%`) e celebração discreta com confetes + badge **`🎉 Peça Finalizada!`**, ficha técnica vinculada aos inventários de fios/agulhas e galeria de progresso com fotos intermediárias e lightbox.
 
-### 3. Calculadora de Precificação
-- Cálculo em tempo real de linhas (em **unidades/novelos** ou **gramas**), mão de obra, acessórios/extras e margem de lucro com controle deslizante (*slider*).
-- **Integração com Inventário de Fios**: botão **Estoque** com autocomplete, cálculo de sobras e gaveta lateral de consulta rápida.
-- **Integração com Aviamentos (`Agulhas e Acessórios`)**: botão **`🎀 Aviamentos`** que lê os aviamentos cadastrados, soma o custo unitário exato pelas quantidades usadas na peça, exibe chips removíveis e discrimina tudo ao copiar o orçamento.
+### 3. Receitas e Anotações
+- **Modo Texto & Passos**: editor de anotações e passo a passo com **marcador interativo de linha atual** (clique em qualquer linha ou use *Próxima ↓*) e exemplos adaptados para **Crochê** e **Tricô**.
+- **Modo PDF / Foto**: upload de arquivos PDF ou fotos de gráficos com **régua destacada "Onde parei"** ajustável.
+- Sincronização bidirecional automática com o projeto ativo na bancada.
 
-### 4. Inventário de Fios
-- Cadastro de linhas com marca, cor, código, lote, TEX, composição, peso, metragem, agulha recomendada, localização, preço e upload de foto com compressão automática.
-- Controle rápido `- / +`, badges de resumo consolidado (novelos, peso total e valor em estoque), tela de detalhes com ficha técnica, duplicação e backup/importação `.json`.
+### 4. Contador de Carreiras
+- Contadores simultâneos com incremento/decremento rápido, cálculo automático do total de pontos no trabalho, meta de carreiras com alarme visual/sonoro offline (Web Audio API), vibração tátil no celular e sincronização em tempo real com o projeto ativo.
 
-### 5. Agulhas e Acessórios
-- Arquitetura em **3 zonas**:
-  1. **Abas internas** (`Todas`, `Agulhas`, `Ferramentas`, `Aviamentos`) com contadores e subfiltros rápidos para agulhas (`Crochê`, `Tricô Reto`, `Tricô Circular`, `Tapeçaria`).
-  2. **Toolbar compacta** com busca instantânea, alternador de visualização **Grade / Lista (Tabela)**, filtro dinâmico de numeração (`mm`) e status (`Disponível`, `Em uso em projeto`, `Estoque baixo`).
-  3. **Grade responsiva** que expande fluidamente de **3 para 4 colunas** ao recolher a barra lateral.
-- **Drawer lateral deslizante** com formulário dinâmico por categoria, upload de foto, calculadora rápida de custo unitário a partir do pacote, toggle **`Em Uso / Livre`** para agulhas, ajuste rápido `- / +` com pulso de cor para aviamentos e modal de confirmação de exclusão.
+### 5. Calculadora de Precificação
+- Cálculo em tempo real de linhas (em **unidades/novelos** ou **gramas**), mão de obra (com importação automática das horas do cronômetro do projeto), acessórios/extras e margem de lucro com controle deslizante (*slider*).
+- **Integração com Inventário de Fios e Aviamentos**: botão **Estoque** (autocomplete, cálculo de sobras e gaveta lateral) e botão **`🎀 Aviamentos`** (puxa custos de `Agulhas e Acessórios`).
+- Suporte reativo às Configurações: moeda (`R$` / `$` / `€`), valor/hora padrão, margem padrão, nome do ateliê e assinatura personalizada ao copiar o orçamento.
 
-### 6. Calculadora de Amostra (Tensão do Ponto) + Modo Avançado
-- Layout **mobile-first** com dois modos via pílula deslizante (*sliding pill*):
-  - **Por Medida Desejada**: calcula pontos iniciais e carreiras necessárias para o tamanho desejado da peça.
-  - **Adaptar Receita**: ajusta automaticamente a receita original à sua tensão real com diagnóstico percentual.
-- Conversão automática **`cm ↔ pol`**, botões stepper (`−` / `+`), visualização proporcional da trama, fita métrica elástica, contador rolante (*count-up*), opção de ver valor exato, cópia animada com toast, modal de ajuda (`?`) e salvamento por projeto (com opção marcada por padrão para **cadastrar automaticamente no Banco de Amostras**).
-- **Modo Avançado (`⚡ On/Off`)**: integra **Fio do Inventário**, **Agulha do Inventário**, pontos-base (**Ponto Baixo** para Crochê e **Ponto Malha** para Tricô), listinha personalizável de novos pontos e modelos do **Banco de Amostras**, exibindo estimativa de consumo em **gramas, metros, novelos** e verificação de estoque.
+### 6. Inventário de Fios
+- Cadastro de linhas com marca, cor, código, lote, TEX, composição, peso, metragem, agulha recomendada (crochê e tricô), localização, preço e upload de foto com compressão automática.
+- Controle rápido `- / +`, badges de resumo consolidado, tela de detalhes com ficha técnica, duplicação e backup/importação `.json`.
 
-### 7. Banco de Amostras
-- Nova ferramenta na barra lateral para catalogar modelos de pontos (nome, técnica, categoria, tensão, fio, agulha em mm, dimensões, pontos × carreiras, peso/metragem gastos, foto com upload tracejado estilo pesponto, link de referência e anotações de blocagem).
-- Busca em tempo real, chips de filtro (`Todos`, `Básicos`, `Fechados`, `Texturizados`, `Rendados`, `Relevo`, `★ Favoritos`), estrela com efeito *pop* fixando favoritos no topo, duplicação, edição, exclusão, modal de detalhes e botão **`Usar na Calculadora`** que envia os dados direto para a Calculadora de Amostra.
+### 7. Agulhas e Acessórios
+- Arquitetura em **3 zonas** (abas com subfiltros `Crochê`, `Tricô Reto`, `Tricô Circular`, `Tapeçaria`; toolbar compacta com busca e alternador Grade/Lista; grade responsiva de 3 → 4 colunas ao recolher a barra lateral).
+- Drawer lateral com campos dinâmicos por categoria, calculadora de custo unitário a partir do pacote, toggle **`Em Uso / Livre`** sincronizado automaticamente ao retirar um projeto, ajuste `- / +` para aviamentos e modal de confirmação de exclusão.
 
-### 8. Banco de Dados, Otimizações e Multiplataforma
-- **Persistência separada por ambiente**:
-  - **App Desktop Ubuntu**: banco relacional **SQL (SQLite)** local em `backend/database/ponto_e_trama.db` ([`schema.sql`](backend/database/schema.sql)) servido pelo backend embarcado em Python (`backend/server.py`, sem dependências externas).
-  - **Versão Web e App Android**: persistência simples e direta no **IndexedDB** local (sem precisar de servidor SQL).
-- **Otimizações de performance**: cache em memória RAM (`< 0.1 ms`), carregamento paralelo de CSS (sem cascata `@import`), inicialização sob demanda das abas (*lazy init*), renderização em lote com `DocumentFragment`, debounce de `80 ms` nas buscas e `content-visibility: auto` nos cards.
-- **Empacotamento**:
-  - **Ubuntu Desktop (`desktop/` e `dist/`)**: app nativo GTK 3 + WebKit2GTK com ícone da logo, instalador gráfico GTK e pacote `.deb` oficial (`./desktop/build-deb.sh`).
-  - **Android (`mobile/`)**: projeto Android nativo com `WebView` + servidor loopback offline, ícone da logo em todas as densidades (`mdpi` a `xxxhdpi`) e script de build `./mobile/build-apk.sh`.
+### 8. Calculadora de Amostra (Tensão do Ponto) + Modo Avançado
+- Dois modos via pílula deslizante (*Por Medida Desejada* e *Adaptar Receita*), conversão **`cm ↔ pol`**, steppers, visualização proporcional da trama, fita métrica elástica, contador rolante (*count-up*), salvamento integrado ao Banco de Amostras e atualização reativa com as Configurações.
+- **Modo Avançado (`⚡ On/Off`)**: integra Fio, Agulha, pontos-base (**Ponto Baixo** para Crochê e **Ponto Malha** para Tricô), listinha personalizável de pontos e modelos do Banco de Amostras, com estimativa de consumo em gramas, metros e novelos.
+
+### 9. Banco de Amostras
+- Galeria de modelos de pontos com busca em tempo real, chips de filtro, favoritos com efeito *pop*, duplicação, detalhes e botão **`Usar na Calculadora`** que preenche automaticamente a Calculadora de Amostra.
+
+### 10. Configurações
+- **Ateliê e Perfil**: nome do ateliê, assinatura para orçamentos e **Técnica Principal** (`Crochê`, `Tricô` ou `Ambos`) refletida em projetos, amostras, agulhas e placeholders.
+- **Aparência e Leitura**: 3 temas visuais (*Azul Marinho Clássico*, *Noite Profunda* e *Ateliê Claro*), 3 tamanhos de fonte (*Compacto*, *Padrão*, *Grande*), toggle *Reduzir Animações* e estado inicial da barra lateral.
+- **Padrões das Ferramentas**: alerta sonoro offline (com botão *Testar som*), alerta visual, vibração, *Manter tela acesa* (Wake Lock), atalhos de teclado, valor/hora, margem, moeda, unidade padrão (`cm`/`pol`), vínculo automático de projetos e confetes.
+- **Dados, Backup Unificado e Zona de Perigo**: diagnóstico em tempo real (SQLite vs. IndexedDB, contagem de registros e tamanho), **Exportar/Importar Backup Completo (`.json`)** com opção de *Mesclar* ou *Substituir Tudo* entre PC, Web e Android, restauração de padrões e limpeza seletiva com confirmação dupla.
+
+### 11. Banco de Dados, Otimizações e Multiplataforma
+- **Persistência dual com auto-reparo**:
+  - **App Desktop Ubuntu**: banco relacional **SQL (SQLite)** local (`backend/database/ponto_e_trama.db` / [`schema.sql`](backend/database/schema.sql)) servido pelo backend Python (`backend/server.py`, sem dependências externas) com conexão persistente por thread, cache estático em RAM, `ETag / 304` e compressão **`gzip`**.
+  - **Versão Web e App Android**: **IndexedDB** (`v4`) com auto-upgrade e fallback automático em `localStorage`.
+- **Otimização de tamanho e resposta**:
+  - Imagens otimizadas (`logo.png` reduzida de `312 KB` para `14 KB` e remoção de `3,1 MB` de imagens não utilizadas).
+  - Minificação automática no empacotamento via [`scripts/otimizar-build.py`](scripts/otimizar-build.py) e compressão `xz -z9` no `.deb`, reduzindo o instalador Ubuntu para **`136 KB`** (`-96%`) e o APK Android para **`220 KB`** (`-65%`).
+  - Remoção de `backdrop-filter: blur()` pesados, `content-visibility: auto`, scroll fluido em todas as telas e inicialização/sincronização sob demanda (*lazy init* + *lazy sync*).
 
 ---
 
@@ -70,8 +84,10 @@ Ponto&Trama/
 ├── iniciar.sh                               # Inicia servidor local Python + SQLite
 ├── AGENTS.md                                # Diretriz de sincronização Web <-> App <-> Mobile
 ├── README.md
+├── scripts/
+│   └── otimizar-build.py                    # Minificador seguro de HTML/CSS/JS para .deb e .apk
 ├── backend/
-│   ├── server.py                            # Servidor HTTP local + API REST SQLite (Python stdlib)
+│   ├── server.py                            # Servidor HTTP local (gzip/ETag) + API REST SQLite
 │   ├── database/
 │   │   └── schema.sql                       # Esquema relacional SQL (fios, itens_biblioteca, banco_amostras, projetos)
 │   └── legacy/
@@ -83,21 +99,21 @@ Ponto&Trama/
 │   ├── build-deb.sh                         # Gera o pacote dist/ponto-e-trama_1.0.0_all.deb
 │   └── ponto-e-trama.desktop
 ├── dist/
-│   ├── ponto-e-trama_1.0.0_all.deb          # Instalador oficial Ubuntu (.deb)
+│   ├── ponto-e-trama_1.0.0_all.deb          # Instalador oficial Ubuntu (.deb - 136 KB)
 │   ├── Ponto & Trama.desktop                # Lançador clicável do app
 │   └── Instalar Ponto & Trama.desktop       # Lançador clicável do instalador gráfico
 ├── mobile/
-│   ├── ponto-e-trama.apk                    # Aplicativo instalável Android (.apk)
-│   ├── build-apk.sh                         # Recompila e assina o APK
+│   ├── ponto-e-trama.apk                    # Aplicativo instalável Android (.apk - 220 KB)
+│   ├── build-apk.sh                         # Recompila, otimiza e assina o APK
 │   ├── README.md
 │   └── android/                             # Código-fonte Android (MainActivity.java, Manifest, ícones)
 ├── docs/
 │   └── requisitos-ferramentas.txt
 └── frontend/
     ├── index.html                           # SPA compartilhada entre Web, Ubuntu e Android
-    ├── assets/images/                       # Logo oficial e imagens
+    ├── assets/images/                       # Logo oficial otimizada
     ├── styles/{base,layout,modules}/        # CSS modularizado
-    └── src/{core,modules}/                  # JS modularizado + main.js
+    └── src/{core,modules}/                  # JS modularizado (database, projeto-contexto, módulos)
 ```
 
 ---

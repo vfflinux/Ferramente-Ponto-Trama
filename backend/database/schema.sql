@@ -85,17 +85,32 @@ CREATE INDEX IF NOT EXISTS idx_amostras_favorito  ON banco_amostras (favorito);
 CREATE INDEX IF NOT EXISTS idx_amostras_nome      ON banco_amostras (nome);
 
 -- ----------------------------------------------------------------------------
--- 4. PROJETOS (Estrutura relacional pronta para o Gerenciador de Projetos)
+-- 4. PROJETOS (Gerenciador de Projetos integrado às ferramentas)
+--    Campos estruturados + JSON `dados_json` para etapas, materiais,
+--    contadores, receita, galeria, amostra e precificação do projeto.
 -- ----------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS projetos (
     id               INTEGER PRIMARY KEY AUTOINCREMENT,
     nome             TEXT    NOT NULL,
+    categoria        TEXT    NOT NULL DEFAULT 'amigurumi',
     cliente          TEXT    DEFAULT '',
-    status           TEXT    NOT NULL DEFAULT 'em_andamento',
-    data_entrega     TEXT,
+    status           TEXT    NOT NULL DEFAULT 'na_fila',
+    foto_capa        TEXT    DEFAULT '',
+    data_inicio      TEXT    DEFAULT '',
+    prazo_estimado   TEXT    DEFAULT '',
+    data_entrega     TEXT    DEFAULT '',
+    progresso_modo   TEXT    NOT NULL DEFAULT 'auto',
+    progresso_manual INTEGER NOT NULL DEFAULT 0,
+    tempo_gasto_seg  INTEGER NOT NULL DEFAULT 0,
+    arquivado        INTEGER NOT NULL DEFAULT 0 CHECK (arquivado IN (0, 1)),
     agulha_id        INTEGER REFERENCES itens_biblioteca(id) ON DELETE SET NULL,
     amostra_id       INTEGER REFERENCES banco_amostras(id)   ON DELETE SET NULL,
     observacoes      TEXT    DEFAULT '',
+    dados_json       TEXT    NOT NULL DEFAULT '{}',
     criado_em        TEXT    NOT NULL DEFAULT (datetime('now')),
     atualizado_em    TEXT    NOT NULL DEFAULT (datetime('now'))
 );
+
+CREATE INDEX IF NOT EXISTS idx_projetos_status    ON projetos (status);
+CREATE INDEX IF NOT EXISTS idx_projetos_categoria ON projetos (categoria);
+CREATE INDEX IF NOT EXISTS idx_projetos_nome      ON projetos (nome);

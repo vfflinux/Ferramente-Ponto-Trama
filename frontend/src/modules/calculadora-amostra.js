@@ -653,8 +653,89 @@ const CalculadoraAmostra = (() => {
     atualizarPainelResultados();
     atualizarVisualizacaoAmostraEFitas();
     atualizarTextoBotaoCalcular();
+    sincronizarComProjetoAtivo();
 
     return ultimoResultado.valido;
+  }
+
+  function sincronizarComProjetoAtivo() {
+    if (
+      typeof ProjetoContexto === "undefined" ||
+      ProjetoContexto.estaHidratando() ||
+      !ProjetoContexto.obterProjetoAtivo()
+    ) {
+      return;
+    }
+
+    const lerVal = (id) => document.getElementById(id)?.value || "";
+    ProjetoContexto.atualizarSecaoAtiva(
+      "amostra",
+      {
+        modo: modoAtual,
+        unidade: unidadeAtual,
+        tecnica: tecnicaAtiva,
+        largura: lerVal("amostra-largura"),
+        altura: lerVal("amostra-altura"),
+        pontos: lerVal("amostra-pontos"),
+        carreiras: lerVal("amostra-carreiras"),
+        metaLargura: lerVal("meta-largura"),
+        metaAltura: lerVal("meta-altura"),
+        receitaAmostraPontos: lerVal("receita-amostra-pontos"),
+        receitaAmostraCarreiras: lerVal("receita-amostra-carreiras"),
+        receitaTotalPontos: lerVal("receita-total-pontos"),
+        receitaTotalCarreiras: lerVal("receita-total-carreiras"),
+        amostra_banco_id: amostraBancoSelecionada ? amostraBancoSelecionada.id : null,
+        resumo: ultimoResultado.valido ? `${ultimoResultado.pontosInt} pts × ${ultimoResultado.carreirasInt} carr` : ""
+      },
+      { origem: "amostra" }
+    );
+  }
+
+  function carregarDoProjeto(projeto) {
+    if (!projeto) return;
+    const am = projeto.amostra || {};
+
+    if (am.unidade && am.unidade !== unidadeAtual) {
+      alternarUnidade(am.unidade);
+    }
+    if (am.modo && am.modo !== modoAtual) {
+      alternarModo(am.modo);
+    }
+    const tecProj = am.tecnica || projeto.tecnica;
+    if (tecProj === "trico" || tecProj === "croche") {
+      atualizarBotoesTecnica(tecProj, !am.amostra_banco_id);
+    }
+
+    const setV = (id, v) => {
+      const el = document.getElementById(id);
+      if (el && v !== undefined && v !== null) el.value = v;
+    };
+
+    setV("amostra-largura", am.largura || (unidadeAtual === "cm" ? "10" : "4"));
+    setV("amostra-altura", am.altura || (unidadeAtual === "cm" ? "10" : "4"));
+    setV("amostra-pontos", am.pontos || "");
+    setV("amostra-carreiras", am.carreiras || "");
+    setV("meta-largura", am.metaLargura || "");
+    setV("meta-altura", am.metaAltura || "");
+    setV("receita-amostra-pontos", am.receitaAmostraPontos || "");
+    setV("receita-amostra-carreiras", am.receitaAmostraCarreiras || "");
+    setV("receita-total-pontos", am.receitaTotalPontos || "");
+    setV("receita-total-carreiras", am.receitaTotalCarreiras || "");
+
+    const fio0 = projeto.materiais?.fios?.[0];
+    if (fio0?.fio_id) {
+      const selFio = document.getElementById("avancado-select-fio");
+      if (selFio) selFio.value = String(fio0.fio_id);
+      fioSelecionado = fiosInventario.find((f) => Number(f.id) === Number(fio0.fio_id)) || null;
+    }
+    if (projeto.materiais?.agulha_id) {
+      const selAg = document.getElementById("avancado-select-agulha");
+      if (selAg) selAg.value = String(projeto.materiais.agulha_id);
+      agulhaSelecionada = agulhasInventario.find((a) => Number(a.id) === Number(projeto.materiais.agulha_id)) || null;
+    }
+
+    atualizarTarjaMateriaisAvancado();
+    calcularTensaodoPonto(false);
   }
 
   function alternarUnidade(novaUnidade) {
@@ -1600,9 +1681,20 @@ const CalculadoraAmostra = (() => {
       if (e.target === modalSalvar) fecharModalSalvar();
     });
 
-    // 8. Re-sincroniza inventários quando houver mudanças ou ao abrir a aba
+    // 8. Re-sincroniza inventários e configurações quando houver mudanças ou ao abrir a aba
     window.addEventListener("ponto-trama:biblioteca-atualizada", sincronizarDadosIntegrados);
     window.addEventListener("ponto-trama:banco-amostras-atualizado", sincronizarDadosIntegrados);
+    window.addEventListener("ponto-trama:configuracoes-atualizadas", (e) => {
+      const cfg = e.detail || {};
+      if (cfg.unidadeMedida && cfg.unidadeMedida !== unidadeAtual) {
+        alternarUnidade(cfg.unidadeMedida);
+      }
+      if (cfg.tecnicaPrincipal === "trico" || cfg.tecnicaPrincipal === "croche") {
+        if (cfg.tecnicaPrincipal !== tecnicaAtiva) {
+          atualizarBotoesTecnica(cfg.tecnicaPrincipal, true);
+        }
+      }
+    });
     document
       .querySelector('.barraLateral .botaoFerramenta[data-ferramenta="amostra"]')
       ?.addEventListener("click", () => {
@@ -1636,12 +1728,24 @@ const CalculadoraAmostra = (() => {
       alternarModoAvancado(true);
     }
 
-    atualizarVisualizacaoAmostraEFitas();
-    atualizarTextoBotaoCalcular();
+    const projAtivo = typeof ProjetoContexto !== "undefined" ? ProjetoContexto.obterProjetoAtivo() : null;
+    if (projAtivo) {
+      carregarDoProjeto(projAtivo);
+    } else {
+      if (typeof Configuracoes !== "undefined") {
+        const unPadrao = Configuracoes.obter("unidadeMedida");
+        if (unPadrao && unPadrao !== unidadeAtual) alternarUnidade(unPadrao);
+        const tecPadrao = Configuracoes.obter("tecnicaPrincipal");
+        if (tecPadrao === "trico" || tecPadrao === "croche") atualizarBotoesTecnica(tecPadrao, true);
+      }
+      atualizarVisualizacaoAmostraEFitas();
+      atualizarTextoBotaoCalcular();
+    }
   }
 
   return {
     init,
+    carregarDoProjeto,
     calcular: calcularTensaodoPonto,
     alternarModoAvancado,
     carregarDoBancoDeAmostras,

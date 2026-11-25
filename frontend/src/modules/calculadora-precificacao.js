@@ -24,6 +24,9 @@ const CalculadoraPrecificacao = (() => {
   // ==========================================================================
 
   function formatarMoeda(valor) {
+    if (typeof Configuracoes !== "undefined" && typeof Configuracoes.formatarMoeda === "function") {
+      return Configuracoes.formatarMoeda(valor);
+    }
     const numero = Number(valor) || 0;
     return numero.toLocaleString("pt-BR", {
       style: "currency",
@@ -303,7 +306,7 @@ const CalculadoraPrecificacao = (() => {
       }
     }
 
-    return {
+    const resultado = {
       subtotalLinhas,
       subtotalMaoObra,
       subtotalAcessorios,
@@ -313,6 +316,123 @@ const CalculadoraPrecificacao = (() => {
       lucroReal,
       listaDiscriminada
     };
+
+    sincronizarComProjetoAtivo(resultado);
+    return resultado;
+  }
+
+  function capturarSnapshotLinhas() {
+    const listaLinhas = document.getElementById("lista-linhas");
+    if (!listaLinhas) return [];
+    return Array.from(listaLinhas.querySelectorAll(".item-linha")).map((item) => ({
+      fio_id: item.dataset.fioId ? Number(item.dataset.fioId) : null,
+      nome: item.querySelector(".input-nome-linha")?.value?.trim() || "",
+      valor: item.querySelector(".input-valor-linha")?.value || "",
+      qtd: item.querySelector(".input-qtd-linha")?.value || "",
+      unidade: item.querySelector(".toggle-medida")?.dataset.unidade || "un"
+    }));
+  }
+
+  function sincronizarComProjetoAtivo(resultado) {
+    if (
+      typeof ProjetoContexto === "undefined" ||
+      ProjetoContexto.estaHidratando() ||
+      !ProjetoContexto.obterProjetoAtivo()
+    ) {
+      return;
+    }
+
+    ProjetoContexto.atualizarSecaoAtiva(
+      "precificacao",
+      {
+        linhas: capturarSnapshotLinhas(),
+        horasGastas: document.getElementById("input-horas-gastas")?.value || "",
+        valorHora: document.getElementById("input-valor-hora")?.value || "",
+        valorAcessorios: document.getElementById("input-valor-acessorios")?.value || "",
+        margemLucro: document.getElementById("input-margem-lucro")?.value || "30",
+        custoTotal: resultado.custoTotal,
+        precoVenda: resultado.precoVenda
+      },
+      { origem: "precificacao" }
+    );
+  }
+
+  function carregarDoProjeto(projeto) {
+    if (!projeto) return;
+    const prec = projeto.precificacao || {};
+    const listaLinhas = document.getElementById("lista-linhas");
+
+    // Define as linhas: prioridade para precificacao.linhas salvas, senão puxa de projeto.materiais.fios
+    let linhasOrigem = Array.isArray(prec.linhas) && prec.linhas.length > 0 ? prec.linhas : null;
+    if (!linhasOrigem && Array.isArray(projeto.materiais?.fios) && projeto.materiais.fios.length > 0) {
+      linhasOrigem = projeto.materiais.fios.map((f) => ({
+        fio_id: f.fio_id || null,
+        nome: f.marca ? `${f.nome} - ${f.cor || ""} (${f.marca})` : f.nome || "",
+        valor: f.preco_pago > 0 ? Number(f.preco_pago).toFixed(2) : "",
+        qtd: f.quantidade || 1,
+        unidade: "un"
+      }));
+    }
+
+    if (listaLinhas) {
+      listaLinhas.innerHTML = "";
+      linhaIdCounter = 0;
+
+      const listaFinal = linhasOrigem && linhasOrigem.length > 0 ? linhasOrigem : [{ nome: "", valor: "", qtd: "", unidade: "un" }];
+      const temFioVinculado = listaFinal.some((l) => l.nome || l.fio_id);
+      if (temFioVinculado && !modoEstoqueAtivo) {
+        alternarModoEstoque(true);
+      }
+
+      listaFinal.forEach((l) => {
+        linhaIdCounter++;
+        const item = criarItemLinha(linhaIdCounter, null);
+        if (l.fio_id) item.dataset.fioId = l.fio_id;
+        const inpNome = item.querySelector(".input-nome-linha");
+        const inpVal = item.querySelector(".input-valor-linha");
+        const inpQtd = item.querySelector(".input-qtd-linha");
+        const toggle = item.querySelector(".toggle-medida");
+        if (inpNome) inpNome.value = l.nome || "";
+        if (inpVal) inpVal.value = l.valor !== undefined && l.valor !== null ? l.valor : "";
+        if (inpQtd) inpQtd.value = l.qtd !== undefined && l.qtd !== null ? l.qtd : "";
+        if (toggle && l.unidade) {
+          toggle.dataset.unidade = l.unidade;
+          toggle.querySelectorAll(".btn-toggle-opcao").forEach((b) => {
+            b.classList.toggle("ativo", b.dataset.valor === l.unidade);
+          });
+        }
+        listaLinhas.appendChild(item);
+      });
+      atualizarBotoesRemover();
+    }
+
+    const horasCrono =
+      projeto.tempo_gasto_seg > 0 && typeof ProjetoContexto !== "undefined"
+        ? ProjetoContexto.segundosParaHoras(projeto.tempo_gasto_seg)
+        : 0;
+    const horasFinais =
+      prec.horasGastas !== undefined && prec.horasGastas !== ""
+        ? prec.horasGastas
+        : horasCrono > 0
+          ? String(horasCrono)
+          : "";
+
+    const inpHoras = document.getElementById("input-horas-gastas");
+    const inpValHora = document.getElementById("input-valor-hora");
+    const inpAcess = document.getElementById("input-valor-acessorios");
+    const inpMargem = document.getElementById("input-margem-lucro");
+    const sliderMargem = document.getElementById("slider-margem-lucro");
+    const dispMargem = document.getElementById("display-margem-lucro");
+
+    if (inpHoras) inpHoras.value = horasFinais;
+    if (inpValHora) inpValHora.value = prec.valorHora || "";
+    if (inpAcess) inpAcess.value = prec.valorAcessorios || "";
+    const margem = prec.margemLucro !== undefined && prec.margemLucro !== "" ? prec.margemLucro : "30";
+    if (inpMargem) inpMargem.value = margem;
+    if (sliderMargem) sliderMargem.value = Math.min(200, Number(margem) || 30);
+    if (dispMargem) dispMargem.textContent = `${margem}%`;
+
+    calcularPrecificacao(false);
   }
 
   function alternarModoEstoque(forcarEstado = null) {
@@ -402,12 +522,21 @@ const CalculadoraPrecificacao = (() => {
     const sliderMargemLucro = document.getElementById("slider-margem-lucro");
     const displayMargemLucro = document.getElementById("display-margem-lucro");
 
+    const valorHoraDefault =
+      typeof Configuracoes !== "undefined" && Configuracoes.obter("valorHoraPadrao") !== ""
+        ? Number(Configuracoes.obter("valorHoraPadrao"))
+        : 0;
+    const margemDefault =
+      typeof Configuracoes !== "undefined" && Configuracoes.obter("margemPadrao") !== ""
+        ? Number(Configuracoes.obter("margemPadrao"))
+        : 30;
+
     if (inputHorasGastas) inputHorasGastas.value = "";
-    if (inputValorHora) inputValorHora.value = "";
+    if (inputValorHora) inputValorHora.value = valorHoraDefault > 0 ? valorHoraDefault.toFixed(2) : "";
     if (inputValorAcessorios) inputValorAcessorios.value = "";
-    if (inputMargemLucro) inputMargemLucro.value = 30;
-    if (sliderMargemLucro) sliderMargemLucro.value = 30;
-    if (displayMargemLucro) displayMargemLucro.textContent = "30%";
+    if (inputMargemLucro) inputMargemLucro.value = margemDefault;
+    if (sliderMargemLucro) sliderMargemLucro.value = Math.min(200, margemDefault);
+    if (displayMargemLucro) displayMargemLucro.textContent = `${margemDefault}%`;
 
     aviamentosSelecionados.clear();
     renderizarChipsAviamentos();
@@ -434,8 +563,17 @@ const CalculadoraPrecificacao = (() => {
         }).join("\n")
       : "";
 
+    const nomeAtelie =
+      typeof Configuracoes !== "undefined" && Configuracoes.obter("nomeAtelie")
+        ? Configuracoes.obter("nomeAtelie")
+        : "Ponto & Trama";
+    const assinatura =
+      typeof Configuracoes !== "undefined" && Configuracoes.obter("assinaturaOrcamento")
+        ? `\n${Configuracoes.obter("assinaturaOrcamento")}`
+        : "";
+
     const texto = [
-      "📋 Orçamento de Precificação - Ponto & Trama",
+      `📋 Orçamento de Precificação - ${nomeAtelie}`,
       "----------------------------------------",
       "🧵 Fios e Materiais:",
       linhasFiosTexto,
@@ -444,7 +582,7 @@ const CalculadoraPrecificacao = (() => {
       "----------------------------------------",
       `💰 Custo Total de Produção: ${formatarMoeda(dados.custoTotal)}`,
       `📈 Margem de Lucro: ${dados.margemPercentual}% (+${formatarMoeda(dados.lucroReal)})`,
-      `✨ Preço Final Sugerido: ${formatarMoeda(dados.precoVenda)}`
+      `✨ Preço Final Sugerido: ${formatarMoeda(dados.precoVenda)}${assinatura}`
     ].join("\n");
 
     const btn = document.getElementById("btn-calcular-precificacao");
@@ -497,6 +635,10 @@ const CalculadoraPrecificacao = (() => {
 
     const valorPreco = fioPreselecionado?.preco_pago ? fioPreselecionado.preco_pago.toFixed(2) : "";
     const nomePreenchido = fioPreselecionado ? `${fioPreselecionado.nome} - ${fioPreselecionado.cor_nome} (${fioPreselecionado.marca})` : "";
+    const simboloMoeda =
+      typeof Configuracoes !== "undefined" && typeof Configuracoes.obterSimboloMoeda === "function"
+        ? Configuracoes.obterSimboloMoeda()
+        : "R$";
 
     item.innerHTML = `
       <div class="item-linha-campos">
@@ -517,9 +659,9 @@ const CalculadoraPrecificacao = (() => {
         </div>
 
         <div class="campo-item campo-valor-linha">
-          <label class="label-campo">VALOR DA LINHA (R$)</label>
+          <label class="label-campo">VALOR DA LINHA</label>
           <div class="input-grupo">
-            <span class="prefixo-input">R$</span>
+            <span class="prefixo-input">${escapeHtml(simboloMoeda)}</span>
             <input
               type="number"
               class="input-precificacao input-valor-linha"
@@ -1132,6 +1274,34 @@ const CalculadoraPrecificacao = (() => {
     }
   }
 
+  function aplicarConfiguracoesNaPrecificacao(sobrescreverSeVazio = true) {
+    if (typeof Configuracoes === "undefined") return;
+    const simbolo = typeof Configuracoes.obterSimboloMoeda === "function" ? Configuracoes.obterSimboloMoeda() : "R$";
+    document.querySelectorAll("#secao-precificacao .prefixo-input").forEach((el) => {
+      el.textContent = simbolo;
+    });
+
+    const inpValHora = document.getElementById("input-valor-hora");
+    const valHoraPadrao = Configuracoes.obter("valorHoraPadrao");
+    if (inpValHora && valHoraPadrao !== "" && Number(valHoraPadrao) >= 0) {
+      if (!sobrescreverSeVazio || !inpValHora.value) {
+        inpValHora.value = Number(valHoraPadrao) > 0 ? Number(valHoraPadrao).toFixed(2) : "";
+      }
+    }
+
+    const margemPadrao = Configuracoes.obter("margemPadrao");
+    const inpMargem = document.getElementById("input-margem-lucro");
+    const sliderMargem = document.getElementById("slider-margem-lucro");
+    const dispMargem = document.getElementById("display-margem-lucro");
+    if (inpMargem && margemPadrao !== undefined && margemPadrao !== "") {
+      if (!sobrescreverSeVazio || inpMargem.value === "30" || inpMargem.value === "") {
+        inpMargem.value = margemPadrao;
+        if (sliderMargem) sliderMargem.value = Math.min(200, Number(margemPadrao) || 30);
+        if (dispMargem) dispMargem.textContent = `${margemPadrao}%`;
+      }
+    }
+  }
+
   // Inicialização do módulo
   async function init() {
     vincularEventos();
@@ -1153,12 +1323,25 @@ const CalculadoraPrecificacao = (() => {
       alternarModoEstoque(true);
     }
 
-    // Cálculo inicial
-    calcularPrecificacao(false);
+    aplicarConfiguracoesNaPrecificacao(true);
+
+    window.addEventListener("ponto-trama:configuracoes-atualizadas", () => {
+      aplicarConfiguracoesNaPrecificacao(false);
+      calcularPrecificacao(false);
+    });
+
+    const projAtivo = typeof ProjetoContexto !== "undefined" ? ProjetoContexto.obterProjetoAtivo() : null;
+    if (projAtivo) {
+      carregarDoProjeto(projAtivo);
+    } else {
+      // Cálculo inicial
+      calcularPrecificacao(false);
+    }
   }
 
   return {
     init,
+    carregarDoProjeto,
     calcularPrecificacao,
     adicionarLinha,
     removerLinha,
