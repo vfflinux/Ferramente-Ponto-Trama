@@ -10,7 +10,7 @@ Aplicação multiplataforma **100% offline** para organização de artesanato em
 | :--- | :--- | :---: | :--- | :--- |
 | **Android (Celular)** | `ponto-e-trama.apk` | `220 KB` | [Baixar APK (`mobile/ponto-e-trama.apk`)](https://github.com/vfflinux/Ferramente-Ponto-Trama/raw/main/mobile/ponto-e-trama.apk) | Copie o `.apk` para o celular (Android 7.0+), toque no arquivo e autorize a instalação. |
 | **Linux / Ubuntu (Instalador `.deb`)** | `ponto-e-trama_1.0.0_all.deb` | `136 KB` | [Baixar `.deb` (`dist/ponto-e-trama_1.0.0_all.deb`)](https://github.com/vfflinux/Ferramente-Ponto-Trama/raw/main/dist/ponto-e-trama_1.0.0_all.deb) | Clique duas vezes no `.deb` (abre a Central de Aplicativos do Ubuntu) ou rode `sudo apt install ./dist/ponto-e-trama_1.0.0_all.deb`. |
-| **Linux / Ubuntu (Direto da pasta)** | `PontoETrama` + Instalador GTK | — | `dist/Ponto & Trama.desktop` e `dist/Instalar Ponto & Trama.desktop` | Após clonar o repositório, clique com o botão direito → *Permitir iniciar* ou execute `./PontoETrama` / `./desktop/instalar-ubuntu.sh`. |
+| **Linux / Ubuntu (Direto da pasta)** | `PontoETrama` + Instalador GTK | — | `dist/Ponto & Trama.desktop` e `dist/Instalar Ponto & Trama.desktop` | Clique com o botão direito → *Permitir iniciar* e dê duplo clique em `Ponto & Trama.desktop` ou no instalador gráfico `Instalar Ponto & Trama.desktop`. |
 | **Web (Navegador)** | `frontend/index.html` | — | Pasta [`frontend/`](frontend/index.html) | Abra `frontend/index.html` diretamente no navegador ou hospede a pasta `frontend/` (não precisa de servidor SQL). |
 
 ---
@@ -81,23 +81,18 @@ Aplicação multiplataforma **100% offline** para organização de artesanato em
 ```text
 Ponto&Trama/
 ├── PontoETrama                              # Executável do App Desktop Ubuntu
-├── iniciar.sh                               # Inicia servidor local Python + SQLite
 ├── AGENTS.md                                # Diretriz de sincronização Web <-> App <-> Mobile
 ├── README.md
 ├── scripts/
 │   └── otimizar-build.py                    # Minificador seguro de HTML/CSS/JS para .deb e .apk
 ├── backend/
 │   ├── server.py                            # Servidor HTTP local (gzip/ETag) + API REST SQLite
-│   ├── database/
-│   │   └── schema.sql                       # Esquema relacional SQL (fios, itens_biblioteca, banco_amostras, projetos)
-│   └── legacy/
-│       └── prototipo-calculo.js
+│   └── database/
+│       └── schema.sql                       # Esquema relacional SQL (fios, itens_biblioteca, banco_amostras, projetos)
 ├── desktop/
 │   ├── app.py                               # App nativo Ubuntu (GTK 3 + WebKit2GTK + SQLite)
 │   ├── instalador-gui.py                    # Instalador gráfico GTK para Ubuntu
-│   ├── instalar-ubuntu.sh                   # Registra app + ícone no menu do Ubuntu
-│   ├── build-deb.sh                         # Gera o pacote dist/ponto-e-trama_1.0.0_all.deb
-│   └── ponto-e-trama.desktop
+│   └── build-deb.sh                         # Gera o pacote dist/ponto-e-trama_1.0.0_all.deb
 ├── dist/
 │   ├── ponto-e-trama_1.0.0_all.deb          # Instalador oficial Ubuntu (.deb - 136 KB)
 │   ├── Ponto & Trama.desktop                # Lançador clicável do app
@@ -107,8 +102,6 @@ Ponto&Trama/
 │   ├── build-apk.sh                         # Recompila, otimiza e assina o APK
 │   ├── README.md
 │   └── android/                             # Código-fonte Android (MainActivity.java, Manifest, ícones)
-├── docs/
-│   └── requisitos-ferramentas.txt
 └── frontend/
     ├── index.html                           # SPA compartilhada entre Web, Ubuntu e Android
     ├── assets/images/                       # Logo oficial otimizada
