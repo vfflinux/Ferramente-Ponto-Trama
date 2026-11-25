@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+
+# Banco de dados local do usuário (gerado automaticamente a partir de schema.sql)
+backend/database/*.db
+backend/database/*.db-wal
+backend/database/*.db-shm
+backend/database/.app-webview-data/
+
+# Chaves de assinatura locais e assets gerados no build Android
+mobile/*.keystore
+mobile/*.idsig
+mobile/android/assets/
+
+# Sistema operacional e editores
+.vscode/
+.DS_Store
+Thumbs.db
+*.swp
+*.swo

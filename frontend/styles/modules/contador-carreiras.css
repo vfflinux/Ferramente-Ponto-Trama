@@ -1,0 +1,662 @@
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   CONTADOR DE CARREIRAS - ESTILO
+   Utiliza as variáveis globais (:root) definidas em global.css
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+
+/* Reset interno de parágrafos para não herdar regras globais */
+.conteiner_contador p,
+.cabecalho p,
+.cabecalho span,
+.conteiner_contador span {
+  height: auto;
+  line-height: normal;
+}
+
+/* ==========================================
+   4# ALARME - ANIMAÇÃO DE PISCAR A TELA
+   Alterna entre cor original do site e vermelho
+   ========================================== */
+@keyframes piscarTelaAlarme {
+  0%, 100% {
+    background-color: var(--cor-fundo-principal);
+  }
+  50% {
+    background-color: var(--cor-alerta-escuro);
+  }
+}
+
+.alarme-tela-ativa {
+  animation: piscarTelaAlarme 0.8s infinite ease-in-out !important;
+}
+
+/* Banner de Alerta no Topo */
+.banner-alarme {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: linear-gradient(90deg, var(--cor-alerta-gradiente-1) 0%, var(--cor-alerta-gradiente-2) 50%, var(--cor-alerta-gradiente-1) 100%);
+  color: var(--cor-texto-principal);
+  padding: 12px 24px;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: var(--z-index-banner-alarme);
+  border-bottom: 2px solid var(--cor-texto-principal);
+  box-shadow: var(--sombra-banner);
+  animation: deslizarBanner 0.35s ease-out;
+}
+
+@keyframes deslizarBanner {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.banner-alarme-conteudo {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.icone-alerta {
+  font-size: 20px;
+  animation: balancarSino 0.6s infinite alternate ease-in-out;
+}
+
+@keyframes balancarSino {
+  from { transform: rotate(-15deg); }
+  to { transform: rotate(15deg); }
+}
+
+.btn-silenciar {
+  background-color: var(--cor-fundo-profundo);
+  color: var(--cor-texto-principal);
+  border: 1.5px solid var(--cor-texto-principal);
+  border-radius: var(--raio-borda-md);
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color var(--transicao-padrao), transform var(--transicao-rapida);
+}
+
+.btn-silenciar:hover {
+  background-color: var(--cor-destaque);
+  transform: scale(1.05);
+}
+
+/* ==========================================
+   CABEÇALHO DA FERRAMENTA & BOTÃO +CONTADOR (2#)
+   ========================================== */
+.cabecalho {
+  background-color: var(--cor-destaque);
+  width: 100%;
+  min-height: var(--altura-cabecalho-min);
+  max-height: var(--altura-cabecalho-max);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px 0 65px;
+  box-sizing: border-box;
+  border-bottom: 2px solid var(--cor-fundo-profundo);
+  flex-shrink: 0;
+}
+
+.cabecalho-conteudo {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cabecalho-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.titulo-ferramenta {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--cor-texto-principal);
+  margin: 0;
+  letter-spacing: 0.5px;
+}
+
+.subtitulo-ferramenta {
+  font-size: 13px;
+  color: var(--creme-opacidade-75);
+}
+
+/* Botão +contador no canto superior direito */
+.btn-adicionar-contador {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: var(--cor-fundo-profundo);
+  color: var(--cor-texto-principal);
+  border: 1.5px solid var(--cor-texto-principal);
+  border-radius: var(--raio-borda-lg);
+  padding: 10px 20px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color var(--transicao-padrao), transform var(--transicao-rapida), box-shadow var(--transicao-padrao);
+  box-shadow: var(--sombra-md);
+  user-select: none;
+}
+
+.btn-adicionar-contador .icone-mais {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.btn-adicionar-contador:hover {
+  background-color: var(--cor-fundo-principal);
+  transform: translateY(-2px);
+  box-shadow: var(--sombra-lg);
+}
+
+.btn-adicionar-contador:active {
+  transform: translateY(0);
+}
+
+/* ==========================================
+   ÁREA PRINCIPAL DE CONTADORES
+   ========================================== */
+.conteiner_contador {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  position: relative;
+  overflow-y: auto;
+  overflow-x: auto;
+  box-sizing: border-box;
+  scrollbar-width: thin;
+  scrollbar-color: var(--cor-destaque) var(--azul-profundo-opacidade-40);
+}
+
+.conteiner_contador::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+}
+
+.conteiner_contador::-webkit-scrollbar-track {
+  background: var(--azul-profundo-opacidade-40);
+  border-radius: var(--raio-borda-sm);
+}
+
+.conteiner_contador::-webkit-scrollbar-thumb {
+  background: var(--cor-destaque);
+  border-radius: var(--raio-borda-sm);
+  border: 1px solid var(--creme-opacidade-20);
+}
+
+.conteiner_contador::-webkit-scrollbar-thumb:hover {
+  background: var(--cor-destaque-hover);
+}
+
+/* O contador inicial sempre centralizado; quando transborda, começa da esquerda sem cortar */
+.area-contadores {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 32px;
+  min-height: 100%;
+  width: max-content;
+  padding: 40px 32px 30px 32px;
+  box-sizing: border-box;
+  margin: auto;
+}
+
+/* ==========================================
+   CARD DO CONTADOR (1#)
+   ========================================== */
+.card-contador {
+  background-color: var(--cor-fundo-profundo);
+  border: 2px solid var(--cor-destaque);
+  border-radius: var(--raio-borda-card);
+  padding: 22px 20px;
+  width: 336px;
+  min-width: 306px;
+  max-width: 356px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  color: var(--cor-texto-principal);
+  box-shadow: var(--sombra-card);
+  position: relative;
+  transition: transform var(--transicao-deslocamento), box-shadow 0.3s ease, border-color 0.3s ease;
+  flex-shrink: 0;
+}
+
+.card-contador:hover {
+  border-color: var(--creme-opacidade-40);
+  box-shadow: var(--sombra-card-hover);
+}
+
+/* Card em estado de alarme disparado */
+.card-contador.alarme-disparado {
+  border-color: var(--cor-alerta);
+  box-shadow: var(--sombra-alerta-brilho);
+  animation: pulsarCardAlarme 1s infinite alternate;
+}
+
+@keyframes pulsarCardAlarme {
+  from {
+    box-shadow: 0 0 15px rgba(231, 76, 60, 0.4);
+  }
+  to {
+    box-shadow: 0 0 30px rgba(231, 76, 60, 0.85);
+  }
+}
+
+/* Topo do Card */
+.card-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border-bottom: 1px solid var(--creme-opacidade-15);
+  padding-bottom: 8px;
+}
+
+.nome-contador {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--cor-texto-principal);
+  font-size: 17px;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: var(--raio-borda-sm);
+  width: 100%;
+  transition: border-color var(--transicao-padrao), background-color var(--transicao-padrao);
+  box-sizing: border-box;
+}
+
+.nome-contador:hover,
+.nome-contador:focus {
+  background-color: var(--azul-medio-opacidade-40);
+  border-color: var(--creme-opacidade-40);
+  outline: none;
+}
+
+/* Botão simples para remover contador secundário (2#) */
+.btn-remover-contador {
+  background-color: var(--azul-medio-opacidade-50);
+  border: 1px solid var(--creme-opacidade-30);
+  color: var(--cor-texto-principal);
+  border-radius: var(--raio-borda-redondo);
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: bold;
+  transition: background-color var(--transicao-padrao), transform var(--transicao-rapida), border-color var(--transicao-padrao);
+  flex-shrink: 0;
+}
+
+.btn-remover-contador:hover {
+  background-color: var(--cor-alerta-gradiente-2);
+  border-color: var(--cor-texto-principal);
+  transform: scale(1.1);
+}
+
+/* ==========================================
+   DISPLAY DO NÚMERO DE CARREIRAS COM BOTÕES LATERAIS (1#)
+   ========================================== */
+.secao-carreiras {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.label-secao {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--creme-opacidade-70);
+  font-weight: 600;
+}
+
+.controle-carreiras {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.controle-carreiras .input-carreiras {
+  flex: 1;
+  min-width: 0;
+  height: 82px;
+  background-color: var(--cor-fundo-principal);
+  border: 2px solid var(--cor-destaque);
+  border-radius: var(--raio-borda-xl);
+  color: var(--cor-texto-principal);
+  font-size: 52px;
+  font-weight: 700;
+  text-align: center;
+  outline: none;
+  transition: border-color var(--transicao-padrao), box-shadow var(--transicao-padrao), background-color var(--transicao-padrao);
+  box-sizing: border-box;
+  -moz-appearance: textfield;
+}
+
+.controle-carreiras .input-carreiras::-webkit-outer-spin-button,
+.controle-carreiras .input-carreiras::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.controle-carreiras .input-carreiras:hover {
+  border-color: var(--creme-opacidade-50);
+}
+
+.controle-carreiras .input-carreiras:focus {
+  border-color: var(--cor-texto-principal);
+  box-shadow: 0 0 16px var(--creme-opacidade-30);
+  background-color: var(--cor-destaque-ativo);
+}
+
+/* Botões Laterais Grandes de Fácil Toque */
+.controle-carreiras .btn-toque {
+  height: 82px;
+  border-radius: var(--raio-borda-xl);
+  font-weight: 700;
+  color: var(--cor-texto-principal);
+  cursor: pointer;
+  transition: background-color var(--transicao-rapida), transform 0.1s, box-shadow var(--transicao-rapida), border-color var(--transicao-rapida);
+  user-select: none;
+  box-sizing: border-box;
+  border: 1.5px solid var(--creme-opacidade-25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+/* Botão Menos na Esquerda */
+.controle-carreiras .btn-menos {
+  width: 70px;
+  font-size: 36px;
+  background-color: var(--azul-medio-opacidade-55);
+}
+
+.controle-carreiras .btn-menos:hover {
+  background-color: var(--cor-destaque);
+  border-color: var(--cor-texto-principal);
+  transform: translateY(-2px);
+}
+
+.controle-carreiras .btn-menos:active {
+  transform: scale(0.95);
+}
+
+/* Botão Mais na Direita */
+.controle-carreiras .btn-mais {
+  width: 78px;
+  font-size: 40px;
+  background-color: var(--cor-destaque);
+  border-color: var(--creme-opacidade-45);
+  box-shadow: var(--sombra-md);
+}
+
+.controle-carreiras .btn-mais:hover {
+  background-color: var(--cor-destaque-hover);
+  border-color: var(--cor-texto-principal);
+  transform: translateY(-2px);
+  box-shadow: var(--sombra-lg);
+}
+
+.controle-carreiras .btn-mais:active {
+  transform: scale(0.95);
+}
+
+/* Botão Bem Simples para Zerar o Contador (1#) */
+.linha-zerar {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.btn-zerar {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: transparent;
+  border: 1px solid var(--creme-opacidade-30);
+  border-radius: var(--raio-borda-md);
+  padding: 6px 16px;
+  color: var(--creme-opacidade-85);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color var(--transicao-padrao), color var(--transicao-padrao), border-color var(--transicao-padrao);
+}
+
+.btn-zerar:hover {
+  background-color: var(--creme-opacidade-12);
+  color: var(--cor-texto-principal);
+  border-color: var(--cor-texto-principal);
+}
+
+.icone-zerar {
+  width: 14px;
+  height: 14px;
+}
+
+/* ==========================================
+   3# CÁLCULO DE PONTOS (Carreiras * Pontos)
+   ========================================== */
+.secao-calculo {
+  background-color: var(--cor-fundo-principal);
+  border: 1.5px solid var(--cor-destaque);
+  border-radius: 14px;
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.linha-input-pontos {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.label-pontos {
+  font-size: 13px;
+  color: var(--cor-texto-principal);
+  font-weight: 500;
+}
+
+/* Remove setas de incremento padrão dos navegadores nos campos de número */
+.input-pontos-carreira::-webkit-outer-spin-button,
+.input-pontos-carreira::-webkit-inner-spin-button,
+.input-meta::-webkit-outer-spin-button,
+.input-meta::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.input-pontos-carreira,
+.input-meta {
+  width: 82px;
+  height: 34px;
+  background-color: var(--cor-fundo-profundo);
+  border: 1.5px solid var(--cor-destaque);
+  border-radius: var(--raio-borda-md);
+  color: var(--cor-texto-principal);
+  font-size: 15px;
+  font-weight: 600;
+  text-align: center;
+  outline: none;
+  transition: border-color var(--transicao-padrao), background-color var(--transicao-padrao), box-shadow var(--transicao-padrao);
+  box-sizing: border-box;
+  -moz-appearance: textfield;
+  appearance: textfield;
+  cursor: text;
+}
+
+.input-pontos-carreira:hover,
+.input-meta:hover {
+  border-color: var(--creme-opacidade-45);
+  background-color: #051033;
+}
+
+.input-pontos-carreira:focus,
+.input-meta:focus {
+  border-color: var(--cor-texto-principal);
+  box-shadow: 0 0 10px var(--creme-opacidade-25);
+  background-color: #081745;
+}
+
+.linha-total-pontos {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  border-top: 1px dashed var(--creme-opacidade-15);
+  padding-top: 8px;
+}
+
+.label-total {
+  font-size: 13px;
+  color: var(--creme-opacidade-85);
+}
+
+.valor-total-pontos {
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--cor-texto-principal);
+}
+
+.unidade-pontos {
+  font-size: 12px;
+  color: var(--creme-opacidade-65);
+  margin-left: 4px;
+}
+
+/* ==========================================
+   4# SEÇÃO DO ALARME / META DE CARREIRAS
+   ========================================== */
+.secao-alarme {
+  background-color: var(--cor-fundo-principal);
+  border: 1.5px solid var(--cor-destaque);
+  border-radius: 14px;
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.linha-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.label-meta {
+  font-size: 13px;
+  color: var(--cor-texto-principal);
+  font-weight: 500;
+}
+
+/* ==========================================
+   2# ANIMAÇÕES DE INFLAR E DESINFLAR CONTADOR
+   ========================================== */
+@keyframes inflarContador {
+  0% {
+    transform: scale(0.25);
+    opacity: 0;
+  }
+  65% {
+    transform: scale(1.05);
+    opacity: 0.95;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes desinflarContador {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.2);
+    opacity: 0;
+  }
+}
+
+.animar-inflar {
+  animation: inflarContador var(--transicao-inflar) forwards;
+}
+
+.animar-desinflar {
+  animation: desinflarContador 0.35s ease forwards;
+}
+
+/* ==========================================
+   ESTRUTURA DE SEÇÕES E VISIBILIDADE DE FERRAMENTAS
+   ========================================== */
+#secao-contador-carreiras,
+.secao-ferramenta {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.conteiner-placeholder,
+.placeholder-ferramenta {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--cor-texto-principal);
+  font-size: 16px;
+  background-color: var(--cor-fundo-principal);
+  opacity: 0.85;
+  user-select: none;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.conteiner-ferramenta {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow-y: auto;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}

@@ -1,0 +1,218 @@
+.logoArea {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  padding-top: 10px;
+  transition: gap var(--transicao-suave);
+}
+
+.logoImagem {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.nomeLogo {
+  font-size: 18px;
+  font-family: var(--fonte-logo);
+  color: var(--cor-texto-principal);
+  white-space: nowrap;
+  height: auto;
+  max-width: 150px;
+  overflow: hidden;
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity 0.2s ease 0.3s,
+    max-width var(--transicao-suave),
+    visibility 0s 0.3s;
+}
+
+.barraLateral {
+  width: var(--largura-barra-lateral);
+  flex-shrink: 0;
+  height: 100%;
+  background-color: var(--cor-fundo-profundo);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  position: relative;
+  transition: width var(--transicao-suave);
+  box-sizing: border-box;
+}
+
+.icon {
+  position: absolute;
+  top: 15px;
+  width: 40px;
+  height: 40px;
+  right: -35px;
+  background-color: var(--cor-fundo-profundo);
+  border-radius: var(--raio-borda-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--z-index-menu-icone);
+}
+
+#opcao-menu {
+  display: none;
+}
+
+.botaoNavegar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--cor-texto-principal);
+  cursor: pointer;
+  border-radius: var(--raio-borda-sm);
+  font-size: 20px;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+#opcao-menu:checked ~ .barraLateral {
+  width: var(--largura-barra-lateral-recolhida);
+  transition: width var(--transicao-suave);
+}
+
+.listaNavegacao {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+  padding: 12px 8px 10px 8px;
+  box-sizing: border-box;
+}
+
+.botaoFerramenta {
+  background: none;
+  border: none;
+  outline: none;
+  font-family: inherit;
+  text-align: left;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  height: auto;
+  padding: 7px 10px;
+  color: var(--cor-texto-principal);
+  cursor: pointer;
+  border-radius: var(--raio-borda-md);
+  white-space: nowrap;
+  font-size: 14px;
+  font-weight: 500;
+  box-sizing: border-box;
+  transition:
+    background-color var(--transicao-padrao),
+    color var(--transicao-padrao),
+    transform var(--transicao-rapida),
+    padding var(--transicao-suave),
+    gap var(--transicao-suave);
+}
+
+.botaoFerramenta:focus-visible {
+  outline: 2px solid var(--cor-foco-destaque);
+  outline-offset: -1px;
+}
+
+.botaoFerramenta:hover {
+  background-color: var(--azul-medio-opacidade-70);
+  color: var(--cor-branco);
+  transform: translateX(3px);
+}
+
+.botaoFerramenta:active {
+  transform: scale(0.98);
+}
+
+.botaoFerramenta.ativo {
+  background-color: var(--azul-medio-opacidade-95);
+  color: var(--cor-branco);
+  box-shadow: var(--sombra-sm);
+}
+
+.iconeFerramenta {
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  flex-shrink: 0;
+  stroke: currentColor;
+  stroke-width: 2;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.botaoFerramenta span {
+  white-space: nowrap;
+  max-width: 210px;
+  overflow: hidden;
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity 0.2s ease 0.3s,
+    max-width var(--transicao-suave),
+    visibility 0s 0.3s;
+}
+
+#opcao-menu:checked ~ .barraLateral .botaoFerramenta {
+  justify-content: center;
+  padding: 7px 0;
+  gap: 0;
+}
+
+#opcao-menu:checked ~ .barraLateral .botaoFerramenta:hover {
+  transform: scale(1.08);
+}
+
+#opcao-menu:checked ~ .barraLateral .botaoFerramenta span {
+  opacity: 0;
+  visibility: hidden;
+  max-width: 0;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  transition:
+    opacity 0.1s ease 0s,
+    max-width var(--transicao-suave),
+    visibility 0s 0.1s;
+}
+
+#opcao-menu:checked ~ .barraLateral .logoArea {
+  gap: 0;
+}
+
+#opcao-menu:checked ~ .barraLateral .nomeLogo {
+  opacity: 0;
+  visibility: hidden;
+  max-width: 0;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  transition:
+    opacity 0.1s ease 0s,
+    max-width var(--transicao-suave),
+    visibility 0s 0.1s;
+}
+
+.logo {
+  width: 100%;
+  height: 12%;
+  background-color: var(--cor-destaque);
+  border-bottom: 2px solid var(--cor-fundo-principal);
+}
+
+label {
+  color: var(--cor-texto-principal);
+  font-size: 15px;
+  margin-right: 10px;
+}

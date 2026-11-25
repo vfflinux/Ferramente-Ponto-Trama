@@ -1,0 +1,1215 @@
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   CALCULADORA DE PRECIFICAÇÃO - ESTILO
+   Layout "Zero Scroll" em 2 Colunas (62% Inputs / 38% Resultados)
+   Utiliza as variáveis globais (:root) de global.css
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+
+/* ==========================================================================
+   1. ARQUITETURA DE TELA (REGRA "ZERO SCROLL")
+   ========================================================================== */
+#secao-precificacao.secao-ferramenta {
+  height: 100%;
+  max-height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.conteiner-precificacao {
+  flex: 1;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+  padding: 20px 24px;
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: calc(62% - 12px) calc(38% - 12px);
+  gap: 24px;
+  background-color: var(--cor-fundo-principal);
+}
+
+/* ==========================================================================
+   2. COLUNA ESQUERDA (62% DA LARGURA) - INPUTS & BLOCOS
+   ========================================================================== */
+.coluna-inputs-precificacao {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 12px;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* Cards de Elevação Translúcidos */
+.bloco-precificacao {
+  background-color: rgba(34, 57, 111, 0.32);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--raio-borda-lg);
+  padding: 12px 18px;
+  box-sizing: border-box;
+  box-shadow: var(--sombra-sm);
+  display: flex;
+  flex-direction: column;
+  transition: border-color var(--transicao-padrao), box-shadow var(--transicao-padrao);
+}
+
+.bloco-precificacao:hover {
+  border-color: rgba(252, 241, 208, 0.2);
+}
+
+/* Títulos dos Blocos */
+.titulo-bloco {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--cor-texto-principal);
+  margin: 0 0 8px 0;
+  letter-spacing: 0.3px;
+}
+
+.cabecalho-bloco {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.titulo-com-icone {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.titulo-com-icone .titulo-bloco {
+  margin: 0;
+}
+
+.subtitulo-bloco {
+  font-size: 11px;
+  color: var(--creme-opacidade-65);
+}
+
+/* Botão + Adicionar Linha (Pill Style) */
+.btn-adicionar-linha {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: var(--cor-fundo-profundo);
+  color: var(--cor-texto-principal);
+  border: 1px solid var(--creme-opacidade-30);
+  border-radius: var(--raio-borda-pilula);
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transicao-rapida);
+  user-select: none;
+}
+
+.btn-adicionar-linha .icone-mais {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.btn-adicionar-linha:hover {
+  background-color: var(--cor-destaque);
+  border-color: var(--cor-texto-principal);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(1, 7, 54, 0.5);
+}
+
+.btn-adicionar-linha:active {
+  transform: scale(0.97);
+}
+
+/* --------------------------------------------------------------------------
+   BLOCO A: LISTA DINÂMICA DE LINHAS (COM TRAVA DE SCROLL INTERNA)
+   -------------------------------------------------------------------------- */
+.bloco-linhas {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.lista-linhas {
+  flex: 1;
+  max-height: 145px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--cor-destaque) rgba(1, 7, 54, 0.4);
+}
+
+.lista-linhas::-webkit-scrollbar {
+  width: 6px;
+}
+
+.lista-linhas::-webkit-scrollbar-track {
+  background: rgba(1, 7, 54, 0.4);
+  border-radius: var(--raio-borda-sm);
+}
+
+.lista-linhas::-webkit-scrollbar-thumb {
+  background: var(--cor-destaque);
+  border-radius: var(--raio-borda-sm);
+  border: 1px solid var(--creme-opacidade-15);
+}
+
+.lista-linhas::-webkit-scrollbar-thumb:hover {
+  background: var(--cor-destaque-hover);
+}
+
+/* ==========================================================================
+   AÇÕES DO CABEÇALHO DA CALCULADORA (BOTÃO ESTOQUE & CONSULTA)
+   ========================================================================== */
+.cabecalho-acoes {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-estoque-precificacao {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(34, 57, 111, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--raio-borda-md);
+  padding: 7px 14px;
+  color: var(--cor-texto-principal);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transicao-padrao);
+  user-select: none;
+}
+
+.btn-estoque-precificacao .icone-btn-estoque {
+  font-size: 15px;
+}
+
+.btn-estoque-precificacao:hover {
+  background: rgba(34, 57, 111, 0.75);
+  border-color: var(--creme-opacidade-40);
+  transform: translateY(-1px);
+}
+
+.btn-estoque-precificacao.ativo {
+  background: rgba(252, 241, 208, 0.16);
+  border-color: var(--cor-destaque);
+  box-shadow: 0 0 12px rgba(252, 241, 208, 0.22);
+}
+
+.badge-status-estoque {
+  font-size: 10px;
+  padding: 2px 7px;
+  border-radius: var(--raio-borda-pilula);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--creme-opacidade-65);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 700;
+  transition: all var(--transicao-rapida);
+}
+
+.btn-estoque-precificacao.ativo .badge-status-estoque {
+  background: var(--cor-destaque);
+  color: var(--cor-fundo-profundo);
+}
+
+.btn-consultar-gaveta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--cor-destaque-hover);
+  border: 1px solid var(--creme-opacidade-30);
+  border-radius: var(--raio-borda-md);
+  padding: 7px 13px;
+  color: var(--cor-texto-principal);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transicao-rapida);
+  animation: fadeInLinha 0.2s ease-out;
+}
+
+.btn-consultar-gaveta .icone-busca-btn {
+  width: 14px;
+  height: 14px;
+}
+
+.btn-consultar-gaveta:hover {
+  background: var(--cor-destaque);
+  border-color: var(--cor-texto-principal);
+  transform: translateY(-1px);
+}
+
+/* Fileira Única Horizontal de Cada Linha */
+.item-linha {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  padding-bottom: 2px;
+  animation: fadeInLinha 0.2s ease-out forwards;
+}
+
+.item-linha-campos {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  width: 100%;
+}
+
+@keyframes fadeInLinha {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeOutLinha {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+
+.animar-linha-removida {
+  animation: fadeOutLinha 0.2s ease-out forwards;
+}
+
+/* Distribuição Proporcional das Larguras (Modo Padrão) */
+.campo-nome-linha {
+  display: none;
+  flex: 34;
+  min-width: 0;
+}
+
+.campo-valor-linha {
+  flex: 30;
+  min-width: 0;
+}
+
+.campo-qtd-linha {
+  flex: 25;
+  min-width: 0;
+}
+
+.campo-medida-linha {
+  flex: 35;
+  min-width: 0;
+}
+
+.campo-acao-linha {
+  flex: 10;
+  min-width: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Distribuição Proporcional das Larguras (Modo Estoque Ativo) */
+.conteiner-precificacao.modo-estoque-ativo .campo-nome-linha {
+  display: flex;
+  flex: 34;
+}
+
+.conteiner-precificacao.modo-estoque-ativo .campo-valor-linha {
+  flex: 22;
+}
+
+.conteiner-precificacao.modo-estoque-ativo .campo-qtd-linha {
+  flex: 18;
+}
+
+.conteiner-precificacao.modo-estoque-ativo .campo-medida-linha {
+  flex: 20;
+}
+
+.conteiner-precificacao.modo-estoque-ativo .campo-acao-linha {
+  flex: 6;
+  min-width: 28px;
+}
+
+/* Tarja Informativa com Especificações de Estoque do Fio */
+.linha-info-estoque {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 5px 9px;
+  background: rgba(1, 7, 54, 0.65);
+  border: 1px solid rgba(252, 241, 208, 0.15);
+  border-radius: var(--raio-borda-sm);
+  animation: fadeInLinha 0.18s ease-out;
+}
+
+.info-tag {
+  font-size: 11px;
+  color: var(--creme-opacidade-85);
+  background: rgba(34, 57, 111, 0.45);
+  padding: 2px 7px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.info-tag.tag-estoque-ok {
+  color: #2ecc71;
+  background: rgba(46, 204, 113, 0.15);
+  border: 1px solid rgba(46, 204, 113, 0.35);
+  font-weight: 600;
+}
+
+.info-tag.tag-estoque-baixo {
+  color: #f1c40f;
+  background: rgba(241, 196, 15, 0.15);
+  border: 1px solid rgba(241, 196, 15, 0.35);
+  font-weight: 600;
+}
+
+.info-tag.tag-estoque-zerado {
+  color: #e74c3c;
+  background: rgba(231, 76, 60, 0.15);
+  border: 1px solid rgba(231, 76, 60, 0.35);
+  font-weight: 600;
+}
+
+.info-tag.tag-sobra {
+  color: var(--cor-destaque);
+  background: rgba(252, 241, 208, 0.12);
+  border: 1px solid rgba(252, 241, 208, 0.25);
+  font-weight: 600;
+  margin-left: auto;
+}
+
+/* Botão Remover Linha */
+.btn-remover-linha {
+  width: 34px;
+  height: 34px;
+  background-color: rgba(1, 7, 54, 0.5);
+  border: 1px solid var(--creme-opacidade-20);
+  border-radius: var(--raio-borda-md);
+  color: var(--creme-opacidade-70);
+  font-size: 18px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transicao-rapida);
+}
+
+.btn-remover-linha:hover {
+  background-color: var(--cor-alerta);
+  border-color: var(--cor-texto-principal);
+  color: var(--cor-branco);
+  transform: scale(1.06);
+}
+
+.btn-remover-linha:active {
+  transform: scale(0.95);
+}
+
+.btn-remover-linha.btn-oculto {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* --------------------------------------------------------------------------
+   SELETOR DE MEDIDA (TOGGLE / SEGMENTED CONTROL)
+   -------------------------------------------------------------------------- */
+.toggle-medida {
+  display: flex;
+  height: 35px;
+  background-color: rgba(1, 7, 54, 0.65);
+  border: 1px solid var(--creme-opacidade-20);
+  border-radius: var(--raio-borda-md);
+  padding: 2px;
+  box-sizing: border-box;
+  width: 100%;
+  gap: 2px;
+}
+
+.btn-toggle-opcao {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: var(--creme-opacidade-65);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background-color 0.18s ease-out, color 0.18s ease-out, box-shadow 0.18s ease-out;
+  user-select: none;
+}
+
+.btn-toggle-opcao:hover {
+  color: var(--cor-texto-principal);
+}
+
+.btn-toggle-opcao.ativo {
+  background-color: var(--cor-destaque);
+  color: var(--cor-texto-principal);
+  box-shadow: 0 2px 6px rgba(1, 7, 54, 0.4);
+}
+
+/* --------------------------------------------------------------------------
+   BLOCOS B E C: CAMPOS LADO A LADO (50% / 50%)
+   -------------------------------------------------------------------------- */
+.linha-campos-dupla {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* --------------------------------------------------------------------------
+   INPUTS LIMPOS, LABELS E PREFIXOS / SUFIXOS
+   -------------------------------------------------------------------------- */
+.campo-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.label-campo {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.8px;
+  color: var(--creme-opacidade-75);
+  text-transform: uppercase;
+}
+
+.label-com-valor {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.valor-slider-display {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--cor-texto-principal);
+}
+
+.input-grupo {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.prefixo-input {
+  position: absolute;
+  left: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--creme-opacidade-50);
+  pointer-events: none;
+}
+
+.sufixo-input {
+  position: absolute;
+  right: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--creme-opacidade-50);
+  pointer-events: none;
+}
+
+/* Estilo Base dos Inputs */
+.input-precificacao {
+  height: 35px;
+  width: 100%;
+  background-color: rgba(1, 7, 54, 0.6);
+  border: 1px solid var(--creme-opacidade-20);
+  border-radius: var(--raio-borda-md);
+  color: var(--cor-texto-principal);
+  font-size: 13.5px;
+  font-weight: 600;
+  padding: 0 10px;
+  box-sizing: border-box;
+  outline: none;
+  transition: border-color var(--transicao-padrao), box-shadow var(--transicao-padrao), background-color var(--transicao-padrao);
+}
+
+.input-grupo .input-precificacao:has(+ .sufixo-input),
+.input-grupo:has(.sufixo-input) .input-precificacao {
+  padding-right: 26px;
+}
+
+.input-grupo .prefixo-input + .input-precificacao,
+.input-grupo:has(.prefixo-input) .input-precificacao {
+  padding-left: 32px;
+}
+
+.input-precificacao:hover {
+  border-color: var(--creme-opacidade-40);
+}
+
+.input-precificacao:focus {
+  border-color: var(--cor-texto-principal);
+  box-shadow: 0 0 10px rgba(252, 241, 208, 0.22);
+  background-color: #081745;
+}
+
+.input-precificacao::placeholder {
+  color: var(--creme-opacidade-30);
+  font-weight: 400;
+  font-size: 12px;
+}
+
+/* Remove setinhas dos inputs numéricos */
+.input-precificacao::-webkit-outer-spin-button,
+.input-precificacao::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.input-precificacao {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+/* Range Slider de Margem de Lucro */
+.slider-lucro {
+  width: 100%;
+  height: 5px;
+  background: rgba(1, 7, 54, 0.7);
+  border-radius: 4px;
+  outline: none;
+  margin-top: 6px;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.slider-lucro::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--cor-texto-principal);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+  transition: transform 0.1s ease;
+}
+
+.slider-lucro::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+.slider-lucro::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--cor-texto-principal);
+  border: none;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+}
+
+/* ==========================================================================
+   3. COLUNA DIREITA (38% DA LARGURA) - CARD DE RESUMO E RESULTADOS
+   ========================================================================== */
+.coluna-outputs-precificacao {
+  height: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.card-resultado-precificacao {
+  height: 100%;
+  background: linear-gradient(180deg, rgba(34, 57, 111, 0.45) 0%, rgba(1, 7, 54, 0.88) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--raio-borda-lg);
+  padding: 20px 20px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: var(--sombra-card);
+}
+
+/* Zona Topo: Mini-Lista Discreta */
+.zona-resumo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.titulo-resumo {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--creme-opacidade-70);
+  text-transform: uppercase;
+  margin: 0 0 2px 0;
+  border-bottom: 1px solid rgba(252, 241, 208, 0.1);
+  padding-bottom: 6px;
+}
+
+.lista-resumo-subtotais {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.item-resumo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+}
+
+.label-resumo {
+  color: var(--creme-opacidade-75);
+}
+
+.valor-resumo {
+  color: var(--cor-texto-principal);
+  font-weight: 600;
+}
+
+/* Zona Centro: Outputs Principais */
+.zona-outputs-principais {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: auto 0;
+}
+
+.box-output {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.label-output {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.8px;
+  color: var(--creme-opacidade-75);
+  text-transform: uppercase;
+}
+
+.label-destaque {
+  color: var(--cor-texto-principal);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 1px;
+}
+
+.valor-output {
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.valor-custo {
+  font-size: 20px;
+  color: var(--creme-opacidade-85);
+}
+
+.divisor-card {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(252, 241, 208, 0.2), transparent);
+  margin: 2px 0;
+}
+
+.wrapper-preco-venda {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.valor-venda {
+  font-size: 34px;
+  font-weight: 800;
+  color: var(--cor-texto-principal);
+  letter-spacing: 0.5px;
+  text-shadow: 0 2px 10px rgba(1, 7, 54, 0.5);
+}
+
+/* Badge de Lucro */
+.badge-lucro {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 6px;
+  background-color: rgba(39, 174, 96, 0.18);
+  border: 1px solid rgba(39, 174, 96, 0.45);
+  color: #7bed9f;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: var(--raio-borda-pilula);
+}
+
+.icone-badge {
+  font-size: 13px;
+}
+
+/* Zona Rodapé: Ações */
+.zona-acoes {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.btn-precificacao-primario {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: var(--cor-texto-principal);
+  color: var(--cor-fundo-profundo);
+  border: none;
+  border-radius: var(--raio-borda-md);
+  padding: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform var(--transicao-rapida), filter var(--transicao-rapida), box-shadow var(--transicao-rapida);
+  box-shadow: 0 4px 14px rgba(1, 7, 54, 0.4);
+  user-select: none;
+}
+
+.btn-precificacao-primario:hover {
+  filter: brightness(1.06);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(1, 7, 54, 0.6);
+}
+
+.btn-precificacao-primario:active {
+  transform: scale(0.97);
+}
+
+.btn-precificacao-secundario {
+  background-color: transparent;
+  color: var(--creme-opacidade-75);
+  border: 1px solid var(--creme-opacidade-25);
+  border-radius: var(--raio-borda-md);
+  padding: 9px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transicao-rapida);
+  user-select: none;
+}
+
+.btn-precificacao-secundario:hover {
+  color: var(--cor-texto-principal);
+  border-color: var(--cor-texto-principal);
+  background-color: rgba(252, 241, 208, 0.08);
+}
+
+.btn-precificacao-secundario:active {
+  transform: scale(0.97);
+}
+
+/* Animação de Pulso para Recálculo */
+@keyframes pulsoValorOutput {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+  100% { transform: scale(1); }
+}
+
+.pulso-atualizacao {
+  animation: pulsoValorOutput 0.25s ease-out;
+}
+
+/* ==========================================================================
+   DRAWER / PAINEL LATERAL DE CONSULTA RÁPIDA DE ESTOQUE
+   ========================================================================== */
+.drawer-overlay-estoque {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(1, 7, 54, 0.72);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: flex;
+  justify-content: flex-end;
+  animation: fadeInLinha 0.2s ease-out;
+}
+
+.drawer-consulta-estoque {
+  width: 440px;
+  max-width: 92vw;
+  height: 100vh;
+  background: var(--cor-fundo-profundo);
+  border-left: 1px solid rgba(252, 241, 208, 0.18);
+  box-shadow: -10px 0 35px rgba(1, 7, 54, 0.85);
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  animation: slideDrawer 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideDrawer {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.drawer-topo {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 18px 22px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(34, 57, 111, 0.2);
+}
+
+.drawer-titulo {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--cor-texto-principal);
+}
+
+.drawer-subtitulo {
+  font-size: 11.5px;
+  color: var(--creme-opacidade-65);
+  margin-top: 4px;
+  display: block;
+}
+
+.btn-fechar-drawer {
+  background: transparent;
+  border: none;
+  font-size: 26px;
+  line-height: 1;
+  color: var(--creme-opacidade-65);
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: all var(--transicao-rapida);
+}
+
+.btn-fechar-drawer:hover {
+  color: var(--cor-texto-principal);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.drawer-busca {
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(1, 7, 54, 0.5);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.icone-busca-drawer {
+  width: 16px;
+  height: 16px;
+  color: var(--creme-opacidade-50);
+}
+
+.input-busca-drawer {
+  flex: 1;
+  background: rgba(1, 7, 54, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--raio-borda-md);
+  padding: 8px 12px;
+  color: var(--cor-texto-principal);
+  font-size: 13px;
+  outline: none;
+  transition: border-color var(--transicao-rapida);
+}
+
+.input-busca-drawer:focus {
+  border-color: var(--cor-destaque);
+}
+
+.drawer-lista-fios {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--cor-destaque) rgba(1, 7, 54, 0.4);
+}
+
+.card-fio-drawer {
+  background: rgba(34, 57, 111, 0.32);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--raio-borda-md);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: all var(--transicao-rapida);
+}
+
+.card-fio-drawer:hover {
+  border-color: rgba(252, 241, 208, 0.3);
+  background: rgba(34, 57, 111, 0.48);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(1, 7, 54, 0.5);
+}
+
+.card-fio-drawer-cabecalho {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.card-fio-drawer-titulos {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.card-fio-drawer-marca {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--creme-opacidade-65);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+.card-fio-drawer-nome {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--cor-texto-principal);
+}
+
+.card-fio-drawer-specs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.card-fio-drawer-rodape {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 4px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.card-fio-drawer-preco {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--cor-destaque);
+}
+
+.btn-usar-fio-drawer {
+  background: var(--cor-destaque);
+  border: none;
+  border-radius: var(--raio-borda-sm);
+  padding: 6px 12px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--cor-fundo-profundo);
+  cursor: pointer;
+  transition: all var(--transicao-rapida);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn-usar-fio-drawer:hover {
+  background: #ffffff;
+  transform: scale(1.03);
+}
+
+.drawer-vazio {
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--creme-opacidade-65);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.drawer-vazio-icone {
+  font-size: 36px;
+}
+
+/* ==========================================================================
+   INTEGRAÇÃO DE AVIAMENTOS NA CALCULADORA DE PRECIFICAÇÃO
+   ========================================================================== */
+.label-com-acao {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.btn-puxar-aviamentos {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 9px;
+  border-radius: var(--raio-borda-pilula);
+  border: 1px solid var(--creme-opacidade-25);
+  background-color: rgba(34, 57, 111, 0.55);
+  color: var(--cor-texto-principal);
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease-out;
+}
+
+.btn-puxar-aviamentos:hover {
+  background-color: var(--cor-destaque-hover);
+  border-color: var(--cor-texto-principal);
+}
+
+.chips-aviamentos-selecionados {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 4px;
+  max-height: 48px;
+  overflow-y: auto;
+}
+
+.chip-aviamento-prec {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10.5px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: var(--raio-borda-pilula);
+  background-color: rgba(44, 74, 145, 0.55);
+  border: 1px solid rgba(139, 173, 247, 0.35);
+  color: var(--cor-texto-principal);
+}
+
+.chip-aviamento-prec button {
+  background: none;
+  border: none;
+  color: var(--creme-opacidade-70);
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 2px;
+}
+
+.chip-aviamento-prec button:hover {
+  color: #ff8a80;
+}
+
+.drawer-rodape-aviamentos {
+  flex-shrink: 0;
+  padding: 14px 20px;
+  background-color: rgba(1, 7, 54, 0.85);
+  border-top: 1px solid rgba(252, 241, 208, 0.14);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.resumo-aviamentos-drawer {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.label-resumo-av {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.7px;
+  color: var(--creme-opacidade-65);
+}
+
+.valor-resumo-av {
+  font-size: 17px;
+  font-weight: 800;
+  color: #7bed9f;
+}
+
+.btn-aplicar-aviamentos {
+  height: 36px;
+  padding: 0 16px;
+  border: none;
+  border-radius: var(--raio-borda-md);
+  background-color: var(--cor-texto-principal);
+  color: var(--cor-fundo-profundo);
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: filter 0.15s ease-out, transform 0.15s ease-out;
+}
+
+.btn-aplicar-aviamentos:hover {
+  filter: brightness(1.06);
+  transform: translateY(-1px);
+}
+
+.controle-qtd-av-drawer {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: rgba(1, 7, 54, 0.75);
+  border: 1px solid var(--creme-opacidade-20);
+  border-radius: 6px;
+  padding: 2px;
+}
+
+.btn-av-drawer-step {
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--cor-texto-principal);
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-av-drawer-step:hover {
+  background-color: var(--cor-destaque-hover);
+  color: var(--cor-branco);
+}
+
+.qtd-av-drawer-num {
+  min-width: 26px;
+  text-align: center;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--cor-texto-principal);
+}

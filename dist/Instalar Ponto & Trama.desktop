@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Instalar Ponto & Trama
+Comment=Abrir o instalador gráfico do Ponto & Trama para Ubuntu
+Exec=python3 "/home/vinicius/Documentos/programas pessoais/Ponto&Trama/desktop/instalador-gui.py"
+Icon=/home/vinicius/Documentos/programas pessoais/Ponto&Trama/frontend/assets/images/logo.png
+Terminal=false
+Categories=Utility;
+StartupNotify=true
+StartupWMClass=ponto-e-trama-instalador

@@ -1,0 +1,3005 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ponto & Trama</title>
+    <!-- Carregamento paralelo de estilos (sem cascata @import) -->
+    <link rel="stylesheet" href="styles/base/global.css" />
+    <link rel="stylesheet" href="styles/layout/barra-lateral.css" />
+    <link rel="stylesheet" href="styles/modules/home.css" />
+    <link rel="stylesheet" href="styles/modules/contador-carreiras.css" />
+    <link rel="stylesheet" href="styles/modules/calculadora-precificacao.css" />
+    <link rel="stylesheet" href="styles/modules/inventario-fios.css" />
+    <link rel="stylesheet" href="styles/modules/inventario-agulhas.css" />
+    <link rel="stylesheet" href="styles/modules/calculadora-amostra.css" />
+    <link rel="stylesheet" href="styles/modules/banco-amostras.css" />
+
+    <!-- Core da aplicação -->
+    <script src="src/core/database.js" defer></script>
+    <script src="src/core/animations.js" defer></script>
+    <script src="src/core/sidebar.js" defer></script>
+
+    <!-- Módulos de ferramentas -->
+    <script src="src/modules/home.js" defer></script>
+    <script src="src/modules/contador-carreiras.js" defer></script>
+    <script src="src/modules/calculadora-precificacao.js" defer></script>
+    <script src="src/modules/leitor-receitas.js" defer></script>
+    <script src="src/modules/gerenciador-projetos.js" defer></script>
+    <script src="src/modules/inventario-fios.js" defer></script>
+    <script src="src/modules/inventario-agulhas.js" defer></script>
+    <script src="src/modules/calculadora-amostra.js" defer></script>
+    <script src="src/modules/banco-amostras.js" defer></script>
+    <script src="src/modules/configuracoes.js" defer></script>
+
+    <!-- Bootstrap principal -->
+    <script src="src/main.js" defer></script>
+  </head>
+  <body>
+    <input type="checkbox" id="opcao-menu" />
+    <!-- ~~~BARRA LATERAL ~~~ -->
+    <header class="barraLateral">
+      <div class="logoArea">
+        <img class="logoImagem" src="assets/images/logo.png" alt="logomarca" width="60" height="60" decoding="async" />
+        <p class="nomeLogo">Ñanduobyeté</p>
+      </div>
+      <div class="listaNavegacao">
+        <div class="icon">
+          <label for="opcao-menu" class="botaoNavegar" aria-label="Alternar menu lateral" title="Alternar menu lateral">☰</label>
+        </div>
+        <button
+          type="button"
+          class="botaoFerramenta ativo"
+          title="Início"
+          data-ferramenta="home"
+        >
+          <svg
+            class="iconeFerramenta"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M3 10.5 12 3l9 7.5"></path>
+            <path d="M5 9.5V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9.5"></path>
+          </svg>
+          <span>Início</span>
+        </button>
+        <button
+          type="button"
+          class="botaoFerramenta"
+          title="Contador de carreiras"
+          data-ferramenta="contador-carreiras"
+        >
+          <svg
+            class="iconeFerramenta"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <rect x="4" y="3" width="16" height="18" rx="4"></rect>
+            <rect x="7" y="7" width="10" height="5" rx="1"></rect>
+            <line x1="12" y1="15" x2="12" y2="19"></line>
+            <line x1="10" y1="17" x2="14" y2="17"></line>
+          </svg>
+          <span>Contador de carreiras</span>
+        </button>
+        <button
+          type="button"
+          class="botaoFerramenta"
+          title="Receitas e Anotações"
+          data-ferramenta="receitas"
+        >
+          <svg
+            class="iconeFerramenta"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path
+              d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"
+            ></path>
+            <path d="M6 6h10"></path>
+            <path d="M6 10h10"></path>
+            <path d="M6 14h6"></path>
+          </svg>
+          <span>Receitas e Anotações</span>
+        </button>
+        <button
+          type="button"
+          class="botaoFerramenta"
+          title="Calculadora de precificação"
+          data-ferramenta="precificacao"
+        >
+          <svg
+            class="iconeFerramenta"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <rect x="4" y="2" width="16" height="20" rx="3"></rect>
+            <line x1="8" y1="6" x2="16" y2="6"></line>
+            <line x1="8" y1="11" x2="8.01" y2="11"></line>
+            <line x1="12" y1="11" x2="12.01" y2="11"></line>
+            <line x1="16" y1="11" x2="16.01" y2="11"></line>
+            <line x1="8" y1="15" x2="8.01" y2="15"></line>
+            <line x1="12" y1="15" x2="12.01" y2="15"></line>
+            <line x1="16" y1="15" x2="16.01" y2="15"></line>
+          </svg>
+          <span>Calculadora de precificação</span>
+        </button>
+        <button
+          type="button"
+          class="botaoFerramenta"
+          title="Gerenciador de Projetos"
+          data-ferramenta="projetos"
+        >
+          <svg
+            class="iconeFerramenta"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path
+              d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"
+            ></path>
+            <rect x="8" y="2" width="8" height="4" rx="1"></rect>
+            <path d="m9 14 2 2 4-4"></path>
+          </svg>
+          <span>Gerenciador de Projetos</span>
+        </button>
+        <button
+          type="button"
+          class="botaoFerramenta"
+          title="Inventário de fios"
+          data-ferramenta="fios"
+        >
+          <svg
+            class="iconeFerramenta"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <circle cx="12" cy="11" r="8"></circle>
+            <path d="M6 14c2-2 6-2 9-5"></path>
+            <path d="M7 8c3 2 7 2 9 6"></path>
+            <path d="M16 17c1.5 2 3 3 5 3"></path>
+          </svg>
+          <span>Inventário de fios</span>
+        </button>
+        <button
+          type="button"
+          class="botaoFerramenta"
+          title="Agulhas e acessórios"
+          data-ferramenta="agulhas"
+        >
+          <svg
+            class="iconeFerramenta"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <line x1="5" y1="19" x2="19" y2="5"></line>
+            <circle cx="19" cy="5" r="1.5"></circle>
+            <line x1="19" y1="19" x2="5" y2="5"></line>
+            <circle cx="5" cy="5" r="1.5"></circle>
+          </svg>
+          <span>Agulhas e acessórios</span>
+        </button>
+        <button
+          type="button"
+          class="botaoFerramenta"
+          title="Calculadora de amostra"
+          data-ferramenta="amostra"
+        >
+          <svg
+            class="iconeFerramenta"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <rect x="3" y="6" width="18" height="12" rx="2"></rect>
+            <line x1="7" y1="6" x2="7" y2="11"></line>
+            <line x1="11" y1="6" x2="11" y2="9"></line>
+            <line x1="15" y1="6" x2="15" y2="11"></line>
+            <line x1="19" y1="6" x2="19" y2="9"></line>
+          </svg>
+          <span>Calculadora de amostra</span>
+        </button>
+        <button
+          type="button"
+          class="botaoFerramenta"
+          title="Banco de Amostras"
+          data-ferramenta="banco-amostras"
+        >
+          <svg
+            class="iconeFerramenta"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <rect x="3" y="3" width="8" height="8" rx="1.5"></rect>
+            <rect x="13" y="3" width="8" height="8" rx="1.5"></rect>
+            <rect x="3" y="13" width="8" height="8" rx="1.5"></rect>
+            <path d="M13 17h8"></path>
+            <path d="M17 13v8"></path>
+          </svg>
+          <span>Banco de Amostras</span>
+        </button>
+        <button
+          type="button"
+          class="botaoFerramenta"
+          title="Configurações"
+          data-ferramenta="configuracoes"
+        >
+          <svg
+            class="iconeFerramenta"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <circle cx="12" cy="12" r="3"></circle>
+            <path
+              d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"
+            ></path>
+          </svg>
+          <span>Configurações</span>
+        </button>
+      </div>
+    </header>
+    <main id="conteudo-principal">
+      <!-- SEÇÃO INICIAL (HOME SIMPLES) -->
+      <div id="secao-home" class="secao-ferramenta">
+        <div class="cabecalho">
+          <div class="cabecalho-conteudo">
+            <div class="cabecalho-info">
+              <h1 class="titulo-ferramenta">Ponto & Trama</h1>
+              <span class="subtitulo-ferramenta"
+                >Inicie um novo trabalho ou acompanhe seus projetos</span
+              >
+            </div>
+          </div>
+        </div>
+        <div class="conteiner-home">
+          <div class="acoes-home">
+            <button type="button" class="btn-home-primario" id="btn-home-novo-projeto">
+              <span>+ Novo projeto</span>
+            </button>
+            <button type="button" class="btn-home-secundario" id="btn-home-ver-projetos">
+              <span>Ver meus projetos</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- SEÇÃO DO CONTADOR DE CARREIRAS -->
+      <div id="secao-contador-carreiras" class="secao-ferramenta" style="display: none">
+        <div class="cabecalho">
+          <div class="cabecalho-conteudo">
+            <div class="cabecalho-info">
+              <h1 class="titulo-ferramenta">Contador de Carreiras</h1>
+              <span class="subtitulo-ferramenta"
+                >Acompanhe suas carreiras, pontos e metas</span
+              >
+            </div>
+            <button
+              id="btn-adicionar-contador"
+              class="btn-adicionar-contador"
+              type="button"
+              title="Adicionar novo contador simultâneo"
+            >
+              <span class="icone-mais">+</span>
+              <span>contador</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- CONTADOR DE CARREIRAS -->
+        <section class="conteiner_contador" id="conteiner-contador">
+          <!-- Banner de Alerta de Meta Atingida (4#) -->
+          <div id="banner-alarme" class="banner-alarme" style="display: none">
+            <div class="banner-alarme-conteudo">
+              <span class="icone-alerta">🔔</span>
+              <span id="texto-alerta-meta">Meta de carreiras atingida!</span>
+              <button
+                id="btn-silenciar-alarme"
+                class="btn-silenciar"
+                type="button"
+              >
+                Silenciar Alarme
+              </button>
+            </div>
+          </div>
+
+          <div class="area-contadores" id="area-contadores">
+            <!-- Contador Inicial (Sempre Centralizado) (1#) -->
+            <article class="card-contador" id="contador-1" data-id="1">
+              <div class="card-topo">
+                <input
+                  type="text"
+                  class="nome-contador"
+                  value="Contador Principal"
+                  title="Clique para renomear"
+                />
+              </div>
+
+              <!-- Display Grande de Carreiras com Botões Laterais (1#) -->
+              <div class="secao-carreiras">
+                <span class="label-secao">Carreiras</span>
+                <div class="controle-carreiras">
+                  <button
+                    type="button"
+                    class="btn-toque btn-menos"
+                    id="btn-menos-1"
+                    title="Diminuir 1 carreira"
+                    aria-label="Diminuir 1 carreira"
+                  >
+                    −
+                  </button>
+                  <input
+                    type="number"
+                    class="input-carreiras"
+                    id="carreiras-1"
+                    value="0"
+                    min="0"
+                    step="1"
+                    aria-label="Número de carreiras"
+                    title="Número de carreiras (clique para digitar manualmente)"
+                  />
+                  <button
+                    type="button"
+                    class="btn-toque btn-mais"
+                    id="btn-mais-1"
+                    title="Adicionar 1 carreira"
+                    aria-label="Adicionar 1 carreira"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+
+              <!-- Botão Bem Simples para Zerar (1#) -->
+              <div class="linha-zerar">
+                <button
+                  type="button"
+                  class="btn-zerar"
+                  id="btn-zerar-1"
+                  title="Zerar contador"
+                >
+                  <svg
+                    class="icone-zerar"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path
+                      d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"
+                    ></path>
+                    <path d="M3 3v5h5"></path>
+                  </svg>
+                  <span>Zerar</span>
+                </button>
+              </div>
+
+              <!-- Cálculo de Pontos (3#) -->
+              <div class="secao-calculo">
+                <div class="linha-input-pontos">
+                  <label for="pontos-carreira-1" class="label-pontos"
+                    >Pontos por carreira:</label
+                  >
+                  <input
+                    type="number"
+                    id="pontos-carreira-1"
+                    class="input-pontos-carreira"
+                    value="0"
+                    min="0"
+                    placeholder="0"
+                    aria-label="Pontos por carreira"
+                    title="Clique para digitar a quantidade de pontos por carreira"
+                  />
+                </div>
+                <div class="linha-total-pontos">
+                  <span class="label-total">Total no trabalho:</span>
+                  <div>
+                    <span class="valor-total-pontos" id="total-pontos-1"
+                      >0</span
+                    >
+                    <span class="unidade-pontos">pontos</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Alarme / Meta de Carreiras (4#) -->
+              <div class="secao-alarme">
+                <div class="linha-meta">
+                  <label for="meta-1" class="label-meta"
+                    >Avisar na carreira:</label
+                  >
+                  <input
+                    type="number"
+                    id="meta-1"
+                    class="input-meta"
+                    placeholder="0"
+                    min="0"
+                    aria-label="Meta de carreiras para disparar alarme"
+                    title="Clique para digitar a carreira de aviso"
+                  />
+                </div>
+              </div>
+            </article>
+          </div>
+        </section>
+      </div>
+
+      <!-- ================================================================= -->
+      <!-- 2. RECEITAS E ANOTAÇÕES -->
+      <!-- ================================================================= -->
+      <div id="secao-receitas" class="secao-ferramenta" style="display: none">
+        <div class="cabecalho">
+          <div class="cabecalho-conteudo">
+            <div class="cabecalho-info">
+              <h1 class="titulo-ferramenta">Receitas e Anotações</h1>
+              <span class="subtitulo-ferramenta"
+                >Importe receitas em PDF ou fotos, use marcador de linha e faça
+                anotações</span
+              >
+            </div>
+          </div>
+        </div>
+        <div class="conteiner-ferramenta" id="conteiner-receitas">
+          <div class="placeholder-ferramenta">
+            <p>Espaço reservado para o Leitor e Anotador de Receitas.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================================================================= -->
+      <!-- 3. CALCULADORA DE PRECIFICAÇÃO -->
+      <!-- ================================================================= -->
+      <div
+        id="secao-precificacao"
+        class="secao-ferramenta"
+        style="display: none"
+      >
+        <div class="cabecalho">
+          <div class="cabecalho-conteudo">
+            <div class="cabecalho-info">
+              <h1 class="titulo-ferramenta">Calculadora de Precificação</h1>
+              <span class="subtitulo-ferramenta"
+                >Calcule custos de materiais, horas de trabalho e margem de
+                lucro</span
+              >
+            </div>
+            <div class="cabecalho-acoes">
+              <button
+                type="button"
+                class="btn-estoque-precificacao"
+                id="btn-estoque-precificacao"
+                title="Ativar integração com o Inventário de Fios e consultar estoque"
+                aria-pressed="false"
+              >
+                <span class="icone-btn-estoque">🧶</span>
+                <span class="texto-btn-estoque">Estoque</span>
+                <span class="badge-status-estoque" id="badge-status-estoque">Desativado</span>
+              </button>
+
+              <button
+                type="button"
+                class="btn-consultar-gaveta"
+                id="btn-abrir-gaveta-estoque"
+                title="Abrir painel de consulta rápida do inventário de fios"
+                style="display: none;"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icone-busca-btn">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <span>Consultar Fios</span>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="conteiner-ferramenta conteiner-precificacao" id="conteiner-precificacao">
+          <!-- Coluna Esquerda: Área de Preenchimento (62%) -->
+          <div class="coluna-inputs-precificacao">
+            <!-- Bloco A: Linhas e Fios (Lista Dinâmica) -->
+            <section class="bloco-precificacao bloco-linhas">
+              <div class="cabecalho-bloco">
+                <div class="titulo-com-icone">
+                  <h2 class="titulo-bloco">Linhas Utilizadas</h2>
+                  <span class="subtitulo-bloco">Adicione todos os fios do projeto</span>
+                </div>
+                <button
+                  type="button"
+                  class="btn-adicionar-linha"
+                  id="btn-adicionar-linha"
+                  title="Adicionar novo fio à receita"
+                >
+                  <span class="icone-mais">+</span>
+                  <span>Adicionar Linha</span>
+                </button>
+              </div>
+
+              <!-- Lista Dinâmica de Linhas com Trava de Scroll Interno -->
+              <div class="lista-linhas" id="lista-linhas">
+                <!-- Linha 1 (Item Padrão) -->
+                <div class="item-linha" data-linha-id="1">
+                  <div class="item-linha-campos">
+                    <!-- Campo Nome da Linha (exibido ao ativar Estoque) -->
+                    <div class="campo-item campo-nome-linha">
+                      <label class="label-campo">NOME DA LINHA / FIO</label>
+                      <div class="input-grupo">
+                        <input
+                          type="text"
+                          class="input-precificacao input-nome-linha"
+                          placeholder="Buscar no estoque ou digitar..."
+                          list="datalist-fios-estoque"
+                          aria-label="Nome do fio ou linha"
+                          autocomplete="off"
+                        />
+                      </div>
+                    </div>
+
+                    <div class="campo-item campo-valor-linha">
+                      <label class="label-campo">VALOR DA LINHA (R$)</label>
+                      <div class="input-grupo">
+                        <span class="prefixo-input">R$</span>
+                        <input
+                          type="number"
+                          class="input-precificacao input-valor-linha"
+                          placeholder="0,00"
+                          min="0"
+                          step="0.01"
+                          aria-label="Valor da Linha em Reais"
+                        />
+                      </div>
+                    </div>
+
+                    <div class="campo-item campo-qtd-linha">
+                      <label class="label-campo">QUANTIDADE</label>
+                      <input
+                        type="number"
+                        class="input-precificacao input-qtd-linha"
+                        placeholder="1"
+                        min="0"
+                        step="0.1"
+                        aria-label="Quantidade utilizada"
+                      />
+                    </div>
+
+                    <div class="campo-item campo-medida-linha">
+                      <label class="label-campo">MEDIDA</label>
+                      <div class="toggle-medida" data-unidade="un" role="group" aria-label="Seletor de Unidade de Medida">
+                        <button type="button" class="btn-toggle-opcao ativo" data-valor="un">Un.</button>
+                        <button type="button" class="btn-toggle-opcao" data-valor="g">g</button>
+                      </div>
+                    </div>
+
+                    <div class="campo-item campo-acao-linha">
+                      <button
+                        type="button"
+                        class="btn-remover-linha btn-oculto"
+                        title="Remover linha"
+                        aria-label="Remover esta linha"
+                      >
+                        &times;
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Tarja Informativa com Cor, TEX, Peso e Estoque Disponível -->
+                  <div class="linha-info-estoque" style="display: none;"></div>
+                </div>
+              </div>
+            </section>
+
+            <!-- Bloco B: Mão de Obra (Lado a Lado) -->
+            <section class="bloco-precificacao bloco-mao-obra">
+              <h2 class="titulo-bloco">Mão de Obra</h2>
+              <div class="linha-campos-dupla">
+                <div class="campo-item">
+                  <label for="input-horas-gastas" class="label-campo">HORAS GASTAS</label>
+                  <div class="input-grupo">
+                    <input
+                      type="number"
+                      id="input-horas-gastas"
+                      class="input-precificacao"
+                      placeholder="0"
+                      min="0"
+                      step="0.5"
+                    />
+                    <span class="sufixo-input">h</span>
+                  </div>
+                </div>
+
+                <div class="campo-item">
+                  <label for="input-valor-hora" class="label-campo">VALOR DA HORA (R$)</label>
+                  <div class="input-grupo">
+                    <span class="prefixo-input">R$</span>
+                    <input
+                      type="number"
+                      id="input-valor-hora"
+                      class="input-precificacao"
+                      placeholder="0,00"
+                      min="0"
+                      step="0.50"
+                    />
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- Bloco C: Acessórios e Lucro (Lado a Lado) -->
+            <section class="bloco-precificacao bloco-extras-lucro">
+              <h2 class="titulo-bloco">Custos Extras & Lucro</h2>
+              <div class="linha-campos-dupla">
+                <div class="campo-item">
+                  <div class="label-com-acao">
+                    <label for="input-valor-acessorios" class="label-campo">VALOR DOS ACESSÓRIOS (R$)</label>
+                    <button
+                      type="button"
+                      class="btn-puxar-aviamentos"
+                      id="btn-puxar-aviamentos-precificacao"
+                      title="Puxar custos de aviamentos cadastrados em Agulhas e Acessórios"
+                    >
+                      <span>🎀 Aviamentos</span>
+                    </button>
+                  </div>
+                  <div class="input-grupo">
+                    <span class="prefixo-input">R$</span>
+                    <input
+                      type="number"
+                      id="input-valor-acessorios"
+                      class="input-precificacao"
+                      placeholder="Alças, fechos, etiquetas..."
+                      min="0"
+                      step="0.01"
+                    />
+                  </div>
+                  <div class="chips-aviamentos-selecionados" id="chips-aviamentos-precificacao" style="display: none;"></div>
+                </div>
+
+                <div class="campo-item">
+                  <div class="label-com-valor">
+                    <label for="input-margem-lucro" class="label-campo">MARGEM DE LUCRO (%)</label>
+                    <span class="valor-slider-display" id="display-margem-lucro">30%</span>
+                  </div>
+                  <div class="input-grupo">
+                    <input
+                      type="number"
+                      id="input-margem-lucro"
+                      class="input-precificacao"
+                      placeholder="30"
+                      value="30"
+                      min="0"
+                      max="500"
+                      step="1"
+                    />
+                    <span class="sufixo-input">%</span>
+                  </div>
+                  <!-- Controle deslizante para ajustes rápidos -->
+                  <input
+                    type="range"
+                    id="slider-margem-lucro"
+                    class="slider-lucro"
+                    min="0"
+                    max="200"
+                    value="30"
+                    step="5"
+                    aria-label="Ajustar margem de lucro em porcentagem"
+                  />
+                </div>
+              </div>
+            </section>
+          </div>
+
+          <!-- Coluna Direita: Card Fixo de Resumo e Resultados (38%) -->
+          <aside class="coluna-outputs-precificacao">
+            <div class="card-resultado-precificacao">
+              <!-- Zona Topo: Mini-Lista Discreta de Resumo -->
+              <div class="zona-resumo">
+                <h3 class="titulo-resumo">RESUMO DOS CUSTOS</h3>
+                <ul class="lista-resumo-subtotais">
+                  <li class="item-resumo">
+                    <span class="label-resumo">Linhas e Fios</span>
+                    <span class="valor-resumo" id="subtotal-linhas">R$ 0,00</span>
+                  </li>
+                  <li class="item-resumo">
+                    <span class="label-resumo">Mão de Obra</span>
+                    <span class="valor-resumo" id="subtotal-mao-obra">R$ 0,00</span>
+                  </li>
+                  <li class="item-resumo">
+                    <span class="label-resumo">Acessórios / Extras</span>
+                    <span class="valor-resumo" id="subtotal-acessorios">R$ 0,00</span>
+                  </li>
+                </ul>
+              </div>
+
+              <!-- Zona Centro: Outputs Principais -->
+              <div class="zona-outputs-principais">
+                <!-- 1. Custo do Produto Final -->
+                <div class="box-output box-custo-total">
+                  <span class="label-output">CUSTO DO PRODUTO FINAL</span>
+                  <span class="valor-output valor-custo" id="resultado-custo-total">R$ 0,00</span>
+                </div>
+
+                <!-- Divisor Sutil -->
+                <div class="divisor-card"></div>
+
+                <!-- 2. Preço de Venda (Produto + Lucro) -->
+                <div class="box-output box-preco-venda">
+                  <span class="label-output label-destaque">PREÇO DE VENDA SUGERIDO</span>
+                  <div class="wrapper-preco-venda">
+                    <span class="valor-output valor-venda" id="resultado-preco-venda">R$ 0,00</span>
+                    <div class="badge-lucro" id="badge-lucro-estimado">
+                      <span class="icone-badge">📈</span>
+                      <span id="texto-badge-lucro">Lucro: +R$ 0,00</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Zona Rodapé: Ações -->
+              <div class="zona-acoes">
+                <button type="button" class="btn-precificacao-primario" id="btn-calcular-precificacao">
+                  <span class="icone-btn">✨</span>
+                  <span>Calcular / Copiar Orçamento</span>
+                </button>
+                <button type="button" class="btn-precificacao-secundario" id="btn-limpar-precificacao">
+                  Limpar Campos
+                </button>
+              </div>
+            </div>
+          </aside>
+        </div>
+
+        <!-- Datalist com os Fios do Inventário para a Calculadora -->
+        <datalist id="datalist-fios-estoque"></datalist>
+
+        <!-- Drawer / Painel Lateral de Consulta Rápida de Estoque -->
+        <div class="drawer-overlay-estoque" id="drawer-overlay-estoque" style="display: none;">
+          <aside class="drawer-consulta-estoque" id="drawer-consulta-estoque" role="dialog" aria-modal="true" aria-labelledby="drawer-titulo-estoque">
+            <div class="drawer-topo">
+              <div class="drawer-titulos">
+                <h3 class="drawer-titulo" id="drawer-titulo-estoque">🧶 Fios em Estoque</h3>
+                <span class="drawer-subtitulo">Consulte fios do inventário e use diretamente na receita</span>
+              </div>
+              <button type="button" class="btn-fechar-drawer" id="btn-fechar-drawer-estoque" aria-label="Fechar painel de estoque">&times;</button>
+            </div>
+
+            <div class="drawer-busca">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icone-busca-drawer">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input
+                type="search"
+                id="busca-drawer-estoque"
+                class="input-busca-drawer"
+                placeholder="Pesquisar por linha, marca, cor ou código..."
+                aria-label="Pesquisar fios do inventário"
+              />
+            </div>
+
+            <div class="drawer-lista-fios" id="drawer-lista-fios">
+              <!-- Cards de fios renderizados dinamicamente via JS -->
+            </div>
+          </aside>
+        </div>
+
+        <!-- Drawer / Painel Lateral de Seleção de Aviamentos (Integração com Agulhas e Acessórios) -->
+        <div class="drawer-overlay-estoque" id="drawer-overlay-aviamentos" style="display: none;">
+          <aside class="drawer-consulta-estoque" id="drawer-consulta-aviamentos" role="dialog" aria-modal="true" aria-labelledby="drawer-titulo-aviamentos">
+            <div class="drawer-topo">
+              <div class="drawer-titulos">
+                <h3 class="drawer-titulo" id="drawer-titulo-aviamentos">🎀 Puxar Aviamentos</h3>
+                <span class="drawer-subtitulo">Selecione os aviamentos usados na peça para somar o custo exato</span>
+              </div>
+              <button type="button" class="btn-fechar-drawer" id="btn-fechar-drawer-aviamentos" aria-label="Fechar painel de aviamentos">&times;</button>
+            </div>
+
+            <div class="drawer-busca">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icone-busca-drawer">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input
+                type="search"
+                id="busca-drawer-aviamentos"
+                class="input-busca-drawer"
+                placeholder="Buscar olhos, botões, alças, fechos..."
+                aria-label="Pesquisar aviamentos cadastrados"
+              />
+            </div>
+
+            <div class="drawer-lista-fios" id="drawer-lista-aviamentos">
+              <!-- Aviamentos renderizados dinamicamente via JS -->
+            </div>
+
+            <div class="drawer-rodape-aviamentos">
+              <div class="resumo-aviamentos-drawer">
+                <span class="label-resumo-av">TOTAL SELECIONADO</span>
+                <strong class="valor-resumo-av" id="total-aviamentos-drawer">R$ 0,00</strong>
+              </div>
+              <button type="button" class="btn-aplicar-aviamentos" id="btn-aplicar-aviamentos-drawer">
+                Aplicar na Precificação
+              </button>
+            </div>
+          </aside>
+        </div>
+      </div>
+
+      <!-- ================================================================= -->
+      <!-- 4. GERENCIADOR DE PROJETOS -->
+      <!-- ================================================================= -->
+      <div id="secao-projetos" class="secao-ferramenta" style="display: none">
+        <div class="cabecalho">
+          <div class="cabecalho-conteudo">
+            <div class="cabecalho-info">
+              <h1 class="titulo-ferramenta">Gerenciador de Projetos</h1>
+              <span class="subtitulo-ferramenta"
+                >Cadastre clientes, datas de entrega e acompanhe suas
+                encomendas</span
+              >
+            </div>
+          </div>
+        </div>
+        <div class="conteiner-ferramenta" id="conteiner-projetos">
+          <div class="placeholder-ferramenta">
+            <p>Espaço reservado para o Gerenciador de Projetos.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================================================================= -->
+      <!-- 5. INVENTÁRIO DE FIOS -->
+      <!-- ================================================================= -->
+      <div id="secao-fios" class="secao-ferramenta" style="display: none">
+        <div class="cabecalho">
+          <div class="cabecalho-conteudo">
+            <div class="cabecalho-info">
+              <h1 class="titulo-ferramenta">Inventário de Fios</h1>
+              <span class="subtitulo-ferramenta"
+                >Cadastre marcas, nomes de cores, espessuras (TEX), lotes e
+                estoque</span
+              >
+            </div>
+          </div>
+        </div>
+        <div class="conteiner-ferramenta conteiner-inventario-fios" id="conteiner-fios">
+          <!-- 1. Barra de Resumo e Ações de Topo -->
+          <header class="barra-ferramentas-fios">
+            <!-- Badges de Resumo Consolidado do Estoque -->
+            <div class="resumo-estoque-fios">
+              <div class="badge-resumo-fio">
+                <span class="icone-resumo-fio">🧶</span>
+                <div class="info-resumo-fio">
+                  <span class="label-resumo-fio">TOTAL DE NOVELOS</span>
+                  <strong class="valor-resumo-fio" id="fios-total-novelos">0</strong>
+                </div>
+              </div>
+              <div class="badge-resumo-fio">
+                <span class="icone-resumo-fio">⚖️</span>
+                <div class="info-resumo-fio">
+                  <span class="label-resumo-fio">PESO TOTAL</span>
+                  <strong class="valor-resumo-fio" id="fios-peso-total">0 kg</strong>
+                </div>
+              </div>
+              <div class="badge-resumo-fio">
+                <span class="icone-resumo-fio">💰</span>
+                <div class="info-resumo-fio">
+                  <span class="label-resumo-fio">VALOR EM ESTOQUE</span>
+                  <strong class="valor-resumo-fio" id="fios-valor-total">R$ 0,00</strong>
+                </div>
+              </div>
+            </div>
+
+            <!-- Controles de Ação de Topo -->
+            <div class="acoes-topo-fios">
+              <!-- Menu Dropdown de Backup (.json) -->
+              <div class="dropdown-backup-fios">
+                <button type="button" class="btn-backup-fios" id="btn-menu-backup-fios" title="Backup do inventário (JSON)" aria-haspopup="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icone-backup">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                  </svg>
+                  <span>Backup</span>
+                </button>
+                <div class="menu-backup-popup" id="menu-backup-fios" style="display: none;">
+                  <button type="button" class="item-menu-backup" id="btn-exportar-fios">
+                    <span>📥 Exportar Backup (.json)</span>
+                  </button>
+                  <label class="item-menu-backup item-importar-label" for="input-importar-fios">
+                    <span>📤 Importar Backup (.json)</span>
+                    <input type="file" id="input-importar-fios" accept=".json" style="display: none;" />
+                  </label>
+                </div>
+              </div>
+
+              <!-- Botão Principal + Novo Fio -->
+              <button type="button" class="btn-novo-fio" id="btn-novo-fio" title="Cadastrar novo fio">
+                <span class="icone-mais">+</span>
+                <span>Novo Fio</span>
+              </button>
+            </div>
+          </header>
+
+          <!-- 2. Barra de Filtros e Busca Instantânea -->
+          <section class="barra-filtros-fios">
+            <!-- Campo de Busca Instantânea -->
+            <div class="campo-busca-fios">
+              <svg class="icone-busca" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input
+                type="search"
+                id="busca-fios"
+                class="input-busca-fios"
+                placeholder="Pesquisar por linha, marca, cor ou código..."
+                aria-label="Pesquisar fios"
+              />
+            </div>
+
+            <!-- Seletores de Filtros Rápidos -->
+            <div class="filtros-seletores-fios">
+              <select id="filtro-marca" class="select-filtro-fio" aria-label="Filtrar por marca">
+                <option value="">Todas as marcas</option>
+              </select>
+
+              <select id="filtro-composicao" class="select-filtro-fio" aria-label="Filtrar por composição">
+                <option value="">Todas composições</option>
+              </select>
+
+              <select id="filtro-tex" class="select-filtro-fio" aria-label="Filtrar por faixa de TEX">
+                <option value="">Todas as espessuras (TEX)</option>
+                <option value="fino">Fino (TEX &lt; 350)</option>
+                <option value="medio">Médio (TEX 350 - 600)</option>
+                <option value="grosso">Grosso (TEX &gt; 600)</option>
+              </select>
+
+              <select id="filtro-status" class="select-filtro-fio" aria-label="Filtrar por status de estoque">
+                <option value="">Todos os status</option>
+                <option value="em-estoque">Em estoque (&gt; 1)</option>
+                <option value="acabando">Acabando (≤ 1)</option>
+                <option value="zerado">Zerado (0)</option>
+              </select>
+
+              <button type="button" class="btn-limpar-filtros-fios" id="btn-limpar-filtros-fios" title="Limpar todos os filtros">
+                Limpar Filtros
+              </button>
+            </div>
+          </section>
+
+          <!-- 3. Grade Responsiva de Cards de Fios -->
+          <div class="area-grade-fios" id="area-grade-fios">
+            <div class="grade-cards-fios" id="grade-cards-fios"></div>
+
+            <!-- Estado Vazio -->
+            <div class="estado-vazio-fios" id="estado-vazio-fios" style="display: none;">
+              <span class="icone-vazio">🧶</span>
+              <h3 class="titulo-vazio">Nenhum fio encontrado</h3>
+              <p class="texto-vazio">Cadastre seus novelos clicando em "+ Novo Fio" ou ajuste os filtros acima.</p>
+              <button type="button" class="btn-novo-fio" id="btn-vazio-novo-fio">+ Cadastrar Primeiro Fio</button>
+            </div>
+          </div>
+
+          <!-- ================================================================= -->
+          <!-- 4. MODAL DE CADASTRO E EDIÇÃO DE FIO                              -->
+          <!-- ================================================================= -->
+          <div class="modal-overlay-fio" id="modal-cadastro-fio" style="display: none;">
+            <div class="modal-conteudo-fio" role="dialog" aria-modal="true" aria-labelledby="modal-fio-titulo">
+              <div class="modal-topo">
+                <div class="modal-topo-info">
+                  <h2 class="modal-titulo" id="modal-fio-titulo">Novo Fio</h2>
+                  <span class="modal-subtitulo">Cadastre as informações e estoque do seu novelo</span>
+                </div>
+                <button type="button" class="btn-fechar-modal" id="btn-fechar-modal-fio" aria-label="Fechar modal">&times;</button>
+              </div>
+
+              <!-- Abas do Formulário -->
+              <div class="abas-modal-fio">
+                <button type="button" class="aba-item ativa" data-aba="identificacao">Identificação</button>
+                <button type="button" class="aba-item" data-aba="especificacoes">Especificações Técnicas</button>
+                <button type="button" class="aba-item" data-aba="estoque">Estoque & Localização</button>
+              </div>
+
+              <form id="form-fio" class="form-fio" novalidate>
+                <input type="hidden" id="fio-id" value="" />
+
+                <!-- Aba 1: Identificação -->
+                <div class="secao-form-aba ativa" id="aba-conteudo-identificacao">
+                  <div class="linha-dupla-form">
+                    <div class="grupo-campo">
+                      <label for="fio-nome" class="label-form">Nome da Linha / Fio <span class="campo-obrigatorio">*</span></label>
+                      <input type="text" id="fio-nome" class="input-form" placeholder="Ex: Amigurumi, Anne, Mollet..." required />
+                    </div>
+                    <div class="grupo-campo">
+                      <label for="fio-marca" class="label-form">Marca <span class="campo-obrigatorio">*</span></label>
+                      <input type="text" id="fio-marca" class="input-form" placeholder="Ex: Círculo, Pingouin, EuroRoma..." required list="datalist-marcas" />
+                      <datalist id="datalist-marcas">
+                        <option value="Círculo"></option>
+                        <option value="Pingouin"></option>
+                        <option value="EuroRoma"></option>
+                        <option value="Fial"></option>
+                        <option value="Coats Corrente"></option>
+                        <option value="Cisne"></option>
+                        <option value="DMC"></option>
+                      </datalist>
+                    </div>
+                  </div>
+
+                  <div class="linha-tripla-form">
+                    <div class="grupo-campo">
+                      <label for="fio-cor-nome" class="label-form">Nome da Cor <span class="campo-obrigatorio">*</span></label>
+                      <input type="text" id="fio-cor-nome" class="input-form" placeholder="Ex: Off-White, Verde Musgo..." required />
+                    </div>
+                    <div class="grupo-campo">
+                      <label for="fio-cor-codigo" class="label-form">Código da Cor</label>
+                      <input type="text" id="fio-cor-codigo" class="input-form" placeholder="Ex: 8176, 5398" />
+                    </div>
+                    <div class="grupo-campo">
+                      <label for="fio-lote" class="label-form">Lote (Tintura)</label>
+                      <input type="text" id="fio-lote" class="input-form" placeholder="Ex: 458920" />
+                    </div>
+                  </div>
+
+                  <!-- Upload de Imagem com Preview e Drag & Drop -->
+                  <div class="grupo-campo">
+                    <label class="label-form">Foto do Fio ou Rótulo</label>
+                    <div class="upload-area-fio" id="upload-area-fio">
+                      <input type="file" id="fio-imagem-input" accept="image/*" class="input-arquivo-invisivel" />
+                      <div class="upload-placeholder" id="upload-placeholder">
+                        <svg class="icone-upload" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                          <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                          <polyline points="21 15 16 10 5 21"></polyline>
+                        </svg>
+                        <span class="upload-texto-principal">Arraste a foto ou clique para selecionar</span>
+                        <span class="upload-texto-secundario">PNG, JPG, WEBP (suporte a câmera no celular)</span>
+                      </div>
+                      <div class="upload-preview-container" id="upload-preview-container" style="display: none;">
+                        <img id="upload-preview-img" src="" alt="Preview da imagem do fio" class="img-preview" />
+                        <button type="button" class="btn-remover-foto" id="btn-remover-foto" title="Remover foto">&times;</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Aba 2: Especificações Técnicas -->
+                <div class="secao-form-aba" id="aba-conteudo-especificacoes" style="display: none;">
+                  <div class="linha-dupla-form">
+                    <div class="grupo-campo">
+                      <label for="fio-tex" class="label-form">TEX (Espessura)</label>
+                      <input type="number" id="fio-tex" class="input-form" placeholder="Ex: 295, 492, 885" min="1" />
+                    </div>
+                    <div class="grupo-campo">
+                      <label for="fio-composicao" class="label-form">Composição</label>
+                      <input type="text" id="fio-composicao" class="input-form" placeholder="Ex: 100% Algodão, 100% Acrílico..." list="datalist-composicoes" />
+                      <datalist id="datalist-composicoes">
+                        <option value="100% Algodão"></option>
+                        <option value="100% Algodão Mercerizado"></option>
+                        <option value="100% Acrílico"></option>
+                        <option value="Misto (Algodão + Acrílico)"></option>
+                        <option value="100% Lã Natural"></option>
+                        <option value="Fio de Malha Residual"></option>
+                      </datalist>
+                    </div>
+                  </div>
+
+                  <div class="linha-tripla-form">
+                    <div class="grupo-campo">
+                      <label for="fio-peso-novelo" class="label-form">Peso / Novelo (g)</label>
+                      <input type="number" id="fio-peso-novelo" class="input-form" placeholder="Ex: 100" min="1" />
+                    </div>
+                    <div class="grupo-campo">
+                      <label for="fio-metragem-novelo" class="label-form">Metragem / Novelo (m)</label>
+                      <input type="number" id="fio-metragem-novelo" class="input-form" placeholder="Ex: 254" min="1" />
+                    </div>
+                    <div class="grupo-campo">
+                      <label for="fio-agulha" class="label-form">Agulha Recomendada</label>
+                      <input type="text" id="fio-agulha" class="input-form" placeholder="Ex: 2.5mm a 3.5mm" />
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Aba 3: Estoque & Localização -->
+                <div class="secao-form-aba" id="aba-conteudo-estoque" style="display: none;">
+                  <div class="linha-tripla-form">
+                    <div class="grupo-campo">
+                      <label for="fio-quantidade" class="label-form">Qtd. de Novelos <span class="campo-obrigatorio">*</span></label>
+                      <input type="number" id="fio-quantidade" class="input-form" placeholder="1" value="1" min="0" step="0.5" required />
+                    </div>
+                    <div class="grupo-campo">
+                      <label for="fio-peso-restante" class="label-form">Peso Restante / Sobra (g)</label>
+                      <input type="number" id="fio-peso-restante" class="input-form" placeholder="Opcional (para balança)" min="0" />
+                    </div>
+                    <div class="grupo-campo">
+                      <label for="fio-preco" class="label-form">Preço Pago (R$ / un)</label>
+                      <input type="number" id="fio-preco" class="input-form" placeholder="0,00" min="0" step="0.01" />
+                    </div>
+                  </div>
+
+                  <div class="linha-dupla-form">
+                    <div class="grupo-campo">
+                      <label for="fio-localizacao" class="label-form">Localização / Onde está guardado</label>
+                      <input type="text" id="fio-localizacao" class="input-form" placeholder="Ex: Caixa 2, Gaveta azul, Cesto..." />
+                    </div>
+                  </div>
+
+                  <div class="grupo-campo">
+                    <label for="fio-observacoes" class="label-form">Observações / Anotações</label>
+                    <textarea id="fio-observacoes" class="input-form textarea-form" rows="3" placeholder="Informações adicionais de textura, loja de compra, projeto planejado..."></textarea>
+                  </div>
+                </div>
+
+                <div class="modal-rodape">
+                  <button type="button" class="btn-cancelar-modal" id="btn-cancelar-modal-fio">Cancelar</button>
+                  <button type="submit" class="btn-salvar-fio" id="btn-salvar-fio">Salvar Fio</button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- ================================================================= -->
+          <!-- 5. TELA DE DETALHES DO FIO (MODAL GRANDE / DRAWER)                 -->
+          <!-- ================================================================= -->
+          <div class="modal-overlay-fio" id="modal-detalhes-fio" style="display: none;">
+            <div class="modal-conteudo-detalhes" role="dialog" aria-modal="true" aria-labelledby="det-fio-nome">
+              <!-- Cabeçalho Fixo com Navegação Anterior / Próximo e Fechar -->
+              <header class="detalhes-cabecalho">
+                <div class="detalhes-titulos">
+                  <div class="detalhes-linha-topo">
+                    <span class="badge-marca" id="det-fio-marca">Marca</span>
+                    <span class="badge-status-fio" id="det-fio-status-badge">Em estoque</span>
+                  </div>
+                  <h2 class="detalhes-nome" id="det-fio-nome">Nome da Linha</h2>
+                </div>
+
+                <div class="detalhes-navegacao-controles">
+                  <button type="button" class="btn-nav-fio" id="btn-fio-anterior" title="Fio anterior (ou use a seta esquerda ←)">
+                    &lsaquo;
+                  </button>
+                  <span class="indicador-posicao-fio" id="det-indicador-posicao">1 de 1</span>
+                  <button type="button" class="btn-nav-fio" id="btn-fio-proximo" title="Próximo fio (ou use a seta direita →)">
+                    &rsaquo;
+                  </button>
+                  <button type="button" class="btn-fechar-detalhes" id="btn-fechar-detalhes-fio" title="Fechar (ESC)">&times;</button>
+                </div>
+              </header>
+
+              <!-- Corpo com 2 Colunas no Desktop -->
+              <div class="detalhes-corpo">
+                <!-- Coluna Visual (Esquerda) -->
+                <div class="detalhes-coluna-visual">
+                  <div class="foto-ampliada-container" id="det-foto-container">
+                    <img id="det-fio-foto" src="" alt="Foto do fio" class="detalhes-foto-img" style="display: none;" />
+                    <div class="foto-placeholder-grande" id="det-foto-placeholder">
+                      <span class="icone-placeholder-fio">🧶</span>
+                    </div>
+                  </div>
+
+                  <div class="bloco-identificacao-destaque">
+                    <div class="item-destaque-cor">
+                      <span class="label-detalhe">COR</span>
+                      <strong class="valor-detalhe-grande" id="det-fio-cor">—</strong>
+                      <span class="codigo-cor-tag" id="det-fio-codigo">—</span>
+                    </div>
+                    <div class="item-destaque-lote">
+                      <span class="label-detalhe">LOTE</span>
+                      <div class="linha-lote-copiar">
+                        <strong class="valor-lote" id="det-fio-lote">—</strong>
+                        <button type="button" class="btn-copiar-lote" id="btn-copiar-lote" title="Copiar número do lote">
+                          <span>Copiar Lote</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Coluna Informações (Direita) -->
+                <div class="detalhes-coluna-dados">
+                  <!-- Bloco 2: Painel de Estoque e Rendimento -->
+                  <section class="detalhes-secao-card secao-estoque-rendimento">
+                    <h3 class="secao-titulo-card">ESTOQUE & RENDIMENTO</h3>
+                    <div class="painel-controle-estoque">
+                      <div class="controle-quantidade-detalhes">
+                        <button type="button" class="btn-ajuste-detalhes btn-menos-det" id="det-btn-menos" title="Diminuir 0.5 novelo">−</button>
+                        <div class="display-qtd-detalhes">
+                          <span class="qtd-numero" id="det-fio-qtd">0</span>
+                          <span class="qtd-unidade">novelos</span>
+                        </div>
+                        <button type="button" class="btn-ajuste-detalhes btn-mais-det" id="det-btn-mais" title="Adicionar 0.5 novelo">+</button>
+                      </div>
+
+                      <div class="rendimento-estimado-grid">
+                        <div class="item-rendimento">
+                          <span class="label-rendimento">PESO DISPONÍVEL</span>
+                          <strong class="valor-rendimento" id="det-fio-peso-disp">—</strong>
+                        </div>
+                        <div class="item-rendimento">
+                          <span class="label-rendimento">METRAGEM ESTIMADA</span>
+                          <strong class="valor-rendimento" id="det-fio-metragem-disp">—</strong>
+                        </div>
+                      </div>
+                    </div>
+                  </section>
+
+                  <!-- Bloco 3: Ficha Técnica -->
+                  <section class="detalhes-secao-card">
+                    <h3 class="secao-titulo-card">FICHA TÉCNICA</h3>
+                    <div class="ficha-tecnica-grid">
+                      <div class="item-ficha">
+                        <span class="label-ficha">TEX</span>
+                        <strong class="valor-ficha" id="det-fio-tex">—</strong>
+                      </div>
+                      <div class="item-ficha">
+                        <span class="label-ficha">AGULHA RECOMENDADA</span>
+                        <strong class="valor-ficha" id="det-fio-agulha">—</strong>
+                      </div>
+                      <div class="item-ficha">
+                        <span class="label-ficha">COMPOSIÇÃO</span>
+                        <strong class="valor-ficha" id="det-fio-composicao">—</strong>
+                      </div>
+                      <div class="item-ficha">
+                        <span class="label-ficha">PESO / NOVELO</span>
+                        <strong class="valor-ficha" id="det-fio-peso-un">—</strong>
+                      </div>
+                      <div class="item-ficha">
+                        <span class="label-ficha">METRAGEM / NOVELO</span>
+                        <strong class="valor-ficha" id="det-fio-metragem-un">—</strong>
+                      </div>
+                    </div>
+                  </section>
+
+                  <!-- Bloco 4: Organização, Custo e Notas -->
+                  <section class="detalhes-secao-card">
+                    <h3 class="secao-titulo-card">ORGANIZAÇÃO & VALORES</h3>
+                    <div class="valores-organizacao-grid">
+                      <div class="item-ficha">
+                        <span class="label-ficha">LOCALIZAÇÃO</span>
+                        <strong class="valor-ficha" id="det-fio-localizacao">—</strong>
+                      </div>
+                      <div class="item-ficha">
+                        <span class="label-ficha">PREÇO PAGO / UN</span>
+                        <strong class="valor-ficha" id="det-fio-preco-un">—</strong>
+                      </div>
+                      <div class="item-ficha">
+                        <span class="label-ficha">VALOR TOTAL EM ESTOQUE</span>
+                        <strong class="valor-ficha destaque-valor-verde" id="det-fio-preco-total">—</strong>
+                      </div>
+                    </div>
+
+                    <!-- Observações -->
+                    <div class="observacoes-detalhe-bloco" id="det-bloco-observacoes">
+                      <span class="label-ficha">OBSERVAÇÕES</span>
+                      <p class="texto-observacao" id="det-fio-obs">—</p>
+                    </div>
+                  </section>
+                </div>
+              </div>
+
+              <!-- Rodapé Fixo com Ações -->
+              <footer class="detalhes-rodape">
+                <div class="rodape-esquerda">
+                  <button type="button" class="btn-acao-perigo" id="btn-excluir-fio">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icone-acao-btn">
+                      <polyline points="3 6 5 6 21 6"></polyline>
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                    <span>Excluir</span>
+                  </button>
+                </div>
+
+                <div class="rodape-direita">
+                  <button type="button" class="btn-acao-secundaria" id="btn-duplicar-fio">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icone-acao-btn">
+                      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                    <span>Duplicar Fio</span>
+                  </button>
+                  <button type="button" class="btn-acao-primaria" id="btn-editar-fio">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icone-acao-btn">
+                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                    </svg>
+                    <span>Editar Fio</span>
+                  </button>
+                </div>
+              </footer>
+            </div>
+          </div>
+
+          <!-- 6. MODAL DE CONFIRMAÇÃO DE EXCLUSÃO DE FIO -->
+          <div class="modal-overlay-fio" id="modal-confirmar-exclusao-fio" style="display: none; z-index: 1100;">
+            <div class="modal-conteudo-confirmar" role="dialog" aria-modal="true" aria-labelledby="titulo-confirmar-exclusao">
+              <div class="modal-confirmar-icone">🗑️</div>
+              <h3 class="modal-confirmar-titulo" id="titulo-confirmar-exclusao">Excluir Fio do Inventário?</h3>
+              <p class="modal-confirmar-texto" id="texto-confirmar-exclusao">
+                Tem certeza que deseja excluir este fio do seu inventário? Esta ação não pode ser desfeita.
+              </p>
+              <div class="modal-confirmar-acoes">
+                <button type="button" class="btn-cancelar-modal" id="btn-cancelar-exclusao-fio">Cancelar</button>
+                <button type="button" class="btn-acao-perigo" id="btn-confirmar-exclusao-fio">Sim, Excluir</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================================================================= -->
+      <!-- 6. AGULHAS E ACESSÓRIOS -->
+      <!-- ================================================================= -->
+      <div id="secao-agulhas" class="secao-ferramenta" style="display: none">
+        <div class="cabecalho">
+          <div class="cabecalho-conteudo">
+            <div class="cabecalho-info">
+              <h1 class="titulo-ferramenta">Agulhas e Acessórios</h1>
+              <span class="subtitulo-ferramenta"
+                >Catálogo de agulhas, ferramentas de confecção e estoque de aviamentos</span
+              >
+            </div>
+          </div>
+        </div>
+
+        <div class="conteiner-ferramenta conteiner-agulhas" id="conteiner-agulhas">
+          <!-- ZONA 1: BARRA DE NAVEGAÇÃO INTERNA (ABAS / TABS + SUBFILTROS) -->
+          <nav class="barra-abas-biblioteca" aria-label="Categorias de agulhas e acessórios">
+            <div class="lista-abas-biblioteca" role="tablist" aria-label="Filtrar por categoria">
+              <button
+                type="button"
+                class="aba-biblioteca ativa"
+                role="tab"
+                aria-selected="true"
+                data-categoria="todas"
+                id="aba-bib-todas"
+              >
+                <span>Todas</span>
+                <span class="contador-aba" id="cont-aba-todas">0</span>
+              </button>
+              <button
+                type="button"
+                class="aba-biblioteca"
+                role="tab"
+                aria-selected="false"
+                data-categoria="agulha"
+                id="aba-bib-agulha"
+              >
+                <span>Agulhas</span>
+                <span class="contador-aba" id="cont-aba-agulha">0</span>
+              </button>
+              <button
+                type="button"
+                class="aba-biblioteca"
+                role="tab"
+                aria-selected="false"
+                data-categoria="ferramenta"
+                id="aba-bib-ferramenta"
+              >
+                <span>Ferramentas</span>
+                <span class="contador-aba" id="cont-aba-ferramenta">0</span>
+              </button>
+              <button
+                type="button"
+                class="aba-biblioteca"
+                role="tab"
+                aria-selected="false"
+                data-categoria="aviamento"
+                id="aba-bib-aviamento"
+              >
+                <span>Aviamentos</span>
+                <span class="contador-aba" id="cont-aba-aviamento">0</span>
+              </button>
+            </div>
+
+            <!-- Subfiltros rápidos exibidos na aba Agulhas -->
+            <div
+              class="subfiltros-agulhas"
+              id="subfiltros-agulhas"
+              role="group"
+              aria-label="Subfiltros de tipo de agulha"
+              style="display: none;"
+            >
+              <button type="button" class="chip-subfiltro ativo" data-subtipo="todos">Todos os tipos</button>
+              <button type="button" class="chip-subfiltro" data-subtipo="croche">Crochê</button>
+              <button type="button" class="chip-subfiltro" data-subtipo="trico-reto">Tricô Reto</button>
+              <button type="button" class="chip-subfiltro" data-subtipo="trico-circular">Tricô Circular</button>
+              <button type="button" class="chip-subfiltro" data-subtipo="tapecaria">Tapeçaria</button>
+            </div>
+          </nav>
+
+          <!-- ZONA 2: BARRA DE FERRAMENTAS E FILTROS (TOOLBAR) -->
+          <section class="toolbar-biblioteca" aria-label="Busca, filtros e ações">
+            <div class="toolbar-esquerda">
+              <!-- Busca por texto -->
+              <div class="campo-busca-biblioteca">
+                <svg class="icone-busca-bib" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input
+                  type="search"
+                  id="busca-biblioteca"
+                  class="input-busca-biblioteca"
+                  placeholder="Buscar por nome, material, cor, projeto..."
+                  aria-label="Buscar agulhas, ferramentas ou aviamentos"
+                />
+              </div>
+
+              <!-- Alternador de Visão (Grade / Lista) ao lado da busca -->
+              <div class="alternador-visao" role="group" aria-label="Alternar modo de visualização">
+                <button
+                  type="button"
+                  class="btn-visao ativo"
+                  id="btn-visao-grade"
+                  data-visao="grade"
+                  aria-pressed="true"
+                  title="Visualização em Grade (Cards)"
+                >
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <rect x="3" y="3" width="7" height="7" rx="1"></rect>
+                    <rect x="14" y="3" width="7" height="7" rx="1"></rect>
+                    <rect x="3" y="14" width="7" height="7" rx="1"></rect>
+                    <rect x="14" y="14" width="7" height="7" rx="1"></rect>
+                  </svg>
+                  <span class="texto-visao">Grade</span>
+                </button>
+                <button
+                  type="button"
+                  class="btn-visao"
+                  id="btn-visao-lista"
+                  data-visao="lista"
+                  aria-pressed="false"
+                  title="Visualização em Lista / Tabela"
+                >
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <line x1="8" y1="6" x2="21" y2="6"></line>
+                    <line x1="8" y1="12" x2="21" y2="12"></line>
+                    <line x1="8" y1="18" x2="21" y2="18"></line>
+                    <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                    <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                    <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                  </svg>
+                  <span class="texto-visao">Lista</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="toolbar-direita">
+              <!-- Filtro por numeração / tamanho -->
+              <select
+                id="filtro-numeracao-biblioteca"
+                class="select-filtro-bib"
+                aria-label="Filtrar por numeração ou tamanho"
+              >
+                <option value="">Todas as numerações</option>
+              </select>
+
+              <!-- Filtro por status -->
+              <select
+                id="filtro-status-biblioteca"
+                class="select-filtro-bib"
+                aria-label="Filtrar por status"
+              >
+                <option value="">Todos os status</option>
+                <option value="disponivel">Disponível</option>
+                <option value="em-uso">Em uso em projeto</option>
+                <option value="estoque-baixo">Estoque baixo</option>
+              </select>
+
+              <button
+                type="button"
+                class="btn-limpar-filtros-bib"
+                id="btn-limpar-filtros-biblioteca"
+                title="Limpar busca e filtros"
+                style="display: none;"
+              >
+                Limpar
+              </button>
+
+              <!-- Botão Primário: + Novo Item -->
+              <button
+                type="button"
+                class="btn-novo-item-bib"
+                id="btn-novo-item-biblioteca"
+                title="Cadastrar nova agulha, ferramenta ou aviamento"
+              >
+                <span class="icone-mais">+</span>
+                <span>Novo Item</span>
+              </button>
+            </div>
+          </section>
+
+          <!-- ZONA 3: ÁREA DE LISTAGEM (GRID RESPONSIVO OU TABELA COMPACTA) -->
+          <div class="area-listagem-biblioteca" id="area-listagem-biblioteca">
+            <!-- Visualização em Grade (3 colunas com sidebar aberta -> 4 colunas recolhida) -->
+            <div class="grade-itens-biblioteca" id="grade-itens-biblioteca"></div>
+
+            <!-- Visualização em Lista / Tabela -->
+            <div class="tabela-wrapper-biblioteca" id="tabela-wrapper-biblioteca" style="display: none;">
+              <table class="tabela-biblioteca" aria-label="Lista de agulhas, ferramentas e aviamentos">
+                <thead>
+                  <tr>
+                    <th>Item</th>
+                    <th>Categoria</th>
+                    <th>Especificação / Tamanho</th>
+                    <th>Status</th>
+                    <th>Estoque / Uso</th>
+                    <th>Custo / Local</th>
+                    <th class="col-acoes-tabela">Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="tabela-corpo-biblioteca"></tbody>
+              </table>
+            </div>
+
+            <!-- Estado Vazio -->
+            <div class="estado-vazio-biblioteca" id="estado-vazio-biblioteca" style="display: none;">
+              <div class="icone-vazio-bib" aria-hidden="true">🪡</div>
+              <h3 class="titulo-vazio-bib">Nenhum item encontrado</h3>
+              <p class="texto-vazio-bib">
+                Cadastre suas agulhas, ferramentas e aviamentos clicando em "+ Novo Item" ou ajuste os filtros ativos.
+              </p>
+              <button type="button" class="btn-novo-item-bib" id="btn-vazio-novo-item">
+                <span class="icone-mais">+</span>
+                <span>Cadastrar Novo Item</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- ================================================================= -->
+          <!-- PAINEL LATERAL DESLIZANTE (DRAWER) PARA CADASTRO / EDIÇÃO         -->
+          <!-- ================================================================= -->
+          <div class="drawer-overlay-bib" id="drawer-overlay-biblioteca" aria-hidden="true">
+            <aside
+              class="drawer-painel-bib"
+              id="drawer-painel-biblioteca"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="drawer-bib-titulo"
+            >
+              <header class="drawer-bib-topo">
+                <div class="drawer-bib-titulos">
+                  <h2 class="drawer-bib-titulo" id="drawer-bib-titulo">Novo Item</h2>
+                  <span class="drawer-bib-subtitulo" id="drawer-bib-subtitulo">
+                    Adicione uma agulha, ferramenta ou aviamento ao catálogo
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  class="btn-fechar-drawer-bib"
+                  id="btn-fechar-drawer-bib"
+                  aria-label="Fechar painel lateral"
+                >
+                  &times;
+                </button>
+              </header>
+
+              <form id="form-item-biblioteca" class="form-drawer-bib" novalidate>
+                <div class="drawer-bib-corpo">
+                  <input type="hidden" id="bib-item-id" value="" />
+
+                  <!-- Seletor de Categoria (controla os campos dinâmicos) -->
+                  <div class="grupo-campo-bib">
+                    <span class="label-bib">Tipo do Item <span class="asterisco-obrig">*</span></span>
+                    <div class="seletor-categoria-bib" role="radiogroup" aria-label="Categoria do item">
+                      <button type="button" class="btn-cat-form ativo" data-cat="agulha" aria-pressed="true">
+                        <span>🪡 Agulha</span>
+                      </button>
+                      <button type="button" class="btn-cat-form" data-cat="ferramenta" aria-pressed="false">
+                        <span>✂️ Ferramenta</span>
+                      </button>
+                      <button type="button" class="btn-cat-form" data-cat="aviamento" aria-pressed="false">
+                        <span>🎀 Aviamento</span>
+                      </button>
+                    </div>
+                    <input type="hidden" id="bib-categoria" value="agulha" />
+                  </div>
+
+                  <!-- Nome do Item -->
+                  <div class="grupo-campo-bib">
+                    <label for="bib-nome" class="label-bib">Nome do Item <span class="asterisco-obrig">*</span></label>
+                    <input
+                      type="text"
+                      id="bib-nome"
+                      class="input-bib"
+                      placeholder="Ex: Agulha Soft Touch 3.5mm, Olhos de Segurança..."
+                      required
+                    />
+                  </div>
+
+                  <!-- CAMPOS DINÂMICOS: AGULHA -->
+                  <div class="bloco-campos-dinamicos ativo" id="campos-cat-agulha">
+                    <div class="titulo-secao-dinamica">Detalhes da Agulha</div>
+                    <div class="grid-duplo-bib">
+                      <div class="grupo-campo-bib">
+                        <label for="bib-agulha-tipo" class="label-bib">Tipo <span class="asterisco-obrig">*</span></label>
+                        <select id="bib-agulha-tipo" class="input-bib">
+                          <option value="croche">Crochê</option>
+                          <option value="trico-reto">Tricô Reto</option>
+                          <option value="trico-circular">Tricô Circular</option>
+                          <option value="tapecaria">Tapeçaria</option>
+                        </select>
+                      </div>
+                      <div class="grupo-campo-bib">
+                        <label for="bib-agulha-mm" class="label-bib">Espessura (mm) <span class="asterisco-obrig">*</span></label>
+                        <input
+                          type="number"
+                          id="bib-agulha-mm"
+                          class="input-bib"
+                          placeholder="Ex: 3.5"
+                          min="0.5"
+                          max="30"
+                          step="0.25"
+                          list="datalist-espessuras-mm"
+                        />
+                        <datalist id="datalist-espessuras-mm">
+                          <option value="1.5"></option>
+                          <option value="2.0"></option>
+                          <option value="2.5"></option>
+                          <option value="3.0"></option>
+                          <option value="3.5"></option>
+                          <option value="4.0"></option>
+                          <option value="4.5"></option>
+                          <option value="5.0"></option>
+                          <option value="6.0"></option>
+                          <option value="7.0"></option>
+                          <option value="8.0"></option>
+                          <option value="9.0"></option>
+                          <option value="10.0"></option>
+                        </datalist>
+                      </div>
+                    </div>
+
+                    <div class="grid-duplo-bib">
+                      <div class="grupo-campo-bib">
+                        <label for="bib-agulha-material" class="label-bib">Material</label>
+                        <input
+                          type="text"
+                          id="bib-agulha-material"
+                          class="input-bib"
+                          placeholder="Ex: Alumínio, Bambu..."
+                          list="datalist-materiais-agulha"
+                        />
+                        <datalist id="datalist-materiais-agulha">
+                          <option value="Alumínio"></option>
+                          <option value="Alumínio c/ Cabo Emborrachado"></option>
+                          <option value="Bambu"></option>
+                          <option value="Acrílico"></option>
+                          <option value="Aço Inox"></option>
+                          <option value="Madeira"></option>
+                          <option value="Plástico"></option>
+                        </datalist>
+                      </div>
+                      <div class="grupo-campo-bib">
+                        <label for="bib-agulha-cabo" class="label-bib">Comprimento / Cabo (cm)</label>
+                        <input
+                          type="number"
+                          id="bib-agulha-cabo"
+                          class="input-bib"
+                          placeholder="Ex: 80 (circular)"
+                          min="0"
+                          step="1"
+                        />
+                      </div>
+                    </div>
+
+                    <!-- Status Em Uso e Vínculo com Projeto -->
+                    <div class="caixa-vinculo-projeto">
+                      <label class="toggle-linha-form" for="bib-agulha-em-uso">
+                        <input type="checkbox" id="bib-agulha-em-uso" class="checkbox-oculto-bib" />
+                        <span class="switch-visual-bib" aria-hidden="true"></span>
+                        <span class="texto-switch-bib">Em uso em projeto atual</span>
+                      </label>
+                      <div class="campo-projeto-vinculado" id="wrapper-projeto-vinculado" style="display: none;">
+                        <label for="bib-agulha-projeto-nome" class="label-bib">Nome do Projeto Vinculado</label>
+                        <input
+                          type="text"
+                          id="bib-agulha-projeto-nome"
+                          class="input-bib"
+                          placeholder="Ex: Bolsa Boho, Amigurumi Raposa..."
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- CAMPOS DINÂMICOS: FERRAMENTA -->
+                  <div class="bloco-campos-dinamicos" id="campos-cat-ferramenta" style="display: none;">
+                    <div class="titulo-secao-dinamica">Detalhes da Ferramenta</div>
+                    <div class="grid-duplo-bib">
+                      <div class="grupo-campo-bib">
+                        <label for="bib-ferr-qtd" class="label-bib">Quantidade <span class="asterisco-obrig">*</span></label>
+                        <input
+                          type="number"
+                          id="bib-ferr-qtd"
+                          class="input-bib"
+                          value="1"
+                          min="0"
+                          step="1"
+                        />
+                      </div>
+                      <div class="grupo-campo-bib">
+                        <label for="bib-ferr-local" class="label-bib">Local de Armazenamento</label>
+                        <input
+                          type="text"
+                          id="bib-ferr-local"
+                          class="input-bib"
+                          placeholder="Ex: Estojo azul, Gaveta 1..."
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- CAMPOS DINÂMICOS: AVIAMENTO -->
+                  <div class="bloco-campos-dinamicos" id="campos-cat-aviamento" style="display: none;">
+                    <div class="titulo-secao-dinamica">Estoque e Custo do Aviamento</div>
+                    <div class="grid-triplo-bib">
+                      <div class="grupo-campo-bib">
+                        <label for="bib-av-qtd" class="label-bib">Qtd. Atual <span class="asterisco-obrig">*</span></label>
+                        <input
+                          type="number"
+                          id="bib-av-qtd"
+                          class="input-bib"
+                          value="1"
+                          min="0"
+                          step="1"
+                        />
+                      </div>
+                      <div class="grupo-campo-bib">
+                        <label for="bib-av-min" class="label-bib">Estoque Mín.</label>
+                        <input
+                          type="number"
+                          id="bib-av-min"
+                          class="input-bib"
+                          value="5"
+                          min="0"
+                          step="1"
+                        />
+                      </div>
+                      <div class="grupo-campo-bib">
+                        <label for="bib-av-unidade" class="label-bib">Unidade</label>
+                        <select id="bib-av-unidade" class="input-bib">
+                          <option value="un">un</option>
+                          <option value="par">par</option>
+                          <option value="metro">metro</option>
+                          <option value="pacote">pacote</option>
+                          <option value="cm">cm</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div class="grid-duplo-bib">
+                      <div class="grupo-campo-bib">
+                        <label for="bib-av-cor-tam" class="label-bib">Cor / Tamanho</label>
+                        <input
+                          type="text"
+                          id="bib-av-cor-tam"
+                          class="input-bib"
+                          placeholder="Ex: 12mm Preto, 60cm Caramelo"
+                        />
+                      </div>
+                      <div class="grupo-campo-bib">
+                        <label for="bib-av-custo" class="label-bib">Custo Unitário (R$)</label>
+                        <div class="input-prefixo-bib">
+                          <span>R$</span>
+                          <input
+                            type="number"
+                            id="bib-av-custo"
+                            class="input-bib"
+                            placeholder="0,00"
+                            min="0"
+                            step="0.01"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Ajudante rápido de cálculo por pacote -->
+                    <div class="calc-pacote-bib">
+                      <span class="label-calc-pacote">Comprou em pacote? Calcule o unitário:</span>
+                      <div class="linha-calc-pacote">
+                        <input
+                          type="number"
+                          id="bib-pacote-valor"
+                          class="input-bib input-mini-bib"
+                          placeholder="R$ pacote (ex: 15)"
+                          min="0"
+                          step="0.01"
+                          aria-label="Valor total do pacote"
+                        />
+                        <span class="divisor-pacote">÷</span>
+                        <input
+                          type="number"
+                          id="bib-pacote-qtd"
+                          class="input-bib input-mini-bib"
+                          placeholder="Qtd (ex: 10)"
+                          min="1"
+                          step="1"
+                          aria-label="Quantidade de unidades no pacote"
+                        />
+                        <button type="button" class="btn-aplicar-pacote" id="btn-calcular-custo-pacote">
+                          Aplicar
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Upload de Foto (com compressão automática) -->
+                  <div class="grupo-campo-bib">
+                    <span class="label-bib">Foto do Item (Opcional)</span>
+                    <div class="upload-area-bib" id="upload-area-bib">
+                      <input type="file" id="bib-foto-input" accept="image/*" class="input-arquivo-invisivel-bib" />
+                      <div class="upload-placeholder-bib" id="upload-placeholder-bib">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icone-upload-bib" aria-hidden="true">
+                          <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                          <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                          <polyline points="21 15 16 10 5 21"></polyline>
+                        </svg>
+                        <span>Clique ou arraste uma foto</span>
+                      </div>
+                      <div class="upload-preview-bib" id="upload-preview-bib" style="display: none;">
+                        <img id="upload-preview-img-bib" src="" alt="Prévia da foto do item" />
+                        <button type="button" class="btn-remover-foto-bib" id="btn-remover-foto-bib" title="Remover foto" aria-label="Remover foto">&times;</button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Observações -->
+                  <div class="grupo-campo-bib">
+                    <label for="bib-observacoes" class="label-bib">Observações</label>
+                    <textarea
+                      id="bib-observacoes"
+                      class="input-bib textarea-bib"
+                      rows="3"
+                      placeholder="Marca, loja onde comprou, detalhes de ergonomia ou uso..."
+                    ></textarea>
+                  </div>
+                </div>
+
+                <!-- Rodapé Fixo do Drawer -->
+                <footer class="drawer-bib-rodape">
+                  <button
+                    type="button"
+                    class="btn-excluir-drawer-bib"
+                    id="btn-excluir-drawer-bib"
+                    style="display: none;"
+                    title="Excluir este item"
+                  >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                      <polyline points="3 6 5 6 21 6"></polyline>
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                    <span>Excluir</span>
+                  </button>
+                  <div class="drawer-rodape-direita">
+                    <button type="button" class="btn-cancelar-drawer-bib" id="btn-cancelar-drawer-bib">Cancelar</button>
+                    <button type="submit" class="btn-salvar-drawer-bib" id="btn-salvar-drawer-bib">Salvar Item</button>
+                  </div>
+                </footer>
+              </form>
+            </aside>
+          </div>
+
+          <!-- ================================================================= -->
+          <!-- MODAL SIMPLES DE CONFIRMAÇÃO DE EXCLUSÃO                          -->
+          <!-- ================================================================= -->
+          <div class="modal-overlay-bib" id="modal-confirmar-exclusao-bib" style="display: none;">
+            <div class="modal-confirmar-bib" role="dialog" aria-modal="true" aria-labelledby="titulo-excluir-bib">
+              <div class="modal-confirmar-bib-icone" aria-hidden="true">🗑️</div>
+              <h3 class="modal-confirmar-bib-titulo" id="titulo-excluir-bib">Excluir item do catálogo?</h3>
+              <p class="modal-confirmar-bib-texto" id="texto-excluir-bib">
+                Tem certeza que deseja remover este item? Essa ação não poderá ser desfeita.
+              </p>
+              <div class="modal-confirmar-bib-acoes">
+                <button type="button" class="btn-cancelar-drawer-bib" id="btn-cancelar-exclusao-bib">Cancelar</button>
+                <button type="button" class="btn-confirmar-excluir-bib" id="btn-confirmar-exclusao-bib">Sim, Excluir</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================================================================= -->
+      <!-- 7. CALCULADORA DE AMOSTRA -->
+      <!-- ================================================================= -->
+      <div id="secao-amostra" class="secao-ferramenta" style="display: none">
+        <div class="cabecalho">
+          <div class="cabecalho-conteudo">
+            <div class="cabecalho-info">
+              <h1 class="titulo-ferramenta">Calculadora de Amostra</h1>
+              <span class="subtitulo-ferramenta"
+                >Calcule a tensão do ponto e adapte medidas exatas para qualquer
+                peça</span
+              >
+            </div>
+            <div class="cabecalho-acoes-amostra">
+              <!-- Botão Modo Avançado (Fio + Agulha + Ponto Base + Consumo) -->
+              <button
+                type="button"
+                class="btn-modo-avancado-amostra btn-macio"
+                id="btn-modo-avancado-amostra"
+                aria-pressed="false"
+                title="Ativar modo avançado com seleção de fio, agulha, ponto base e estimativa de consumo"
+              >
+                <span aria-hidden="true">⚡</span>
+                <span>Modo Avançado</span>
+                <span class="badge-avancado-status" id="badge-modo-avancado-amostra">Off</span>
+              </button>
+
+              <!-- Toggle de Unidade (cm / pol) com Pílula Deslizante -->
+              <div class="toggle-unidade-amostra" id="toggle-unidade-amostra" role="group" aria-label="Unidade de medida">
+                <span class="pill-deslizante-unidade" id="pill-unidade-amostra" aria-hidden="true"></span>
+                <button type="button" class="btn-unidade-amostra ativo" data-unidade="cm" aria-pressed="true">cm</button>
+                <button type="button" class="btn-unidade-amostra" data-unidade="pol" aria-pressed="false">pol</button>
+              </div>
+
+              <!-- Botão de Ajuda (?) -->
+              <button
+                type="button"
+                class="btn-ajuda-amostra btn-macio"
+                id="btn-ajuda-amostra"
+                title="Como medir sua amostra corretamente"
+                aria-label="Como medir sua amostra corretamente"
+              >
+                ?
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="conteiner-ferramenta conteiner-amostra" id="conteiner-amostra">
+          <!-- ZONA 1: SELETOR DE MODO (ABAS COM PÍLULA DESLIZANTE) -->
+          <div class="barra-modo-amostra">
+            <div class="seletor-modo-amostra" id="seletor-modo-amostra" role="tablist" aria-label="Modo da calculadora de amostra">
+              <span class="pill-deslizante-modo" id="pill-modo-amostra" aria-hidden="true"></span>
+              <button
+                type="button"
+                class="btn-modo-amostra ativo"
+                role="tab"
+                aria-selected="true"
+                data-modo="medida"
+                id="tab-modo-medida"
+              >
+                <span class="icone-modo-amostra" aria-hidden="true">📐</span>
+                <span>Por Medida Desejada</span>
+              </button>
+              <button
+                type="button"
+                class="btn-modo-amostra"
+                role="tab"
+                aria-selected="false"
+                data-modo="receita"
+                id="tab-modo-receita"
+              >
+                <span class="icone-modo-amostra" aria-hidden="true">📖</span>
+                <span>Adaptar Receita</span>
+              </button>
+            </div>
+            <p class="descricao-modo-amostra" id="descricao-modo-amostra">
+              Informe sua amostra e o tamanho desejado da peça para descobrir quantos pontos e carreiras fazer.
+            </p>
+          </div>
+
+          <!-- CONTEÚDO PRINCIPAL (2 COLUNAS NO DESKTOP / EMPILHADO NO MOBILE) -->
+          <div class="grid-principal-amostra">
+            <!-- ZONA 2: ÁREA DE ENTRADA (ESQUERDA NO DESKTOP / TOPO NO MOBILE) -->
+            <div class="coluna-entrada-amostra">
+              <!-- PAINEL MODO AVANÇADO: LINHA + AGULHA + PONTO BASE -->
+              <section
+                class="card-amostra card-modo-avancado"
+                id="painel-modo-avancado-amostra"
+                aria-labelledby="titulo-modo-avancado"
+                style="display: none;"
+              >
+                <div class="card-amostra-topo">
+                  <div>
+                    <h2 class="card-amostra-titulo" id="titulo-modo-avancado">⚡ Materiais & Ponto Base</h2>
+                    <span class="card-amostra-sub">Selecione linha, agulha e ponto para estimar consumo de fio</span>
+                  </div>
+                  <button
+                    type="button"
+                    class="btn-link-banco-amostras"
+                    id="btn-ir-banco-amostras"
+                    title="Abrir Banco de Amostras"
+                  >
+                    📚 Banco de Amostras
+                  </button>
+                </div>
+
+                <!-- Seleção de Fio do Inventário + Agulha do Inventário -->
+                <div class="campos-amostra-grid">
+                  <div class="campo-amostra">
+                    <label for="avancado-select-fio" class="label-amostra">LINHA DO INVENTÁRIO</label>
+                    <select id="avancado-select-fio" class="select-amostra-avancado">
+                      <option value="">Selecionar fio do estoque...</option>
+                    </select>
+                  </div>
+
+                  <div class="campo-amostra">
+                    <label for="avancado-select-agulha" class="label-amostra">AGULHA DO INVENTÁRIO</label>
+                    <select id="avancado-select-agulha" class="select-amostra-avancado">
+                      <option value="">Selecionar agulha cadastrada...</option>
+                    </select>
+                  </div>
+                </div>
+
+                <!-- Tags com detalhes puxados automaticamente dos inventários -->
+                <div class="tarja-materiais-avancado" id="tarja-materiais-avancado" style="display: none;"></div>
+
+                <!-- Seleção do Ponto Base / Modelo do Banco de Amostras -->
+                <div class="bloco-ponto-base-avancado">
+                  <div class="topo-ponto-base">
+                    <label for="avancado-select-ponto" class="label-amostra">PONTO BASE / MODELO DA AMOSTRA</label>
+                    <button
+                      type="button"
+                      class="btn-add-ponto-lista"
+                      id="btn-toggle-novo-ponto-lista"
+                      title="Adicionar outro tipo de ponto na listinha"
+                    >
+                      + Adicionar ponto
+                    </button>
+                  </div>
+
+                  <div class="linha-seletor-ponto-base">
+                    <div class="pills-tecnica-avancado" role="group" aria-label="Técnica principal">
+                      <button type="button" class="btn-tec-av ativo" data-tecnica="croche" aria-pressed="true">Crochê</button>
+                      <button type="button" class="btn-tec-av" data-tecnica="trico" aria-pressed="false">Tricô</button>
+                    </div>
+                    <select id="avancado-select-ponto" class="select-amostra-avancado select-ponto-flex">
+                      <!-- Preenchido via JS: Ponto Baixo, Ponto Malha, pontos da listinha e Banco de Amostras -->
+                    </select>
+                  </div>
+
+                  <!-- Mini-formulário para adicionar novos pontos na listinha -->
+                  <div class="box-novo-ponto-rapido" id="box-novo-ponto-rapido" style="display: none;">
+                    <div class="grid-novo-ponto">
+                      <input
+                        type="text"
+                        id="input-novo-ponto-nome"
+                        class="input-amostra input-texto-amostra"
+                        placeholder="Nome (ex: Ponto Alto, Ponto Pipoca...)"
+                        aria-label="Nome do novo tipo de ponto"
+                      />
+                      <select id="select-novo-ponto-tecnica" class="select-amostra-avancado" aria-label="Técnica do ponto">
+                        <option value="croche">Crochê</option>
+                        <option value="trico">Tricô</option>
+                      </select>
+                      <select id="select-novo-ponto-consumo" class="select-amostra-avancado" aria-label="Consumo de fio">
+                        <option value="0.78">Consumo Leve (rendado/malha)</option>
+                        <option value="1.0" selected>Consumo Médio (ponto baixo)</option>
+                        <option value="1.22">Consumo Alto (ponto alto/fechado)</option>
+                        <option value="1.48">Consumo Muito Alto (pipoca/relevo)</option>
+                      </select>
+                    </div>
+                    <div class="acoes-novo-ponto">
+                      <span class="dica-novo-ponto">O novo ponto fica salvo na sua listinha para futuros cálculos.</span>
+                      <div class="btns-novo-ponto">
+                        <button type="button" class="btn-mini-cancelar" id="btn-cancelar-novo-ponto">Cancelar</button>
+                        <button type="button" class="btn-mini-salvar" id="btn-salvar-novo-ponto">Salvar na Lista</button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Chips de pontos personalizados adicionados na listinha -->
+                  <div class="chips-pontos-custom" id="chips-pontos-custom" style="display: none;"></div>
+                </div>
+              </section>
+
+              <!-- CARTÃO 1: SUA AMOSTRA -->
+              <section class="card-amostra card-sua-amostra" aria-labelledby="titulo-card-sua-amostra">
+                <div class="card-amostra-topo">
+                  <div>
+                    <h2 class="card-amostra-titulo" id="titulo-card-sua-amostra">1. Sua Amostra</h2>
+                    <span class="card-amostra-sub">Medidas e contagem feitas no centro do quadrado</span>
+                  </div>
+                  <span class="badge-padrao-amostra" id="badge-padrao-amostra">Padrão 10 × 10 cm</span>
+                </div>
+
+                <div class="conteudo-card-amostra-com-preview">
+                  <div class="campos-amostra-grid">
+                    <!-- Largura da Amostra -->
+                    <div class="campo-amostra" id="campo-amostra-largura">
+                      <label for="amostra-largura" class="label-amostra">
+                        LARGURA (<span class="txt-unidade">cm</span>)
+                      </label>
+                      <div class="stepper-amostra">
+                        <button type="button" class="btn-stepper-am" data-alvo="amostra-largura" data-delta="-0.5" aria-label="Diminuir largura da amostra">−</button>
+                        <input
+                          type="number"
+                          id="amostra-largura"
+                          class="input-amostra"
+                          value="10"
+                          min="0.5"
+                          step="0.5"
+                          inputmode="decimal"
+                        />
+                        <button type="button" class="btn-stepper-am" data-alvo="amostra-largura" data-delta="0.5" aria-label="Aumentar largura da amostra">+</button>
+                      </div>
+                    </div>
+
+                    <!-- Altura da Amostra -->
+                    <div class="campo-amostra" id="campo-amostra-altura">
+                      <label for="amostra-altura" class="label-amostra">
+                        ALTURA (<span class="txt-unidade">cm</span>)
+                      </label>
+                      <div class="stepper-amostra">
+                        <button type="button" class="btn-stepper-am" data-alvo="amostra-altura" data-delta="-0.5" aria-label="Diminuir altura da amostra">−</button>
+                        <input
+                          type="number"
+                          id="amostra-altura"
+                          class="input-amostra"
+                          value="10"
+                          min="0.5"
+                          step="0.5"
+                          inputmode="decimal"
+                        />
+                        <button type="button" class="btn-stepper-am" data-alvo="amostra-altura" data-delta="0.5" aria-label="Aumentar altura da amostra">+</button>
+                      </div>
+                    </div>
+
+                    <!-- Pontos Contados -->
+                    <div class="campo-amostra" id="campo-amostra-pontos">
+                      <label for="amostra-pontos" class="label-amostra">PONTOS CONTADOS</label>
+                      <div class="stepper-amostra">
+                        <button type="button" class="btn-stepper-am" data-alvo="amostra-pontos" data-delta="-1" aria-label="Diminuir pontos contados">−</button>
+                        <input
+                          type="number"
+                          id="amostra-pontos"
+                          class="input-amostra"
+                          placeholder="Ex: 18"
+                          min="1"
+                          step="1"
+                          inputmode="numeric"
+                        />
+                        <button type="button" class="btn-stepper-am" data-alvo="amostra-pontos" data-delta="1" aria-label="Aumentar pontos contados">+</button>
+                      </div>
+                    </div>
+
+                    <!-- Carreiras Contadas -->
+                    <div class="campo-amostra" id="campo-amostra-carreiras">
+                      <label for="amostra-carreiras" class="label-amostra">CARREIRAS CONTADAS</label>
+                      <div class="stepper-amostra">
+                        <button type="button" class="btn-stepper-am" data-alvo="amostra-carreiras" data-delta="-1" aria-label="Diminuir carreiras contadas">−</button>
+                        <input
+                          type="number"
+                          id="amostra-carreiras"
+                          class="input-amostra"
+                          placeholder="Ex: 22"
+                          min="1"
+                          step="1"
+                          inputmode="numeric"
+                        />
+                        <button type="button" class="btn-stepper-am" data-alvo="amostra-carreiras" data-delta="1" aria-label="Aumentar carreiras contadas">+</button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Visualização Ilustrativa da Amostra -->
+                  <div class="preview-amostra-box" aria-hidden="true">
+                    <div class="preview-seta-topo">
+                      <span class="seta-linha"></span>
+                      <span class="seta-texto" id="preview-txt-largura">10 cm • — pts</span>
+                      <span class="seta-linha"></span>
+                    </div>
+                    <div class="preview-miolo-wrapper">
+                      <div class="preview-quadrado-trama" id="preview-quadrado-trama">
+                        <span class="preview-centro-tag" id="preview-centro-tag">10 × 10</span>
+                      </div>
+                      <div class="preview-seta-direita">
+                        <span class="seta-texto-vertical" id="preview-txt-altura">10 cm • — carr</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Fita Métrica Elástica da Amostra -->
+                <div class="fita-metrica-wrapper">
+                  <div class="fita-metrica-header">
+                    <span class="fita-label">Fita Métrica (Largura da amostra)</span>
+                    <span class="fita-valor" id="fita-amostra-valor">10 cm</span>
+                  </div>
+                  <div class="fita-metrica-trilha">
+                    <div class="fita-metrica-barra" id="fita-amostra-barra" style="width: 50%;"></div>
+                  </div>
+                </div>
+              </section>
+
+              <!-- CARTÃO 2: SUA META (MODO 1: MEDIDA / MODO 2: ADAPTAR RECEITA) -->
+              <section class="card-amostra card-sua-meta" aria-labelledby="titulo-card-meta">
+                <div class="card-amostra-topo">
+                  <div>
+                    <h2 class="card-amostra-titulo" id="titulo-card-meta">2. Sua Meta (Tamanho da Peça)</h2>
+                    <span class="card-amostra-sub" id="subtitulo-card-meta">Dimensões finais que você deseja alcançar</span>
+                  </div>
+                </div>
+
+                <!-- Campos Modo 1: Por Medida Desejada -->
+                <div class="bloco-modo-campos" id="campos-modo-medida">
+                  <div class="campos-amostra-grid">
+                    <div class="campo-amostra" id="campo-meta-largura">
+                      <label for="meta-largura" class="label-amostra">
+                        LARGURA DESEJADA (<span class="txt-unidade">cm</span>)
+                      </label>
+                      <div class="stepper-amostra">
+                        <button type="button" class="btn-stepper-am" data-alvo="meta-largura" data-delta="-0.5" aria-label="Diminuir largura desejada">−</button>
+                        <input
+                          type="number"
+                          id="meta-largura"
+                          class="input-amostra"
+                          placeholder="Ex: 45"
+                          min="0.5"
+                          step="0.5"
+                          inputmode="decimal"
+                        />
+                        <button type="button" class="btn-stepper-am" data-alvo="meta-largura" data-delta="0.5" aria-label="Aumentar largura desejada">+</button>
+                      </div>
+                    </div>
+
+                    <div class="campo-amostra" id="campo-meta-altura">
+                      <label for="meta-altura" class="label-amostra">
+                        ALTURA DESEJADA (<span class="txt-unidade">cm</span>)
+                      </label>
+                      <div class="stepper-amostra">
+                        <button type="button" class="btn-stepper-am" data-alvo="meta-altura" data-delta="-0.5" aria-label="Diminuir altura desejada">−</button>
+                        <input
+                          type="number"
+                          id="meta-altura"
+                          class="input-amostra"
+                          placeholder="Ex: 60"
+                          min="0.5"
+                          step="0.5"
+                          inputmode="decimal"
+                        />
+                        <button type="button" class="btn-stepper-am" data-alvo="meta-altura" data-delta="0.5" aria-label="Aumentar altura desejada">+</button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Fita Métrica Elástica da Meta -->
+                  <div class="fita-metrica-wrapper">
+                    <div class="fita-metrica-header">
+                      <span class="fita-label">Fita Métrica (Largura da peça)</span>
+                      <span class="fita-valor" id="fita-meta-valor">0 cm</span>
+                    </div>
+                    <div class="fita-metrica-trilha">
+                      <div class="fita-metrica-barra fita-meta-barra" id="fita-meta-barra" style="width: 8%;"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Campos Modo 2: Adaptar Receita -->
+                <div class="bloco-modo-campos" id="campos-modo-receita" style="display: none;">
+                  <div class="subbloco-receita-titulo">Tensão original da receita (em <span id="txt-base-receita">10 cm</span>)</div>
+                  <div class="campos-amostra-grid">
+                    <div class="campo-amostra" id="campo-rec-amostra-pts">
+                      <label for="receita-amostra-pontos" class="label-amostra">PONTOS DA RECEITA (EM <span class="txt-base-curta">10cm</span>)</label>
+                      <div class="stepper-amostra">
+                        <button type="button" class="btn-stepper-am" data-alvo="receita-amostra-pontos" data-delta="-1" aria-label="Diminuir pontos da tensão da receita">−</button>
+                        <input
+                          type="number"
+                          id="receita-amostra-pontos"
+                          class="input-amostra"
+                          placeholder="Ex: 20"
+                          min="1"
+                          step="1"
+                          inputmode="numeric"
+                        />
+                        <button type="button" class="btn-stepper-am" data-alvo="receita-amostra-pontos" data-delta="1" aria-label="Aumentar pontos da tensão da receita">+</button>
+                      </div>
+                    </div>
+
+                    <div class="campo-amostra" id="campo-rec-amostra-carr">
+                      <label for="receita-amostra-carreiras" class="label-amostra">CARREIRAS DA RECEITA (EM <span class="txt-base-curta">10cm</span>)</label>
+                      <div class="stepper-amostra">
+                        <button type="button" class="btn-stepper-am" data-alvo="receita-amostra-carreiras" data-delta="-1" aria-label="Diminuir carreiras da tensão da receita">−</button>
+                        <input
+                          type="number"
+                          id="receita-amostra-carreiras"
+                          class="input-amostra"
+                          placeholder="Ex: 24"
+                          min="1"
+                          step="1"
+                          inputmode="numeric"
+                        />
+                        <button type="button" class="btn-stepper-am" data-alvo="receita-amostra-carreiras" data-delta="1" aria-label="Aumentar carreiras da tensão da receita">+</button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="subbloco-receita-titulo">O que a receita manda fazer na peça</div>
+                  <div class="campos-amostra-grid">
+                    <div class="campo-amostra" id="campo-rec-total-pts">
+                      <label for="receita-total-pontos" class="label-amostra">PONTOS PEDIDOS NA RECEITA</label>
+                      <div class="stepper-amostra">
+                        <button type="button" class="btn-stepper-am" data-alvo="receita-total-pontos" data-delta="-1" aria-label="Diminuir pontos pedidos">−</button>
+                        <input
+                          type="number"
+                          id="receita-total-pontos"
+                          class="input-amostra"
+                          placeholder="Ex: 100"
+                          min="1"
+                          step="1"
+                          inputmode="numeric"
+                        />
+                        <button type="button" class="btn-stepper-am" data-alvo="receita-total-pontos" data-delta="1" aria-label="Aumentar pontos pedidos">+</button>
+                      </div>
+                    </div>
+
+                    <div class="campo-amostra" id="campo-rec-total-carr">
+                      <label for="receita-total-carreiras" class="label-amostra">CARREIRAS PEDIDAS (OPCIONAL)</label>
+                      <div class="stepper-amostra">
+                        <button type="button" class="btn-stepper-am" data-alvo="receita-total-carreiras" data-delta="-1" aria-label="Diminuir carreiras pedidas">−</button>
+                        <input
+                          type="number"
+                          id="receita-total-carreiras"
+                          class="input-amostra"
+                          placeholder="Ex: 80"
+                          min="0"
+                          step="1"
+                          inputmode="numeric"
+                        />
+                        <button type="button" class="btn-stepper-am" data-alvo="receita-total-carreiras" data-delta="1" aria-label="Aumentar carreiras pedidas">+</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Erro gentil inline (sem alert) -->
+                <div class="aviso-validacao-amostra" id="aviso-validacao-amostra" role="status" aria-live="polite" style="display: none;"></div>
+
+                <!-- Botões Calcular / Limpar -->
+                <div class="barra-acoes-entrada-amostra">
+                  <button type="button" class="btn-amostra-primario btn-macio" id="btn-calcular-amostra">
+                    <span>✨ Calcular</span>
+                  </button>
+                  <button type="button" class="btn-amostra-secundario btn-macio" id="btn-limpar-amostra">
+                    <span>Limpar</span>
+                  </button>
+                </div>
+              </section>
+            </div>
+
+            <!-- ZONA 3: PAINEL DE RESULTADOS (DIREITA NO DESKTOP / BASE NO MOBILE) -->
+            <aside class="coluna-resultado-amostra" id="painel-resultado-amostra" aria-live="polite">
+              <div class="card-resultado-amostra">
+                <div class="resultado-amostra-topo">
+                  <span class="label-resultado-topo">RESULTADO DA TENSÃO</span>
+                  <label class="toggle-exato-amostra" for="check-valor-exato-amostra">
+                    <input type="checkbox" id="check-valor-exato-amostra" />
+                    <span>Ver valor exato</span>
+                  </label>
+                </div>
+
+                <!-- Displays Principais com Count-Up -->
+                <div class="bloco-numeros-resultado">
+                  <div class="box-numero-resultado">
+                    <span class="label-numero-res" id="label-res-pontos">PONTOS INICIAIS (BASE)</span>
+                    <div class="linha-valor-grande">
+                      <strong class="valor-grande-amostra" id="resultado-amostra-pontos">0</strong>
+                      <span class="unidade-grande-amostra">pts</span>
+                    </div>
+                    <span class="valor-exato-detalhe" id="exato-amostra-pontos" style="display: none;">Exato: 0,00 pts</span>
+                  </div>
+
+                  <div class="divisor-resultado-amostra"></div>
+
+                  <div class="box-numero-resultado">
+                    <span class="label-numero-res" id="label-res-carreiras">CARREIRAS NECESSÁRIAS</span>
+                    <div class="linha-valor-grande">
+                      <strong class="valor-grande-amostra" id="resultado-amostra-carreiras">0</strong>
+                      <span class="unidade-grande-amostra">carr</span>
+                    </div>
+                    <span class="valor-exato-detalhe" id="exato-amostra-carreiras" style="display: none;">Exato: 0,00 carr</span>
+                  </div>
+                </div>
+
+                <!-- Densidade e Diagnóstico -->
+                <div class="resumo-densidade-amostra" id="resumo-densidade-amostra">
+                  <div class="item-densidade">
+                    <span>Densidade horizontal</span>
+                    <strong id="densidade-pts-unidade">—</strong>
+                  </div>
+                  <div class="item-densidade">
+                    <span>Densidade vertical</span>
+                    <strong id="densidade-carr-unidade">—</strong>
+                  </div>
+                </div>
+
+                <!-- Diagnóstico de Adaptação (visível no Modo 2) -->
+                <div class="box-diagnostico-receita" id="box-diagnostico-receita" style="display: none;"></div>
+
+                <!-- Estimativa de Consumo de Fio (visível no Modo Avançado ou amostra com peso/metragem) -->
+                <div class="bloco-consumo-fio-amostra" id="bloco-consumo-fio-amostra" style="display: none;">
+                  <div class="topo-consumo-fio">
+                    <span class="label-consumo-fio">🧶 ESTIMATIVA DE CONSUMO DE FIO</span>
+                    <span class="badge-origem-consumo" id="badge-origem-consumo">Ponto Base</span>
+                  </div>
+                  <div class="grid-consumo-fio">
+                    <div class="item-consumo-fio">
+                      <span>Peso estimado</span>
+                      <strong id="consumo-fio-gramas">—</strong>
+                    </div>
+                    <div class="item-consumo-fio">
+                      <span>Metragem</span>
+                      <strong id="consumo-fio-metros">—</strong>
+                    </div>
+                    <div class="item-consumo-fio">
+                      <span>Novelos</span>
+                      <strong id="consumo-fio-novelos">—</strong>
+                    </div>
+                  </div>
+                  <div class="status-estoque-consumo" id="status-estoque-consumo" style="display: none;"></div>
+                </div>
+
+                <!-- Botões Copiar Resultado e Salvar no Projeto -->
+                <div class="acoes-resultado-amostra">
+                  <button type="button" class="btn-copiar-amostra btn-macio" id="btn-copiar-amostra">
+                    <span class="icone-copiar-amostra" id="icone-copiar-amostra" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                      </svg>
+                    </span>
+                    <span id="texto-btn-copiar-amostra">Copiar Resultado</span>
+                  </button>
+
+                  <button type="button" class="btn-salvar-projeto-amostra btn-macio" id="btn-salvar-projeto-amostra">
+                    <span aria-hidden="true">📌</span>
+                    <span>Salvar no Projeto</span>
+                  </button>
+                </div>
+
+                <!-- Amostras Salvas Vinculadas a Projetos -->
+                <div class="bloco-amostras-salvas" id="bloco-amostras-salvas" style="display: none;">
+                  <div class="topo-amostras-salvas">
+                    <span>AMOSTRAS SALVAS</span>
+                    <span class="badge-qtd-salvas" id="qtd-amostras-salvas">0</span>
+                  </div>
+                  <div class="lista-amostras-salvas" id="lista-amostras-salvas"></div>
+                </div>
+              </div>
+            </aside>
+          </div>
+
+          <!-- Toast Flutuante de Feedback -->
+          <div class="toast-amostra" id="toast-amostra" role="status" aria-live="polite"></div>
+
+          <!-- Modal de Ajuda (?) -->
+          <div class="modal-overlay-amostra" id="modal-ajuda-amostra" style="display: none;">
+            <div class="modal-box-amostra" role="dialog" aria-modal="true" aria-labelledby="titulo-modal-ajuda-amostra">
+              <div class="modal-amostra-topo">
+                <h3 id="titulo-modal-ajuda-amostra">🧶 Como medir sua amostra corretamente</h3>
+                <button type="button" class="btn-fechar-modal-amostra" id="btn-fechar-ajuda-amostra" aria-label="Fechar ajuda">&times;</button>
+              </div>
+              <div class="modal-amostra-corpo">
+                <ul class="lista-dicas-amostra">
+                  <li><strong>Faça um quadrado maior que 10 × 10 cm:</strong> teça cerca de 14 × 14 cm para evitar que as bordas distorçam a contagem.</li>
+                  <li><strong>Meça sempre no centro:</strong> posicione a fita métrica ou régua no miolo da amostra, longe das bordas laterais e de acabamento.</li>
+                  <li><strong>Não estique o fio:</strong> deixe a amostra descansar plana sobre a mesa (e bloqueie/lave antes se a peça final for bloqueada).</li>
+                  <li><strong>Conte pontos na horizontal e carreiras na vertical:</strong> registre o total exato dentro dos centímetros medidos.</li>
+                </ul>
+              </div>
+              <div class="modal-amostra-rodape">
+                <button type="button" class="btn-amostra-primario btn-macio" id="btn-entendi-ajuda-amostra">Entendi!</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Modal Salvar no Projeto -->
+          <div class="modal-overlay-amostra" id="modal-salvar-amostra" style="display: none;">
+            <div class="modal-box-amostra" role="dialog" aria-modal="true" aria-labelledby="titulo-modal-salvar-amostra">
+              <div class="modal-amostra-topo">
+                <h3 id="titulo-modal-salvar-amostra">📌 Salvar Tensão no Projeto</h3>
+                <button type="button" class="btn-fechar-modal-amostra" id="btn-fechar-salvar-amostra" aria-label="Fechar">&times;</button>
+              </div>
+              <form id="form-salvar-amostra" class="modal-amostra-corpo" novalidate>
+                <div class="campo-amostra" id="campo-nome-projeto-amostra">
+                  <label for="input-nome-projeto-amostra" class="label-amostra">NOME DO PROJETO OU RECEITA *</label>
+                  <input
+                    type="text"
+                    id="input-nome-projeto-amostra"
+                    class="input-amostra input-texto-amostra"
+                    placeholder="Ex: Suéter Outono, Manta Bebê..."
+                    required
+                  />
+                </div>
+                <div class="campo-amostra">
+                  <label for="input-notas-projeto-amostra" class="label-amostra">FIO / AGULHA UTILIZADOS (OPCIONAL)</label>
+                  <input
+                    type="text"
+                    id="input-notas-projeto-amostra"
+                    class="input-amostra input-texto-amostra"
+                    placeholder="Ex: Fio Mollet + Agulha 4.5mm"
+                  />
+                </div>
+
+                <!-- Opção de cadastrar automaticamente no Banco de Amostras -->
+                <div class="caixa-check-banco-modal">
+                  <label class="label-check-banco-modal" for="check-salvar-tambem-banco">
+                    <input type="checkbox" id="check-salvar-tambem-banco" checked />
+                    <span>📚 Também cadastrar este modelo no Banco de Amostras</span>
+                  </label>
+                  <div class="campos-extra-banco-modal" id="campos-extra-salvar-banco">
+                    <div class="campo-amostra">
+                      <label for="input-banco-ponto-rapido" class="label-amostra">NOME DO PONTO NO BANCO</label>
+                      <input
+                        type="text"
+                        id="input-banco-ponto-rapido"
+                        class="input-amostra input-texto-amostra"
+                        placeholder="Ex: Ponto Baixo, Ponto Malha..."
+                      />
+                    </div>
+                    <div class="grid-duplo-modal-salvar">
+                      <div class="campo-amostra">
+                        <label for="input-banco-fio-rapido" class="label-amostra">FIO</label>
+                        <input
+                          type="text"
+                          id="input-banco-fio-rapido"
+                          class="input-amostra input-texto-amostra"
+                          placeholder="Ex: Fio Mollet"
+                        />
+                      </div>
+                      <div class="campo-amostra">
+                        <label for="input-banco-agulha-rapido" class="label-amostra">AGULHA (mm)</label>
+                        <input
+                          type="number"
+                          id="input-banco-agulha-rapido"
+                          class="input-amostra input-texto-amostra"
+                          placeholder="Ex: 4.5"
+                          min="0.5"
+                          max="30"
+                          step="0.25"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="resumo-modal-salvar" id="resumo-modal-salvar"></div>
+                <div class="modal-amostra-rodape">
+                  <button type="button" class="btn-amostra-secundario btn-macio" id="btn-cancelar-salvar-amostra">Cancelar</button>
+                  <button type="submit" class="btn-amostra-primario btn-macio">Salvar Tensão</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================================================================= -->
+      <!-- 8. BANCO DE AMOSTRAS                                              -->
+      <!-- ================================================================= -->
+      <div id="secao-banco-amostras" class="secao-ferramenta" style="display: none">
+        <div class="cabecalho">
+          <div class="cabecalho-conteudo">
+            <div class="cabecalho-info">
+              <h1 class="titulo-ferramenta">Banco de Amostras</h1>
+              <span class="subtitulo-ferramenta"
+                >Guarde modelos de pontos, tensões e consumo de fio para usar na calculadora</span
+              >
+            </div>
+            <button
+              type="button"
+              class="btn-nova-amostra-banco btn-macio"
+              id="btn-nova-amostra-banco"
+              title="Cadastrar novo modelo de amostra"
+            >
+              <span class="icone-mais">+</span>
+              <span>Nova Amostra</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="conteiner-ferramenta conteiner-banco-amostras" id="conteiner-banco-amostras">
+          <!-- BARRA DE CONTROLE: BUSCA + CHIPS DE FILTRO RÁPIDO -->
+          <section class="barra-controle-banco" aria-label="Busca e filtros do banco de amostras">
+            <div class="linha-busca-banco">
+              <div class="campo-busca-banco">
+                <svg class="icone-busca-banco" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input
+                  type="search"
+                  id="busca-banco-amostras"
+                  class="input-busca-banco"
+                  placeholder="Buscar por nome do ponto, fio ou agulha (ex: 4.5mm)..."
+                  aria-label="Buscar amostras"
+                />
+              </div>
+
+              <button
+                type="button"
+                class="btn-limpar-filtros-banco"
+                id="btn-limpar-filtros-banco"
+                style="display: none;"
+              >
+                Limpar Filtros
+              </button>
+            </div>
+
+            <div class="chips-filtro-banco" id="chips-filtro-banco" role="group" aria-label="Filtrar por categoria">
+              <button type="button" class="chip-filtro-banco ativo" data-filtro="todos">Todos</button>
+              <button type="button" class="chip-filtro-banco" data-filtro="basico">Básicos</button>
+              <button type="button" class="chip-filtro-banco" data-filtro="fechado">Fechados</button>
+              <button type="button" class="chip-filtro-banco" data-filtro="texturizado">Texturizados</button>
+              <button type="button" class="chip-filtro-banco" data-filtro="rendado">Rendados</button>
+              <button type="button" class="chip-filtro-banco" data-filtro="relevo">Relevo</button>
+              <button type="button" class="chip-filtro-banco chip-favoritos" data-filtro="favoritos">
+                <span aria-hidden="true">★</span>
+                <span>Favoritos</span>
+              </button>
+            </div>
+          </section>
+
+          <!-- ÁREA DE GALERIA RESPONSIVA -->
+          <div class="area-galeria-banco" id="area-galeria-banco">
+            <!-- Loader Temático de Laçada -->
+            <div class="loader-banco-amostras" id="loader-banco-amostras" style="display: none;" aria-live="polite">
+              <svg class="svg-loader-lacada" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+                <path class="linha-lacada-trilha" d="M16 42 C10 24, 24 10, 38 14 C52 18, 54 38, 42 48 C30 56, 16 48, 22 32 C26 20, 42 22, 46 34" stroke-width="3.5" stroke-linecap="round"/>
+                <path class="linha-lacada-anim" d="M16 42 C10 24, 24 10, 38 14 C52 18, 54 38, 42 48 C30 56, 16 48, 22 32 C26 20, 42 22, 46 34" stroke-width="3.5" stroke-linecap="round"/>
+              </svg>
+              <span>Preparando fios e laçadas...</span>
+            </div>
+
+            <!-- Grade Responsiva de Cards -->
+            <div class="grade-banco-amostras" id="grade-banco-amostras"></div>
+
+            <!-- Estado Vazio (Empty State) -->
+            <div class="estado-vazio-banco" id="estado-vazio-banco" style="display: none;">
+              <div class="ilustracao-vazio-banco" aria-hidden="true">🧶</div>
+              <h3 class="titulo-vazio-banco" id="titulo-vazio-banco">Seu banco de amostras está vazio</h3>
+              <p class="texto-vazio-banco" id="texto-vazio-banco">
+                Cadastre seus pontos favoritos com medidas, fio, agulha e foto para reutilizar na Calculadora de Amostra em um clique.
+              </p>
+              <button type="button" class="btn-nova-amostra-banco btn-macio" id="btn-vazio-nova-amostra">
+                <span class="icone-mais">+</span>
+                <span>Cadastrar Primeira Amostra</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Toast Flutuante do Banco de Amostras -->
+          <div class="toast-banco-amostras" id="toast-banco-amostras" role="status" aria-live="polite"></div>
+
+          <!-- ================================================================= -->
+          <!-- MODAL DE CADASTRO / EDIÇÃO DE MODELO DE AMOSTRA                   -->
+          <!-- ================================================================= -->
+          <div class="modal-overlay-banco" id="modal-form-banco-amostra" style="display: none;">
+            <div class="modal-conteudo-banco" role="dialog" aria-modal="true" aria-labelledby="titulo-modal-form-banco">
+              <header class="modal-banco-topo">
+                <div>
+                  <h2 class="modal-banco-titulo" id="titulo-modal-form-banco">Nova Amostra</h2>
+                  <span class="modal-banco-subtitulo">Separe os detalhes visuais das medidas matemáticas da sua amostra</span>
+                </div>
+                <button type="button" class="btn-fechar-banco" id="btn-fechar-form-banco" aria-label="Fechar modal">&times;</button>
+              </header>
+
+              <form id="form-banco-amostra" class="form-banco-amostra" novalidate>
+                <input type="hidden" id="banco-amostra-id" value="" />
+
+                <div class="modal-banco-corpo">
+                  <!-- Bloco 1: Identificação -->
+                  <fieldset class="bloco-form-banco">
+                    <legend class="legenda-bloco-banco">1. Identificação</legend>
+                    <div class="grid-form-banco-2">
+                      <div class="grupo-campo-banco col-span-2">
+                        <label for="banco-nome" class="label-banco">Nome do Ponto <span class="obrig-banco">*</span></label>
+                        <input
+                          type="text"
+                          id="banco-nome"
+                          class="input-banco"
+                          placeholder="Ex: Ponto Baixo, Ponto Malha, Ponto Pipoca..."
+                          required
+                        />
+                      </div>
+                      <div class="grupo-campo-banco">
+                        <label for="banco-tecnica" class="label-banco">Técnica</label>
+                        <select id="banco-tecnica" class="input-banco">
+                          <option value="croche">Crochê</option>
+                          <option value="trico">Tricô</option>
+                        </select>
+                      </div>
+                      <div class="grupo-campo-banco">
+                        <label for="banco-categoria" class="label-banco">Categoria</label>
+                        <select id="banco-categoria" class="input-banco">
+                          <option value="basico">Básico</option>
+                          <option value="fechado">Fechado</option>
+                          <option value="texturizado">Texturizado</option>
+                          <option value="rendado">Rendado</option>
+                          <option value="relevo">Relevo</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="grupo-campo-banco">
+                      <label for="banco-tensao" class="label-banco">Tensão do Ponto</label>
+                      <select id="banco-tensao" class="input-banco">
+                        <option value="medio">Médio</option>
+                        <option value="apertado">Apertado</option>
+                        <option value="solto">Solto</option>
+                      </select>
+                    </div>
+                  </fieldset>
+
+                  <!-- Bloco 2: Materiais -->
+                  <fieldset class="bloco-form-banco">
+                    <legend class="legenda-bloco-banco">2. Materiais</legend>
+                    <div class="grid-form-banco-2">
+                      <div class="grupo-campo-banco">
+                        <label for="banco-fio" class="label-banco">Fio Utilizado <span class="obrig-banco">*</span></label>
+                        <input
+                          type="text"
+                          id="banco-fio"
+                          class="input-banco"
+                          placeholder="Ex: Fio Mollet, Amigurumi..."
+                          list="datalist-banco-fios"
+                          required
+                        />
+                        <datalist id="datalist-banco-fios"></datalist>
+                      </div>
+                      <div class="grupo-campo-banco">
+                        <label for="banco-agulha" class="label-banco">Agulha (mm) <span class="obrig-banco">*</span></label>
+                        <input
+                          type="number"
+                          id="banco-agulha"
+                          class="input-banco"
+                          placeholder="Ex: 4.5"
+                          min="0.5"
+                          max="30"
+                          step="0.25"
+                          list="datalist-banco-agulhas"
+                          required
+                        />
+                        <datalist id="datalist-banco-agulhas"></datalist>
+                      </div>
+                    </div>
+                  </fieldset>
+
+                  <!-- Bloco 3: Medidas e Consumo -->
+                  <fieldset class="bloco-form-banco">
+                    <legend class="legenda-bloco-banco">3. Medidas & Consumo de Fio</legend>
+                    <div class="grid-form-banco-2">
+                      <div class="grupo-campo-banco">
+                        <label for="banco-largura" class="label-banco">Largura da Amostra (cm) <span class="obrig-banco">*</span></label>
+                        <input type="number" id="banco-largura" class="input-banco" value="10" min="0.5" step="0.5" required />
+                      </div>
+                      <div class="grupo-campo-banco">
+                        <label for="banco-altura" class="label-banco">Altura da Amostra (cm) <span class="obrig-banco">*</span></label>
+                        <input type="number" id="banco-altura" class="input-banco" value="10" min="0.5" step="0.5" required />
+                      </div>
+                      <div class="grupo-campo-banco">
+                        <label for="banco-pontos" class="label-banco">Qtd. de Pontos <span class="obrig-banco">*</span></label>
+                        <input type="number" id="banco-pontos" class="input-banco" placeholder="Ex: 18" min="1" step="1" required />
+                      </div>
+                      <div class="grupo-campo-banco">
+                        <label for="banco-carreiras" class="label-banco">Qtd. de Carreiras <span class="obrig-banco">*</span></label>
+                        <input type="number" id="banco-carreiras" class="input-banco" placeholder="Ex: 20" min="1" step="1" required />
+                      </div>
+                      <div class="grupo-campo-banco">
+                        <label for="banco-peso" class="label-banco">Peso da Amostra (g)</label>
+                        <input type="number" id="banco-peso" class="input-banco" placeholder="Ex: 5.5 (p/ prever novelos)" min="0" step="0.1" />
+                      </div>
+                      <div class="grupo-campo-banco">
+                        <label for="banco-metros" class="label-banco">Fio Gasto (metros)</label>
+                        <input type="number" id="banco-metros" class="input-banco" placeholder="Ex: 12.5" min="0" step="0.1" />
+                      </div>
+                    </div>
+                  </fieldset>
+
+                  <!-- Bloco 4: Foto e Notas -->
+                  <fieldset class="bloco-form-banco">
+                    <legend class="legenda-bloco-banco">4. Foto e Notas</legend>
+                    <div class="grupo-campo-banco">
+                      <span class="label-banco">Foto do Modelo</span>
+                      <div class="upload-pesponto-banco" id="upload-area-banco">
+                        <input type="file" id="banco-foto-input" accept="image/*" class="input-arquivo-invisivel-bib" />
+                        <div class="upload-placeholder-banco" id="upload-placeholder-banco">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icone-upload-banco" aria-hidden="true">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                            <polyline points="21 15 16 10 5 21"></polyline>
+                          </svg>
+                          <strong>Clique ou arraste a foto da amostra</strong>
+                          <span>PNG, JPG ou WEBP com pré-visualização imediata</span>
+                        </div>
+                        <div class="upload-preview-banco" id="upload-preview-banco" style="display: none;">
+                          <img id="upload-preview-img-banco" src="" alt="Prévia da amostra" />
+                          <button type="button" class="btn-remover-foto-banco" id="btn-remover-foto-banco" title="Remover foto" aria-label="Remover foto">&times;</button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="grupo-campo-banco">
+                      <label for="banco-link" class="label-banco">Link de Referência (URL)</label>
+                      <input
+                        type="url"
+                        id="banco-link"
+                        class="input-banco"
+                        placeholder="https://youtube.com/... ou receita online"
+                      />
+                    </div>
+
+                    <div class="grupo-campo-banco">
+                      <label for="banco-anotacoes" class="label-banco">Anotações</label>
+                      <textarea
+                        id="banco-anotacoes"
+                        class="input-banco textarea-banco"
+                        rows="3"
+                        placeholder="Ex: Encolheu 1 cm após lavar; usar agulha 0.5 mm maior na correntinha inicial..."
+                      ></textarea>
+                    </div>
+                  </fieldset>
+
+                  <div class="aviso-erro-banco" id="aviso-erro-banco" style="display: none;"></div>
+                </div>
+
+                <footer class="modal-banco-rodape">
+                  <button type="button" class="btn-cancelar-banco" id="btn-cancelar-form-banco">Cancelar</button>
+                  <button type="submit" class="btn-salvar-banco btn-macio" id="btn-salvar-form-banco">Salvar Amostra</button>
+                </footer>
+              </form>
+            </div>
+          </div>
+
+          <!-- ================================================================= -->
+          <!-- MODAL DE VISUALIZAÇÃO DE DETALHES DA AMOSTRA                      -->
+          <!-- ================================================================= -->
+          <div class="modal-overlay-banco" id="modal-detalhes-banco-amostra" style="display: none;">
+            <div class="modal-conteudo-banco modal-detalhes-banco" role="dialog" aria-modal="true" aria-labelledby="det-banco-nome">
+              <header class="modal-banco-topo">
+                <div class="det-banco-header-esq">
+                  <div class="det-banco-badges">
+                    <span class="badge-cat-det" id="det-banco-categoria">Básico</span>
+                    <span class="badge-tec-det" id="det-banco-tecnica">Crochê</span>
+                    <span class="badge-tensao-det" id="det-banco-tensao">Tensão: Médio</span>
+                  </div>
+                  <h2 class="modal-banco-titulo" id="det-banco-nome">Nome do Ponto</h2>
+                </div>
+                <div class="det-banco-header-dir">
+                  <button type="button" class="btn-fav-det-banco" id="det-banco-btn-fav" title="Favoritar amostra" aria-label="Favoritar">★</button>
+                  <button type="button" class="btn-fechar-banco" id="btn-fechar-det-banco" aria-label="Fechar detalhes">&times;</button>
+                </div>
+              </header>
+
+              <div class="modal-banco-corpo det-banco-corpo">
+                <div class="det-banco-midia" id="det-banco-midia">
+                  <img id="det-banco-foto" src="" alt="Foto ampliada do ponto" style="display: none;" />
+                  <div class="det-banco-placeholder" id="det-banco-placeholder">
+                    <span aria-hidden="true">🧶</span>
+                    <span>Sem foto cadastrada</span>
+                  </div>
+                </div>
+
+                <div class="det-banco-destaque-num" id="det-banco-destaque-num">18 pts × 20 carr = 10 × 10 cm</div>
+
+                <div class="det-banco-grid-info">
+                  <div class="det-info-box">
+                    <span>Fio Utilizado</span>
+                    <strong id="det-banco-fio">—</strong>
+                  </div>
+                  <div class="det-info-box">
+                    <span>Agulha</span>
+                    <strong id="det-banco-agulha">—</strong>
+                  </div>
+                  <div class="det-info-box">
+                    <span>Consumo da Amostra</span>
+                    <strong id="det-banco-consumo">—</strong>
+                  </div>
+                  <div class="det-info-box">
+                    <span>Consumo por 100 cm²</span>
+                    <strong id="det-banco-consumo-100">—</strong>
+                  </div>
+                </div>
+
+                <div class="det-banco-link-box" id="det-banco-link-box" style="display: none;">
+                  <span class="label-banco">LINK DE REFERÊNCIA</span>
+                  <a id="det-banco-link" href="#" target="_blank" rel="noopener noreferrer">Abrir link da receita / vídeo ↗</a>
+                </div>
+
+                <div class="det-banco-notas-box" id="det-banco-notas-box" style="display: none;">
+                  <span class="label-banco">ANOTAÇÕES & BLOCAGEM</span>
+                  <p id="det-banco-anotacoes"></p>
+                </div>
+              </div>
+
+              <footer class="modal-banco-rodape det-banco-rodape">
+                <div class="det-rodape-acoes-sec">
+                  <button type="button" class="btn-perigo-banco" id="det-banco-btn-excluir">Excluir</button>
+                  <button type="button" class="btn-sec-banco" id="det-banco-btn-duplicar">Duplicar</button>
+                  <button type="button" class="btn-sec-banco" id="det-banco-btn-editar">Editar</button>
+                </div>
+                <button type="button" class="btn-usar-calc-banco btn-macio" id="det-banco-btn-usar">
+                  <span class="icone-usar-calc" aria-hidden="true">📐</span>
+                  <span>Usar na Calculadora</span>
+                </button>
+              </footer>
+            </div>
+          </div>
+
+          <!-- MODAL CONFIRMAÇÃO DE EXCLUSÃO -->
+          <div class="modal-overlay-banco" id="modal-excluir-banco-amostra" style="display: none; z-index: 1150;">
+            <div class="modal-confirmar-banco" role="dialog" aria-modal="true" aria-labelledby="titulo-excluir-banco">
+              <div class="icone-confirmar-banco" aria-hidden="true">🗑️</div>
+              <h3 id="titulo-excluir-banco">Excluir amostra?</h3>
+              <p id="texto-excluir-banco">Esta amostra será removida permanentemente do seu banco.</p>
+              <div class="acoes-confirmar-banco">
+                <button type="button" class="btn-cancelar-banco" id="btn-cancelar-excluir-banco">Cancelar</button>
+                <button type="button" class="btn-perigo-solido-banco" id="btn-confirmar-excluir-banco">Sim, Excluir</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================================================================= -->
+      <!-- 9. CONFIGURAÇÕES -->
+      <!-- ================================================================= -->
+      <div
+        id="secao-configuracoes"
+        class="secao-ferramenta"
+        style="display: none"
+      >
+        <div class="cabecalho">
+          <div class="cabecalho-conteudo">
+            <div class="cabecalho-info">
+              <h1 class="titulo-ferramenta">Configurações</h1>
+              <span class="subtitulo-ferramenta"
+                >Preferências do aplicativo, temas e opções de
+                personalização</span
+              >
+            </div>
+          </div>
+        </div>
+        <div class="conteiner-ferramenta" id="conteiner-configuracoes">
+          <div class="placeholder-ferramenta">
+            <p>Espaço reservado para as Configurações.</p>
+          </div>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,101 @@
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   HOME - TELA INICIAL SIMPLES
+   Apenas as ações principais: "Novo projeto" e "Ver meus projetos"
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+
+#secao-home.secao-ferramenta {
+  height: 100%;
+  max-height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.conteiner-home {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  box-sizing: border-box;
+  background-color: var(--cor-fundo-principal);
+}
+
+.acoes-home {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 14px;
+  width: 100%;
+  max-width: 300px;
+  animation: fadeInHome 0.22s ease-out;
+}
+
+@keyframes fadeInHome {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.btn-home-primario,
+.btn-home-secundario {
+  width: 100%;
+  height: 52px;
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 15.5px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  user-select: none;
+  transition:
+    transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    color 0.18s ease;
+}
+
+.btn-home-primario {
+  border: none;
+  background-color: var(--cor-texto-principal);
+  color: var(--cor-fundo-profundo);
+  box-shadow: var(--sombra-md);
+}
+
+.btn-home-primario:hover {
+  filter: brightness(1.06);
+  transform: translateY(-2px);
+  box-shadow: var(--sombra-lg);
+}
+
+.btn-home-primario:active {
+  transform: scale(0.96);
+}
+
+.btn-home-secundario {
+  border: 1.5px solid var(--creme-opacidade-30);
+  background-color: rgba(34, 57, 111, 0.35);
+  color: var(--cor-texto-principal);
+}
+
+.btn-home-secundario:hover {
+  background-color: var(--cor-destaque-hover);
+  border-color: var(--cor-texto-principal);
+  color: var(--cor-branco);
+  transform: translateY(-2px);
+  box-shadow: var(--sombra-sm);
+}
+
+.btn-home-secundario:active {
+  transform: scale(0.96);
+}

@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Ponto & Trama
+Comment=Abrir o aplicativo Ponto & Trama
+Exec="/home/vinicius/Documentos/programas pessoais/Ponto&Trama/PontoETrama"
+Icon=/home/vinicius/Documentos/programas pessoais/Ponto&Trama/frontend/assets/images/logo.png
+Terminal=false
+Categories=Utility;
+StartupNotify=true
+StartupWMClass=ponto-e-trama

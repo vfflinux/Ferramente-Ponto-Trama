@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.PontoETrama" parent="@android:style/Theme.DeviceDefault.NoActionBar">
+        <item name="android:windowBackground">@color/fundo_principal</item>
+        <item name="android:statusBarColor">@color/fundo_profundo</item>
+        <item name="android:navigationBarColor">@color/fundo_profundo</item>
+    </style>
+
+    <color name="fundo_profundo">#010736</color>
+    <color name="fundo_principal">#0d1c42</color>
+</resources>

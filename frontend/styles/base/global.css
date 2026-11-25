@@ -1,0 +1,178 @@
+/* ==========================================================================
+   SISTEMA DE DESIGN GLOBAL (:root) - PONTO & TRAMA
+   Variáveis globais para cores, tipografia, dimensões, bordas, sombras e efeitos.
+   Modifique aqui para alterar o tema em todo o sistema.
+   (Estilos das ferramentas carregados em paralelo via <link> no index.html)
+   ========================================================================== */
+:root {
+  /* --- PALETA DE CORES PRINCIPAL --- */
+  --cor-fundo-profundo: #010736;     /* Azul Escuro Profundo (barra lateral, botões escuros, bordas) */
+  --cor-fundo-base: #010736;         /* Alias base para scrollbars */
+  --cor-fundo-principal: #0d1c42;    /* Azul Marinho Principal (fundo da aplicação, tela, campos) */
+  --cor-destaque: #22396f;           /* Azul Médio (cabeçalhos, destaques, botões ativos) */
+  --cor-destaque-hover: #2c4a91;     /* Azul Claro (interações de hover nos botões e elementos) */
+  --cor-destaque-ativo: #0f224f;     /* Azul Médio-Escuro (foco e clique de inputs) */
+  --cor-borda-suave: rgba(252, 241, 208, 0.2);
+  --cor-foco-destaque: #5b87e8;
+  --cor-texto-principal: #fcf1d0;    /* Creme Claro (letras, ícones, números e bordas suaves) */
+  --cor-branco: #ffffff;             /* Branco puro (textos de alto contraste e estados ativos) */
+
+  /* --- CORES DE ALERTA, ALARME E STATUS --- */
+  --cor-alerta: #e74c3c;             /* Vermelho Vibrante (borda de alarme e advertência) */
+  --cor-alerta-escuro: #8b1313;      /* Vermelho Escuro (efeito de piscar da tela) */
+  --cor-alerta-gradiente-1: #7a1212; /* Vermelho Escuro para gradiente do banner de alarme */
+  --cor-alerta-gradiente-2: #a82020; /* Vermelho Médio para gradiente do banner de alarme */
+
+  /* --- VARIAÇÕES COM TRANSPARÊNCIA (CREME - #FCF1D0) --- */
+  --creme-opacidade-85: rgba(252, 241, 208, 0.85);
+  --creme-opacidade-75: rgba(252, 241, 208, 0.75);
+  --creme-opacidade-70: rgba(252, 241, 208, 0.7);
+  --creme-opacidade-65: rgba(252, 241, 208, 0.65);
+  --creme-opacidade-50: rgba(252, 241, 208, 0.5);
+  --creme-opacidade-45: rgba(252, 241, 208, 0.45);
+  --creme-opacidade-40: rgba(252, 241, 208, 0.4);
+  --creme-opacidade-30: rgba(252, 241, 208, 0.3);
+  --creme-opacidade-25: rgba(252, 241, 208, 0.25);
+  --creme-opacidade-20: rgba(252, 241, 208, 0.2);
+  --creme-opacidade-15: rgba(252, 241, 208, 0.15);
+  --creme-opacidade-12: rgba(252, 241, 208, 0.12);
+
+  /* --- VARIAÇÕES COM TRANSPARÊNCIA (AZUL MÉDIO - #22396F) --- */
+  --azul-medio-opacidade-95: rgba(34, 57, 111, 0.95);
+  --azul-medio-opacidade-70: rgba(34, 57, 111, 0.7);
+  --azul-medio-opacidade-55: rgba(34, 57, 111, 0.55);
+  --azul-medio-opacidade-50: rgba(34, 57, 111, 0.5);
+  --azul-medio-opacidade-40: rgba(34, 57, 111, 0.4);
+
+  /* --- VARIAÇÕES COM TRANSPARÊNCIA (AZUL PROFUNDO / SOMBRAS - #010736) --- */
+  --azul-profundo-opacidade-80: rgba(1, 7, 54, 0.8);
+  --azul-profundo-opacidade-70: rgba(1, 7, 54, 0.7);
+  --azul-profundo-opacidade-65: rgba(1, 7, 54, 0.65);
+  --azul-profundo-opacidade-50: rgba(1, 7, 54, 0.5);
+  --azul-profundo-opacidade-40: rgba(1, 7, 54, 0.4);
+
+  /* --- TIPOGRAFIA --- */
+  --fonte-padrao: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --fonte-logo: "Times New Roman", Times, serif;
+
+  /* --- DIMENSÕES E LAYOUT --- */
+  --largura-barra-lateral: 270px;
+  --largura-barra-lateral-recolhida: 80px;
+  --altura-cabecalho-min: 80px;
+  --altura-cabecalho-max: 90px;
+
+  /* --- RAIOS DE BORDA (BORDER-RADIUS) --- */
+  --raio-borda-sm: 5px;
+  --raio-borda-md: 8px;
+  --raio-borda-lg: 12px;
+  --raio-borda-xl: 16px;
+  --raio-borda-card: 22px;
+  --raio-borda-redondo: 50%;
+  --raio-borda-pilula: 9999px;
+
+  /* --- SOMBRAS (BOX-SHADOW) --- */
+  --sombra-sm: 0 2px 6px var(--azul-profundo-opacidade-40);
+  --sombra-md: 0 4px 12px var(--azul-profundo-opacidade-50);
+  --sombra-lg: 0 6px 16px var(--azul-profundo-opacidade-70);
+  --sombra-card: 0 12px 32px var(--azul-profundo-opacidade-65);
+  --sombra-card-hover: 0 16px 36px var(--azul-profundo-opacidade-80);
+  --sombra-banner: 0 4px 18px rgba(0, 0, 0, 0.5);
+  --sombra-alerta-brilho: 0 0 25px rgba(231, 76, 60, 0.7);
+
+  /* --- TRANSIÇÕES E ANIMAÇÕES --- */
+  --transicao-rapida: 0.15s ease;
+  --transicao-padrao: 0.2s ease;
+  --transicao-suave: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  --transicao-deslocamento: 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+  --transicao-inflar: 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* --- CAMADAS (Z-INDEX) --- */
+  --z-index-padrao: 1;
+  --z-index-menu-icone: 10;
+  --z-index-banner-alarme: 50;
+  --z-index-modal: 100;
+}
+
+/* ==========================================================================
+   ESTILOS BASE / GLOBAIS
+   ========================================================================== */
+body,
+html {
+  background-color: var(--cor-fundo-principal);
+  color: var(--cor-texto-principal);
+  font-family: var(--fonte-padrao);
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow-x: hidden;
+}
+
+main {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+header {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+}
+
+p {
+  text-decoration: none;
+  color: var(--cor-texto-principal);
+  font-size: 15px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* ==========================================================================
+   BARRA DE ROLAGEM PADRONIZADA (CUSTOM SCROLLBARS)
+   ========================================================================== */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--cor-fundo-base);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--cor-borda-suave);
+  border-radius: var(--raio-borda-sm);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--cor-foco-destaque);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--cor-borda-suave) var(--cor-fundo-base);
+}
+
+/* ==========================================================================
+   ACESSIBILIDADE: ANÉIS DE FOCO VISÍVEIS
+   ========================================================================== */
+:focus-visible {
+  outline: 2px solid var(--cor-foco-destaque);
+  outline-offset: 2px;
+}
+
+.cabecalho {
+  background-color: var(--cor-destaque);
+  width: 100%;
+  min-height: var(--altura-cabecalho-min);
+  max-height: var(--altura-cabecalho-max);
+  display: flex;
+  transition: width var(--transicao-suave);
+}

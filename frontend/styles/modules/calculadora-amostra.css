@@ -1,0 +1,1562 @@
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   CALCULADORA DE AMOSTRA (TENSÃO DO PONTO) - ESTILO
+   Arquitetura Mobile-First em 3 Zonas + Animações Macias e Fluidas
+   Utiliza as variáveis globais (:root) de global.css
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+
+/* ==========================================================================
+   1. CONTAINER PRINCIPAL E CABEÇALHO
+   ========================================================================== */
+#secao-amostra.secao-ferramenta {
+  height: 100%;
+  max-height: 100vh;
+  overflow: hidden;
+  flex-direction: column;
+}
+
+.conteiner-amostra {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 16px 16px 32px 16px;
+  box-sizing: border-box;
+  background-color: var(--cor-fundo-principal);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: relative;
+  scrollbar-width: thin;
+  scrollbar-color: var(--cor-destaque) rgba(1, 7, 54, 0.4);
+}
+
+.conteiner-amostra::-webkit-scrollbar {
+  width: 7px;
+}
+
+.conteiner-amostra::-webkit-scrollbar-track {
+  background: rgba(1, 7, 54, 0.4);
+}
+
+.conteiner-amostra::-webkit-scrollbar-thumb {
+  background: var(--cor-destaque);
+  border-radius: var(--raio-borda-sm);
+}
+
+.cabecalho-acoes-amostra {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+/* Botões Macios (Squishy) com curva elástica leve */
+.btn-macio {
+  transition:
+    transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.2s ease,
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+  user-select: none;
+}
+
+.btn-macio:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(1, 7, 54, 0.55);
+}
+
+.btn-macio:active {
+  transform: scale(0.95);
+}
+
+/* Toggle de Unidade (cm / pol) com Pílula Deslizante */
+.toggle-unidade-amostra {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  width: 96px;
+  height: 36px;
+  padding: 3px;
+  box-sizing: border-box;
+  background-color: rgba(1, 7, 54, 0.72);
+  border: 1px solid var(--creme-opacidade-25);
+  border-radius: var(--raio-borda-pilula);
+}
+
+.pill-deslizante-unidade {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: calc(50% - 3px);
+  height: calc(100% - 6px);
+  border-radius: var(--raio-borda-pilula);
+  background-color: var(--cor-destaque-hover);
+  box-shadow: 0 2px 8px rgba(1, 7, 54, 0.55);
+  transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+  z-index: 1;
+}
+
+.toggle-unidade-amostra.unidade-pol .pill-deslizante-unidade {
+  transform: translateX(100%);
+}
+
+.btn-unidade-amostra {
+  position: relative;
+  z-index: 2;
+  background: transparent;
+  border: none;
+  color: var(--creme-opacidade-65);
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  height: 100%;
+  border-radius: var(--raio-borda-pilula);
+  transition: color 0.2s ease;
+}
+
+.btn-unidade-amostra.ativo {
+  color: var(--cor-branco);
+}
+
+/* Botão de Ajuda (?) */
+.btn-ajuda-amostra {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1.5px solid var(--creme-opacidade-30);
+  background-color: rgba(1, 7, 54, 0.7);
+  color: var(--cor-texto-principal);
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-ajuda-amostra:hover {
+  background-color: var(--cor-destaque-hover);
+  border-color: var(--cor-texto-principal);
+  color: var(--cor-branco);
+}
+
+/* ==========================================================================
+   2. ZONA 1: SELETOR DE MODO (ABAS COM PÍLULA DESLIZANTE)
+   ========================================================================== */
+.barra-modo-amostra {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.seletor-modo-amostra {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: 100%;
+  max-width: 520px;
+  padding: 4px;
+  box-sizing: border-box;
+  background-color: rgba(1, 7, 54, 0.65);
+  border: 1px solid rgba(252, 241, 208, 0.16);
+  border-radius: var(--raio-borda-pilula);
+  box-shadow: var(--sombra-sm);
+}
+
+.pill-deslizante-modo {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: calc(50% - 4px);
+  height: calc(100% - 8px);
+  border-radius: var(--raio-borda-pilula);
+  background: linear-gradient(135deg, var(--cor-destaque) 0%, var(--cor-destaque-hover) 100%);
+  border: 1px solid rgba(139, 173, 247, 0.45);
+  box-shadow: 0 4px 12px rgba(1, 7, 54, 0.55);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  z-index: 1;
+}
+
+.seletor-modo-amostra.modo-receita .pill-deslizante-modo {
+  transform: translateX(100%);
+}
+
+.btn-modo-amostra {
+  position: relative;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  height: 40px;
+  padding: 0 12px;
+  border: none;
+  background: transparent;
+  color: var(--creme-opacidade-70);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  border-radius: var(--raio-borda-pilula);
+  transition: color 0.2s ease;
+}
+
+.btn-modo-amostra.ativo {
+  color: var(--cor-branco);
+}
+
+.icone-modo-amostra {
+  font-size: 15px;
+}
+
+.descricao-modo-amostra {
+  font-size: 12.5px;
+  color: var(--creme-opacidade-70);
+  text-align: center;
+  max-width: 580px;
+}
+
+/* ==========================================================================
+   3. GRID MOBILE-FIRST (EMPILHADO NO MOBILE -> 2 COLUNAS NO DESKTOP)
+   ========================================================================== */
+.grid-principal-amostra {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  align-items: start;
+}
+
+.coluna-entrada-amostra {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Cartões Visuais Leves */
+.card-amostra {
+  background-color: rgba(34, 57, 111, 0.28);
+  border: 1px solid rgba(252, 241, 208, 0.1);
+  border-radius: 16px;
+  padding: 18px;
+  box-sizing: border-box;
+  box-shadow: var(--sombra-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  transition: border-color 0.2s ease;
+}
+
+.card-amostra:hover {
+  border-color: rgba(252, 241, 208, 0.2);
+}
+
+.card-amostra-topo {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.card-amostra-titulo {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--cor-texto-principal);
+}
+
+.card-amostra-sub {
+  display: block;
+  margin-top: 2px;
+  font-size: 11.5px;
+  color: var(--creme-opacidade-65);
+}
+
+.badge-padrao-amostra {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: var(--raio-borda-pilula);
+  background-color: rgba(1, 7, 54, 0.65);
+  border: 1px solid var(--creme-opacidade-20);
+  color: var(--creme-opacidade-85);
+  white-space: nowrap;
+}
+
+/* Layout Interno do Cartão Sua Amostra + Visualização do Quadrado */
+.conteudo-card-amostra-com-preview {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  align-items: center;
+}
+
+.campos-amostra-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.campo-amostra {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.label-amostra {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  color: var(--creme-opacidade-75);
+  text-transform: uppercase;
+}
+
+/* Controle Stepper (- e +) com Input Central */
+.stepper-amostra {
+  display: flex;
+  align-items: center;
+  height: 42px;
+  background-color: rgba(1, 7, 54, 0.68);
+  border: 1.5px solid var(--creme-opacidade-20);
+  border-radius: 10px;
+  overflow: hidden;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.stepper-amostra:focus-within {
+  border-color: #6b95f0;
+  box-shadow: 0 0 0 2px rgba(79, 125, 224, 0.26);
+  background-color: #081745;
+}
+
+.btn-stepper-am {
+  width: 38px;
+  height: 100%;
+  border: none;
+  background: transparent;
+  color: var(--cor-texto-principal);
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.15s ease, transform 0.14s cubic-bezier(0.34, 1.56, 0.64, 1);
+  user-select: none;
+}
+
+.btn-stepper-am:hover {
+  background-color: rgba(44, 74, 145, 0.65);
+  color: var(--cor-branco);
+}
+
+.btn-stepper-am:active {
+  transform: scale(0.88);
+}
+
+.input-amostra {
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  border: none;
+  background: transparent;
+  color: var(--cor-texto-principal);
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  text-align: center;
+  outline: none;
+  padding: 0 4px;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.input-amostra::-webkit-outer-spin-button,
+.input-amostra::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.input-amostra::placeholder {
+  color: var(--creme-opacidade-30);
+  font-weight: 500;
+  font-size: 13px;
+}
+
+.input-texto-amostra {
+  height: 40px;
+  text-align: left;
+  padding: 0 12px;
+  background-color: rgba(1, 7, 54, 0.72);
+  border: 1.5px solid var(--creme-opacidade-20);
+  border-radius: 10px;
+  font-size: 13.5px;
+  font-weight: 500;
+  box-sizing: border-box;
+}
+
+.input-texto-amostra:focus {
+  border-color: #6b95f0;
+  box-shadow: 0 0 0 2px rgba(79, 125, 224, 0.26);
+}
+
+/* ==========================================================================
+   4. VISUALIZAÇÃO ILUSTRATIVA DA AMOSTRA (QUADRADO INTERATIVO)
+   ========================================================================== */
+.preview-amostra-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  background-color: rgba(1, 7, 54, 0.48);
+  border: 1px dashed rgba(252, 241, 208, 0.18);
+  border-radius: 14px;
+  min-height: 148px;
+  box-sizing: border-box;
+}
+
+.preview-seta-topo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  justify-content: center;
+}
+
+.seta-linha {
+  flex: 1;
+  max-width: 24px;
+  height: 1.5px;
+  background-color: rgba(252, 241, 208, 0.45);
+}
+
+.seta-texto {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--cor-texto-principal);
+  white-space: nowrap;
+}
+
+.preview-miolo-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.preview-quadrado-trama {
+  width: 96px;
+  height: 96px;
+  border-radius: 10px;
+  border: 2px solid var(--cor-texto-principal);
+  background-color: rgba(44, 74, 145, 0.52);
+  background-image:
+    repeating-linear-gradient(
+      45deg,
+      rgba(252, 241, 208, 0.1) 0px,
+      rgba(252, 241, 208, 0.1) 3px,
+      transparent 3px,
+      transparent 9px
+    ),
+    repeating-linear-gradient(
+      -45deg,
+      rgba(252, 241, 208, 0.08) 0px,
+      rgba(252, 241, 208, 0.08) 3px,
+      transparent 3px,
+      transparent 9px
+    );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 0 18px rgba(1, 7, 54, 0.6), 0 4px 12px rgba(1, 7, 54, 0.45);
+  transition: width 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), height 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.preview-centro-tag {
+  font-size: 11px;
+  font-weight: 800;
+  padding: 3px 7px;
+  border-radius: 6px;
+  background-color: rgba(1, 7, 54, 0.82);
+  color: var(--cor-texto-principal);
+  border: 1px solid rgba(252, 241, 208, 0.25);
+  white-space: nowrap;
+}
+
+.preview-seta-direita {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.seta-texto-vertical {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--creme-opacidade-85);
+  white-space: nowrap;
+}
+
+/* ==========================================================================
+   5. FITA MÉTRICA ELÁSTICA (TRANSITION: WIDTH 0.4S EASE)
+   ========================================================================== */
+.fita-metrica-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.fita-metrica-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+}
+
+.fita-label {
+  color: var(--creme-opacidade-65);
+  font-weight: 600;
+}
+
+.fita-valor {
+  color: var(--cor-texto-principal);
+  font-weight: 700;
+}
+
+.fita-metrica-trilha {
+  width: 100%;
+  height: 14px;
+  border-radius: 6px;
+  background-color: rgba(1, 7, 54, 0.72);
+  border: 1px solid rgba(252, 241, 208, 0.14);
+  overflow: hidden;
+  padding: 2px;
+  box-sizing: border-box;
+}
+
+.fita-metrica-barra {
+  height: 100%;
+  min-width: 18px;
+  max-width: 100%;
+  border-radius: 4px;
+  background-color: #f3dc9b;
+  background-image:
+    repeating-linear-gradient(
+      90deg,
+      rgba(1, 7, 54, 0.65) 0px,
+      rgba(1, 7, 54, 0.65) 1.5px,
+      transparent 1.5px,
+      transparent 10px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(1, 7, 54, 0.35) 0px,
+      rgba(1, 7, 54, 0.35) 1px,
+      transparent 1px,
+      transparent 5px
+    );
+  background-size: 100% 7px, 100% 4px;
+  background-repeat: no-repeat;
+  background-position: top left;
+  box-shadow: 0 0 10px rgba(252, 241, 208, 0.3);
+  transition: width 0.4s ease;
+}
+
+.fita-meta-barra {
+  background-color: #8ab0ff;
+  box-shadow: 0 0 10px rgba(138, 176, 255, 0.35);
+}
+
+/* Blocos de Modo 1 / Modo 2 */
+.bloco-modo-campos {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: fadeInModoAmostra 0.18s ease-out;
+}
+
+@keyframes fadeInModoAmostra {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.subbloco-receita-titulo {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  color: #8ab0ff;
+  margin-top: 2px;
+}
+
+/* Erro Gentil (Shake 300ms + borda destacada sem alert) */
+@keyframes shakeAmostra {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+}
+
+.campo-erro-amostra .stepper-amostra,
+.campo-erro-amostra .input-texto-amostra {
+  border-color: #ff6b6b !important;
+  box-shadow: 0 0 0 2px rgba(231, 76, 60, 0.32) !important;
+  animation: shakeAmostra 0.3s ease-in-out;
+}
+
+.aviso-validacao-amostra {
+  font-size: 12px;
+  font-weight: 600;
+  color: #ffb3ad;
+  background-color: rgba(231, 76, 60, 0.16);
+  border: 1px solid rgba(231, 76, 60, 0.4);
+  border-radius: 8px;
+  padding: 8px 12px;
+  animation: fadeInModoAmostra 0.18s ease-out;
+}
+
+/* Ações da Entrada (Calcular / Limpar) */
+.barra-acoes-entrada-amostra {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-top: 4px;
+}
+
+.btn-amostra-primario {
+  flex: 1;
+  height: 42px;
+  border: none;
+  border-radius: 10px;
+  background-color: var(--cor-texto-principal);
+  color: var(--cor-fundo-profundo);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 18px;
+}
+
+.btn-amostra-primario:hover {
+  filter: brightness(1.06);
+}
+
+.btn-amostra-secundario {
+  height: 42px;
+  border: 1px solid var(--creme-opacidade-25);
+  border-radius: 10px;
+  background-color: rgba(1, 7, 54, 0.5);
+  color: var(--creme-opacidade-85);
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0 18px;
+}
+
+.btn-amostra-secundario:hover {
+  border-color: var(--cor-texto-principal);
+  color: var(--cor-texto-principal);
+  background-color: rgba(34, 57, 111, 0.45);
+}
+
+/* ==========================================================================
+   6. ZONA 3: PAINEL DE RESULTADOS (DESTAQUE & COUNT-UP)
+   ========================================================================== */
+.card-resultado-amostra {
+  background: linear-gradient(180deg, rgba(34, 57, 111, 0.48) 0%, rgba(1, 7, 54, 0.92) 100%);
+  border: 1.5px solid rgba(252, 241, 208, 0.16);
+  border-radius: 18px;
+  padding: 20px;
+  box-sizing: border-box;
+  box-shadow: var(--sombra-card);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.resultado-amostra-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border-bottom: 1px solid rgba(252, 241, 208, 0.12);
+  padding-bottom: 10px;
+}
+
+.label-resultado-topo {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: var(--creme-opacidade-75);
+}
+
+.toggle-exato-amostra {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--creme-opacidade-75);
+  cursor: pointer;
+  margin: 0;
+  user-select: none;
+}
+
+.toggle-exato-amostra input {
+  accent-color: #5b87e8;
+  cursor: pointer;
+}
+
+.bloco-numeros-resultado {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 6px 0;
+}
+
+.box-numero-resultado {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.label-numero-res {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  color: #9bbaff;
+  text-transform: uppercase;
+}
+
+.linha-valor-grande {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.valor-grande-amostra {
+  font-size: 46px;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--cor-texto-principal);
+  letter-spacing: -1px;
+  text-shadow: 0 4px 14px rgba(1, 7, 54, 0.7);
+  font-variant-numeric: tabular-nums;
+}
+
+.unidade-grande-amostra {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--creme-opacidade-65);
+}
+
+.valor-exato-detalhe {
+  font-size: 12px;
+  font-weight: 600;
+  color: #7bed9f;
+}
+
+.divisor-resultado-amostra {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(252, 241, 208, 0.22), transparent);
+}
+
+.resumo-densidade-amostra {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  background-color: rgba(1, 7, 54, 0.55);
+  border: 1px solid rgba(252, 241, 208, 0.1);
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+
+.item-densidade {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.item-densidade span {
+  font-size: 10.5px;
+  color: var(--creme-opacidade-65);
+}
+
+.item-densidade strong {
+  font-size: 13px;
+  color: var(--cor-texto-principal);
+}
+
+.box-diagnostico-receita {
+  font-size: 12px;
+  line-height: 1.45;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background-color: rgba(52, 120, 246, 0.18);
+  border: 1px solid rgba(107, 149, 240, 0.4);
+  color: #dce8ff;
+}
+
+/* Botões Copiar Resultado e Salvar no Projeto */
+.acoes-resultado-amostra {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.btn-copiar-amostra {
+  height: 42px;
+  border: none;
+  border-radius: 10px;
+  background-color: var(--cor-texto-principal);
+  color: var(--cor-fundo-profundo);
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 800;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-copiar-amostra.copiado {
+  background-color: #27ae60;
+  color: var(--cor-branco);
+}
+
+.icone-copiar-amostra {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 17px;
+  height: 17px;
+}
+
+.icone-copiar-amostra svg {
+  width: 17px;
+  height: 17px;
+}
+
+@keyframes girarCheckCopiar {
+  0% { transform: rotate(-28deg) scale(0.75); opacity: 0.4; }
+  65% { transform: rotate(8deg) scale(1.18); opacity: 1; }
+  100% { transform: rotate(0deg) scale(1); opacity: 1; }
+}
+
+.icone-copiar-amostra.animar-check {
+  animation: girarCheckCopiar 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.btn-salvar-projeto-amostra {
+  height: 40px;
+  border: 1px solid rgba(139, 173, 247, 0.45);
+  border-radius: 10px;
+  background-color: rgba(44, 74, 145, 0.48);
+  color: var(--cor-branco);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+}
+
+.btn-salvar-projeto-amostra:hover {
+  background-color: var(--cor-destaque-hover);
+  border-color: var(--cor-texto-principal);
+}
+
+/* Lista Compacta de Amostras Salvas */
+.bloco-amostras-salvas {
+  border-top: 1px solid rgba(252, 241, 208, 0.12);
+  padding-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.topo-amostras-salvas {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.7px;
+  color: var(--creme-opacidade-70);
+}
+
+.badge-qtd-salvas {
+  background-color: var(--cor-destaque-hover);
+  color: var(--cor-branco);
+  padding: 1px 7px;
+  border-radius: var(--raio-borda-pilula);
+  font-size: 10.5px;
+}
+
+.lista-amostras-salvas {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 155px;
+  overflow-y: auto;
+}
+
+.item-amostra-salva {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background-color: rgba(1, 7, 54, 0.55);
+  border: 1px solid rgba(252, 241, 208, 0.1);
+  transition: border-color 0.18s ease, background-color 0.18s ease;
+}
+
+.item-amostra-salva:hover {
+  border-color: rgba(107, 149, 240, 0.5);
+  background-color: rgba(34, 57, 111, 0.35);
+}
+
+.info-amostra-salva {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  cursor: pointer;
+  flex: 1;
+}
+
+.nome-amostra-salva {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--cor-texto-principal);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.detalhe-amostra-salva {
+  font-size: 11px;
+  color: var(--creme-opacidade-65);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.btn-remover-salva {
+  background: transparent;
+  border: none;
+  color: var(--creme-opacidade-50);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 5px;
+}
+
+.btn-remover-salva:hover {
+  color: #ff8a80;
+  background-color: rgba(231, 76, 60, 0.18);
+}
+
+/* ==========================================================================
+   7. TOAST FLUTUANTE E MODAIS (AJUDA & SALVAR NO PROJETO)
+   ========================================================================== */
+.toast-amostra {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translate(-50%, 24px);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1200;
+  background-color: #010736;
+  color: var(--cor-texto-principal);
+  border: 1.5px solid #2ecc71;
+  border-radius: var(--raio-borda-pilula);
+  padding: 10px 20px;
+  font-size: 13px;
+  font-weight: 700;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.65);
+  transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.22s ease;
+}
+
+.toast-amostra.visivel {
+  transform: translate(-50%, 0);
+  opacity: 1;
+}
+
+.modal-overlay-amostra {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  background-color: rgba(1, 7, 54, 0.78);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  animation: fadeInModoAmostra 0.18s ease-out;
+}
+
+.modal-box-amostra {
+  width: 100%;
+  max-width: 440px;
+  background-color: var(--cor-fundo-principal);
+  border: 1.5px solid rgba(252, 241, 208, 0.2);
+  border-radius: 16px;
+  box-shadow: 0 22px 48px rgba(0, 0, 0, 0.75);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-amostra-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 16px 20px;
+  background-color: rgba(34, 57, 111, 0.35);
+  border-bottom: 1px solid rgba(252, 241, 208, 0.12);
+}
+
+.modal-amostra-topo h3 {
+  margin: 0;
+  font-size: 16px;
+  color: var(--cor-texto-principal);
+}
+
+.btn-fechar-modal-amostra {
+  background: transparent;
+  border: none;
+  color: var(--creme-opacidade-70);
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 2px 6px;
+}
+
+.btn-fechar-modal-amostra:hover {
+  color: var(--cor-branco);
+}
+
+.modal-amostra-corpo {
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.lista-dicas-amostra {
+  margin: 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--creme-opacidade-85);
+}
+
+.lista-dicas-amostra strong {
+  color: var(--cor-texto-principal);
+}
+
+.resumo-modal-salvar {
+  font-size: 12px;
+  line-height: 1.45;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background-color: rgba(1, 7, 54, 0.6);
+  border: 1px solid rgba(252, 241, 208, 0.12);
+  color: var(--creme-opacidade-85);
+}
+
+.modal-amostra-rodape {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 0 20px 18px 20px;
+}
+
+.modal-amostra-corpo .modal-amostra-rodape {
+  padding: 4px 0 0 0;
+}
+
+/* ==========================================================================
+   8. BREAKPOINTS RESPONSIVOS (TABLET & DESKTOP)
+   ========================================================================== */
+@media (min-width: 680px) {
+  .conteiner-amostra {
+    padding: 20px 26px 32px 26px;
+  }
+
+  .conteudo-card-amostra-com-preview {
+    grid-template-columns: minmax(0, 1.45fr) minmax(165px, 0.75fr);
+  }
+}
+
+@media (min-width: 980px) {
+  .grid-principal-amostra {
+    grid-template-columns: minmax(0, 1.38fr) minmax(320px, 0.88fr);
+    gap: 22px;
+  }
+
+  .coluna-resultado-amostra {
+    position: sticky;
+    top: 4px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-macio,
+  .pill-deslizante-modo,
+  .pill-deslizante-unidade,
+  .fita-metrica-barra,
+  .preview-quadrado-trama,
+  .toast-amostra,
+  .icone-copiar-amostra.animar-check {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* ==========================================================================
+   9. MODO AVANÇADO DA CALCULADORA DE AMOSTRA (FIO, AGULHA, PONTO & CONSUMO)
+   ========================================================================== */
+.btn-modo-avancado-amostra {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 36px;
+  padding: 0 12px;
+  border-radius: var(--raio-borda-pilula);
+  border: 1px solid var(--creme-opacidade-25);
+  background-color: rgba(1, 7, 54, 0.7);
+  color: var(--cor-texto-principal);
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn-modo-avancado-amostra.ativo {
+  background: linear-gradient(135deg, rgba(44, 74, 145, 0.92), rgba(79, 125, 224, 0.85));
+  border-color: #8ab0ff;
+  color: var(--cor-branco);
+  box-shadow: 0 0 14px rgba(79, 125, 224, 0.45);
+}
+
+.badge-avancado-status {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: var(--raio-borda-pilula);
+  background-color: rgba(255, 255, 255, 0.12);
+  color: var(--creme-opacidade-70);
+}
+
+.btn-modo-avancado-amostra.ativo .badge-avancado-status {
+  background-color: var(--cor-texto-principal);
+  color: var(--cor-fundo-profundo);
+}
+
+.card-modo-avancado {
+  border-color: rgba(107, 149, 240, 0.35);
+  background: linear-gradient(160deg, rgba(44, 74, 145, 0.32) 0%, rgba(1, 7, 54, 0.55) 100%);
+  animation: fadeInModoAmostra 0.22s ease-out;
+}
+
+.btn-link-banco-amostras {
+  height: 30px;
+  padding: 0 11px;
+  border-radius: var(--raio-borda-pilula);
+  border: 1px solid rgba(139, 173, 247, 0.4);
+  background-color: rgba(1, 7, 54, 0.65);
+  color: var(--cor-texto-principal);
+  font-family: inherit;
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.btn-link-banco-amostras:hover {
+  background-color: var(--cor-destaque-hover);
+  border-color: var(--cor-texto-principal);
+  color: var(--cor-branco);
+}
+
+.select-amostra-avancado {
+  width: 100%;
+  height: 40px;
+  background-color: rgba(1, 7, 54, 0.72);
+  border: 1.5px solid var(--creme-opacidade-20);
+  border-radius: 10px;
+  color: var(--cor-texto-principal);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 0 10px;
+  box-sizing: border-box;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.18s ease;
+}
+
+.select-amostra-avancado:focus {
+  border-color: #6b95f0;
+}
+
+.select-amostra-avancado option,
+.select-amostra-avancado optgroup {
+  background-color: var(--cor-fundo-profundo);
+  color: var(--cor-texto-principal);
+}
+
+.tarja-materiais-avancado {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 8px 10px;
+  border-radius: 9px;
+  background-color: rgba(1, 7, 54, 0.6);
+  border: 1px solid rgba(252, 241, 208, 0.12);
+}
+
+.tag-mat-av {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background-color: rgba(34, 57, 111, 0.55);
+  color: var(--cor-texto-principal);
+}
+
+.bloco-ponto-base-avancado {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.topo-ponto-base {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.btn-add-ponto-lista {
+  background: transparent;
+  border: 1px dashed rgba(139, 173, 247, 0.55);
+  border-radius: var(--raio-borda-pilula);
+  padding: 3px 10px;
+  color: #9bbaff;
+  font-family: inherit;
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.16s ease;
+}
+
+.btn-add-ponto-lista:hover {
+  background-color: rgba(79, 125, 224, 0.22);
+  color: var(--cor-branco);
+}
+
+.linha-seletor-ponto-base {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.pills-tecnica-avancado {
+  display: inline-flex;
+  height: 40px;
+  padding: 3px;
+  box-sizing: border-box;
+  background-color: rgba(1, 7, 54, 0.72);
+  border: 1.5px solid var(--creme-opacidade-20);
+  border-radius: 10px;
+  gap: 3px;
+  flex-shrink: 0;
+}
+
+.btn-tec-av {
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--creme-opacidade-65);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 0 12px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.btn-tec-av.ativo {
+  background-color: var(--cor-destaque-hover);
+  color: var(--cor-branco);
+}
+
+.select-ponto-flex {
+  flex: 1;
+  min-width: 190px;
+}
+
+.box-novo-ponto-rapido {
+  background-color: rgba(1, 7, 54, 0.65);
+  border: 1px solid rgba(139, 173, 247, 0.35);
+  border-radius: 10px;
+  padding: 11px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  animation: fadeInModoAmostra 0.18s ease-out;
+}
+
+.grid-novo-ponto {
+  display: grid;
+  grid-template-columns: 1.4fr 0.8fr 1.1fr;
+  gap: 8px;
+}
+
+@media (max-width: 680px) {
+  .grid-novo-ponto {
+    grid-template-columns: 1fr;
+  }
+}
+
+.acoes-novo-ponto {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.dica-novo-ponto {
+  font-size: 11px;
+  color: var(--creme-opacidade-65);
+}
+
+.btns-novo-ponto {
+  display: flex;
+  gap: 6px;
+}
+
+.btn-mini-cancelar {
+  height: 30px;
+  padding: 0 11px;
+  border-radius: 7px;
+  border: 1px solid var(--creme-opacidade-25);
+  background: transparent;
+  color: var(--creme-opacidade-75);
+  font-family: inherit;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-mini-salvar {
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 7px;
+  border: none;
+  background-color: var(--cor-texto-principal);
+  color: var(--cor-fundo-profundo);
+  font-family: inherit;
+  font-size: 11.5px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.chips-pontos-custom {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chip-ponto-custom {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: var(--raio-borda-pilula);
+  background-color: rgba(44, 74, 145, 0.45);
+  border: 1px solid rgba(139, 173, 247, 0.35);
+  color: var(--cor-texto-principal);
+}
+
+.chip-ponto-custom button {
+  background: none;
+  border: none;
+  color: var(--creme-opacidade-65);
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 2px;
+}
+
+.chip-ponto-custom button:hover {
+  color: #ff8a80;
+}
+
+/* Bloco de Estimativa de Consumo no Painel de Resultados */
+.bloco-consumo-fio-amostra {
+  background-color: rgba(1, 7, 54, 0.62);
+  border: 1px solid rgba(46, 204, 113, 0.35);
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  animation: fadeInModoAmostra 0.2s ease-out;
+}
+
+.topo-consumo-fio {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.label-consumo-fio {
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.7px;
+  color: #7bed9f;
+}
+
+.badge-origem-consumo {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: var(--raio-borda-pilula);
+  background-color: rgba(46, 204, 113, 0.16);
+  color: #a8f5c2;
+}
+
+.grid-consumo-fio {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.item-consumo-fio {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.item-consumo-fio span {
+  font-size: 10px;
+  color: var(--creme-opacidade-65);
+}
+
+.item-consumo-fio strong {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--cor-texto-principal);
+}
+
+.status-estoque-consumo {
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 6px 9px;
+  border-radius: 7px;
+}
+
+.status-estoque-consumo.ok {
+  background-color: rgba(46, 204, 113, 0.14);
+  color: #7bed9f;
+  border: 1px solid rgba(46, 204, 113, 0.3);
+}
+
+.status-estoque-consumo.aviso {
+  background-color: rgba(243, 156, 18, 0.16);
+  color: #ffe066;
+  border: 1px solid rgba(243, 156, 18, 0.35);
+}
+
+/* Opção "Também cadastrar no Banco de Amostras" no Modal Salvar */
+.caixa-check-banco-modal {
+  background-color: rgba(1, 7, 54, 0.55);
+  border: 1px solid rgba(139, 173, 247, 0.3);
+  border-radius: 10px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.label-check-banco-modal {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--cor-texto-principal);
+  cursor: pointer;
+  margin: 0;
+  user-select: none;
+}
+
+.label-check-banco-modal input {
+  width: 16px;
+  height: 16px;
+  accent-color: #5b87e8;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.campos-extra-banco-modal {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 4px;
+  border-top: 1px solid rgba(252, 241, 208, 0.08);
+  animation: fadeInModoAmostra 0.16s ease-out;
+}
+
+.grid-duplo-modal-salvar {
+  display: grid;
+  grid-template-columns: 1.4fr 0.8fr;
+  gap: 8px;
+}

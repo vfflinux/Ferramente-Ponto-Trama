@@ -1,0 +1,1222 @@
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   BANCO DE AMOSTRAS - ESTILO
+   Galeria escaneável de modelos de pontos com animações fluidas
+   (Stagger, Pop no Favoritar, Pesponto interativo, Modais com mola)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+
+/* ==========================================================================
+   1. CONTAINER PRINCIPAL E BOTÃO + NOVA AMOSTRA
+   ========================================================================== */
+#secao-banco-amostras.secao-ferramenta {
+  height: 100%;
+  max-height: 100vh;
+  overflow: hidden;
+  flex-direction: column;
+}
+
+.conteiner-banco-amostras {
+  flex: 1;
+  min-height: 0;
+  height: calc(100vh - var(--altura-cabecalho-min));
+  max-height: calc(100vh - var(--altura-cabecalho-min));
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background-color: var(--cor-fundo-principal);
+  padding: 16px 24px 20px 24px;
+  gap: 14px;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.btn-nova-amostra-banco {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 40px;
+  padding: 0 18px;
+  border-radius: 10px;
+  border: 1px solid rgba(139, 173, 247, 0.5);
+  background-color: var(--cor-destaque-hover);
+  color: var(--cor-branco);
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: var(--sombra-sm);
+  white-space: nowrap;
+}
+
+.btn-nova-amostra-banco:hover {
+  background-color: #365bb0;
+  border-color: var(--cor-texto-principal);
+}
+
+.btn-nova-amostra-banco .icone-mais {
+  font-size: 17px;
+  line-height: 1;
+}
+
+/* ==========================================================================
+   2. BARRA DE CONTROLE: BUSCA E CHIPS DE FILTRO RÁPIDO
+   ========================================================================== */
+.barra-controle-banco {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background-color: rgba(1, 7, 54, 0.45);
+  border: 1px solid rgba(252, 241, 208, 0.08);
+  border-radius: 12px;
+  padding: 12px 14px;
+}
+
+.linha-busca-banco {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.campo-busca-banco {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.icone-busca-banco {
+  position: absolute;
+  left: 12px;
+  width: 16px;
+  height: 16px;
+  color: var(--creme-opacidade-50);
+  pointer-events: none;
+}
+
+.input-busca-banco {
+  width: 100%;
+  height: 38px;
+  background-color: rgba(1, 7, 54, 0.72);
+  border: 1px solid var(--creme-opacidade-20);
+  border-radius: var(--raio-borda-md);
+  color: var(--cor-texto-principal);
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 500;
+  padding: 0 14px 0 36px;
+  box-sizing: border-box;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.input-busca-banco:focus {
+  border-color: #6b95f0;
+  box-shadow: 0 0 0 2px rgba(79, 125, 224, 0.25);
+  background-color: #081745;
+}
+
+.btn-limpar-filtros-banco {
+  height: 38px;
+  padding: 0 13px;
+  border-radius: var(--raio-borda-md);
+  border: 1px solid var(--creme-opacidade-25);
+  background: transparent;
+  color: var(--creme-opacidade-85);
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.18s ease;
+}
+
+.btn-limpar-filtros-banco:hover {
+  border-color: var(--cor-texto-principal);
+  color: var(--cor-texto-principal);
+  background-color: rgba(252, 241, 208, 0.08);
+}
+
+.chips-filtro-banco {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+
+.chip-filtro-banco {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border-radius: var(--raio-borda-pilula);
+  border: 1px solid var(--creme-opacidade-20);
+  background-color: rgba(1, 7, 54, 0.62);
+  color: var(--creme-opacidade-75);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.chip-filtro-banco:hover {
+  color: var(--cor-texto-principal);
+  border-color: rgba(107, 149, 240, 0.6);
+  background-color: rgba(34, 57, 111, 0.5);
+  transform: translateY(-1px);
+}
+
+.chip-filtro-banco.ativo {
+  background-color: var(--cor-destaque-hover);
+  border-color: #6b95f0;
+  color: var(--cor-branco);
+  box-shadow: 0 2px 8px rgba(1, 7, 54, 0.5);
+}
+
+.chip-filtro-banco.chip-favoritos.ativo {
+  background-color: rgba(246, 201, 69, 0.2);
+  border-color: #f6c945;
+  color: #ffe382;
+}
+
+/* ==========================================================================
+   3. ÁREA DA GALERIA RESPONSIVA E LOADER TEMÁTICO
+   ========================================================================== */
+.area-galeria-banco {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 4px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--cor-destaque) rgba(1, 7, 54, 0.4);
+}
+
+.area-galeria-banco::-webkit-scrollbar {
+  width: 7px;
+}
+
+.area-galeria-banco::-webkit-scrollbar-thumb {
+  background: var(--cor-destaque);
+  border-radius: var(--raio-borda-sm);
+}
+
+/* Loader Temático Minimalista (Linha fazendo laçada) */
+.loader-banco-amostras {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 36px 20px;
+  color: var(--creme-opacidade-75);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.svg-loader-lacada {
+  width: 52px;
+  height: 52px;
+}
+
+.linha-lacada-trilha {
+  stroke: rgba(252, 241, 208, 0.16);
+}
+
+.linha-lacada-anim {
+  stroke: var(--cor-texto-principal);
+  stroke-dasharray: 56 140;
+  animation: desenharLacada 1.15s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes desenharLacada {
+  0% { stroke-dashoffset: 196; }
+  100% { stroke-dashoffset: 0; }
+}
+
+/* Galeria Responsiva (1 col mobile -> 2 a 4 no desktop) */
+.grade-banco-amostras {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px;
+  padding: 4px 0 24px 0;
+  transition: grid-template-columns 0.25s ease-out;
+}
+
+@media (min-width: 640px) {
+  .grade-banco-amostras {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1080px) {
+  .grade-banco-amostras {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  #opcao-menu:checked ~ main .grade-banco-amostras {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1480px) {
+  .grade-banco-amostras {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+/* ==========================================================================
+   4. CARDS DO BANCO DE AMOSTRAS (STAGGER, HOVER, POP FAVORITAR)
+   ========================================================================== */
+@keyframes cardCascataBanco {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.card-banco-amostra {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: rgba(34, 57, 111, 0.28);
+  border: 1.5px solid rgba(252, 241, 208, 0.09);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: var(--sombra-sm);
+  cursor: pointer;
+  contain: layout style;
+  content-visibility: auto;
+  contain-intrinsic-size: auto 340px;
+  animation: cardCascataBanco 0.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: var(--delay-stagger, 0ms);
+  transition:
+    transform 0.2s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.2s ease,
+    border-color 0.18s ease;
+}
+
+.card-banco-amostra:hover {
+  transform: translateY(-4px);
+  border-color: #5480df;
+  box-shadow: 0 14px 28px rgba(1, 7, 54, 0.72), 0 0 0 1px rgba(84, 128, 223, 0.35);
+}
+
+/* Topo Visual / Foto */
+.card-banco-midia {
+  position: relative;
+  height: 158px;
+  width: 100%;
+  background: radial-gradient(circle at center, rgba(44, 74, 145, 0.48) 0%, rgba(1, 7, 54, 0.92) 100%);
+  overflow: hidden;
+  border-bottom: 1px solid rgba(252, 241, 208, 0.08);
+}
+
+.card-banco-foto {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.card-banco-amostra:hover .card-banco-foto {
+  transform: scale(1.04);
+}
+
+.card-banco-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: var(--creme-opacidade-45);
+}
+
+.card-banco-placeholder svg {
+  width: 44px;
+  height: 44px;
+  opacity: 0.75;
+}
+
+.card-banco-placeholder span {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+/* Botão Favoritar (Estrela com Efeito Pop) */
+.btn-fav-card-banco {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 3;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid rgba(252, 241, 208, 0.25);
+  background-color: rgba(1, 7, 54, 0.78);
+  backdrop-filter: blur(4px);
+  color: var(--creme-opacidade-65);
+  font-size: 17px;
+  line-height: 1;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.btn-fav-card-banco:hover {
+  color: #f6c945;
+  border-color: #f6c945;
+}
+
+.btn-fav-card-banco.favorito {
+  color: #f6c945;
+  background-color: rgba(1, 7, 54, 0.92);
+  border-color: #f6c945;
+  text-shadow: 0 0 10px rgba(246, 201, 69, 0.55);
+}
+
+@keyframes popFavorito {
+  0% { transform: scale(1); }
+  45% { transform: scale(1.32); }
+  100% { transform: scale(1); }
+}
+
+.btn-fav-card-banco.animar-pop,
+.btn-fav-det-banco.animar-pop {
+  animation: popFavorito 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Menu de Ações do Card (...) */
+.menu-card-banco-wrap {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 5;
+}
+
+.btn-menu-card-banco {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid rgba(252, 241, 208, 0.22);
+  background-color: rgba(1, 7, 54, 0.8);
+  backdrop-filter: blur(4px);
+  color: var(--cor-texto-principal);
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.16s ease, border-color 0.16s ease;
+}
+
+.btn-menu-card-banco:hover {
+  background-color: var(--cor-destaque-hover);
+  border-color: var(--cor-texto-principal);
+}
+
+.dropdown-card-banco {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 140px;
+  background-color: #010736;
+  border: 1px solid rgba(252, 241, 208, 0.24);
+  border-radius: 10px;
+  padding: 5px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.65);
+  display: none;
+  flex-direction: column;
+  gap: 2px;
+  animation: fadeInModoAmostra 0.15s ease-out;
+}
+
+.dropdown-card-banco.aberto {
+  display: flex;
+}
+
+.item-dropdown-banco {
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  padding: 7px 10px;
+  color: var(--cor-texto-principal);
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  transition: background-color 0.15s ease;
+}
+
+.item-dropdown-banco:hover {
+  background-color: var(--cor-destaque);
+}
+
+.item-dropdown-banco.perigo:hover {
+  background-color: rgba(231, 76, 60, 0.28);
+  color: #ff9c92;
+}
+
+.badge-cat-card-banco {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  z-index: 2;
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.45px;
+  padding: 3px 9px;
+  border-radius: var(--raio-borda-pilula);
+  background-color: rgba(1, 7, 54, 0.85);
+  color: var(--cor-texto-principal);
+  border: 1px solid rgba(252, 241, 208, 0.22);
+}
+
+/* Corpo do Card */
+.card-banco-corpo {
+  flex: 1;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.card-banco-nome {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--cor-texto-principal);
+  line-height: 1.25;
+}
+
+.card-banco-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.badge-mat-banco {
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background-color: rgba(1, 7, 54, 0.62);
+  border: 1px solid rgba(252, 241, 208, 0.14);
+  color: var(--creme-opacidade-85);
+}
+
+.badge-mat-banco.consumo {
+  background-color: rgba(39, 174, 96, 0.16);
+  border-color: rgba(46, 204, 113, 0.35);
+  color: #7bed9f;
+}
+
+/* Destaque Numérico Principal */
+.destaque-num-banco {
+  padding: 9px 11px;
+  border-radius: 10px;
+  background-color: rgba(1, 7, 54, 0.65);
+  border: 1px solid rgba(139, 173, 247, 0.3);
+  font-size: 13.5px;
+  font-weight: 800;
+  color: var(--cor-branco);
+  text-align: center;
+  letter-spacing: 0.2px;
+}
+
+/* Rodapé do Card: Usar na Calculadora */
+.card-banco-rodape {
+  margin-top: auto;
+  padding-top: 8px;
+}
+
+.btn-usar-calc-banco {
+  width: 100%;
+  height: 38px;
+  border: none;
+  border-radius: 9px;
+  background-color: var(--cor-texto-principal);
+  color: var(--cor-fundo-profundo);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 14px;
+}
+
+.btn-usar-calc-banco.confirmado {
+  background-color: #27ae60;
+  color: var(--cor-branco);
+}
+
+/* Estado Vazio */
+.estado-vazio-banco {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 64px 20px;
+  gap: 12px;
+}
+
+.ilustracao-vazio-banco {
+  font-size: 54px;
+  opacity: 0.8;
+}
+
+.titulo-vazio-banco {
+  margin: 0;
+  font-size: 20px;
+  color: var(--cor-texto-principal);
+}
+
+.texto-vazio-banco {
+  margin: 0 0 6px 0;
+  font-size: 13.5px;
+  color: var(--creme-opacidade-65);
+  max-width: 440px;
+}
+
+/* ==========================================================================
+   5. MODAIS (COM BACKDROP BLUR E EFEITO DE MOLA)
+   ========================================================================== */
+.modal-overlay-banco {
+  position: fixed;
+  inset: 0;
+  z-index: 1050;
+  background-color: rgba(1, 7, 54, 0.78);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  animation: fadeInOverlayBanco 0.16s ease-out;
+}
+
+@keyframes fadeInOverlayBanco {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes molaModalBanco {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.modal-conteudo-banco {
+  width: 100%;
+  max-width: 640px;
+  max-height: 90vh;
+  background-color: var(--cor-fundo-principal);
+  border: 1.5px solid rgba(252, 241, 208, 0.2);
+  border-radius: 18px;
+  box-shadow: 0 24px 54px rgba(0, 0, 0, 0.75);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: molaModalBanco 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.modal-banco-topo {
+  flex-shrink: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 22px;
+  background-color: rgba(34, 57, 111, 0.34);
+  border-bottom: 1px solid rgba(252, 241, 208, 0.12);
+}
+
+.modal-banco-titulo {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--cor-texto-principal);
+}
+
+.modal-banco-subtitulo {
+  display: block;
+  margin-top: 3px;
+  font-size: 12px;
+  color: var(--creme-opacidade-65);
+}
+
+.btn-fechar-banco {
+  background: transparent;
+  border: none;
+  color: var(--creme-opacidade-70);
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+
+.btn-fechar-banco:hover {
+  color: var(--cor-branco);
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.form-banco-amostra {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-banco-corpo {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 18px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--cor-destaque) rgba(1, 7, 54, 0.4);
+}
+
+.bloco-form-banco {
+  border: 1px solid rgba(252, 241, 208, 0.12);
+  border-radius: 12px;
+  background-color: rgba(1, 7, 54, 0.36);
+  padding: 12px 14px 14px 14px;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+
+.legenda-bloco-banco {
+  padding: 0 8px;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: #8ab0ff;
+}
+
+.grid-form-banco-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.col-span-2 {
+  grid-column: span 2;
+}
+
+.grupo-campo-banco {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.label-banco {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--creme-opacidade-75);
+}
+
+.obrig-banco {
+  color: #ff6b6b;
+}
+
+.input-banco {
+  width: 100%;
+  height: 38px;
+  background-color: rgba(1, 7, 54, 0.72);
+  border: 1px solid var(--creme-opacidade-20);
+  border-radius: 8px;
+  color: var(--cor-texto-principal);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 0 11px;
+  box-sizing: border-box;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.input-banco:focus {
+  border-color: #6b95f0;
+  box-shadow: 0 0 0 2px rgba(79, 125, 224, 0.25);
+  background-color: #081745;
+}
+
+.input-banco option {
+  background-color: var(--cor-fundo-profundo);
+  color: var(--cor-texto-principal);
+}
+
+.textarea-banco {
+  height: auto;
+  min-height: 76px;
+  padding: 9px 11px;
+  resize: vertical;
+  line-height: 1.45;
+}
+
+/* Upload de Foto Interativo (Borda Tracejada Estilo Pesponto) */
+@keyframes pulsoPesponto {
+  0%, 100% { border-color: #6b95f0; box-shadow: 0 0 0 0 rgba(107, 149, 240, 0.35); }
+  50% { border-color: var(--cor-texto-principal); box-shadow: 0 0 0 5px rgba(107, 149, 240, 0.14); }
+}
+
+.upload-pesponto-banco {
+  position: relative;
+  border: 2px dashed rgba(252, 241, 208, 0.34);
+  border-radius: 12px;
+  background-color: rgba(1, 7, 54, 0.55);
+  min-height: 112px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  overflow: hidden;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.upload-pesponto-banco:hover {
+  border-color: #6b95f0;
+  background-color: rgba(34, 57, 111, 0.32);
+}
+
+.upload-pesponto-banco.dragover {
+  background-color: rgba(44, 74, 145, 0.42);
+  animation: pulsoPesponto 0.9s ease-in-out infinite;
+}
+
+.upload-placeholder-banco {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 16px;
+  text-align: center;
+  color: var(--creme-opacidade-75);
+  font-size: 12.5px;
+}
+
+.upload-placeholder-banco span {
+  font-size: 11px;
+  color: var(--creme-opacidade-50);
+}
+
+.icone-upload-banco {
+  width: 26px;
+  height: 26px;
+  color: var(--creme-opacidade-65);
+  margin-bottom: 2px;
+}
+
+@keyframes fadeInFotoBanco {
+  from { opacity: 0; transform: scale(0.98); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.upload-preview-banco {
+  position: relative;
+  width: 100%;
+  height: 168px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.upload-preview-banco img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  animation: fadeInFotoBanco 0.26s ease-out;
+}
+
+.btn-remover-foto-banco {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+  background-color: rgba(231, 76, 60, 0.92);
+  color: #ffffff;
+  font-size: 17px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.aviso-erro-banco {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #ffb3ad;
+  background-color: rgba(231, 76, 60, 0.16);
+  border: 1px solid rgba(231, 76, 60, 0.42);
+  border-radius: 8px;
+  padding: 9px 12px;
+}
+
+.modal-banco-rodape {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 14px 22px;
+  background-color: rgba(1, 7, 54, 0.65);
+  border-top: 1px solid rgba(252, 241, 208, 0.12);
+}
+
+.btn-cancelar-banco,
+.btn-sec-banco {
+  height: 38px;
+  padding: 0 15px;
+  border-radius: 9px;
+  border: 1px solid var(--creme-opacidade-25);
+  background: transparent;
+  color: var(--creme-opacidade-85);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.btn-cancelar-banco:hover,
+.btn-sec-banco:hover {
+  border-color: var(--cor-texto-principal);
+  color: var(--cor-texto-principal);
+  background-color: rgba(252, 241, 208, 0.08);
+}
+
+.btn-salvar-banco {
+  height: 38px;
+  padding: 0 20px;
+  border: none;
+  border-radius: 9px;
+  background-color: var(--cor-texto-principal);
+  color: var(--cor-fundo-profundo);
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+/* ==========================================================================
+   6. MODAL DE DETALHES DA AMOSTRA E CONFIRMAÇÃO DE EXCLUSÃO
+   ========================================================================== */
+.modal-detalhes-banco {
+  max-width: 680px;
+}
+
+.det-banco-header-esq {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.det-banco-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.badge-cat-det,
+.badge-tec-det,
+.badge-tensao-det {
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: var(--raio-borda-pilula);
+  background-color: rgba(1, 7, 54, 0.72);
+  color: var(--cor-texto-principal);
+  border: 1px solid rgba(252, 241, 208, 0.2);
+}
+
+.det-banco-header-dir {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-fav-det-banco {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid var(--creme-opacidade-25);
+  background-color: rgba(1, 7, 54, 0.65);
+  color: var(--creme-opacidade-65);
+  font-size: 17px;
+  cursor: pointer;
+}
+
+.btn-fav-det-banco.favorito {
+  color: #f6c945;
+  border-color: #f6c945;
+}
+
+.det-banco-midia {
+  width: 100%;
+  height: 230px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: radial-gradient(circle, rgba(44, 74, 145, 0.45) 0%, rgba(1, 7, 54, 0.9) 100%);
+  border: 1px solid rgba(252, 241, 208, 0.14);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.det-banco-midia img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.det-banco-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  color: var(--creme-opacidade-50);
+  font-size: 13px;
+}
+
+.det-banco-placeholder span:first-child {
+  font-size: 46px;
+}
+
+.det-banco-destaque-num {
+  padding: 12px 14px;
+  border-radius: 12px;
+  background-color: rgba(44, 74, 145, 0.35);
+  border: 1px solid rgba(139, 173, 247, 0.4);
+  text-align: center;
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--cor-branco);
+}
+
+.det-banco-grid-info {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.det-info-box {
+  background-color: rgba(1, 7, 54, 0.55);
+  border: 1px solid rgba(252, 241, 208, 0.1);
+  border-radius: 10px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.det-info-box span {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--creme-opacidade-65);
+}
+
+.det-info-box strong {
+  font-size: 14px;
+  color: var(--cor-texto-principal);
+}
+
+.det-banco-link-box,
+.det-banco-notas-box {
+  background-color: rgba(1, 7, 54, 0.45);
+  border: 1px solid rgba(252, 241, 208, 0.1);
+  border-radius: 10px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.det-banco-link-box a {
+  color: #8ab0ff;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  word-break: break-all;
+}
+
+.det-banco-link-box a:hover {
+  text-decoration: underline;
+}
+
+.det-banco-notas-box p {
+  font-size: 13px;
+  color: var(--creme-opacidade-85);
+  white-space: pre-wrap;
+}
+
+.det-banco-rodape {
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.det-rodape-acoes-sec {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.det-banco-rodape .btn-usar-calc-banco {
+  width: auto;
+  padding: 0 18px;
+}
+
+.btn-perigo-banco {
+  height: 38px;
+  padding: 0 13px;
+  border-radius: 9px;
+  border: 1px solid rgba(231, 76, 60, 0.45);
+  background-color: rgba(231, 76, 60, 0.15);
+  color: #ff8a80;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-perigo-banco:hover {
+  background-color: var(--cor-alerta);
+  color: var(--cor-branco);
+}
+
+.modal-confirmar-banco {
+  width: 100%;
+  max-width: 390px;
+  background-color: var(--cor-fundo-principal);
+  border: 1.5px solid rgba(252, 241, 208, 0.22);
+  border-radius: 16px;
+  padding: 24px 22px 20px 22px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  animation: molaModalBanco 0.24s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.icone-confirmar-banco {
+  font-size: 36px;
+}
+
+.modal-confirmar-banco h3 {
+  margin: 0;
+  font-size: 17px;
+  color: var(--cor-texto-principal);
+}
+
+.modal-confirmar-banco p {
+  font-size: 13px;
+  color: var(--creme-opacidade-75);
+}
+
+.acoes-confirmar-banco {
+  display: flex;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.btn-perigo-solido-banco {
+  height: 38px;
+  padding: 0 18px;
+  border: none;
+  border-radius: 9px;
+  background-color: var(--cor-alerta);
+  color: var(--cor-branco);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* Toast Flutuante no Canto da Tela */
+.toast-banco-amostras {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  transform: translateY(24px);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1250;
+  background-color: #010736;
+  color: var(--cor-texto-principal);
+  border: 1.5px solid #2ecc71;
+  border-radius: 12px;
+  padding: 11px 18px;
+  font-size: 13px;
+  font-weight: 700;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.65);
+  transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.22s ease;
+}
+
+.toast-banco-amostras.visivel {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+@media (max-width: 640px) {
+  .conteiner-banco-amostras {
+    padding: 14px;
+  }
+
+  .grid-form-banco-2,
+  .det-banco-grid-info {
+    grid-template-columns: 1fr;
+  }
+
+  .col-span-2 {
+    grid-column: span 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-banco-amostra,
+  .card-banco-foto,
+  .btn-fav-card-banco,
+  .modal-conteudo-banco,
+  .upload-pesponto-banco,
+  .linha-lacada-anim {
+    animation: none !important;
+    transition: none !important;
+  }
+}
