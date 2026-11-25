@@ -125,6 +125,10 @@ const Configuracoes = (() => {
       }
       if (prefs.tema === "classico") root.removeAttribute("data-tema");
       else root.setAttribute("data-tema", prefs.tema);
+      if (typeof window !== "undefined" && window.PontoETramaAndroid && typeof window.PontoETramaAndroid.atualizarTema === "function") {
+        const corBarra = prefs.tema === "noite" ? "#050812" : prefs.tema === "claro" ? "#1b2e5a" : "#010736";
+        window.PontoETramaAndroid.atualizarTema(corBarra);
+      }
     }
 
     if (!chaveAlterada || chaveAlterada === "tamanhoFonte") {
@@ -153,6 +157,13 @@ const Configuracoes = (() => {
   }
 
   async function gerenciarWakeLock(ativar) {
+    if (typeof window !== "undefined" && window.PontoETramaAndroid && typeof window.PontoETramaAndroid.manterTelaAcesa === "function") {
+      try {
+        window.PontoETramaAndroid.manterTelaAcesa(Boolean(ativar));
+      } catch {
+        // ignora
+      }
+    }
     if (typeof navigator === "undefined" || !("wakeLock" in navigator)) return;
     try {
       if (ativar && !wakeLockSentinela) {
@@ -386,16 +397,23 @@ const Configuracoes = (() => {
         preferencias: { ...prefs },
         dados
       };
-      const blob = new Blob([JSON.stringify(pacote, null, 2)], { type: "application/json;charset=utf-8" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
+      const jsonTexto = JSON.stringify(pacote, null, 2);
       const dataStr = new Date().toISOString().slice(0, 10);
-      a.href = url;
-      a.download = `ponto-e-trama-backup-${dataStr}.json`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      const nomeArquivo = `ponto-e-trama-backup-${dataStr}.json`;
+
+      if (typeof window !== "undefined" && window.PontoETramaAndroid && typeof window.PontoETramaAndroid.salvarArquivo === "function") {
+        window.PontoETramaAndroid.salvarArquivo(nomeArquivo, jsonTexto);
+      } else {
+        const blob = new Blob([jsonTexto], { type: "application/json;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = nomeArquivo;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+      }
 
       if (btn) {
         const orig = btn.innerHTML;

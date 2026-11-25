@@ -1,0 +1,1188 @@
+/* ==========================================================================
+   PONTO & TRAMA — SISTEMA DE TEMAS HARMONIZADOS, FONTE E ACESSIBILIDADE
+   Carregado por último no index.html para harmonizar todas as 10 ferramentas
+   com contraste AA/AAA nos modos:
+     1. Clássico (padrão :root em global.css)
+     2. Noite Profunda ([data-tema="noite"])
+     3. Ateliê Claro ([data-tema="claro"])
+   ========================================================================== */
+
+:root.transicao-tema,
+:root.transicao-tema body,
+:root.transicao-tema .cabecalho,
+:root.transicao-tema .barraLateral,
+:root.transicao-tema .conteiner-ferramenta {
+  transition: background-color 0.22s ease, color 0.22s ease, border-color 0.22s ease;
+}
+
+/* ==========================================================================
+   ESCALA DE FONTE E REDUÇÃO DE ANIMAÇÕES
+   ========================================================================== */
+:root[data-fonte="compacto"] {
+  font-size: 14px;
+}
+
+:root[data-fonte="compacto"] main {
+  zoom: 0.94;
+}
+
+:root[data-fonte="grande"] {
+  font-size: 18px;
+}
+
+:root[data-fonte="grande"] main {
+  zoom: 1.08;
+}
+
+:root[data-reduzir-animacoes="true"] *,
+:root[data-reduzir-animacoes="true"] *::before,
+:root[data-reduzir-animacoes="true"] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* ==========================================================================
+   TEMA 2: NOITE PROFUNDA (ALTO CONTRASTE / OBSIDIANA + MARFIM SUAVE)
+   ========================================================================== */
+:root[data-tema="noite"] {
+  --cor-fundo-profundo: #050812;
+  --cor-fundo-base: #050812;
+  --cor-fundo-principal: #0a1020;
+  --cor-destaque: #18284d;
+  --cor-destaque-hover: #253f7a;
+  --cor-destaque-ativo: #101b38;
+  --cor-texto-principal: #f7f1de;
+  --cor-branco: #ffffff;
+  --cor-borda-suave: rgba(247, 241, 222, 0.22);
+  --cor-foco-destaque: #80abff;
+
+  --creme-opacidade-85: rgba(247, 241, 222, 0.92);
+  --creme-opacidade-75: rgba(247, 241, 222, 0.84);
+  --creme-opacidade-70: rgba(247, 241, 222, 0.78);
+  --creme-opacidade-65: rgba(247, 241, 222, 0.74);
+  --creme-opacidade-50: rgba(247, 241, 222, 0.62);
+  --creme-opacidade-45: rgba(247, 241, 222, 0.56);
+  --creme-opacidade-40: rgba(247, 241, 222, 0.5);
+  --creme-opacidade-30: rgba(247, 241, 222, 0.36);
+  --creme-opacidade-25: rgba(247, 241, 222, 0.28);
+  --creme-opacidade-20: rgba(247, 241, 222, 0.22);
+  --creme-opacidade-15: rgba(247, 241, 222, 0.16);
+  --creme-opacidade-12: rgba(247, 241, 222, 0.13);
+
+  --azul-medio-opacidade-95: rgba(28, 47, 92, 0.96);
+  --azul-medio-opacidade-70: rgba(28, 47, 92, 0.78);
+  --azul-medio-opacidade-55: rgba(28, 47, 92, 0.62);
+  --azul-medio-opacidade-50: rgba(28, 47, 92, 0.54);
+  --azul-medio-opacidade-40: rgba(28, 47, 92, 0.42);
+}
+
+:root[data-tema="noite"] .barraLateral,
+:root[data-tema="noite"] .barraLateral .icon {
+  background-color: #050812;
+  border-right: 1px solid rgba(247, 241, 222, 0.1);
+}
+
+:root[data-tema="noite"] .cabecalho {
+  background-color: #111b36;
+  border-bottom: 1px solid rgba(247, 241, 222, 0.14);
+}
+
+:root[data-tema="noite"] .barra-projeto-ativo {
+  background: linear-gradient(90deg, #060a16 0%, #132040 100%);
+  border-bottom-color: rgba(247, 241, 222, 0.16);
+}
+
+/* Superfícies elevadas coesas em Noite Profunda */
+:root[data-tema="noite"] .bloco-config,
+:root[data-tema="noite"] .ws-card,
+:root[data-tema="noite"] .barra-controle-projetos,
+:root[data-tema="noite"] .barra-controle-banco,
+:root[data-tema="noite"] .barra-filtros-fios,
+:root[data-tema="noite"] .barra-abas-biblioteca,
+:root[data-tema="noite"] .coluna-editor-receita,
+:root[data-tema="noite"] .coluna-leitor-linhas,
+:root[data-tema="noite"] .barra-arquivo-receita,
+:root[data-tema="noite"] .area-viewer-receita,
+:root[data-tema="noite"] .bloco-precificacao,
+:root[data-tema="noite"] .card-amostra,
+:root[data-tema="noite"] .card-banco-amostra,
+:root[data-tema="noite"] .card-fio,
+:root[data-tema="noite"] .card-bib,
+:root[data-tema="noite"] .card-contador,
+:root[data-tema="noite"] .tabela-wrapper-biblioteca {
+  background: #0f172b;
+  border-color: rgba(247, 241, 222, 0.15);
+}
+
+:root[data-tema="noite"] .card-bib:hover {
+  background: #14203b;
+}
+
+:root[data-tema="noite"] .card-resultado-precificacao,
+:root[data-tema="noite"] .card-resultado-amostra,
+:root[data-tema="noite"] .card-modo-avancado {
+  background: linear-gradient(180deg, #13203d 0%, #091020 100%);
+  border-color: rgba(247, 241, 222, 0.18);
+}
+
+:root[data-tema="noite"] .pasta-corpo {
+  background: linear-gradient(180deg, #162344 0%, #0d1529 100%);
+  border-color: rgba(247, 241, 222, 0.18);
+}
+
+:root[data-tema="noite"] .pasta-aba-topo {
+  background: linear-gradient(180deg, #1e315c 0%, #152344 100%);
+  border-color: rgba(247, 241, 222, 0.2);
+}
+
+:root[data-tema="noite"] .card-pasta-projeto.projeto-na-bancada .pasta-aba-topo {
+  background: #f7f1de;
+  color: #050812;
+  border-color: #f7f1de;
+}
+
+/* Modais, Drawers e Dropdowns em Noite Profunda */
+:root[data-tema="noite"] .telinha-dossie-pasta,
+:root[data-tema="noite"] .drawer-form-proj,
+:root[data-tema="noite"] .drawer-proj-rodape,
+:root[data-tema="noite"] .modal-box-cfg,
+:root[data-tema="noite"] .modal-confirmar-proj,
+:root[data-tema="noite"] .modal-conteudo-fio,
+:root[data-tema="noite"] .modal-conteudo-detalhes,
+:root[data-tema="noite"] .modal-conteudo-confirmar,
+:root[data-tema="noite"] .modal-conteudo-banco,
+:root[data-tema="noite"] .modal-confirmar-banco,
+:root[data-tema="noite"] .modal-confirmar-bib,
+:root[data-tema="noite"] .modal-box-amostra,
+:root[data-tema="noite"] .drawer-consulta-estoque,
+:root[data-tema="noite"] .drawer-painel-bib,
+:root[data-tema="noite"] .dropdown-pasta-card,
+:root[data-tema="noite"] .menu-status-ws,
+:root[data-tema="noite"] .menu-backup-popup,
+:root[data-tema="noite"] .dropdown-card-banco,
+:root[data-tema="noite"] .lightbox-proj-box {
+  background: #0d1529;
+  border-color: rgba(247, 241, 222, 0.22);
+}
+
+:root[data-tema="noite"] .modal-banco-topo,
+:root[data-tema="noite"] .modal-banco-rodape,
+:root[data-tema="noite"] .modal-amostra-topo,
+:root[data-tema="noite"] .modal-cfg-topo,
+:root[data-tema="noite"] .drawer-topo,
+:root[data-tema="noite"] .drawer-busca,
+:root[data-tema="noite"] .drawer-rodape-aviamentos,
+:root[data-tema="noite"] .drawer-bib-topo,
+:root[data-tema="noite"] .drawer-bib-rodape,
+:root[data-tema="noite"] .detalhes-cabecalho,
+:root[data-tema="noite"] .detalhes-rodape,
+:root[data-tema="noite"] .abas-modal-fio,
+:root[data-tema="noite"] .tabela-biblioteca thead th {
+  background-color: #131e38;
+  border-color: rgba(247, 241, 222, 0.14);
+}
+
+/* Sub-superfícies elevadas em Noite Profunda */
+:root[data-tema="noite"] .ws-contador-principal,
+:root[data-tema="noite"] .ficha-arquivo,
+:root[data-tema="noite"] .diagnostico-banco-cfg,
+:root[data-tema="noite"] .ws-etapa-item,
+:root[data-tema="noite"] .ws-fio-card,
+:root[data-tema="noite"] .ws-agulha-linha,
+:root[data-tema="noite"] .ws-atalho-card,
+:root[data-tema="noite"] .accordion-proj,
+:root[data-tema="noite"] .sobre-item-cfg,
+:root[data-tema="noite"] .stepper-amostra,
+:root[data-tema="noite"] .preview-amostra-box,
+:root[data-tema="noite"] .resumo-densidade-amostra,
+:root[data-tema="noite"] .item-amostra-salva,
+:root[data-tema="noite"] .tarja-materiais-avancado,
+:root[data-tema="noite"] .box-novo-ponto-rapido,
+:root[data-tema="noite"] .bloco-consumo-fio-amostra,
+:root[data-tema="noite"] .bloco-form-banco,
+:root[data-tema="noite"] .det-info-box,
+:root[data-tema="noite"] .det-banco-link-box,
+:root[data-tema="noite"] .det-banco-notas-box,
+:root[data-tema="noite"] .linha-info-estoque,
+:root[data-tema="noite"] .card-fio-drawer,
+:root[data-tema="noite"] .bloco-identificacao-destaque,
+:root[data-tema="noite"] .detalhes-secao-card,
+:root[data-tema="noite"] .bloco-campos-dinamicos,
+:root[data-tema="noite"] .calc-pacote-bib,
+:root[data-tema="noite"] .card-tema-cfg {
+  background: #131e38;
+  border-color: rgba(247, 241, 222, 0.14);
+}
+
+:root[data-tema="noite"] input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+:root[data-tema="noite"] select,
+:root[data-tema="noite"] textarea {
+  background-color: #060b18;
+  border-color: rgba(247, 241, 222, 0.24);
+  color: #f7f1de;
+}
+
+:root[data-tema="noite"] input:focus,
+:root[data-tema="noite"] select:focus,
+:root[data-tema="noite"] textarea:focus {
+  border-color: #80abff;
+  background-color: #091126;
+}
+
+:root[data-tema="noite"] .btn-dossie-retirar {
+  background: #f7f1de;
+  color: #050812;
+}
+
+:root[data-tema="noite"] .info-tag.tag-sobra {
+  background: rgba(247, 241, 222, 0.14);
+  color: #f7f1de;
+}
+
+:root[data-tema="noite"] .toast-projetos,
+:root[data-tema="noite"] .toast-configuracoes,
+:root[data-tema="noite"] .toast-amostra,
+:root[data-tema="noite"] .toast-banco-amostras {
+  background: #162547;
+  color: #f7f1de;
+  border: 1px solid rgba(247, 241, 222, 0.3);
+}
+
+/* ==========================================================================
+   TEMA 3: ATELIÊ CLARO (PERGAMINHO QUENTE + MARFIM + AZUL TINTA)
+   --cor-fundo-profundo vira superfície clara (#ffffff) e --cor-texto-principal
+   vira azul-marinho tinta (#16264d). Isso harmoniza automaticamente os botões
+   que usam o par (fundo texto / texto fundo) sem nenhum escuro-no-escuro!
+   ========================================================================== */
+:root[data-tema="claro"] {
+  --cor-fundo-profundo: #ffffff;
+  --cor-fundo-base: #e5dcc9;
+  --cor-fundo-principal: #f4eee1;
+  --cor-destaque: #233b72;
+  --cor-destaque-hover: #2e4e96;
+  --cor-destaque-ativo: #e5dcc9;
+  --cor-texto-principal: #16264d;
+  --cor-branco: #ffffff;
+  --cor-borda-suave: rgba(22, 38, 77, 0.18);
+  --cor-foco-destaque: #2a56bd;
+
+  --creme-opacidade-85: rgba(22, 38, 77, 0.9);
+  --creme-opacidade-75: rgba(22, 38, 77, 0.8);
+  --creme-opacidade-70: rgba(22, 38, 77, 0.74);
+  --creme-opacidade-65: rgba(22, 38, 77, 0.68);
+  --creme-opacidade-50: rgba(22, 38, 77, 0.56);
+  --creme-opacidade-45: rgba(22, 38, 77, 0.5);
+  --creme-opacidade-40: rgba(22, 38, 77, 0.42);
+  --creme-opacidade-30: rgba(22, 38, 77, 0.28);
+  --creme-opacidade-25: rgba(22, 38, 77, 0.22);
+  --creme-opacidade-20: rgba(22, 38, 77, 0.17);
+  --creme-opacidade-15: rgba(22, 38, 77, 0.13);
+  --creme-opacidade-12: rgba(22, 38, 77, 0.1);
+
+  --azul-medio-opacidade-95: rgba(35, 59, 114, 0.95);
+  --azul-medio-opacidade-70: rgba(35, 59, 114, 0.14);
+  --azul-medio-opacidade-55: rgba(35, 59, 114, 0.12);
+  --azul-medio-opacidade-50: rgba(35, 59, 114, 0.1);
+  --azul-medio-opacidade-40: rgba(35, 59, 114, 0.08);
+
+  --sombra-sm: 0 2px 8px rgba(22, 38, 77, 0.08);
+  --sombra-md: 0 4px 14px rgba(22, 38, 77, 0.12);
+  --sombra-lg: 0 10px 28px rgba(22, 38, 77, 0.18);
+  --sombra-card: 0 8px 24px rgba(22, 38, 77, 0.1);
+  --sombra-card-hover: 0 12px 28px rgba(22, 38, 77, 0.16);
+}
+
+/* 1. Barra Lateral & Cabeçalho: mantêm o azul-marinho da marca com texto creme claro */
+:root[data-tema="claro"] .barraLateral,
+:root[data-tema="claro"] .barraLateral .icon {
+  background-color: #1b2e5a;
+}
+
+:root[data-tema="claro"] .barraLateral .nomeLogo,
+:root[data-tema="claro"] .barraLateral .botaoFerramenta,
+:root[data-tema="claro"] .barraLateral .botaoNavegar {
+  color: #fcf1d0;
+}
+
+:root[data-tema="claro"] .barraLateral .botaoFerramenta:hover {
+  background-color: rgba(252, 241, 208, 0.14);
+  color: #ffffff;
+}
+
+:root[data-tema="claro"] .barraLateral .botaoFerramenta.ativo {
+  background-color: #2c4a91;
+  color: #ffffff;
+}
+
+:root[data-tema="claro"] .cabecalho {
+  background-color: #233b72;
+  border-bottom: 2px solid #16264d;
+}
+
+:root[data-tema="claro"] .cabecalho .titulo-ferramenta,
+:root[data-tema="claro"] .cabecalho .subtitulo-ferramenta {
+  color: #fcf1d0;
+}
+
+:root[data-tema="claro"] .cabecalho .subtitulo-ferramenta {
+  opacity: 0.85;
+}
+
+/* Botões posicionados DENTRO do cabeçalho azul-marinho (sempre alto contraste!) */
+:root[data-tema="claro"] .cabecalho .btn-novo-projeto-primario,
+:root[data-tema="claro"] .cabecalho .btn-adicionar-contador,
+:root[data-tema="claro"] .cabecalho .btn-nova-amostra-banco,
+:root[data-tema="claro"] .cabecalho .btn-novo-fio,
+:root[data-tema="claro"] .cabecalho .btn-novo-item-bib {
+  background-color: #fcf1d0;
+  color: #16264d;
+  border: 1.5px solid #fcf1d0;
+}
+
+:root[data-tema="claro"] .cabecalho .btn-novo-projeto-primario:hover,
+:root[data-tema="claro"] .cabecalho .btn-adicionar-contador:hover,
+:root[data-tema="claro"] .cabecalho .btn-nova-amostra-banco:hover,
+:root[data-tema="claro"] .cabecalho .btn-novo-fio:hover,
+:root[data-tema="claro"] .cabecalho .btn-novo-item-bib:hover {
+  background-color: #ffffff;
+  color: #16264d;
+}
+
+:root[data-tema="claro"] .cabecalho .btn-estoque-precificacao,
+:root[data-tema="claro"] .cabecalho .btn-consultar-gaveta,
+:root[data-tema="claro"] .cabecalho .btn-ajuda-amostra,
+:root[data-tema="claro"] .cabecalho .btn-modo-avancado-amostra,
+:root[data-tema="claro"] .cabecalho .btn-backup-fios {
+  background-color: rgba(255, 255, 255, 0.14);
+  border-color: rgba(252, 241, 208, 0.38);
+  color: #fcf1d0;
+}
+
+:root[data-tema="claro"] .cabecalho .btn-estoque-precificacao:hover,
+:root[data-tema="claro"] .cabecalho .btn-consultar-gaveta:hover,
+:root[data-tema="claro"] .cabecalho .btn-ajuda-amostra:hover,
+:root[data-tema="claro"] .cabecalho .btn-modo-avancado-amostra:hover,
+:root[data-tema="claro"] .cabecalho .btn-backup-fios:hover {
+  background-color: rgba(255, 255, 255, 0.24);
+  color: #ffffff;
+  border-color: #fcf1d0;
+}
+
+:root[data-tema="claro"] .cabecalho .btn-estoque-precificacao.ativo,
+:root[data-tema="claro"] .cabecalho .btn-modo-avancado-amostra.ativo {
+  background: #fcf1d0;
+  color: #16264d;
+  border-color: #fcf1d0;
+}
+
+:root[data-tema="claro"] .cabecalho .badge-status-estoque,
+:root[data-tema="claro"] .cabecalho .badge-avancado-status {
+  background-color: rgba(22, 38, 77, 0.3);
+  color: #fcf1d0;
+}
+
+:root[data-tema="claro"] .cabecalho .btn-estoque-precificacao.ativo .badge-status-estoque,
+:root[data-tema="claro"] .cabecalho .btn-modo-avancado-amostra.ativo .badge-avancado-status {
+  background-color: #233b72;
+  color: #ffffff;
+}
+
+:root[data-tema="claro"] .cabecalho .badge-resumo-fio {
+  background-color: rgba(255, 255, 255, 0.14);
+  border-color: rgba(252, 241, 208, 0.32);
+  color: #fcf1d0;
+}
+
+:root[data-tema="claro"] .cabecalho .switch-modo-receita,
+:root[data-tema="claro"] .cabecalho .toggle-unidade-amostra {
+  background-color: rgba(10, 20, 48, 0.45);
+  border-color: rgba(252, 241, 208, 0.32);
+}
+
+:root[data-tema="claro"] .cabecalho .btn-modo-receita,
+:root[data-tema="claro"] .cabecalho .btn-unidade-amostra {
+  color: rgba(252, 241, 208, 0.85);
+}
+
+:root[data-tema="claro"] .cabecalho .btn-modo-receita.ativo {
+  background-color: #fcf1d0;
+  color: #16264d;
+}
+
+:root[data-tema="claro"] .cabecalho .btn-unidade-amostra.ativo {
+  color: #ffffff;
+}
+
+:root[data-tema="claro"] .cabecalho .badge-salvo-config {
+  background-color: rgba(61, 214, 140, 0.24);
+  border-color: #6ce8ac;
+  color: #e8fff3;
+}
+
+/* 2. Barra global "Na bancada" */
+:root[data-tema="claro"] .barra-projeto-ativo {
+  background: linear-gradient(90deg, #eae1cf 0%, #f1e9d9 100%);
+  border-bottom: 1px solid rgba(22, 38, 77, 0.16);
+}
+
+:root[data-tema="claro"] .barra-ativo-rotulo,
+:root[data-tema="claro"] .barra-ativo-nome {
+  color: #16264d;
+}
+
+:root[data-tema="claro"] .barra-ativo-progresso {
+  background: rgba(35, 59, 114, 0.12);
+  color: #16264d;
+}
+
+:root[data-tema="claro"] .barra-ativo-sync {
+  color: #0e7445;
+}
+
+:root[data-tema="claro"] .barra-ativo-sync.salvando {
+  color: #8c5c00;
+}
+
+:root[data-tema="claro"] .btn-barra-ativo {
+  background: #233b72;
+  color: #ffffff;
+  border-color: #233b72;
+}
+
+:root[data-tema="claro"] .btn-barra-ativo.secundario {
+  background: #ffffff;
+  color: #16264d;
+  border-color: rgba(22, 38, 77, 0.26);
+}
+
+/* 3. Home */
+:root[data-tema="claro"] .btn-home-secundario {
+  background-color: #fffdf8;
+  border-color: rgba(22, 38, 77, 0.28);
+  color: #16264d;
+}
+
+:root[data-tema="claro"] .btn-home-secundario:hover {
+  background-color: #233b72;
+  border-color: #233b72;
+  color: #ffffff;
+}
+
+/* 4. Superfícies, Cards e Contêineres Principais (Marfim claro #fffdf8) */
+:root[data-tema="claro"] .bloco-config,
+:root[data-tema="claro"] .ws-card,
+:root[data-tema="claro"] .barra-controle-projetos,
+:root[data-tema="claro"] .barra-controle-banco,
+:root[data-tema="claro"] .barra-filtros-fios,
+:root[data-tema="claro"] .barra-abas-biblioteca,
+:root[data-tema="claro"] .coluna-editor-receita,
+:root[data-tema="claro"] .coluna-leitor-linhas,
+:root[data-tema="claro"] .barra-arquivo-receita,
+:root[data-tema="claro"] .area-viewer-receita,
+:root[data-tema="claro"] .bloco-precificacao,
+:root[data-tema="claro"] .card-resultado-precificacao,
+:root[data-tema="claro"] .card-amostra,
+:root[data-tema="claro"] .card-resultado-amostra,
+:root[data-tema="claro"] .card-modo-avancado,
+:root[data-tema="claro"] .card-banco-amostra,
+:root[data-tema="claro"] .card-fio,
+:root[data-tema="claro"] .card-bib,
+:root[data-tema="claro"] .card-contador,
+:root[data-tema="claro"] .tabela-wrapper-biblioteca,
+:root[data-tema="claro"] .card-tema-cfg {
+  background: #fffdf8;
+  border-color: rgba(22, 38, 77, 0.14);
+  color: #16264d;
+}
+
+:root[data-tema="claro"] .card-bib:hover,
+:root[data-tema="claro"] .card-fio:hover,
+:root[data-tema="claro"] .card-banco-amostra:hover {
+  background: #ffffff;
+  border-color: rgba(35, 59, 114, 0.35);
+}
+
+:root[data-tema="claro"] .card-tema-cfg.ativo {
+  border-color: #233b72;
+  box-shadow: 0 0 0 2px rgba(35, 59, 114, 0.22);
+}
+
+/* Sub-superfícies suaves dentro dos cards (Pergaminho leve #f2ebdc) */
+:root[data-tema="claro"] .ws-contador-principal,
+:root[data-tema="claro"] .ws-etapa-item,
+:root[data-tema="claro"] .ws-fio-card,
+:root[data-tema="claro"] .ws-agulha-linha,
+:root[data-tema="claro"] .ws-atalho-card,
+:root[data-tema="claro"] .ws-add-fio-box,
+:root[data-tema="claro"] .ws-progresso-manual-box,
+:root[data-tema="claro"] .ws-receita-viewer,
+:root[data-tema="claro"] .ws-foto-prog-card,
+:root[data-tema="claro"] .linha-receita-item,
+:root[data-tema="claro"] .diagnostico-banco-cfg,
+:root[data-tema="claro"] .diag-stat-pill,
+:root[data-tema="claro"] .sobre-item-cfg,
+:root[data-tema="claro"] .item-atalho-cfg,
+:root[data-tema="claro"] .accordion-proj,
+:root[data-tema="claro"] .ficha-arquivo,
+:root[data-tema="claro"] .seletor-modo-amostra,
+:root[data-tema="claro"] .stepper-amostra,
+:root[data-tema="claro"] .preview-amostra-box,
+:root[data-tema="claro"] .fita-metrica-trilha,
+:root[data-tema="claro"] .resumo-densidade-amostra,
+:root[data-tema="claro"] .item-amostra-salva,
+:root[data-tema="claro"] .tarja-materiais-avancado,
+:root[data-tema="claro"] .pills-tecnica-avancado,
+:root[data-tema="claro"] .box-novo-ponto-rapido,
+:root[data-tema="claro"] .bloco-consumo-fio-amostra,
+:root[data-tema="claro"] .caixa-check-banco-modal,
+:root[data-tema="claro"] .linha-info-estoque,
+:root[data-tema="claro"] .controle-qtd-av-drawer,
+:root[data-tema="claro"] .det-info-box,
+:root[data-tema="claro"] .det-banco-link-box,
+:root[data-tema="claro"] .det-banco-notas-box,
+:root[data-tema="claro"] .detalhes-secao-card,
+:root[data-tema="claro"] .bloco-form-banco,
+:root[data-tema="claro"] .bloco-identificacao-destaque,
+:root[data-tema="claro"] .resumo-modal-salvar,
+:root[data-tema="claro"] .dica-modal-cfg,
+:root[data-tema="claro"] .checklist-limpar-cfg label,
+:root[data-tema="claro"] .upload-capa-proj,
+:root[data-tema="claro"] .upload-pesponto-banco,
+:root[data-tema="claro"] .upload-area-fio,
+:root[data-tema="claro"] .upload-area-bib,
+:root[data-tema="claro"] .card-fio-drawer,
+:root[data-tema="claro"] .card-controle-estoque,
+:root[data-tema="claro"] .controle-quantidade-detalhes,
+:root[data-tema="claro"] .controle-estoque-bib,
+:root[data-tema="claro"] .seletor-categoria-bib,
+:root[data-tema="claro"] .bloco-campos-dinamicos,
+:root[data-tema="claro"] .calc-pacote-bib,
+:root[data-tema="claro"] .abas-modal-fio,
+:root[data-tema="claro"] .foto-ampliada-container,
+:root[data-tema="claro"] .thumb-tabela {
+  background: #f2ebdc;
+  border-color: rgba(22, 38, 77, 0.14);
+  color: #16264d;
+}
+
+:root[data-tema="claro"] .stepper-amostra:focus-within {
+  background: #ffffff;
+  border-color: #2a56bd;
+}
+
+:root[data-tema="claro"] .item-amostra-salva:hover,
+:root[data-tema="claro"] .linha-receita-item:hover,
+:root[data-tema="claro"] .card-fio-drawer:hover,
+:root[data-tema="claro"] .upload-pesponto-banco:hover,
+:root[data-tema="claro"] .upload-area-fio:hover,
+:root[data-tema="claro"] .upload-area-fio.dragover,
+:root[data-tema="claro"] .upload-area-bib:hover,
+:root[data-tema="claro"] .upload-area-bib.dragover {
+  background: #e9e0cd;
+  border-color: rgba(35, 59, 114, 0.32);
+}
+
+:root[data-tema="claro"] .accordion-proj-header,
+:root[data-tema="claro"] .modal-banco-topo,
+:root[data-tema="claro"] .modal-banco-rodape,
+:root[data-tema="claro"] .modal-amostra-topo,
+:root[data-tema="claro"] .modal-cfg-topo,
+:root[data-tema="claro"] .drawer-topo,
+:root[data-tema="claro"] .drawer-busca,
+:root[data-tema="claro"] .drawer-rodape-aviamentos,
+:root[data-tema="claro"] .drawer-bib-topo,
+:root[data-tema="claro"] .drawer-bib-rodape,
+:root[data-tema="claro"] .detalhes-cabecalho,
+:root[data-tema="claro"] .detalhes-rodape,
+:root[data-tema="claro"] .tabela-biblioteca thead th {
+  background: #eae1cf;
+  border-color: rgba(22, 38, 77, 0.15);
+  color: #16264d;
+}
+
+:root[data-tema="claro"] .modal-cfg-topo.perigo {
+  background: rgba(184, 37, 26, 0.12);
+}
+
+:root[data-tema="claro"] .aba-item.ativa {
+  background: #fffdf8;
+  color: #16264d;
+  border-bottom-color: #233b72;
+}
+
+/* 5. Pastas / Fichários, Mídias e Dossiê no Tema Claro */
+:root[data-tema="claro"] .pasta-aba-topo {
+  background: linear-gradient(180deg, #e5dac3 0%, #dcd0b6 100%);
+  border-color: rgba(22, 38, 77, 0.2);
+  color: #16264d;
+  box-shadow: none;
+}
+
+:root[data-tema="claro"] .card-pasta-projeto.projeto-na-bancada .pasta-aba-topo {
+  background: #233b72;
+  color: #fcf1d0;
+  border-color: #233b72;
+}
+
+:root[data-tema="claro"] .pasta-corpo {
+  background: #fffdf8;
+  border-color: rgba(22, 38, 77, 0.16);
+}
+
+:root[data-tema="claro"] .card-pasta-projeto.projeto-na-bancada .pasta-corpo {
+  border-color: #233b72;
+  box-shadow: 0 8px 22px rgba(35, 59, 114, 0.18), 0 0 0 1px rgba(35, 59, 114, 0.25);
+}
+
+:root[data-tema="claro"] .pasta-midia,
+:root[data-tema="claro"] .card-banco-midia,
+:root[data-tema="claro"] .det-banco-midia,
+:root[data-tema="claro"] .card-bib-midia,
+:root[data-tema="claro"] .card-fio-foto-wrapper,
+:root[data-tema="claro"] .card-fio-placeholder {
+  background: linear-gradient(135deg, #ebe3d3 0%, #dfd5c0 100%);
+  color: rgba(22, 38, 77, 0.45);
+}
+
+:root[data-tema="claro"] .card-skeleton-pasta {
+  background: linear-gradient(90deg, #ede5d4 25%, #e2d7c1 50%, #ede5d4 75%);
+}
+
+:root[data-tema="claro"] .pasta-badge-status,
+:root[data-tema="claro"] .badge-cat-card-banco,
+:root[data-tema="claro"] .badge-cat-card,
+:root[data-tema="claro"] .preview-centro-tag {
+  background: rgba(255, 253, 248, 0.95);
+  border-color: rgba(22, 38, 77, 0.22);
+  color: #16264d;
+}
+
+:root[data-tema="claro"] .btn-pasta-menu,
+:root[data-tema="claro"] .btn-menu-card-banco,
+:root[data-tema="claro"] .btn-fav-card-banco,
+:root[data-tema="claro"] .btn-flutuante-card {
+  background: rgba(255, 253, 248, 0.95);
+  border-color: rgba(22, 38, 77, 0.22);
+  color: #16264d;
+}
+
+:root[data-tema="claro"] .btn-fav-card-banco.favorito {
+  background: #1b2e5a;
+  border-color: #1b2e5a;
+  color: #f6c945;
+}
+
+:root[data-tema="claro"] .btn-pasta-menu:hover,
+:root[data-tema="claro"] .btn-menu-card-banco:hover,
+:root[data-tema="claro"] .btn-flutuante-card:hover {
+  background: #233b72;
+  border-color: #233b72;
+  color: #ffffff;
+}
+
+:root[data-tema="claro"] .mini-pill-ficha,
+:root[data-tema="claro"] .badge-padrao-amostra,
+:root[data-tema="claro"] .badge-mat-banco,
+:root[data-tema="claro"] .badge-cat-det,
+:root[data-tema="claro"] .badge-tec-det,
+:root[data-tema="claro"] .badge-tensao-det,
+:root[data-tema="claro"] .dossie-cat-pill,
+:root[data-tema="claro"] .dossie-status-pill,
+:root[data-tema="claro"] .tag-fio,
+:root[data-tema="claro"] .tag-fio-lote,
+:root[data-tema="claro"] .tag-mat-av,
+:root[data-tema="claro"] .info-tag,
+:root[data-tema="claro"] .chip-meta-bib,
+:root[data-tema="claro"] .contador-aba,
+:root[data-tema="claro"] .badge-cont-chip,
+:root[data-tema="claro"] .ws-card-dica kbd {
+  background: #e9e0cd;
+  border-color: rgba(22, 38, 77, 0.18);
+  color: #16264d;
+}
+
+:root[data-tema="claro"] .chip-meta-bib.destaque-mm {
+  background: #233b72;
+  color: #ffffff;
+}
+
+:root[data-tema="claro"] .chip-meta-bib.destaque-projeto {
+  background: #e4ecfc;
+  border-color: rgba(35, 59, 114, 0.25);
+  color: #1d4499;
+}
+
+:root[data-tema="claro"] .pasta-progresso-base,
+:root[data-tema="claro"] .trilha-progresso-ws,
+:root[data-tema="claro"] .dossie-progresso-trilha,
+:root[data-tema="claro"] .slider-lucro {
+  background: #dfd5c0;
+}
+
+:root[data-tema="claro"] .pasta-progresso-fill,
+:root[data-tema="claro"] .preenchimento-progresso-ws,
+:root[data-tema="claro"] .dossie-progresso-fill {
+  background: linear-gradient(90deg, #233b72 0%, #3d64bd 100%);
+}
+
+:root[data-tema="claro"] .telinha-dossie-pasta {
+  background: #fffdf8;
+  border-color: rgba(22, 38, 77, 0.2);
+}
+
+:root[data-tema="claro"] .dossie-rodape {
+  background: #f2ebdc;
+}
+
+:root[data-tema="claro"] .bolso-pasta-aba {
+  background: #dfd3ba;
+  color: #16264d;
+  border-color: rgba(22, 38, 77, 0.2);
+}
+
+:root[data-tema="claro"] .bolso-pasta-frente {
+  background: linear-gradient(180deg, #e5dac3 0%, #d4c6a8 100%);
+  border-color: rgba(22, 38, 77, 0.2);
+}
+
+:root[data-tema="claro"] .dossie-capa-thumb {
+  background: #ede5d4;
+}
+
+/* Abas das fichas no dossiê com contraste nítido no claro */
+:root[data-tema="claro"] .ficha-contadores .ficha-aba { background: rgba(35, 89, 196, 0.14); color: #1d4499; }
+:root[data-tema="claro"] .ficha-receita .ficha-aba { background: rgba(179, 120, 0, 0.16); color: #7f5300; }
+:root[data-tema="claro"] .ficha-materiais .ficha-aba { background: rgba(15, 130, 76, 0.15); color: #0b663b; }
+:root[data-tema="claro"] .ficha-etapas .ficha-aba { background: rgba(132, 69, 156, 0.15); color: #672b80; }
+:root[data-tema="claro"] .ficha-amostra .ficha-aba { background: rgba(14, 118, 146, 0.15); color: #0c5d75; }
+:root[data-tema="claro"] .ficha-precificacao .ficha-aba { background: rgba(22, 38, 77, 0.13); color: #16264d; }
+
+/* 6. Modais, Drawers e Dropdowns (Fundo Claro + Texto Escuro) */
+:root[data-tema="claro"] .drawer-form-proj,
+:root[data-tema="claro"] .drawer-proj-rodape,
+:root[data-tema="claro"] .modal-box-cfg,
+:root[data-tema="claro"] .modal-confirmar-proj,
+:root[data-tema="claro"] .modal-conteudo-fio,
+:root[data-tema="claro"] .modal-conteudo-detalhes,
+:root[data-tema="claro"] .modal-conteudo-confirmar,
+:root[data-tema="claro"] .modal-conteudo-banco,
+:root[data-tema="claro"] .modal-confirmar-banco,
+:root[data-tema="claro"] .modal-confirmar-bib,
+:root[data-tema="claro"] .modal-box-amostra,
+:root[data-tema="claro"] .drawer-consulta-estoque,
+:root[data-tema="claro"] .drawer-painel-bib,
+:root[data-tema="claro"] .dropdown-pasta-card,
+:root[data-tema="claro"] .menu-status-ws,
+:root[data-tema="claro"] .menu-backup-popup,
+:root[data-tema="claro"] .dropdown-card-banco,
+:root[data-tema="claro"] .lightbox-proj-box {
+  background: #fffdf8;
+  border-color: rgba(22, 38, 77, 0.2);
+  color: #16264d;
+}
+
+:root[data-tema="claro"] .drawer-proj-topo {
+  background: #233b72;
+}
+
+:root[data-tema="claro"] .drawer-proj-topo .drawer-proj-titulo,
+:root[data-tema="claro"] .drawer-proj-topo .drawer-proj-subtitulo,
+:root[data-tema="claro"] .drawer-proj-topo .btn-fechar-drawer-proj {
+  color: #fcf1d0;
+}
+
+:root[data-tema="claro"] .btn-fechar-banco:hover,
+:root[data-tema="claro"] .btn-fechar-modal-amostra:hover,
+:root[data-tema="claro"] .btn-fechar-drawer-bib:hover,
+:root[data-tema="claro"] .btn-fechar-drawer:hover {
+  background: rgba(22, 38, 77, 0.1);
+  color: #16264d;
+}
+
+:root[data-tema="claro"] .item-dropdown-pasta:hover,
+:root[data-tema="claro"] .opcao-status-ws:hover,
+:root[data-tema="claro"] .item-menu-backup:hover,
+:root[data-tema="claro"] .item-dropdown-banco:hover {
+  background: #e9effa;
+  color: #16264d;
+}
+
+/* 7. Botões, Chips, Abas e Controles no Tema Claro (ZERO escuro-no-escuro!) */
+:root[data-tema="claro"] .btn-dossie-retirar,
+:root[data-tema="claro"] .btn-retirar-ws,
+:root[data-tema="claro"] .btn-salvar-proj,
+:root[data-tema="claro"] .btn-cfg-primario,
+:root[data-tema="claro"] .btn-novo-fio,
+:root[data-tema="claro"] .btn-salvar-fio,
+:root[data-tema="claro"] .btn-ajuste-detalhes,
+:root[data-tema="claro"] .btn-acao-primaria,
+:root[data-tema="claro"] .btn-novo-item-bib,
+:root[data-tema="claro"] .btn-aplicar-pacote,
+:root[data-tema="claro"] .btn-receita-primario,
+:root[data-tema="claro"] .btn-salvar-projeto-amostra,
+:root[data-tema="claro"] .btn-usar-fio-drawer,
+:root[data-tema="claro"] .btn-ws-chip.destaque,
+:root[data-tema="claro"] .btn-ws-contador.mais,
+:root[data-tema="claro"] .controle-carreiras .btn-mais {
+  background: #233b72;
+  color: #ffffff;
+  border-color: #233b72;
+}
+
+:root[data-tema="claro"] .btn-dossie-retirar:hover,
+:root[data-tema="claro"] .btn-retirar-ws:hover,
+:root[data-tema="claro"] .btn-salvar-proj:hover,
+:root[data-tema="claro"] .btn-cfg-primario:hover,
+:root[data-tema="claro"] .btn-novo-fio:hover,
+:root[data-tema="claro"] .btn-salvar-fio:hover,
+:root[data-tema="claro"] .btn-ajuste-detalhes:hover,
+:root[data-tema="claro"] .btn-acao-primaria:hover,
+:root[data-tema="claro"] .btn-novo-item-bib:hover,
+:root[data-tema="claro"] .btn-aplicar-pacote:hover,
+:root[data-tema="claro"] .btn-salvar-projeto-amostra:hover,
+:root[data-tema="claro"] .btn-usar-fio-drawer:hover,
+:root[data-tema="claro"] .controle-carreiras .btn-mais:hover {
+  background: #182a54;
+  color: #ffffff;
+  border-color: #182a54;
+}
+
+:root[data-tema="claro"] .btn-dossie-workspace,
+:root[data-tema="claro"] .btn-ws-play,
+:root[data-tema="claro"] .btn-puxar-aviamentos {
+  background: #e8eefb;
+  color: #16264d;
+  border-color: rgba(35, 59, 114, 0.35);
+}
+
+:root[data-tema="claro"] .btn-dossie-workspace:hover,
+:root[data-tema="claro"] .btn-ws-play:hover,
+:root[data-tema="claro"] .btn-puxar-aviamentos:hover {
+  background: #233b72;
+  color: #ffffff;
+  border-color: #233b72;
+}
+
+:root[data-tema="claro"] .btn-voltar-pastas,
+:root[data-tema="claro"] .btn-status-ws,
+:root[data-tema="claro"] .btn-editar-ws,
+:root[data-tema="claro"] .btn-ws-chip,
+:root[data-tema="claro"] .btn-ws-contador.menos,
+:root[data-tema="claro"] .btn-receita-suave,
+:root[data-tema="claro"] .btn-cfg-suave,
+:root[data-tema="claro"] .btn-backup-fios,
+:root[data-tema="claro"] .btn-dossie-secundario,
+:root[data-tema="claro"] .btn-fechar-dossie,
+:root[data-tema="claro"] .btn-cancelar-proj,
+:root[data-tema="claro"] .btn-toque,
+:root[data-tema="claro"] .btn-zerar,
+:root[data-tema="claro"] .btn-remover-contador,
+:root[data-tema="claro"] .controle-carreiras .btn-menos,
+:root[data-tema="claro"] .btn-silenciar,
+:root[data-tema="claro"] .btn-amostra-secundario,
+:root[data-tema="claro"] .btn-link-banco-amostras,
+:root[data-tema="claro"] .btn-adicionar-linha,
+:root[data-tema="claro"] .btn-remover-linha,
+:root[data-tema="claro"] .btn-nav-fio,
+:root[data-tema="claro"] .btn-copiar-lote,
+:root[data-tema="claro"] .btn-fav-det-banco,
+:root[data-tema="claro"] .btn-toggle-uso,
+:root[data-tema="claro"] .btn-toggle-uso-compacto {
+  background: #ffffff;
+  color: #16264d;
+  border-color: rgba(22, 38, 77, 0.24);
+}
+
+:root[data-tema="claro"] .btn-voltar-pastas:hover,
+:root[data-tema="claro"] .btn-status-ws:hover,
+:root[data-tema="claro"] .btn-editar-ws:hover,
+:root[data-tema="claro"] .btn-ws-chip:hover,
+:root[data-tema="claro"] .btn-receita-suave:hover,
+:root[data-tema="claro"] .btn-cfg-suave:hover,
+:root[data-tema="claro"] .btn-fechar-dossie:hover,
+:root[data-tema="claro"] .btn-toque:hover,
+:root[data-tema="claro"] .controle-carreiras .btn-menos:hover,
+:root[data-tema="claro"] .btn-silenciar:hover,
+:root[data-tema="claro"] .btn-amostra-secundario:hover,
+:root[data-tema="claro"] .btn-link-banco-amostras:hover,
+:root[data-tema="claro"] .btn-adicionar-linha:hover,
+:root[data-tema="claro"] .btn-nav-fio:hover,
+:root[data-tema="claro"] .btn-copiar-lote:hover,
+:root[data-tema="claro"] .btn-qtd-card:hover,
+:root[data-tema="claro"] .btn-acao-card:hover,
+:root[data-tema="claro"] .btn-toggle-uso:hover,
+:root[data-tema="claro"] .btn-toggle-uso-compacto:hover,
+:root[data-tema="claro"] .btn-add-ponto-lista:hover {
+  background: #233b72;
+  color: #ffffff;
+  border-color: #233b72;
+}
+
+:root[data-tema="claro"] .btn-toggle-uso.em-uso,
+:root[data-tema="claro"] .btn-toggle-uso-compacto.em-uso {
+  background: #233b72;
+  border-color: #233b72;
+  color: #ffffff;
+}
+
+:root[data-tema="claro"] .btn-remover-linha:hover {
+  background: #c93326;
+  border-color: #c93326;
+  color: #ffffff;
+}
+
+:root[data-tema="claro"] .btn-limpar-filtros-banco:hover,
+:root[data-tema="claro"] .btn-limpar-filtros-proj:hover,
+:root[data-tema="claro"] .btn-limpar-filtros-bib:hover,
+:root[data-tema="claro"] .btn-limpar-filtros-fios:hover,
+:root[data-tema="claro"] .btn-cancelar-banco:hover,
+:root[data-tema="claro"] .btn-sec-banco:hover,
+:root[data-tema="claro"] .btn-cancelar-drawer-bib:hover,
+:root[data-tema="claro"] .btn-acao-secundaria:hover,
+:root[data-tema="claro"] .btn-precificacao-secundario:hover,
+:root[data-tema="claro"] .btn-cat-form:hover,
+:root[data-tema="claro"] .aba-config:hover {
+  background: #e9effa;
+  color: #16264d;
+}
+
+:root[data-tema="claro"] .chip-status-proj,
+:root[data-tema="claro"] .chip-filtro-banco,
+:root[data-tema="claro"] .chip-subfiltro,
+:root[data-tema="claro"] .ws-tab-contador,
+:root[data-tema="claro"] .ws-switch-mini,
+:root[data-tema="claro"] .alternador-visao,
+:root[data-tema="claro"] .segmented-cfg,
+:root[data-tema="claro"] .toggle-medida,
+:root[data-tema="claro"] .workspace-abas-mobile {
+  background: #ede5d4;
+  border-color: rgba(22, 38, 77, 0.18);
+  color: #1e315e;
+}
+
+:root[data-tema="claro"] .chip-status-proj:hover,
+:root[data-tema="claro"] .chip-filtro-banco:hover,
+:root[data-tema="claro"] .chip-subfiltro:hover {
+  background: #dfe7f7;
+  color: #16264d;
+}
+
+:root[data-tema="claro"] .chip-status-proj.ativo,
+:root[data-tema="claro"] .chip-filtro-banco.ativo,
+:root[data-tema="claro"] .chip-subfiltro.ativo,
+:root[data-tema="claro"] .ws-tab-contador.ativo,
+:root[data-tema="claro"] .btn-ws-switch.ativo,
+:root[data-tema="claro"] .btn-visao.ativo,
+:root[data-tema="claro"] .btn-seg-cfg.ativo,
+:root[data-tema="claro"] .ws-aba-mob.ativa,
+:root[data-tema="claro"] .btn-toggle-opcao.ativo,
+:root[data-tema="claro"] .aba-config.ativa,
+:root[data-tema="claro"] .btn-cat-form.ativo,
+:root[data-tema="claro"] .btn-tec-av.ativo {
+  background: #233b72;
+  border-color: #233b72;
+  color: #ffffff;
+}
+
+:root[data-tema="claro"] .chip-status-proj.ativo .badge-cont-chip {
+  background: rgba(255, 255, 255, 0.22);
+  color: #ffffff;
+}
+
+:root[data-tema="claro"] .aba-biblioteca {
+  color: rgba(22, 38, 77, 0.72);
+}
+
+:root[data-tema="claro"] .aba-biblioteca:hover {
+  background: #e9effa;
+  color: #16264d;
+}
+
+:root[data-tema="claro"] .aba-biblioteca.ativa {
+  color: #16264d;
+  background: rgba(35, 59, 114, 0.1);
+  border-bottom-color: #233b72;
+}
+
+:root[data-tema="claro"] .btn-modo-amostra {
+  color: #253a6e;
+}
+
+:root[data-tema="claro"] .btn-modo-amostra.ativo {
+  color: #ffffff;
+}
+
+:root[data-tema="claro"] .trilha-switch,
+:root[data-tema="claro"] .pilula-switch,
+:root[data-tema="claro"] .switch-visual-bib {
+  background: #cfc5b0;
+  border-color: rgba(22, 38, 77, 0.22);
+}
+
+:root[data-tema="claro"] .trilha-switch::before {
+  background: #ffffff;
+}
+
+:root[data-tema="claro"] .switch-cfg input:checked + .trilha-switch {
+  background: #233b72;
+  border-color: #233b72;
+}
+
+/* 8. Inputs, Selects, Textareas e Scrollbars no Tema Claro */
+:root[data-tema="claro"] input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+:root[data-tema="claro"] select,
+:root[data-tema="claro"] textarea {
+  background-color: #ffffff;
+  border-color: rgba(22, 38, 77, 0.24);
+  color: #16264d;
+}
+
+:root[data-tema="claro"] .input-pontos-carreira:hover,
+:root[data-tema="claro"] .input-meta:hover {
+  background-color: #faf6ed;
+}
+
+:root[data-tema="claro"] input::placeholder,
+:root[data-tema="claro"] textarea::placeholder {
+  color: rgba(22, 38, 77, 0.48);
+}
+
+:root[data-tema="claro"] input:focus,
+:root[data-tema="claro"] select:focus,
+:root[data-tema="claro"] textarea:focus,
+:root[data-tema="claro"] .input-pontos-carreira:focus,
+:root[data-tema="claro"] .input-meta:focus,
+:root[data-tema="claro"] .controle-carreiras .input-carreiras:focus {
+  background-color: #ffffff;
+  border-color: #2a56bd;
+  color: #16264d;
+}
+
+:root[data-tema="claro"] select option,
+:root[data-tema="claro"] select optgroup {
+  background-color: #ffffff;
+  color: #16264d;
+}
+
+:root[data-tema="claro"] .conteiner-amostra::-webkit-scrollbar-track,
+:root[data-tema="claro"] .lista-linhas::-webkit-scrollbar-track,
+:root[data-tema="claro"] .area-listagem-biblioteca::-webkit-scrollbar-track,
+:root[data-tema="claro"] .area-grade-fios::-webkit-scrollbar-track {
+  background: #e5dcc9;
+}
+
+:root[data-tema="claro"] .divisor-resultado-amostra,
+:root[data-tema="claro"] .divisor-card {
+  background: linear-gradient(90deg, transparent, rgba(22, 38, 77, 0.18), transparent);
+}
+
+:root[data-tema="claro"] .seta-linha {
+  background-color: rgba(22, 38, 77, 0.35);
+}
+
+/* 9. Números em Destaque, Links, Linhas Ativas e Cores Semânticas no Tema Claro */
+:root[data-tema="claro"] .ws-contador-numero,
+:root[data-tema="claro"] .det-banco-destaque-num,
+:root[data-tema="claro"] .destaque-num-banco,
+:root[data-tema="claro"] .valor-output,
+:root[data-tema="claro"] .ws-cronometro-visor {
+  color: #16264d;
+}
+
+:root[data-tema="claro"] .det-banco-destaque-num,
+:root[data-tema="claro"] .destaque-num-banco {
+  background: #e8eefb;
+  border-color: rgba(35, 59, 114, 0.28);
+}
+
+:root[data-tema="claro"] .linha-receita-item.atual {
+  background: #e4ecfc;
+  border-color: #233b72;
+  color: #16264d;
+}
+
+:root[data-tema="claro"] .regua-marcadora-receita {
+  background: rgba(35, 59, 114, 0.16);
+  border-color: #233b72;
+}
+
+:root[data-tema="claro"] .etiqueta-regua {
+  background: #233b72;
+  color: #ffffff;
+}
+
+:root[data-tema="claro"] .btn-ws-link,
+:root[data-tema="claro"] .btn-sugerir-etapas,
+:root[data-tema="claro"] .ws-contador-total-pts {
+  color: #1f4cb3;
+}
+
+:root[data-tema="claro"] .box-diagnostico-receita,
+:root[data-tema="claro"] .pill-status-tabela.status-em-uso {
+  background: #e4ecfc;
+  border-color: rgba(35, 59, 114, 0.28);
+  color: #1d4499;
+}
+
+:root[data-tema="claro"] .ws-badge-finalizado,
+:root[data-tema="claro"] .btn-retirar-ws.ativo,
+:root[data-tema="claro"] .btn-ws-play.rodando,
+:root[data-tema="claro"] .dossie-ativo-pill,
+:root[data-tema="claro"] .badge-origem-consumo,
+:root[data-tema="claro"] .info-tag.tag-estoque-ok {
+  background: rgba(15, 138, 80, 0.14);
+  border-color: #118a51;
+  color: #0b663b;
+}
+
+:root[data-tema="claro"] .btn-cfg-aviso,
+:root[data-tema="claro"] .chip-filtro-banco.chip-favoritos.ativo,
+:root[data-tema="claro"] .info-tag.tag-estoque-baixo {
+  background: rgba(196, 136, 0, 0.18);
+  border-color: #b87e00;
+  color: #7a5200;
+}
+
+:root[data-tema="claro"] .btn-cfg-perigo,
+:root[data-tema="claro"] .info-tag.tag-estoque-zerado,
+:root[data-tema="claro"] .pill-status-tabela.status-zerado {
+  background: rgba(184, 37, 26, 0.12);
+  border-color: rgba(184, 37, 26, 0.45);
+  color: #a61e12;
+}
+
+:root[data-tema="claro"] .btn-cfg-perigo:hover:not(:disabled) {
+  background: #c93326;
+  border-color: #c93326;
+  color: #ffffff;
+}
+
+:root[data-tema="claro"] .item-dropdown-pasta.perigo,
+:root[data-tema="claro"] .item-dropdown-banco.perigo,
+:root[data-tema="claro"] .btn-ws-rem-etapa:hover,
+:root[data-tema="claro"] .obrigatorio,
+:root[data-tema="claro"] .campo-obrigatorio {
+  color: #b8251a;
+}
+
+:root[data-tema="claro"] .item-dropdown-banco.perigo:hover,
+:root[data-tema="claro"] .item-dropdown-pasta.perigo:hover {
+  background: rgba(184, 37, 26, 0.12);
+  color: #a61e12;
+}
+
+:root[data-tema="claro"] .badge-imp-item {
+  background: #e8eefb;
+  color: #16264d;
+}
+
+:root[data-tema="claro"] .toast-projetos,
+:root[data-tema="claro"] .toast-configuracoes,
+:root[data-tema="claro"] .toast-amostra,
+:root[data-tema="claro"] .toast-banco-amostras {
+  background: #1b2e5a;
+  color: #fcf1d0;
+  border-color: rgba(252, 241, 208, 0.35);
+}

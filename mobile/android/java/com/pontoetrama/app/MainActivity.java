@@ -8,52 +8,62 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
+import android.view.WindowManager;
+import android.webkit.JavascriptInterface;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Toast;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.net.InetAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * Ponto & Trama — Aplicativo Android Nativo (100% offline).
- * Serve os arquivos embutidos de `assets/frontend/` em 127.0.0.1 para garantir
- * persistência estável de IndexedDB e localStorage sem depender de internet.
+ * Ponto & Trama — Aplicativo Android 100% Local e Offline.
+ *
+ * - ZERO permissão de internet (INTERNET não existe no AndroidManifest).
+ * - ZERO servidor HTTP externo ou socket TCP.
+ * - ZERO abertura de navegador / páginas web externas.
+ * - Todos os arquivos do app são lidos diretamente dos assets internos do APK
+ *   em memória via WebViewClient.shouldInterceptRequest no domínio virtual
+ *   local `appassets.androidplatform.net` (padrão oficial Android).
+ * - Persistência local permanente via IndexedDB + localStorage no armazenamento
+ *   privado do celular, além de exportação nativa de backup via SAF.
  */
 public class MainActivity extends Activity {
 
     private static final int REQ_FILE_CHOOSER = 1001;
-    private static final int PORTA_PREFERENCIAL = 18421;
+    private static final int REQ_SAVE_FILE = 1002;
+    private static final String HOST_LOCAL = "appassets.androidplatform.net";
+    private static final String URL_INICIAL = "https://" + HOST_LOCAL + "/index.html";
 
     private WebView webView;
-    private LocalAssetServer assetServer;
     private ValueCallback<Uri[]> filePathCallback;
+    private String conteudoPendenteSalvar;
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Cores nativas da barra de status e navegação combinando com o tema Ponto & Trama
         getWindow().setStatusBarColor(Color.parseColor("#010736"));
         getWindow().setNavigationBarColor(Color.parseColor("#010736"));
 
         webView = new WebView(this);
         webView.setBackgroundColor(Color.parseColor("#0d1c42"));
         webView.setOverScrollMode(View.OVER_SCROLL_NEVER);
+        webView.setVerticalScrollBarEnabled(false);
+        webView.setHorizontalScrollBarEnabled(false);
         setContentView(webView);
 
         WebSettings settings = webView.getSettings();
@@ -64,29 +74,68 @@ public class MainActivity extends Activity {
         settings.setAllowContentAccess(true);
         settings.setUseWideViewPort(true);
         settings.setLoadWithOverviewMode(true);
+        settings.setSupportZoom(false);
         settings.setBuiltInZoomControls(false);
         settings.setDisplayZoomControls(false);
+        settings.setMediaPlaybackRequiresUserGesture(false);
+
+        webView.addJavascriptInterface(new PonteAndroidNativa(), "PontoETramaAndroid");
+
+        final AssetManager assets = getAssets();
 
         webView.setWebViewClient(new WebViewClient() {
             @Override
-            public boolean shouldOverrideUrlLoading(WebView view, android.webkit.WebResourceRequest request) {
+            public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
                 Uri uri = request.getUrl();
-                if (uri != null && ("127.0.0.1".equals(uri.getHost()) || "localhost".equals(uri.getHost()))) {
+                if (uri == null || !HOST_LOCAL.equalsIgnoreCase(uri.getHost())) {
+                    // Bloqueia qualquer acesso externo — o app roda 100% local no celular
+                    return respostaVazia(403, "Offline");
+                }
+
+                String rawPath = uri.getPath();
+                if (rawPath == null || rawPath.isEmpty() || "/".equals(rawPath)) {
+                    rawPath = "/index.html";
+                }
+                String rel;
+                try {
+                    rel = URLDecoder.decode(rawPath, "UTF-8");
+                } catch (Exception e) {
+                    rel = rawPath;
+                }
+                while (rel.startsWith("/")) {
+                    rel = rel.substring(1);
+                }
+                if (rel.isEmpty()) {
+                    rel = "index.html";
+                }
+                if (rel.contains("..")) {
+                    return respostaVazia(403, "Forbidden");
+                }
+
+                try {
+                    InputStream is = assets.open("frontend/" + rel);
+                    String mime = detectarMime(rel);
+                    String encoding = isTexto(mime) ? "UTF-8" : null;
+                    Map<String, String> headers = new HashMap<>();
+                    headers.put("Cache-Control", "no-cache");
+                    return new WebResourceResponse(mime, encoding, 200, "OK", headers, is);
+                } catch (IOException e) {
+                    return respostaVazia(404, "Not Found");
+                }
+            }
+
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                Uri uri = request.getUrl();
+                // Permite navegação somente nos assets internos; nunca abre navegador/página web
+                if (uri != null && HOST_LOCAL.equalsIgnoreCase(uri.getHost())) {
                     return false;
                 }
-                // Links externos (ex: link de referência no Banco de Amostras) abrem no navegador do celular
-                if (uri != null && ("http".equalsIgnoreCase(uri.getScheme()) || "https".equalsIgnoreCase(uri.getScheme()))) {
-                    try {
-                        startActivity(new Intent(Intent.ACTION_VIEW, uri));
-                    } catch (Exception ignored) {
-                    }
-                    return true;
-                }
-                return false;
+                return true;
             }
         });
 
-        // Suporte nativo a upload de fotos (fios, agulhas, amostras) e backup JSON
+        // Suporte nativo a galeria/câmera (fotos de projetos, fios, agulhas, amostras) e importar backup JSON
         webView.setWebChromeClient(new WebChromeClient() {
             @Override
             public boolean onShowFileChooser(WebView view, ValueCallback<Uri[]> callback, FileChooserParams params) {
@@ -105,13 +154,53 @@ public class MainActivity extends Activity {
             }
         });
 
-        assetServer = new LocalAssetServer(getAssets(), PORTA_PREFERENCIAL);
-        int porta = assetServer.iniciar();
+        webView.loadUrl(URL_INICIAL);
+    }
 
-        if (porta > 0) {
-            webView.loadUrl("http://127.0.0.1:" + porta + "/index.html");
-        } else {
-            webView.loadUrl("file:///android_asset/frontend/index.html");
+    private class PonteAndroidNativa {
+        @JavascriptInterface
+        public boolean isNativo() {
+            return true;
+        }
+
+        @JavascriptInterface
+        public void atualizarTema(final String corHex) {
+            runOnUiThread(() -> {
+                try {
+                    int cor = Color.parseColor(corHex);
+                    getWindow().setStatusBarColor(cor);
+                    getWindow().setNavigationBarColor(cor);
+                } catch (Exception ignored) {
+                }
+            });
+        }
+
+        @JavascriptInterface
+        public void manterTelaAcesa(final boolean ativo) {
+            runOnUiThread(() -> {
+                if (ativo) {
+                    getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+                } else {
+                    getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+                }
+            });
+        }
+
+        @JavascriptInterface
+        public void salvarArquivo(final String nomeArquivo, final String conteudo) {
+            conteudoPendenteSalvar = conteudo;
+            runOnUiThread(() -> {
+                try {
+                    Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+                    intent.addCategory(Intent.CATEGORY_OPENABLE);
+                    intent.setType("application/json");
+                    intent.putExtra(Intent.EXTRA_TITLE, nomeArquivo != null ? nomeArquivo : "ponto-e-trama-backup.json");
+                    startActivityForResult(intent, REQ_SAVE_FILE);
+                } catch (Exception e) {
+                    conteudoPendenteSalvar = null;
+                    Toast.makeText(MainActivity.this, "Não foi possível abrir o seletor de arquivos.", Toast.LENGTH_SHORT).show();
+                }
+            });
         }
     }
 
@@ -125,16 +214,32 @@ public class MainActivity extends Activity {
             }
             return;
         }
+        if (requestCode == REQ_SAVE_FILE) {
+            if (resultCode == RESULT_OK && data != null && data.getData() != null && conteudoPendenteSalvar != null) {
+                try (OutputStream os = getContentResolver().openOutputStream(data.getData())) {
+                    if (os != null) {
+                        os.write(conteudoPendenteSalvar.getBytes(StandardCharsets.UTF_8));
+                        os.flush();
+                        Toast.makeText(this, "Backup salvo no celular!", Toast.LENGTH_SHORT).show();
+                    }
+                } catch (Exception e) {
+                    Toast.makeText(this, "Erro ao salvar arquivo.", Toast.LENGTH_SHORT).show();
+                }
+            }
+            conteudoPendenteSalvar = null;
+            return;
+        }
         super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
     public void onBackPressed() {
-        // Primeiro tenta fechar modais/drawers abertos via ESC ou voltar para Home
         if (webView != null) {
             webView.evaluateJavascript(
                 "(function(){" +
-                "  var abertos = document.querySelectorAll('.drawer-overlay-bib.aberto, .modal-overlay-fio[style*=\"flex\"], .modal-overlay-bib[style*=\"flex\"], .modal-overlay-amostra[style*=\"flex\"], .modal-overlay-banco[style*=\"flex\"]');" +
+                "  var chk = document.getElementById('opcao-menu');" +
+                "  if (window.innerWidth <= 768 && chk && !chk.checked) { chk.checked = true; return 'menu'; }" +
+                "  var abertos = document.querySelectorAll('.overlay-pasta-aberta.aberto, .drawer-overlay-proj.aberto, .drawer-overlay-bib.aberto, .drawer-overlay-estoque.aberto, .modal-overlay-cfg[style*=\"flex\"], .modal-overlay-proj[style*=\"flex\"], .modal-overlay-fio[style*=\"flex\"], .modal-overlay-bib[style*=\"flex\"], .modal-overlay-amostra[style*=\"flex\"], .modal-overlay-banco[style*=\"flex\"]');" +
                 "  if (abertos.length > 0) { document.dispatchEvent(new KeyboardEvent('keydown', {key:'Escape'})); return 'closed'; }" +
                 "  var home = document.getElementById('secao-home');" +
                 "  if (home && home.style.display === 'none') {" +
@@ -156,159 +261,37 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onDestroy() {
-        if (assetServer != null) {
-            assetServer.parar();
-        }
         if (webView != null) {
             webView.destroy();
         }
         super.onDestroy();
     }
 
-    /**
-     * Mini servidor HTTP loopback local (127.0.0.1) que serve `assets/frontend/`
-     * em porta fixa para manter o IndexedDB/localStorage persistente no Android.
-     */
-    private static class LocalAssetServer {
-        private final AssetManager assets;
-        private final int portaPreferencial;
-        private ServerSocket serverSocket;
-        private ExecutorService pool;
-        private volatile boolean rodando = false;
+    private static WebResourceResponse respostaVazia(int status, String reason) {
+        return new WebResourceResponse(
+            "text/plain",
+            "UTF-8",
+            status,
+            reason,
+            null,
+            new ByteArrayInputStream(new byte[0])
+        );
+    }
 
-        LocalAssetServer(AssetManager assets, int portaPreferencial) {
-            this.assets = assets;
-            this.portaPreferencial = portaPreferencial;
-        }
+    private static boolean isTexto(String mime) {
+        return mime.startsWith("text/") || mime.contains("javascript") || mime.contains("json") || mime.contains("svg");
+    }
 
-        int iniciar() {
-            InetAddress loopback = InetAddress.getLoopbackAddress();
-            for (int p = portaPreferencial; p < portaPreferencial + 10; p++) {
-                try {
-                    serverSocket = new ServerSocket(p, 16, loopback);
-                    break;
-                } catch (IOException ignored) {
-                }
-            }
-            if (serverSocket == null) {
-                try {
-                    serverSocket = new ServerSocket(0, 16, loopback);
-                } catch (IOException e) {
-                    return -1;
-                }
-            }
-
-            rodando = true;
-            pool = Executors.newFixedThreadPool(4);
-            Thread acceptThread = new Thread(() -> {
-                while (rodando) {
-                    try {
-                        Socket client = serverSocket.accept();
-                        pool.execute(() -> atenderCliente(client));
-                    } catch (IOException e) {
-                        if (!rodando) break;
-                    }
-                }
-            }, "PontoETrama-LocalAssets");
-            acceptThread.setDaemon(true);
-            acceptThread.start();
-            return serverSocket.getLocalPort();
-        }
-
-        void parar() {
-            rodando = false;
-            if (serverSocket != null) {
-                try {
-                    serverSocket.close();
-                } catch (IOException ignored) {
-                }
-            }
-            if (pool != null) {
-                pool.shutdownNow();
-            }
-        }
-
-        private void atenderCliente(Socket socket) {
-            try (Socket s = socket;
-                 BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream(), StandardCharsets.UTF_8));
-                 OutputStream out = s.getOutputStream()) {
-
-                String reqLine = in.readLine();
-                if (reqLine == null || reqLine.isEmpty()) return;
-
-                String[] partes = reqLine.split(" ");
-                if (partes.length < 2) return;
-
-                String rawPath = partes[1];
-                int qIdx = rawPath.indexOf('?');
-                if (qIdx >= 0) rawPath = rawPath.substring(0, qIdx);
-
-                String rel = URLDecoder.decode(rawPath, "UTF-8");
-                while (rel.startsWith("/")) rel = rel.substring(1);
-                if (rel.isEmpty()) rel = "index.html";
-                if (rel.contains("..")) {
-                    enviarErro(out, 403, "Forbidden");
-                    return;
-                }
-
-                byte[] conteudo = lerAsset("frontend/" + rel);
-                if (conteudo == null) {
-                    enviarErro(out, 404, "Not Found");
-                    return;
-                }
-
-                String mime = detectarMime(rel);
-                String headers =
-                    "HTTP/1.1 200 OK\r\n" +
-                    "Content-Type: " + mime + "\r\n" +
-                    "Content-Length: " + conteudo.length + "\r\n" +
-                    "Cache-Control: no-cache\r\n" +
-                    "Connection: close\r\n\r\n";
-
-                out.write(headers.getBytes(StandardCharsets.UTF_8));
-                out.write(conteudo);
-                out.flush();
-            } catch (Exception ignored) {
-            }
-        }
-
-        private byte[] lerAsset(String caminho) {
-            try (InputStream is = assets.open(caminho);
-                 ByteArrayOutputStream buf = new ByteArrayOutputStream()) {
-                byte[] chunk = new byte[8192];
-                int n;
-                while ((n = is.read(chunk)) != -1) {
-                    buf.write(chunk, 0, n);
-                }
-                return buf.toByteArray();
-            } catch (IOException e) {
-                return null;
-            }
-        }
-
-        private void enviarErro(OutputStream out, int code, String msg) throws IOException {
-            byte[] body = msg.getBytes(StandardCharsets.UTF_8);
-            String headers =
-                "HTTP/1.1 " + code + " " + msg + "\r\n" +
-                "Content-Type: text/plain; charset=utf-8\r\n" +
-                "Content-Length: " + body.length + "\r\n" +
-                "Connection: close\r\n\r\n";
-            out.write(headers.getBytes(StandardCharsets.UTF_8));
-            out.write(body);
-            out.flush();
-        }
-
-        private String detectarMime(String path) {
-            String p = path.toLowerCase();
-            if (p.endsWith(".html")) return "text/html; charset=utf-8";
-            if (p.endsWith(".css")) return "text/css; charset=utf-8";
-            if (p.endsWith(".js")) return "application/javascript; charset=utf-8";
-            if (p.endsWith(".json")) return "application/json; charset=utf-8";
-            if (p.endsWith(".png")) return "image/png";
-            if (p.endsWith(".jpg") || p.endsWith(".jpeg")) return "image/jpeg";
-            if (p.endsWith(".webp")) return "image/webp";
-            if (p.endsWith(".svg")) return "image/svg+xml";
-            return "application/octet-stream";
-        }
+    private static String detectarMime(String path) {
+        String p = path.toLowerCase();
+        if (p.endsWith(".html")) return "text/html";
+        if (p.endsWith(".css")) return "text/css";
+        if (p.endsWith(".js")) return "application/javascript";
+        if (p.endsWith(".json")) return "application/json";
+        if (p.endsWith(".png")) return "image/png";
+        if (p.endsWith(".jpg") || p.endsWith(".jpeg")) return "image/jpeg";
+        if (p.endsWith(".webp")) return "image/webp";
+        if (p.endsWith(".svg")) return "image/svg+xml";
+        return "application/octet-stream";
     }
 }

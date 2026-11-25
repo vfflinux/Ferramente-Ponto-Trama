@@ -172,11 +172,6 @@
   transition: opacity 0.15s ease, border-color 0.18s ease;
 }
 
-:root[data-tema="claro"] .bloco-config {
-  background: rgba(255, 255, 255, 0.65);
-  border-color: rgba(19, 34, 74, 0.14);
-}
-
 .bloco-perigo-cfg {
   border-color: rgba(231, 76, 60, 0.35);
 }
@@ -351,10 +346,6 @@
   gap: 3px;
 }
 
-:root[data-tema="claro"] .segmented-cfg {
-  background: rgba(19, 34, 74, 0.08);
-}
-
 .btn-seg-cfg {
   height: 32px;
   padding: 0 12px;
@@ -407,11 +398,6 @@
 .card-tema-cfg.ativo {
   border-color: #fcf1d0;
   box-shadow: 0 0 0 1px rgba(252, 241, 208, 0.4), var(--sombra-md);
-}
-
-:root[data-tema="claro"] .card-tema-cfg.ativo {
-  border-color: #22396f;
-  box-shadow: 0 0 0 2px rgba(34, 57, 111, 0.22);
 }
 
 .preview-tema-mini {
@@ -496,11 +482,6 @@
   font-weight: 800;
 }
 
-:root[data-tema="claro"] .btn-cfg-primario {
-  background: #22396f;
-  color: #fcf1d0;
-}
-
 .btn-cfg-suave {
   border: 1px solid var(--creme-opacidade-25);
   background: rgba(34, 57, 111, 0.36);
@@ -518,19 +499,10 @@
   color: #ffe382;
 }
 
-:root[data-tema="claro"] .btn-cfg-aviso {
-  color: #7c5800;
-  background: rgba(246, 201, 69, 0.25);
-}
-
 .btn-cfg-perigo {
   border: 1px solid rgba(231, 76, 60, 0.65);
   background: rgba(231, 76, 60, 0.2);
   color: #ff9c92;
-}
-
-:root[data-tema="claro"] .btn-cfg-perigo {
-  color: #a61e12;
 }
 
 .btn-cfg-perigo:hover:not(:disabled) {
@@ -602,10 +574,6 @@
   gap: 3px;
 }
 
-:root[data-tema="claro"] .diag-stat-pill {
-  background: rgba(255, 255, 255, 0.75);
-}
-
 .diag-stat-pill span {
   font-size: 11px;
   color: var(--creme-opacidade-70);
@@ -656,10 +624,6 @@
   border-radius: 8px;
   background: rgba(1, 7, 54, 0.4);
   font-size: 12.5px;
-}
-
-:root[data-tema="claro"] .item-atalho-cfg {
-  background: rgba(19, 34, 74, 0.06);
 }
 
 .item-atalho-cfg kbd {

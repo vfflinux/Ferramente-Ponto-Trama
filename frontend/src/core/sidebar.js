@@ -65,10 +65,35 @@ const BarraLateral = (() => {
   // PARTE 3: EVENTOS E INICIALIZAÇÃO
   // ==========================================================================
   function init() {
+    const chkMenu = document.getElementById("opcao-menu");
+    const isMobileViewport = () =>
+      (typeof window !== "undefined" && window.innerWidth <= 768) ||
+      Boolean(typeof window !== "undefined" && window.PontoETramaAndroid);
+
+    // No celular, inicia com a gaveta lateral fechada para a ferramenta ocupar 100% da tela
+    if (chkMenu && isMobileViewport()) {
+      chkMenu.checked = true;
+    }
+
     const botoesFerramenta = document.querySelectorAll(".barraLateral .botaoFerramenta");
     botoesFerramenta.forEach((botao) => {
-      botao.addEventListener("click", () => alternarFerramenta(botao));
+      botao.addEventListener("click", () => {
+        alternarFerramenta(botao);
+        if (chkMenu && window.innerWidth <= 768) {
+          chkMenu.checked = true;
+        }
+      });
     });
+
+    // Toque na área principal fecha a gaveta lateral aberta no celular
+    const mainEl = document.querySelector("main");
+    if (mainEl && chkMenu) {
+      mainEl.addEventListener("click", () => {
+        if (window.innerWidth <= 768 && !chkMenu.checked) {
+          chkMenu.checked = true;
+        }
+      });
+    }
   }
 
   return {

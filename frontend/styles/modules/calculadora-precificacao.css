@@ -220,7 +220,7 @@
 }
 
 .btn-estoque-precificacao.ativo .badge-status-estoque {
-  background: var(--cor-destaque);
+  background: var(--cor-texto-principal);
   color: var(--cor-fundo-profundo);
 }
 
@@ -394,8 +394,8 @@
 }
 
 .info-tag.tag-sobra {
-  color: var(--cor-destaque);
-  background: rgba(252, 241, 208, 0.12);
+  color: var(--cor-texto-principal);
+  background: rgba(252, 241, 208, 0.14);
   border: 1px solid rgba(252, 241, 208, 0.25);
   font-weight: 600;
   margin-left: auto;
@@ -1037,11 +1037,11 @@
 .card-fio-drawer-preco {
   font-size: 14px;
   font-weight: 700;
-  color: var(--cor-destaque);
+  color: var(--cor-texto-principal);
 }
 
 .btn-usar-fio-drawer {
-  background: var(--cor-destaque);
+  background: var(--cor-texto-principal);
   border: none;
   border-radius: var(--raio-borda-sm);
   padding: 6px 12px;
@@ -1056,7 +1056,8 @@
 }
 
 .btn-usar-fio-drawer:hover {
-  background: #ffffff;
+  background: var(--cor-destaque-hover);
+  color: var(--cor-branco);
   transform: scale(1.03);
 }
 
