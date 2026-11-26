@@ -151,8 +151,8 @@ const Configuracoes = (() => {
     aplicarNoDOM(null);
 
     const chkMenu = document.getElementById("opcao-menu");
-    if (chkMenu && prefs.sidebarInicial === "recolhido") {
-      chkMenu.checked = true;
+    if (chkMenu && window.innerWidth > 768) {
+      chkMenu.checked = prefs.sidebarInicial === "recolhido";
     }
   }
 
@@ -187,6 +187,9 @@ const Configuracoes = (() => {
       const AudioCtx = window.AudioContext || window.webkitAudioContext;
       if (!AudioCtx) return;
       const ctx = new AudioCtx();
+      if (ctx.state === "suspended" && typeof ctx.resume === "function") {
+        ctx.resume().catch(() => {});
+      }
       const agora = ctx.currentTime;
       const notas = [587.33, 880]; // Ré5 -> Lá5 (acorde agradável)
       notas.forEach((freq, i) => {
@@ -476,13 +479,13 @@ const Configuracoes = (() => {
       if (backupPendente.preferencias && typeof backupPendente.preferencias === "object") {
         prefs = { ...PADROES, ...backupPendente.preferencias };
         aplicarNoDOM(null);
-        salvarPrefsStorage(false);
+        salvarPrefsStorage(true);
         preencherFormularioComPrefs();
       }
       fecharModal("modal-cfg-importar");
       backupPendente = null;
       await atualizarDiagnosticoBanco();
-      recarregarModulosAposDados();
+      await recarregarModulosAposDados();
       const total = resumo.projetos + resumo.fios + resumo.itens_biblioteca + resumo.banco_amostras;
       mostrarToast(`✓ Backup restaurado (${total} registros importados)!`);
     } catch (err) {
@@ -491,17 +494,33 @@ const Configuracoes = (() => {
     }
   }
 
-  function recarregarModulosAposDados() {
+  async function recarregarModulosAposDados() {
+    const tarefas = [];
     if (typeof GerenciadorProjetos !== "undefined" && typeof GerenciadorProjetos.recarregar === "function") {
-      GerenciadorProjetos.recarregar();
+      tarefas.push(Promise.resolve(GerenciadorProjetos.recarregar()).catch(() => {}));
     }
-    window.dispatchEvent(new CustomEvent("ponto-trama:biblioteca-atualizada"));
-    window.dispatchEvent(new CustomEvent("ponto-trama:banco-amostras-atualizado"));
+    if (typeof InventarioFios !== "undefined" && typeof InventarioFios.recarregar === "function") {
+      tarefas.push(Promise.resolve(InventarioFios.recarregar()).catch(() => {}));
+    }
+    if (typeof InventarioAgulhas !== "undefined" && typeof InventarioAgulhas.recarregar === "function") {
+      tarefas.push(Promise.resolve(InventarioAgulhas.recarregar()).catch(() => {}));
+    }
+    if (typeof BancoAmostras !== "undefined" && typeof BancoAmostras.recarregar === "function") {
+      tarefas.push(Promise.resolve(BancoAmostras.recarregar()).catch(() => {}));
+    }
+    await Promise.all(tarefas);
+    window.dispatchEvent(new CustomEvent("ponto-trama:fios-atualizados", { detail: { origem: "configuracoes" } }));
+    window.dispatchEvent(new CustomEvent("ponto-trama:biblioteca-atualizada", { detail: { origem: "configuracoes" } }));
+    window.dispatchEvent(new CustomEvent("ponto-trama:banco-amostras-atualizado", { detail: { origem: "configuracoes" } }));
   }
 
   function restaurarPadroesFabrica() {
     prefs = { ...PADROES };
     aplicarNoDOM(null);
+    if (window.innerWidth > 768) {
+      const chk = document.getElementById("opcao-menu");
+      if (chk) chk.checked = false;
+    }
     salvarPrefsStorage(true);
     preencherFormularioComPrefs();
     fecharModal("modal-cfg-padroes");
@@ -529,7 +548,7 @@ const Configuracoes = (() => {
 
     fecharModal("modal-cfg-limpar");
     await atualizarDiagnosticoBanco();
-    recarregarModulosAposDados();
+    await recarregarModulosAposDados();
     mostrarToast("🗑️ Dados selecionados removidos com sucesso.");
   }
 
@@ -601,7 +620,7 @@ const Configuracoes = (() => {
         btn.addEventListener("click", () => {
           document.querySelectorAll(`#${containerId} .btn-seg-cfg`).forEach((b) => b.classList.toggle("ativo", b === btn));
           atualizar(chave, btn.dataset.valor);
-          if (chave === "sidebarInicial") {
+          if (chave === "sidebarInicial" && window.innerWidth > 768) {
             const chk = document.getElementById("opcao-menu");
             if (chk) chk.checked = btn.dataset.valor === "recolhido";
           }
@@ -694,6 +713,13 @@ const Configuracoes = (() => {
         fecharModal("modal-cfg-importar");
         fecharModal("modal-cfg-padroes");
         fecharModal("modal-cfg-limpar");
+      }
+    });
+
+    // Reativa Wake Lock automaticamente ao voltar para a aba/app
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible" && prefs.manterTelaAcesa) {
+        gerenciarWakeLock(true);
       }
     });
 

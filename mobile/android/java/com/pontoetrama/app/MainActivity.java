@@ -5,9 +5,14 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.res.AssetManager;
 import android.graphics.Color;
+import android.graphics.Insets;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowInsets;
+import android.view.WindowInsetsController;
 import android.view.WindowManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.ValueCallback;
@@ -17,6 +22,7 @@ import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import java.io.ByteArrayInputStream;
@@ -34,11 +40,8 @@ import java.util.Map;
  * - ZERO permissão de internet (INTERNET não existe no AndroidManifest).
  * - ZERO servidor HTTP externo ou socket TCP.
  * - ZERO abertura de navegador / páginas web externas.
- * - Todos os arquivos do app são lidos diretamente dos assets internos do APK
- *   em memória via WebViewClient.shouldInterceptRequest no domínio virtual
- *   local `appassets.androidplatform.net` (padrão oficial Android).
- * - Persistência local permanente via IndexedDB + localStorage no armazenamento
- *   privado do celular, além de exportação nativa de backup via SAF.
+ * - Tratamento nativo de WindowInsets (Android 15 Edge-to-Edge, barras do sistema,
+ *   câmera/notch e teclado virtual) para nunca sobrepor relógio ou botões do celular.
  */
 public class MainActivity extends Activity {
 
@@ -47,24 +50,62 @@ public class MainActivity extends Activity {
     private static final String HOST_LOCAL = "appassets.androidplatform.net";
     private static final String URL_INICIAL = "https://" + HOST_LOCAL + "/index.html";
 
+    private FrameLayout rootContainer;
     private WebView webView;
     private ValueCallback<Uri[]> filePathCallback;
     private String conteudoPendenteSalvar;
 
     @SuppressLint("SetJavaScriptEnabled")
+    @SuppressWarnings("deprecation")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        getWindow().setStatusBarColor(Color.parseColor("#010736"));
-        getWindow().setNavigationBarColor(Color.parseColor("#010736"));
+        final int corInicial = Color.parseColor("#010736");
+        aplicarCorBarrasSistema(corInicial);
+
+        // Container raiz com padding nativo de WindowInsets (impede sobreposição com relógio e barra inferior no Android 15+)
+        rootContainer = new FrameLayout(this);
+        rootContainer.setBackgroundColor(corInicial);
+        rootContainer.setLayoutParams(new ViewGroup.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT
+        ));
 
         webView = new WebView(this);
         webView.setBackgroundColor(Color.parseColor("#0d1c42"));
         webView.setOverScrollMode(View.OVER_SCROLL_NEVER);
         webView.setVerticalScrollBarEnabled(false);
         webView.setHorizontalScrollBarEnabled(false);
-        setContentView(webView);
+        rootContainer.addView(webView, new FrameLayout.LayoutParams(
+            FrameLayout.LayoutParams.MATCH_PARENT,
+            FrameLayout.LayoutParams.MATCH_PARENT
+        ));
+
+        rootContainer.setOnApplyWindowInsetsListener((view, insets) -> {
+            int left, top, right, bottom;
+            if (Build.VERSION.SDK_INT >= 30) {
+                Insets bars = insets.getInsets(
+                    WindowInsets.Type.systemBars()
+                    | WindowInsets.Type.displayCutout()
+                    | WindowInsets.Type.ime()
+                );
+                left = bars.left;
+                top = bars.top;
+                right = bars.right;
+                bottom = bars.bottom;
+            } else {
+                left = insets.getSystemWindowInsetLeft();
+                top = insets.getSystemWindowInsetTop();
+                right = insets.getSystemWindowInsetRight();
+                bottom = insets.getSystemWindowInsetBottom();
+            }
+            view.setPadding(left, top, right, bottom);
+            return Build.VERSION.SDK_INT >= 30 ? WindowInsets.CONSUMED : insets.consumeSystemWindowInsets();
+        });
+
+        setContentView(rootContainer);
+        rootContainer.requestApplyInsets();
 
         WebSettings settings = webView.getSettings();
         settings.setJavaScriptEnabled(true);
@@ -90,7 +131,6 @@ public class MainActivity extends Activity {
             public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
                 Uri uri = request.getUrl();
                 if (uri == null || !HOST_LOCAL.equalsIgnoreCase(uri.getHost())) {
-                    // Bloqueia qualquer acesso externo — o app roda 100% local no celular
                     return respostaVazia(403, "Offline");
                 }
 
@@ -129,7 +169,6 @@ public class MainActivity extends Activity {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 Uri uri = request.getUrl();
-                // Permite navegação somente nos assets internos; nunca abre navegador/página web
                 if (uri != null && HOST_LOCAL.equalsIgnoreCase(uri.getHost())) {
                     return false;
                 }
@@ -137,7 +176,6 @@ public class MainActivity extends Activity {
             }
         });
 
-        // Suporte nativo a galeria/câmera (fotos de projetos, fios, agulhas, amostras) e importar backup JSON
         webView.setWebChromeClient(new WebChromeClient() {
             @Override
             public boolean onShowFileChooser(WebView view, ValueCallback<Uri[]> callback, FileChooserParams params) {
@@ -159,6 +197,29 @@ public class MainActivity extends Activity {
         webView.loadUrl(URL_INICIAL);
     }
 
+    @SuppressWarnings("deprecation")
+    private void aplicarCorBarrasSistema(int cor) {
+        try {
+            getWindow().setStatusBarColor(cor);
+            getWindow().setNavigationBarColor(cor);
+            if (rootContainer != null) {
+                rootContainer.setBackgroundColor(cor);
+            }
+            if (Build.VERSION.SDK_INT >= 30) {
+                WindowInsetsController ctrl = getWindow().getInsetsController();
+                if (ctrl != null) {
+                    // Ícones brancos nítidos sobre a barra escura da marca em todos os temas
+                    ctrl.setSystemBarsAppearance(
+                        0,
+                        WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
+                        | WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS
+                    );
+                }
+            }
+        } catch (Exception ignored) {
+        }
+    }
+
     private class PonteAndroidNativa {
         @JavascriptInterface
         public boolean isNativo() {
@@ -169,9 +230,7 @@ public class MainActivity extends Activity {
         public void atualizarTema(final String corHex) {
             runOnUiThread(() -> {
                 try {
-                    int cor = Color.parseColor(corHex);
-                    getWindow().setStatusBarColor(cor);
-                    getWindow().setNavigationBarColor(cor);
+                    aplicarCorBarrasSistema(Color.parseColor(corHex));
                 } catch (Exception ignored) {
                 }
             });
@@ -234,6 +293,7 @@ public class MainActivity extends Activity {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void onBackPressed() {
         if (webView != null) {

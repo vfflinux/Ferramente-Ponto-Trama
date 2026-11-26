@@ -868,9 +868,9 @@ const BancoAmostras = (() => {
       if (e.target.id === "modal-excluir-banco-amostra") fecharModalExclusao();
     });
 
-    // Atualiza a galeria instantaneamente quando a Calculadora de Amostra cadastrar um novo modelo
+    // Atualiza a galeria instantaneamente quando a Calculadora de Amostra ou Configurações alterar o banco
     window.addEventListener("ponto-trama:banco-amostras-atualizado", async (e) => {
-      if (e.detail?.origem === "calculadora") {
+      if (e.detail?.origem === "calculadora" || e.detail?.origem === "configuracoes") {
         amostrasCache = await dbObterStore(STORE_AMOSTRAS);
         aplicarFiltros();
       }
@@ -910,8 +910,18 @@ const BancoAmostras = (() => {
     notificarAtualizacao();
   }
 
+  async function recarregar() {
+    try {
+      amostrasCache = await dbObterStore(STORE_AMOSTRAS);
+      aplicarFiltros();
+    } catch (erro) {
+      console.error("Falha ao recarregar Banco de Amostras:", erro);
+    }
+  }
+
   return {
     init,
+    recarregar,
     obterTodas: () => amostrasCache.map((a) => ({ ...a })),
     abrirModalNovaAmostra: () => abrirModalForm(null)
   };

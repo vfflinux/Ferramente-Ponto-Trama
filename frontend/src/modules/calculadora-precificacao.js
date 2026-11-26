@@ -1283,9 +1283,13 @@ const CalculadoraPrecificacao = (() => {
 
     const inpValHora = document.getElementById("input-valor-hora");
     const valHoraPadrao = Configuracoes.obter("valorHoraPadrao");
-    if (inpValHora && valHoraPadrao !== "" && Number(valHoraPadrao) >= 0) {
-      if (!sobrescreverSeVazio || !inpValHora.value) {
-        inpValHora.value = Number(valHoraPadrao) > 0 ? Number(valHoraPadrao).toFixed(2) : "";
+    if (inpValHora) {
+      if (valHoraPadrao !== "" && Number(valHoraPadrao) >= 0) {
+        if (!sobrescreverSeVazio || !inpValHora.value) {
+          inpValHora.value = Number(valHoraPadrao) > 0 ? Number(valHoraPadrao).toFixed(2) : "";
+        }
+      } else if (!sobrescreverSeVazio) {
+        inpValHora.value = "";
       }
     }
 
@@ -1328,6 +1332,15 @@ const CalculadoraPrecificacao = (() => {
     window.addEventListener("ponto-trama:configuracoes-atualizadas", () => {
       aplicarConfiguracoesNaPrecificacao(false);
       calcularPrecificacao(false);
+    });
+
+    window.addEventListener("ponto-trama:fios-atualizados", async () => {
+      await obterFiosDoInventario();
+      atualizarDatalistFios();
+    });
+
+    window.addEventListener("ponto-trama:biblioteca-atualizada", async () => {
+      await obterAviamentosDoInventario();
     });
 
     const projAtivo = typeof ProjetoContexto !== "undefined" ? ProjetoContexto.obterProjetoAtivo() : null;

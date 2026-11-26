@@ -360,6 +360,7 @@
   transition: border-color var(--transicao-padrao), box-shadow var(--transicao-padrao), background-color var(--transicao-padrao);
   box-sizing: border-box;
   -moz-appearance: textfield;
+  appearance: textfield;
 }
 
 .controle-carreiras .input-carreiras::-webkit-outer-spin-button,

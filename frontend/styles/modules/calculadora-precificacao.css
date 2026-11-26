@@ -295,7 +295,7 @@
 }
 
 /* Distribuição Proporcional das Larguras (Modo Padrão) */
-.campo-nome-linha {
+.item-linha-campos .campo-nome-linha {
   display: none;
   flex: 34;
   min-width: 0;
@@ -659,6 +659,14 @@
   .conteiner-precificacao {
     grid-template-columns: 1fr;
     padding: 14px 14px 28px 14px;
+  }
+
+  .bloco-linhas,
+  .lista-linhas {
+    flex: none;
+    min-height: auto;
+    max-height: none;
+    overflow: visible;
   }
 
   .coluna-outputs-precificacao {

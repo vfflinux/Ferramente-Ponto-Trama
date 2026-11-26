@@ -53,6 +53,17 @@ const BarraLateral = (() => {
         detail: { ferramenta }
       })
     );
+
+    // Sincroniza destaque da barra inferior mobile
+    const btnsMob = document.querySelectorAll("#nav-mobile-inferior .nav-mob-btn[data-mob-ferramenta]");
+    let achouNaBarra = false;
+    btnsMob.forEach((bm) => {
+      const ativo = bm.dataset.mobFerramenta === ferramenta;
+      bm.classList.toggle("ativo", ativo);
+      if (ativo) achouNaBarra = true;
+    });
+    const btnMais = document.getElementById("btn-nav-mob-mais");
+    if (btnMais) btnMais.classList.toggle("ativo", !achouNaBarra);
   }
 
   // ==========================================================================
@@ -84,6 +95,26 @@ const BarraLateral = (() => {
         }
       });
     });
+
+    // Barra inferior nativa mobile (navegação rápida por polegar)
+    document.querySelectorAll("#nav-mobile-inferior .nav-mob-btn[data-mob-ferramenta]").forEach((btnMob) => {
+      btnMob.addEventListener("click", () => {
+        const alvo = btnMob.dataset.mobFerramenta;
+        const btnSide = document.querySelector(`.barraLateral .botaoFerramenta[data-ferramenta="${alvo}"]`);
+        if (btnSide) alternarFerramenta(btnSide);
+        if (chkMenu && window.innerWidth <= 768) {
+          chkMenu.checked = true;
+        }
+      });
+    });
+
+    const btnMobMais = document.getElementById("btn-nav-mob-mais");
+    if (btnMobMais && chkMenu) {
+      btnMobMais.addEventListener("click", (e) => {
+        e.stopPropagation();
+        chkMenu.checked = !chkMenu.checked;
+      });
+    }
 
     // Toque na área principal fecha a gaveta lateral aberta no celular
     const mainEl = document.querySelector("main");

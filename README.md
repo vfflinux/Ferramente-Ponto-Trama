@@ -8,8 +8,8 @@ Aplicação multiplataforma **100% offline** para organização de artesanato em
 
 | Plataforma | Arquivo | Tamanho | Onde baixar | Como instalar |
 | :--- | :--- | :---: | :--- | :--- |
-| **Android (Celular)** | `ponto-e-trama.apk` | `220 KB` | [Baixar APK (`mobile/ponto-e-trama.apk`)](https://github.com/vfflinux/Ferramente-Ponto-Trama/raw/main/mobile/ponto-e-trama.apk) | Copie o `.apk` para o celular (Android 7.0+), toque no arquivo e autorize a instalação. |
-| **Linux / Ubuntu (Instalador `.deb`)** | `ponto-e-trama_1.0.0_all.deb` | `136 KB` | [Baixar `.deb` (`dist/ponto-e-trama_1.0.0_all.deb`)](https://github.com/vfflinux/Ferramente-Ponto-Trama/raw/main/dist/ponto-e-trama_1.0.0_all.deb) | Clique duas vezes no `.deb` (abre a Central de Aplicativos do Ubuntu) ou rode `sudo apt install ./dist/ponto-e-trama_1.0.0_all.deb`. |
+| **Android (Celular)** | `ponto-e-trama.apk` | `553 KB` | [Baixar APK (`mobile/ponto-e-trama.apk`)](https://github.com/vfflinux/Ferramente-Ponto-Trama/raw/main/mobile/ponto-e-trama.apk) | Copie o `.apk` para o celular (Android 7.0+), toque no arquivo e autorize a instalação. Roda **100% local** (zero permissão de internet). |
+| **Linux / Ubuntu (Instalador `.deb`)** | `ponto-e-trama_1.0.0_all.deb` | `139 KB` | [Baixar `.deb` (`dist/ponto-e-trama_1.0.0_all.deb`)](https://github.com/vfflinux/Ferramente-Ponto-Trama/raw/main/dist/ponto-e-trama_1.0.0_all.deb) | Clique duas vezes no `.deb` (abre a Central de Aplicativos do Ubuntu) ou rode `sudo apt install ./dist/ponto-e-trama_1.0.0_all.deb`. |
 | **Linux / Ubuntu (Direto da pasta)** | `PontoETrama` + Instalador GTK | — | `dist/Ponto & Trama.desktop` e `dist/Instalar Ponto & Trama.desktop` | Clique com o botão direito → *Permitir iniciar* e dê duplo clique em `Ponto & Trama.desktop` ou no instalador gráfico `Instalar Ponto & Trama.desktop`. |
 | **Web (Navegador)** | `frontend/index.html` | — | Pasta [`frontend/`](frontend/index.html) | Abra `frontend/index.html` diretamente no navegador ou hospede a pasta `frontend/` (não precisa de servidor SQL). |
 
@@ -59,19 +59,29 @@ Aplicação multiplataforma **100% offline** para organização de artesanato em
 ### 9. Banco de Amostras
 - Galeria de modelos de pontos com busca em tempo real, chips de filtro, favoritos com efeito *pop*, duplicação, detalhes e botão **`Usar na Calculadora`** que preenche automaticamente a Calculadora de Amostra.
 
-### 10. Configurações
+### 10. Configurações e Temas Harmonizados
 - **Ateliê e Perfil**: nome do ateliê, assinatura para orçamentos e **Técnica Principal** (`Crochê`, `Tricô` ou `Ambos`) refletida em projetos, amostras, agulhas e placeholders.
-- **Aparência e Leitura**: 3 temas visuais (*Azul Marinho Clássico*, *Noite Profunda* e *Ateliê Claro*), 3 tamanhos de fonte (*Compacto*, *Padrão*, *Grande*), toggle *Reduzir Animações* e estado inicial da barra lateral.
-- **Padrões das Ferramentas**: alerta sonoro offline (com botão *Testar som*), alerta visual, vibração, *Manter tela acesa* (Wake Lock), atalhos de teclado, valor/hora, margem, moeda, unidade padrão (`cm`/`pol`), vínculo automático de projetos e confetes.
+- **Aparência e Leitura (`frontend/styles/base/temas.css`)**: 3 temas visuais totalmente harmonizados com alto contraste AA/AAA (*Azul Marinho Clássico*, *Noite Profunda* em obsidiana + marfim suave e *Ateliê Claro* em pergaminho + marfim + azul-tinta, eliminando qualquer botão escuro com texto escuro), 3 tamanhos de fonte (*Compacto*, *Padrão*, *Grande*), toggle *Reduzir Animações* e estado inicial da barra lateral.
+- **Padrões das Ferramentas**: alerta sonoro offline (com botão *Testar som*), alerta visual, vibração, *Manter tela acesa* (Wake Lock / nativo no Android), atalhos de teclado, valor/hora, margem, moeda, unidade padrão (`cm`/`pol`), vínculo automático de projetos e confetes.
 - **Dados, Backup Unificado e Zona de Perigo**: diagnóstico em tempo real (SQLite vs. IndexedDB, contagem de registros e tamanho), **Exportar/Importar Backup Completo (`.json`)** com opção de *Mesclar* ou *Substituir Tudo* entre PC, Web e Android, restauração de padrões e limpeza seletiva com confirmação dupla.
 
-### 11. Banco de Dados, Otimizações e Multiplataforma
+### 11. App Android 100% Local e Layout Mobile Remodelado
+- **Execução 100% local no celular (`mobile/android/`)**:
+  - **Zero permissão de internet** (`android.permission.INTERNET` removida do `AndroidManifest.xml`), sem servidor HTTP local e sem abrir páginas web externas.
+  - Todos os arquivos embutidos no APK são carregados diretamente em memória via `WebViewClient.shouldInterceptRequest` (padrão oficial Android `appassets.androidplatform.net`), mantendo **IndexedDB** e **localStorage** persistentes no aparelho.
+  - **Ponte nativa Android (`PontoETramaAndroid`)**: sincroniza a cor da barra de status/navegação com o tema escolhido, mantém a tela acesa nativamente (`FLAG_KEEP_SCREEN_ON`) e salva backups `.json` diretamente pelo seletor de arquivos do celular (`ACTION_CREATE_DOCUMENT`).
+  - **Ícone adaptativo com fundo escuro**: ícones Android (Android 7 a 15, padrão, redondo e adaptativo `mipmap-anydpi-v26`) com fundo gradiente azul-marinho escuro destacando a logo oficial sem alterar a logo transparente usada no Web e no App Ubuntu.
+- **Layout mobile remodelado (`frontend/styles/base/mobile.css`)**:
+  - Remodelagem completa para telas de celular (`≤ 768px` e `≤ 400px`) em **todas as 10 ferramentas**, com viewport real 1:1 no Android (`setLoadWithOverviewMode(false)` + `setTextZoom(100)`).
+  - Gaveta lateral deslizante com fundo escurecido, cabeçalho flexível sem sobreposição, scroll vertical único por ferramenta, faixas de filtros/chips deslizáveis na horizontal, grades em 1 coluna, linhas da Calculadora de Precificação em mini-cards 2 colunas e modais/drawers em largura total.
+
+### 12. Banco de Dados, Otimizações e Multiplataforma
 - **Persistência dual com auto-reparo**:
   - **App Desktop Ubuntu**: banco relacional **SQL (SQLite)** local (`backend/database/ponto_e_trama.db` / [`schema.sql`](backend/database/schema.sql)) servido pelo backend Python (`backend/server.py`, sem dependências externas) com conexão persistente por thread, cache estático em RAM, `ETag / 304` e compressão **`gzip`**.
   - **Versão Web e App Android**: **IndexedDB** (`v4`) com auto-upgrade e fallback automático em `localStorage`.
 - **Otimização de tamanho e resposta**:
   - Imagens otimizadas (`logo.png` reduzida de `312 KB` para `14 KB` e remoção de `3,1 MB` de imagens não utilizadas).
-  - Minificação automática no empacotamento via [`scripts/otimizar-build.py`](scripts/otimizar-build.py) e compressão `xz -z9` no `.deb`, reduzindo o instalador Ubuntu para **`136 KB`** (`-96%`) e o APK Android para **`220 KB`** (`-65%`).
+  - Minificação automática no empacotamento via [`scripts/otimizar-build.py`](scripts/otimizar-build.py) e compressão `xz -z9` no `.deb` (`139 KB`) e assinatura final no APK Android (`553 KB` já com o conjunto completo de ícones adaptativos em alta definição).
   - Remoção de `backdrop-filter: blur()` pesados, `content-visibility: auto`, scroll fluido em todas as telas e inicialização/sincronização sob demanda (*lazy init* + *lazy sync*).
 
 ---
@@ -94,18 +104,21 @@ Ponto&Trama/
 │   ├── instalador-gui.py                    # Instalador gráfico GTK para Ubuntu
 │   └── build-deb.sh                         # Gera o pacote dist/ponto-e-trama_1.0.0_all.deb
 ├── dist/
-│   ├── ponto-e-trama_1.0.0_all.deb          # Instalador oficial Ubuntu (.deb - 136 KB)
+│   ├── ponto-e-trama_1.0.0_all.deb          # Instalador oficial Ubuntu (.deb - 139 KB)
 │   ├── Ponto & Trama.desktop                # Lançador clicável do app
 │   └── Instalar Ponto & Trama.desktop       # Lançador clicável do instalador gráfico
 ├── mobile/
-│   ├── ponto-e-trama.apk                    # Aplicativo instalável Android (.apk - 220 KB)
+│   ├── ponto-e-trama.apk                    # Aplicativo Android 100% local (.apk - 553 KB)
 │   ├── build-apk.sh                         # Recompila, otimiza e assina o APK
 │   ├── README.md
-│   └── android/                             # Código-fonte Android (MainActivity.java, Manifest, ícones)
+│   └── android/                             # Código-fonte Android (MainActivity.java, Manifest sem INTERNET, ícones adaptativos escuros)
 └── frontend/
     ├── index.html                           # SPA compartilhada entre Web, Ubuntu e Android
     ├── assets/images/                       # Logo oficial otimizada
-    ├── styles/{base,layout,modules}/        # CSS modularizado
+    ├── styles/
+    │   ├── base/                            # global.css, mobile.css (layout celular), temas.css (3 temas)
+    │   ├── layout/                          # barra-lateral.css
+    │   └── modules/                         # CSS modularizado das 10 ferramentas
     └── src/{core,modules}/                  # JS modularizado (database, projeto-contexto, módulos)
 ```
 

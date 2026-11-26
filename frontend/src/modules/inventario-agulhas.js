@@ -130,6 +130,9 @@ const InventarioAgulhas = (() => {
   }
 
   function formatarMoeda(valor) {
+    if (typeof Configuracoes !== "undefined" && typeof Configuracoes.formatarMoeda === "function") {
+      return Configuracoes.formatarMoeda(valor);
+    }
     const n = Number(valor) || 0;
     return n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
   }
@@ -1407,6 +1410,16 @@ const InventarioAgulhas = (() => {
     });
   }
 
+  async function recarregar() {
+    try {
+      await carregarDadosIniciais();
+      aplicarFiltros(true);
+      notificarBibliotecaAtualizada();
+    } catch (erro) {
+      console.error("Falha ao recarregar Agulhas e Acessórios:", erro);
+    }
+  }
+
   async function init() {
     vincularEventos();
     try {
@@ -1425,6 +1438,9 @@ const InventarioAgulhas = (() => {
 
       aplicarFiltros(true);
       notificarBibliotecaAtualizada();
+      window.addEventListener("ponto-trama:configuracoes-atualizadas", () => {
+        aplicarFiltros(false);
+      });
     } catch (erro) {
       console.error("Falha ao inicializar Agulhas e Acessórios:", erro);
     }
@@ -1433,6 +1449,7 @@ const InventarioAgulhas = (() => {
   // API pública (inclui métodos para Gerenciador de Projetos e Calculadora de Precificação)
   return {
     init,
+    recarregar,
     abrirDrawer,
     fecharDrawer,
     obterTodosItens,

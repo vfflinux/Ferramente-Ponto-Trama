@@ -4381,6 +4381,47 @@
           <div class="toast-configuracoes" id="toast-configuracoes" role="status" aria-live="polite"></div>
         </div>
       </div>
+
+      <!-- BARRA INFERIOR NATIVA MOBILE (EXIBIDA SOMENTE EM TELAS <= 768px) -->
+      <nav id="nav-mobile-inferior" class="nav-mobile-inferior" aria-label="Navegação rápida mobile">
+        <button type="button" class="nav-mob-btn ativo" data-mob-ferramenta="home">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M3 10.5 12 3l9 7.5"></path>
+            <path d="M5 9.5V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9.5"></path>
+          </svg>
+          <span>Início</span>
+        </button>
+        <button type="button" class="nav-mob-btn" data-mob-ferramenta="projetos">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z"></path>
+          </svg>
+          <span>Projetos</span>
+        </button>
+        <button type="button" class="nav-mob-btn" data-mob-ferramenta="contador-carreiras">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="4" y="3" width="16" height="18" rx="4"></rect>
+            <rect x="7" y="7" width="10" height="5" rx="1"></rect>
+            <line x1="12" y1="15" x2="12" y2="19"></line>
+            <line x1="10" y1="17" x2="14" y2="17"></line>
+          </svg>
+          <span>Contador</span>
+        </button>
+        <button type="button" class="nav-mob-btn" data-mob-ferramenta="precificacao">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="12" y1="2" x2="12" y2="22"></line>
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+          </svg>
+          <span>Preço</span>
+        </button>
+        <button type="button" class="nav-mob-btn" id="btn-nav-mob-mais" data-mob-acao="menu">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="4" y1="6" x2="20" y2="6"></line>
+            <line x1="4" y1="12" x2="20" y2="12"></line>
+            <line x1="4" y1="18" x2="20" y2="18"></line>
+          </svg>
+          <span>Mais</span>
+        </button>
+      </nav>
     </main>
   </body>
 </html>

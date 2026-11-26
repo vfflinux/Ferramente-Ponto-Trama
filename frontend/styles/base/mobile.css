@@ -1,18 +1,28 @@
 /* ==========================================================================
-   PONTO & TRAMA — REMODELAGEM COMPLETA DO LAYOUT MOBILE (CELULAR ≤ 768px)
-   Carregado após todos os módulos e antes de temas.css.
-   Garante zero sobreposição de elementos, zero estouro horizontal e uso
-   confortável com uma mão em todas as 10 ferramentas no celular.
+   PONTO & TRAMA — FRONTEND MOBILE DEDICADO (CELULAR ≤ 768px)
+   Arquitetura nativa para celular:
+     - Top App Bar limpa com gaveta lateral deslizante + backdrop
+     - Bottom Navigation Bar para navegação com uma mão
+     - ZERO flex:1 vertical colapsando containers (zero elemento por cima de elemento!)
+     - Scroll vertical único e fluido por ferramenta
+     - 100% compatível com Android 15 WindowInsets (sem sobrepor barras do sistema)
    ========================================================================== */
+
+/* Oculto no Desktop/Ubuntu */
+.nav-mobile-inferior {
+  display: none;
+}
 
 @media (max-width: 768px) {
   /* ========================================================================
-     0. BASE MOBILE, VIEWPORT E GAVETA LATERAL DESLIZANTE
+     0. BASE MOBILE, GAVETA LATERAL E BARRA DE NAVEGAÇÃO INFERIOR
      ======================================================================== */
   html,
   body {
     width: 100%;
     height: 100%;
+    margin: 0;
+    padding: 0;
     overflow: hidden;
     overscroll-behavior: none;
     -webkit-tap-highlight-color: transparent;
@@ -21,7 +31,8 @@
 
   button,
   .barraLateral,
-  .cabecalho {
+  .cabecalho,
+  .nav-mobile-inferior {
     user-select: none;
     -webkit-user-select: none;
     -webkit-touch-callout: none;
@@ -32,48 +43,52 @@
     height: 100%;
     min-width: 0;
     min-height: 0;
+    display: flex;
+    flex-direction: column;
     overflow: hidden;
     position: relative;
   }
 
-  /* Fundo escurecido suave quando a gaveta lateral está aberta no celular */
+  /* Backdrop escuro ao abrir a gaveta lateral */
   #opcao-menu:not(:checked) ~ main::after {
     content: "";
     position: fixed;
     inset: 0;
-    background: rgba(1, 5, 22, 0.52);
+    background: rgba(1, 5, 22, 0.56);
     z-index: 88;
     pointer-events: auto;
   }
 
+  /* Gaveta lateral de todas as 10 ferramentas */
   .barraLateral {
     position: fixed;
     left: 0;
     top: 0;
     bottom: 0;
-    width: 268px;
+    width: 272px;
     max-width: 82vw;
     z-index: 95;
     transform: translateX(0);
-    box-shadow: 8px 0 30px rgba(0, 0, 0, 0.6);
-    transition: transform 0.26s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 8px 0 32px rgba(0, 0, 0, 0.65);
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
+  /* Botão ☰ encaixado com precisão no topo esquerdo da App Bar */
   .barraLateral .icon {
     position: absolute;
     right: -52px;
     left: auto;
     top: 10px;
-    width: 42px;
-    height: 42px;
+    width: 40px;
+    height: 40px;
     border-radius: 10px;
-    border: 1px solid rgba(252, 241, 208, 0.2);
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(252, 241, 208, 0.22);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     z-index: 96;
   }
 
   #opcao-menu:checked ~ .barraLateral {
-    width: 268px;
+    width: 272px;
     max-width: 82vw;
     transform: translateX(-100%);
     box-shadow: none;
@@ -97,24 +112,69 @@
   }
 
   .listaNavegacao {
-    gap: 8px;
+    gap: 6px;
     padding: 12px 10px 24px 10px;
   }
 
   .botaoFerramenta {
-    min-height: 42px;
+    min-height: 44px;
     font-size: 14px;
   }
 
+  /* Barra inferior nativa estilo Android (sempre visível, sem cobrir conteúdo!) */
+  .nav-mobile-inferior {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    align-items: center;
+    flex-shrink: 0;
+    width: 100%;
+    height: 58px;
+    background-color: var(--cor-fundo-profundo);
+    border-top: 1px solid rgba(252, 241, 208, 0.14);
+    padding: 4px 4px;
+    box-sizing: border-box;
+    z-index: 40;
+  }
+
+  .nav-mob-btn {
+    border: none;
+    background: transparent;
+    color: var(--creme-opacidade-65);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    height: 100%;
+    padding: 4px 2px;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 10.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.16s ease, color 0.16s ease;
+  }
+
+  .nav-mob-btn svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+  }
+
+  .nav-mob-btn.ativo {
+    color: var(--cor-branco);
+    background-color: rgba(44, 74, 145, 0.45);
+  }
+
   /* ========================================================================
-     1. CABEÇALHO GLOBAL SEM TRAVA DE 90px (ZERO SOBREPOSIÇÃO!)
+     1. TOP APP BAR LIMPA (SEM TRAVA DE 90px E SEM COLISÃO)
      ======================================================================== */
   .cabecalho {
     width: 100%;
     height: auto !important;
-    min-height: 62px !important;
+    min-height: 60px !important;
     max-height: none !important;
-    padding: 11px 14px 11px 62px !important;
+    padding: 10px 14px 10px 60px !important;
     box-sizing: border-box;
     flex-shrink: 0;
     align-items: center;
@@ -137,7 +197,7 @@
 
   .titulo-ferramenta {
     font-size: 17px;
-    line-height: 1.2;
+    line-height: 1.25;
     word-break: break-word;
   }
 
@@ -147,7 +207,6 @@
     word-break: break-word;
   }
 
-  /* Ações dentro do cabeçalho fluem limpas na segunda linha */
   .cabecalho-acoes,
   .cabecalho-acoes-projetos,
   .cabecalho-acoes-amostra,
@@ -195,9 +254,9 @@
     font-size: 12.5px;
   }
 
-  /* Barra global "Na bancada" compacta e sem colisão com o botão ☰ */
+  /* Barra global "Na bancada" sem colisão com o botão ☰ */
   .barra-projeto-ativo {
-    padding: 10px 12px 10px 62px;
+    padding: 10px 12px 10px 60px;
     gap: 8px;
     flex-direction: column;
     align-items: stretch;
@@ -229,11 +288,11 @@
   }
 
   /* ========================================================================
-     2. ARQUITETURA DE SCROLL ÚNICO POR FERRAMENTA (ZERO CONTEINER ESMAGADO)
+     2. SCROLL VERTICAL ÚNICO & BLINDAGEM CONTRA COLAPSO DE FLEX:1
      ======================================================================== */
   .secao-ferramenta,
   #secao-contador-carreiras {
-    flex: 1;
+    flex: 1 1 0%;
     min-height: 0;
     min-width: 0;
     width: 100%;
@@ -250,17 +309,18 @@
   .conteiner-precificacao,
   .conteiner-amostra,
   .conteiner-configuracoes {
-    flex: 1;
+    flex: 1 1 0%;
     min-height: 0;
     width: 100%;
     overflow-y: auto !important;
     overflow-x: hidden !important;
     -webkit-overflow-scrolling: touch;
     box-sizing: border-box;
-    padding: 12px 12px 28px 12px !important;
+    padding: 14px 12px 28px 12px !important;
   }
 
-  /* Desativa travas internas de scroll que esmagavam cards no celular */
+  /* CRÍTICO: Remove flex:1 / min-height:0 / overflow:hidden de TODOS os blocos internos
+     para que nenhum container colapse a 0px nem vaze em cima do vizinho! */
   .projetos-visao-dashboard,
   .area-grade-projetos,
   .area-grade-fios,
@@ -270,11 +330,26 @@
   .nav-configuracoes,
   .layout-configuracoes,
   .painel-receita-texto,
-  .painel-receita-arquivo {
-    overflow: visible !important;
-    height: auto !important;
-    max-height: none !important;
+  .painel-receita-arquivo,
+  .coluna-inputs-precificacao,
+  .coluna-outputs-precificacao,
+  .bloco-precificacao,
+  .bloco-linhas,
+  .lista-linhas,
+  .coluna-editor-receita,
+  .coluna-leitor-linhas,
+  .textarea-receita-global,
+  .area-viewer-receita,
+  .pasta-corpo,
+  .pasta-info,
+  .card-fio-corpo,
+  .card-bib-corpo,
+  .card-banco-corpo {
     flex: none !important;
+    height: auto !important;
+    min-height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
   }
 
   /* ========================================================================
@@ -293,6 +368,7 @@
   .btn-home-secundario {
     height: 54px;
     font-size: 15.5px;
+    border-radius: 14px;
   }
 
   /* ========================================================================
@@ -301,7 +377,7 @@
   .banner-alarme {
     position: relative !important;
     padding: 10px 12px;
-    border-radius: 10px;
+    border-radius: 12px;
     margin-bottom: 12px;
   }
 
@@ -329,6 +405,7 @@
     max-width: 440px !important;
     padding: 16px 14px !important;
     gap: 14px;
+    border-radius: 18px;
   }
 
   .controle-carreiras {
@@ -365,8 +442,8 @@
 
   .coluna-editor-receita,
   .coluna-leitor-linhas {
-    padding: 12px;
-    min-height: auto;
+    padding: 14px 12px;
+    border-radius: 14px;
   }
 
   .topo-card-receita {
@@ -385,18 +462,20 @@
   .controles-linha-receita .btn-receita-primario {
     width: 100%;
     justify-content: center;
-    height: 38px;
+    height: 40px;
     font-size: 12.5px;
   }
 
   .textarea-receita-global {
-    min-height: 170px;
+    min-height: 170px !important;
     font-size: 14px;
+    overflow-y: auto !important;
   }
 
   .lista-linhas-interativas {
-    max-height: 50vh;
-    overflow-y: auto;
+    flex: none !important;
+    max-height: 48vh !important;
+    overflow-y: auto !important;
   }
 
   .barra-arquivo-receita {
@@ -417,50 +496,59 @@
   }
 
   .area-viewer-receita {
-    min-height: 55vh;
+    min-height: 52vh !important;
+    overflow: auto !important;
   }
 
   .pdf-receita-viewer {
-    height: 60vh;
+    height: 56vh;
   }
 
   /* ========================================================================
-     6. CALCULADORA DE PRECIFICAÇÃO (LINHAS EM GRID LIMPO 2 COLUNAS!)
+     6. CALCULADORA DE PRECIFICAÇÃO (BLOCO A / B / C / RESULTADO LIMPOS)
      ======================================================================== */
   .conteiner-precificacao {
     display: flex !important;
     flex-direction: column;
     gap: 14px;
+    align-items: stretch;
   }
 
   .coluna-inputs-precificacao,
   .coluna-outputs-precificacao {
     width: 100%;
     position: static !important;
-    gap: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
   }
 
   .bloco-precificacao {
-    padding: 12px;
+    width: 100%;
+    padding: 14px 12px;
+    gap: 10px;
+    border-radius: 14px;
+    box-sizing: border-box;
   }
 
   .cabecalho-bloco {
     flex-wrap: wrap;
     gap: 8px;
+    margin-bottom: 4px;
   }
 
   .lista-linhas {
-    max-height: none !important;
-    overflow: visible !important;
+    width: 100%;
     padding-right: 0;
     gap: 10px;
   }
 
   .item-linha {
+    width: 100%;
     padding: 10px;
-    border-radius: 10px;
+    border-radius: 12px;
     background: rgba(1, 7, 54, 0.28);
-    border: 1px solid rgba(252, 241, 208, 0.1);
+    border: 1px solid rgba(252, 241, 208, 0.12);
     box-sizing: border-box;
   }
 
@@ -469,19 +557,24 @@
     border-color: rgba(22, 38, 77, 0.14);
   }
 
-  /* Em vez de espremer 5 inputs na mesma linha, usa grid 2 colunas super limpo */
   .item-linha-campos {
     display: grid !important;
     grid-template-columns: 1fr 1fr;
-    gap: 8px;
+    gap: 10px 8px;
     align-items: end;
+    width: 100%;
   }
 
-  .campo-nome-linha,
-  .conteiner-precificacao.modo-estoque-ativo .campo-nome-linha {
+  .item-linha-campos .campo-nome-linha {
+    display: none;
     grid-column: 1 / -1;
     width: 100%;
-    flex: none;
+  }
+
+  .conteiner-precificacao.modo-estoque-ativo .item-linha-campos .campo-nome-linha {
+    display: flex;
+    grid-column: 1 / -1;
+    width: 100%;
   }
 
   .campo-valor-linha,
@@ -509,7 +602,7 @@
 
   .btn-remover-linha {
     width: 100%;
-    height: 35px;
+    height: 36px;
     border-radius: 8px;
   }
 
@@ -524,8 +617,11 @@
   }
 
   .card-resultado-precificacao {
+    width: 100%;
     padding: 16px 14px;
     gap: 14px;
+    border-radius: 16px;
+    box-sizing: border-box;
   }
 
   .valor-output {
@@ -540,6 +636,7 @@
   .acoes-precificacao button {
     width: 100%;
     justify-content: center;
+    min-height: 42px;
   }
 
   .drawer-consulta-estoque {
@@ -548,11 +645,12 @@
   }
 
   /* ========================================================================
-     7. GERENCIADOR DE PROJETOS (DASHBOARD, DOSSIÊ, WORKSPACE E DRAWER)
+     7. GERENCIADOR DE PROJETOS
      ======================================================================== */
   .barra-controle-projetos {
     padding: 10px;
     gap: 8px;
+    border-radius: 14px;
   }
 
   .linha-topo-filtros-proj {
@@ -583,7 +681,6 @@
     grid-column: 1 / -1;
   }
 
-  /* Chips em faixa única deslizável na horizontal */
   .chips-status-projetos {
     flex-wrap: nowrap !important;
     overflow-x: auto;
@@ -619,7 +716,6 @@
     gap: 8px;
   }
 
-  /* Dossiê da pasta aberta */
   .overlay-pasta-aberta {
     padding: 8px;
   }
@@ -627,11 +723,11 @@
   .palco-pasta-aberta {
     width: 100%;
     max-width: 100%;
-    max-height: 94dvh;
+    max-height: 92dvh;
   }
 
   .telinha-dossie-pasta {
-    max-height: calc(94dvh - 18px);
+    max-height: calc(92dvh - 18px);
     padding: 12px;
   }
 
@@ -666,10 +762,10 @@
     justify-content: center;
   }
 
-  /* Workspace do projeto */
   .projetos-visao-workspace {
-    overflow-y: auto !important;
-    gap: 10px;
+    flex: none !important;
+    overflow: visible !important;
+    gap: 12px;
   }
 
   .workspace-topo {
@@ -710,10 +806,7 @@
 
   .ws-card {
     padding: 12px;
-  }
-
-  .ws-contador-controles {
-    gap: 10px;
+    border-radius: 14px;
   }
 
   .ws-contador-numero {
@@ -919,7 +1012,7 @@
     grid-column: 1 / -1;
     width: 100%;
     justify-content: center;
-    height: 40px;
+    height: 42px;
   }
 
   .area-listagem-biblioteca {
@@ -993,6 +1086,7 @@
   .card-amostra,
   .card-resultado-amostra {
     padding: 14px 12px;
+    border-radius: 14px;
   }
 
   .select-ponto-flex {
@@ -1013,6 +1107,7 @@
   .acoes-resultado-amostra button {
     width: 100%;
     justify-content: center;
+    min-height: 42px;
   }
 
   .modal-overlay-amostra {
@@ -1031,6 +1126,7 @@
   .barra-controle-banco {
     padding: 10px;
     gap: 8px;
+    border-radius: 14px;
   }
 
   .linha-busca-banco {
@@ -1117,6 +1213,7 @@
 
   .bloco-config {
     padding: 14px 12px;
+    border-radius: 14px;
     content-visibility: visible;
   }
 
@@ -1167,20 +1264,19 @@
     max-height: 92dvh !important;
   }
 
-  /* Toasts centralizados na base no celular */
+  /* Toasts posicionados acima da barra inferior mobile */
   .toast-projetos,
   .toast-configuracoes,
   .toast-amostra,
   .toast-banco-amostras {
     left: 12px !important;
     right: 12px !important;
-    bottom: 14px !important;
+    bottom: 68px !important;
     text-align: center;
     max-width: none;
   }
 }
 
-/* Ajustes extras para celulares muito estreitos (≤ 400px) */
 @media (max-width: 400px) {
   .campos-amostra-grid,
   .resumo-densidade-amostra {

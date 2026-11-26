@@ -191,6 +191,9 @@ const InventarioFios = (() => {
 
   // Formatadores de valores
   function formatarMoeda(valor) {
+    if (typeof Configuracoes !== "undefined" && typeof Configuracoes.formatarMoeda === "function") {
+      return Configuracoes.formatarMoeda(valor);
+    }
     const v = Number(valor) || 0;
     return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
   }
@@ -833,7 +836,7 @@ const InventarioFios = (() => {
     if (elPrecoUn) elPrecoUn.textContent = precoUn > 0 ? formatarMoeda(precoUn) : "—";
 
     const valorTotalEstoque = precoUn > 0 && qtd > 0 ? precoUn * qtd : 0;
-    if (elPrecoTotal) elPrecoTotal.textContent = valorTotalEstoque > 0 ? formatarMoeda(valorTotalEstoque) : "R$ 0,00";
+    if (elPrecoTotal) elPrecoTotal.textContent = valorTotalEstoque > 0 ? formatarMoeda(valorTotalEstoque) : formatarMoeda(0);
 
     if (elObs) {
       if (fio.observacoes && fio.observacoes.trim()) {
@@ -1396,6 +1399,16 @@ const InventarioFios = (() => {
     });
   }
 
+  async function recarregar() {
+    try {
+      await carregarDadosIniciais();
+      aplicarFiltros(true);
+      atualizarResumoEstoque();
+    } catch (erro) {
+      console.error("Falha ao recarregar Inventário de Fios:", erro);
+    }
+  }
+
   // Inicialização do módulo
   async function init() {
     try {
@@ -1403,6 +1416,10 @@ const InventarioFios = (() => {
       await carregarDadosIniciais();
       aplicarFiltros(true);
       atualizarResumoEstoque();
+      window.addEventListener("ponto-trama:configuracoes-atualizadas", () => {
+        aplicarFiltros(false);
+        atualizarResumoEstoque();
+      });
     } catch (erro) {
       console.error("Falha ao inicializar o Inventário de Fios:", erro);
     }
@@ -1411,6 +1428,7 @@ const InventarioFios = (() => {
   // API pública do módulo
   return {
     init,
+    recarregar,
     alterarQuantidade,
     duplicarFio,
     excluirFio: solicitarExclusaoFio,

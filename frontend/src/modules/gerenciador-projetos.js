@@ -824,6 +824,9 @@ const GerenciadorProjetos = (() => {
 
     c.carreiras = Math.max(0, (parseInt(c.carreiras, 10) || 0) + delta);
     renderizarContadoresWorkspace(p);
+    if (typeof Configuracoes !== "undefined") {
+      Configuracoes.vibrar(delta > 0 ? 18 : 12);
+    }
 
     if (animar) {
       const numEl = document.getElementById("ws-contador-numero");
@@ -835,6 +838,10 @@ const GerenciadorProjetos = (() => {
     }
 
     if (c.meta > 0 && c.carreiras === c.meta) {
+      if (typeof Configuracoes !== "undefined") {
+        Configuracoes.tocarSomAlarme(false);
+        Configuracoes.vibrar([100, 60, 100]);
+      }
       mostrarToast(`🔔 Meta atingida em "${c.nome}": ${c.meta} carreiras!`);
     }
 
