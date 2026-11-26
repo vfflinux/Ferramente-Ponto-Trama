@@ -1,0 +1,1206 @@
+/* ==========================================================================
+   PONTO & TRAMA — REMODELAGEM COMPLETA DO LAYOUT MOBILE (CELULAR ≤ 768px)
+   Carregado após todos os módulos e antes de temas.css.
+   Garante zero sobreposição de elementos, zero estouro horizontal e uso
+   confortável com uma mão em todas as 10 ferramentas no celular.
+   ========================================================================== */
+
+@media (max-width: 768px) {
+  /* ========================================================================
+     0. BASE MOBILE, VIEWPORT E GAVETA LATERAL DESLIZANTE
+     ======================================================================== */
+  html,
+  body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    overscroll-behavior: none;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  button,
+  .barraLateral,
+  .cabecalho {
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+  }
+
+  main {
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* Fundo escurecido suave quando a gaveta lateral está aberta no celular */
+  #opcao-menu:not(:checked) ~ main::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: rgba(1, 5, 22, 0.52);
+    z-index: 88;
+    pointer-events: auto;
+  }
+
+  .barraLateral {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 268px;
+    max-width: 82vw;
+    z-index: 95;
+    transform: translateX(0);
+    box-shadow: 8px 0 30px rgba(0, 0, 0, 0.6);
+    transition: transform 0.26s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .barraLateral .icon {
+    position: absolute;
+    right: -52px;
+    left: auto;
+    top: 10px;
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    border: 1px solid rgba(252, 241, 208, 0.2);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35);
+    z-index: 96;
+  }
+
+  #opcao-menu:checked ~ .barraLateral {
+    width: 268px;
+    max-width: 82vw;
+    transform: translateX(-100%);
+    box-shadow: none;
+  }
+
+  #opcao-menu:checked ~ .barraLateral .botaoFerramenta {
+    justify-content: flex-start;
+    padding: 10px 12px;
+    gap: 12px;
+  }
+
+  #opcao-menu:checked ~ .barraLateral .botaoFerramenta span,
+  #opcao-menu:checked ~ .barraLateral .nomeLogo {
+    opacity: 1;
+    visibility: visible;
+    max-width: 210px;
+  }
+
+  #opcao-menu:checked ~ .barraLateral .logoArea {
+    gap: 12px;
+  }
+
+  .listaNavegacao {
+    gap: 8px;
+    padding: 12px 10px 24px 10px;
+  }
+
+  .botaoFerramenta {
+    min-height: 42px;
+    font-size: 14px;
+  }
+
+  /* ========================================================================
+     1. CABEÇALHO GLOBAL SEM TRAVA DE 90px (ZERO SOBREPOSIÇÃO!)
+     ======================================================================== */
+  .cabecalho {
+    width: 100%;
+    height: auto !important;
+    min-height: 62px !important;
+    max-height: none !important;
+    padding: 11px 14px 11px 62px !important;
+    box-sizing: border-box;
+    flex-shrink: 0;
+    align-items: center;
+  }
+
+  .cabecalho-conteudo {
+    width: 100%;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .cabecalho-info {
+    min-width: 0;
+    gap: 2px;
+  }
+
+  .titulo-ferramenta {
+    font-size: 17px;
+    line-height: 1.2;
+    word-break: break-word;
+  }
+
+  .subtitulo-ferramenta {
+    font-size: 11.5px;
+    line-height: 1.3;
+    word-break: break-word;
+  }
+
+  /* Ações dentro do cabeçalho fluem limpas na segunda linha */
+  .cabecalho-acoes,
+  .cabecalho-acoes-projetos,
+  .cabecalho-acoes-amostra,
+  .cabecalho-acoes-receitas,
+  .cabecalho-acoes-config {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    justify-content: flex-start;
+  }
+
+  .cabecalho .btn-adicionar-contador,
+  .cabecalho .btn-novo-projeto-primario,
+  .cabecalho .btn-nova-amostra-banco {
+    width: 100%;
+    justify-content: center;
+    height: 40px;
+    padding: 0 14px;
+    font-size: 13.5px;
+    box-sizing: border-box;
+  }
+
+  .cabecalho .btn-estoque-precificacao,
+  .cabecalho .btn-consultar-gaveta,
+  .cabecalho .btn-modo-avancado-amostra {
+    flex: 1 1 auto;
+    justify-content: center;
+    min-height: 36px;
+    padding: 6px 10px;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+
+  .cabecalho .switch-modo-receita {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .cabecalho .btn-modo-receita {
+    justify-content: center;
+    width: 100%;
+    font-size: 12.5px;
+  }
+
+  /* Barra global "Na bancada" compacta e sem colisão com o botão ☰ */
+  .barra-projeto-ativo {
+    padding: 10px 12px 10px 62px;
+    gap: 8px;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .barra-ativo-info {
+    width: 100%;
+    gap: 6px;
+    font-size: 12px;
+  }
+
+  .barra-ativo-nome {
+    max-width: 165px;
+  }
+
+  .barra-ativo-acoes {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+
+  .btn-barra-ativo {
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+    padding: 7px 8px;
+    font-size: 12px;
+  }
+
+  /* ========================================================================
+     2. ARQUITETURA DE SCROLL ÚNICO POR FERRAMENTA (ZERO CONTEINER ESMAGADO)
+     ======================================================================== */
+  .secao-ferramenta,
+  #secao-contador-carreiras {
+    flex: 1;
+    min-height: 0;
+    min-width: 0;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .conteiner-ferramenta,
+  .conteiner_contador,
+  .conteiner-projetos,
+  .conteiner-inventario-fios,
+  .conteiner-agulhas,
+  .conteiner-banco-amostras,
+  .conteiner-receitas,
+  .conteiner-precificacao,
+  .conteiner-amostra,
+  .conteiner-configuracoes {
+    flex: 1;
+    min-height: 0;
+    width: 100%;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch;
+    box-sizing: border-box;
+    padding: 12px 12px 28px 12px !important;
+  }
+
+  /* Desativa travas internas de scroll que esmagavam cards no celular */
+  .projetos-visao-dashboard,
+  .area-grade-projetos,
+  .area-grade-fios,
+  .area-listagem-biblioteca,
+  .area-galeria-banco,
+  .painel-configuracoes,
+  .nav-configuracoes,
+  .layout-configuracoes,
+  .painel-receita-texto,
+  .painel-receita-arquivo {
+    overflow: visible !important;
+    height: auto !important;
+    max-height: none !important;
+    flex: none !important;
+  }
+
+  /* ========================================================================
+     3. HOME (TELA INICIAL)
+     ======================================================================== */
+  .conteiner-home {
+    padding: 24px 16px;
+  }
+
+  .acoes-home {
+    max-width: 340px;
+    gap: 14px;
+  }
+
+  .btn-home-primario,
+  .btn-home-secundario {
+    height: 54px;
+    font-size: 15.5px;
+  }
+
+  /* ========================================================================
+     4. CONTADOR DE CARREIRAS
+     ======================================================================== */
+  .banner-alarme {
+    position: relative !important;
+    padding: 10px 12px;
+    border-radius: 10px;
+    margin-bottom: 12px;
+  }
+
+  .banner-alarme-conteudo {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    font-size: 13.5px;
+    text-align: center;
+  }
+
+  .area-contadores {
+    flex-direction: column !important;
+    align-items: center !important;
+    width: 100% !important;
+    min-height: auto !important;
+    padding: 4px 0 24px 0 !important;
+    gap: 16px !important;
+    margin: 0 !important;
+  }
+
+  .card-contador {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 440px !important;
+    padding: 16px 14px !important;
+    gap: 14px;
+  }
+
+  .controle-carreiras {
+    gap: 8px;
+  }
+
+  .controle-carreiras .input-carreiras {
+    height: 70px;
+    font-size: 40px;
+  }
+
+  .controle-carreiras .btn-toque {
+    height: 70px;
+  }
+
+  .controle-carreiras .btn-menos {
+    width: 60px;
+    font-size: 32px;
+  }
+
+  .controle-carreiras .btn-mais {
+    width: 68px;
+    font-size: 36px;
+  }
+
+  /* ========================================================================
+     5. RECEITAS E ANOTAÇÕES
+     ======================================================================== */
+  .painel-receita-texto {
+    display: flex !important;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .coluna-editor-receita,
+  .coluna-leitor-linhas {
+    padding: 12px;
+    min-height: auto;
+  }
+
+  .topo-card-receita {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .controles-linha-receita {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .controles-linha-receita .btn-receita-suave,
+  .controles-linha-receita .btn-receita-primario {
+    width: 100%;
+    justify-content: center;
+    height: 38px;
+    font-size: 12.5px;
+  }
+
+  .textarea-receita-global {
+    min-height: 170px;
+    font-size: 14px;
+  }
+
+  .lista-linhas-interativas {
+    max-height: 50vh;
+    overflow-y: auto;
+  }
+
+  .barra-arquivo-receita {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .barra-arquivo-receita > * {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .controle-regua-receita {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .area-viewer-receita {
+    min-height: 55vh;
+  }
+
+  .pdf-receita-viewer {
+    height: 60vh;
+  }
+
+  /* ========================================================================
+     6. CALCULADORA DE PRECIFICAÇÃO (LINHAS EM GRID LIMPO 2 COLUNAS!)
+     ======================================================================== */
+  .conteiner-precificacao {
+    display: flex !important;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .coluna-inputs-precificacao,
+  .coluna-outputs-precificacao {
+    width: 100%;
+    position: static !important;
+    gap: 12px;
+  }
+
+  .bloco-precificacao {
+    padding: 12px;
+  }
+
+  .cabecalho-bloco {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .lista-linhas {
+    max-height: none !important;
+    overflow: visible !important;
+    padding-right: 0;
+    gap: 10px;
+  }
+
+  .item-linha {
+    padding: 10px;
+    border-radius: 10px;
+    background: rgba(1, 7, 54, 0.28);
+    border: 1px solid rgba(252, 241, 208, 0.1);
+    box-sizing: border-box;
+  }
+
+  :root[data-tema="claro"] .item-linha {
+    background: #f2ebdc;
+    border-color: rgba(22, 38, 77, 0.14);
+  }
+
+  /* Em vez de espremer 5 inputs na mesma linha, usa grid 2 colunas super limpo */
+  .item-linha-campos {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    align-items: end;
+  }
+
+  .campo-nome-linha,
+  .conteiner-precificacao.modo-estoque-ativo .campo-nome-linha {
+    grid-column: 1 / -1;
+    width: 100%;
+    flex: none;
+  }
+
+  .campo-valor-linha,
+  .campo-qtd-linha,
+  .conteiner-precificacao.modo-estoque-ativo .campo-valor-linha,
+  .conteiner-precificacao.modo-estoque-ativo .campo-qtd-linha {
+    flex: none;
+    width: 100%;
+  }
+
+  .campo-medida-linha,
+  .conteiner-precificacao.modo-estoque-ativo .campo-medida-linha {
+    grid-column: 1 / 2;
+    flex: none;
+    width: 100%;
+  }
+
+  .campo-acao-linha,
+  .conteiner-precificacao.modo-estoque-ativo .campo-acao-linha {
+    grid-column: 2 / 3;
+    justify-content: flex-end;
+    align-items: flex-end;
+    height: 36px;
+  }
+
+  .btn-remover-linha {
+    width: 100%;
+    height: 35px;
+    border-radius: 8px;
+  }
+
+  .linha-campos-dupla {
+    grid-template-columns: 1fr !important;
+    gap: 10px;
+  }
+
+  .label-com-acao {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .card-resultado-precificacao {
+    padding: 16px 14px;
+    gap: 14px;
+  }
+
+  .valor-output {
+    font-size: 32px !important;
+  }
+
+  .acoes-precificacao {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .acoes-precificacao button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .drawer-consulta-estoque {
+    width: 100vw !important;
+    max-width: 100% !important;
+  }
+
+  /* ========================================================================
+     7. GERENCIADOR DE PROJETOS (DASHBOARD, DOSSIÊ, WORKSPACE E DRAWER)
+     ======================================================================== */
+  .barra-controle-projetos {
+    padding: 10px;
+    gap: 8px;
+  }
+
+  .linha-topo-filtros-proj {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .campo-busca-proj {
+    min-width: 0 !important;
+    width: 100%;
+  }
+
+  .seletores-filtro-proj {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .select-filtro-proj,
+  .btn-limpar-filtros-proj {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .btn-limpar-filtros-proj {
+    grid-column: 1 / -1;
+  }
+
+  /* Chips em faixa única deslizável na horizontal */
+  .chips-status-projetos {
+    flex-wrap: nowrap !important;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    gap: 6px;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .chips-status-projetos::-webkit-scrollbar {
+    display: none;
+  }
+
+  .chip-status-proj {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  .grade-projetos,
+  #opcao-menu:checked ~ main .grade-projetos {
+    grid-template-columns: 1fr !important;
+    gap: 16px;
+    padding-bottom: 24px;
+  }
+
+  .menu-status-ws {
+    left: 0;
+    right: auto;
+  }
+
+  .ws-card-topo {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  /* Dossiê da pasta aberta */
+  .overlay-pasta-aberta {
+    padding: 8px;
+  }
+
+  .palco-pasta-aberta {
+    width: 100%;
+    max-width: 100%;
+    max-height: 94dvh;
+  }
+
+  .telinha-dossie-pasta {
+    max-height: calc(94dvh - 18px);
+    padding: 12px;
+  }
+
+  .dossie-cabecalho {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .dossie-fichas-grid {
+    grid-template-columns: 1fr !important;
+    gap: 10px;
+  }
+
+  .dossie-rodape {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    padding: 10px;
+  }
+
+  .dossie-rodape-esq,
+  .dossie-rodape-dir {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .btn-dossie-retirar,
+  .btn-dossie-workspace {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Workspace do projeto */
+  .projetos-visao-workspace {
+    overflow-y: auto !important;
+    gap: 10px;
+  }
+
+  .workspace-topo {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .workspace-topo-esq,
+  .workspace-topo-dir {
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .workspace-nome {
+    font-size: 18px;
+  }
+
+  .workspace-abas-mobile {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
+    padding: 4px;
+    position: sticky;
+    top: 0;
+    z-index: 15;
+  }
+
+  .ws-aba-mob {
+    font-size: 11.5px;
+    padding: 8px 4px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .ws-card {
+    padding: 12px;
+  }
+
+  .ws-contador-controles {
+    gap: 10px;
+  }
+
+  .ws-contador-numero {
+    font-size: 46px !important;
+  }
+
+  .ws-mini-campos-row,
+  .ws-etapa-add-row,
+  .ws-atalhos-integrados,
+  .ws-add-fio-grid,
+  .linha-dupla-proj {
+    grid-template-columns: 1fr !important;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .drawer-form-proj {
+    width: 100vw !important;
+    max-width: 100% !important;
+  }
+
+  /* ========================================================================
+     8. INVENTÁRIO DE FIOS
+     ======================================================================== */
+  .barra-ferramentas-fios {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .resumo-estoque-fios {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    width: 100%;
+  }
+
+  .badge-resumo-fio {
+    padding: 8px 10px;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .badge-resumo-fio:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+
+  .acoes-topo-fios {
+    width: 100%;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 8px;
+  }
+
+  .menu-backup-popup {
+    left: 0;
+    right: auto;
+  }
+
+  .btn-novo-fio,
+  .btn-backup-fios {
+    justify-content: center;
+    height: 40px;
+  }
+
+  .barra-filtros-fios {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    padding: 10px;
+  }
+
+  .campo-busca-fios {
+    min-width: 0 !important;
+    width: 100%;
+  }
+
+  .filtros-seletores-fios {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .select-filtro-fio,
+  .btn-limpar-filtros-fios {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .btn-limpar-filtros-fios {
+    grid-column: 1 / -1;
+  }
+
+  .grade-cards-fios,
+  #opcao-menu:checked ~ main .grade-cards-fios {
+    grid-template-columns: 1fr !important;
+    gap: 12px;
+    padding-bottom: 24px;
+  }
+
+  .modal-overlay-fio {
+    padding: 8px;
+  }
+
+  .modal-conteudo-fio,
+  .modal-conteudo-detalhes,
+  .modal-conteudo-confirmar {
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: 92dvh !important;
+  }
+
+  .abas-modal-fio {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+  }
+
+  .detalhes-corpo {
+    grid-template-columns: 1fr !important;
+  }
+
+  .detalhes-cabecalho,
+  .detalhes-rodape {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .linha-dupla-form,
+  .linha-tripla-form {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* ========================================================================
+     9. AGULHAS & ACESSÓRIOS (BIBLIOTECA)
+     ======================================================================== */
+  .conteiner-agulhas {
+    padding: 0 0 28px 0 !important;
+  }
+
+  .barra-abas-biblioteca {
+    padding: 0 10px;
+  }
+
+  .aba-biblioteca {
+    padding: 11px 12px 9px 12px;
+    font-size: 13px;
+  }
+
+  .subfiltros-agulhas {
+    flex-wrap: nowrap !important;
+    overflow-x: auto;
+    padding: 8px 0 10px 0;
+    scrollbar-width: none;
+  }
+
+  .subfiltros-agulhas::-webkit-scrollbar {
+    display: none;
+  }
+
+  .chip-subfiltro {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  .toolbar-biblioteca {
+    padding: 10px 12px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .toolbar-esquerda {
+    min-width: 0 !important;
+    width: 100%;
+    gap: 8px;
+  }
+
+  .campo-busca-biblioteca {
+    min-width: 0 !important;
+    max-width: none !important;
+    flex: 1;
+  }
+
+  .texto-visao {
+    display: none;
+  }
+
+  .toolbar-direita {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .select-filtro-bib,
+  .btn-limpar-filtros-bib {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .btn-novo-item-bib {
+    grid-column: 1 / -1;
+    width: 100%;
+    justify-content: center;
+    height: 40px;
+  }
+
+  .area-listagem-biblioteca {
+    padding: 0 12px 24px 12px !important;
+  }
+
+  .grade-itens-biblioteca,
+  #opcao-menu:checked ~ main .grade-itens-biblioteca {
+    grid-template-columns: 1fr !important;
+    gap: 12px;
+  }
+
+  .card-bib-acoes-hover {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+  }
+
+  .seletor-categoria-bib .btn-cat-form {
+    font-size: 11.5px;
+    padding: 8px 4px;
+  }
+
+  .tabela-wrapper-biblioteca {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .drawer-painel-bib {
+    width: 100vw !important;
+    max-width: 100% !important;
+  }
+
+  .grid-duplo-bib,
+  .grid-triplo-bib {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* ========================================================================
+     10. CALCULADORA DE AMOSTRA
+     ======================================================================== */
+  .barra-modo-amostra {
+    gap: 8px;
+  }
+
+  .seletor-modo-amostra {
+    width: 100%;
+    max-width: none;
+  }
+
+  .btn-modo-amostra {
+    font-size: 11.5px;
+    padding: 8px 6px;
+    gap: 4px;
+  }
+
+  .grid-principal-amostra,
+  .conteudo-card-amostra-com-preview,
+  .grid-consumo-fio,
+  .grid-duplo-modal-salvar,
+  .grid-novo-ponto {
+    grid-template-columns: 1fr !important;
+    gap: 12px;
+  }
+
+  .campos-amostra-grid,
+  .resumo-densidade-amostra {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .card-amostra,
+  .card-resultado-amostra {
+    padding: 14px 12px;
+  }
+
+  .select-ponto-flex {
+    min-width: 0 !important;
+    width: 100%;
+  }
+
+  .linha-ponto-avancado {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .acoes-resultado-amostra {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .acoes-resultado-amostra button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .modal-overlay-amostra {
+    padding: 8px;
+  }
+
+  .modal-box-amostra {
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: 92dvh !important;
+  }
+
+  /* ========================================================================
+     11. BANCO DE AMOSTRAS
+     ======================================================================== */
+  .barra-controle-banco {
+    padding: 10px;
+    gap: 8px;
+  }
+
+  .linha-busca-banco {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .campo-busca-banco {
+    min-width: 0 !important;
+    width: 100%;
+  }
+
+  .chips-filtro-banco {
+    flex-wrap: nowrap !important;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    gap: 6px;
+    scrollbar-width: none;
+  }
+
+  .chips-filtro-banco::-webkit-scrollbar {
+    display: none;
+  }
+
+  .chip-filtro-banco {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  .grade-banco-amostras,
+  #opcao-menu:checked ~ main .grade-banco-amostras {
+    grid-template-columns: 1fr !important;
+    gap: 12px;
+    padding-bottom: 24px;
+  }
+
+  .modal-overlay-banco {
+    padding: 8px;
+  }
+
+  .modal-conteudo-banco,
+  .modal-confirmar-banco {
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: 92dvh !important;
+  }
+
+  .grid-form-banco-2,
+  .det-banco-grid-info {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* ========================================================================
+     12. CONFIGURAÇÕES
+     ======================================================================== */
+  .layout-configuracoes {
+    display: flex !important;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .lista-abas-config {
+    flex-direction: row !important;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 6px;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+  }
+
+  .lista-abas-config::-webkit-scrollbar {
+    display: none;
+  }
+
+  .aba-config {
+    flex-shrink: 0;
+    white-space: nowrap;
+    width: auto;
+    padding: 8px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--creme-opacidade-20);
+  }
+
+  .bloco-config {
+    padding: 14px 12px;
+    content-visibility: visible;
+  }
+
+  .linha-config {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .controle-linha-config,
+  .controle-linha-config.largo {
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+
+  .segmented-cfg {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .btn-seg-cfg {
+    flex: 1 1 auto;
+    text-align: center;
+    justify-content: center;
+    padding: 0 8px;
+    font-size: 12px;
+  }
+
+  .grade-temas-cfg,
+  .sobre-grid-cfg,
+  .grade-atalhos-cfg {
+    grid-template-columns: 1fr !important;
+  }
+
+  .diag-badges-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .modal-overlay-cfg {
+    padding: 8px;
+  }
+
+  .modal-box-cfg {
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: 92dvh !important;
+  }
+
+  /* Toasts centralizados na base no celular */
+  .toast-projetos,
+  .toast-configuracoes,
+  .toast-amostra,
+  .toast-banco-amostras {
+    left: 12px !important;
+    right: 12px !important;
+    bottom: 14px !important;
+    text-align: center;
+    max-width: none;
+  }
+}
+
+/* Ajustes extras para celulares muito estreitos (≤ 400px) */
+@media (max-width: 400px) {
+  .campos-amostra-grid,
+  .resumo-densidade-amostra {
+    grid-template-columns: 1fr !important;
+  }
+
+  .controle-carreiras .input-carreiras {
+    height: 62px;
+    font-size: 34px;
+  }
+
+  .controle-carreiras .btn-toque {
+    height: 62px;
+  }
+
+  .controle-carreiras .btn-menos {
+    width: 52px;
+  }
+
+  .controle-carreiras .btn-mais {
+    width: 58px;
+  }
+}
