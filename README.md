@@ -33,6 +33,7 @@ Aplicação multiplataforma **100% offline e local** para organização de artes
 - **Workspace do Projeto (2 Colunas no Desktop / 3 Abas fixas no Mobile):**
   - **Execução:** múltiplos contadores integrados (`+1` / `-1`, atalhos `Espaço`, `↑`, `↓`, vibração e alarme sonoro ao atingir a meta), cronômetro de trabalho (**Play / Pause** + envio direto das horas para a Precificação) e leitor/editor de receitas.
   - **Metadados:** checklist de etapas com progresso automático ou manual (`0–100%`), celebração discreta (*confetes* + badge **`🎉 Peça Finalizada!`**), ficha técnica vinculada aos inventários de fios/agulhas e galeria de progresso com lightbox.
+- **Formulário de Criação/Edição em Drawer:** acordeões **1. Informações Básicas** e **2. Materiais, Etapas e Prazos** com rolagem interna independente para fácil preenchimento no desktop e celular.
 - **Baixa Automática no Estoque ao Concluir Projeto:** ao finalizar o projeto (`100%` ou status *Concluído*), exibe confirmação em 1 clique para descontar automaticamente do estoque os novelos/gramas de fios e aviamentos utilizados.
 
 ### 3. Receitas e Anotações (com Dicionário Multilíngue & Tradutor Automático)
