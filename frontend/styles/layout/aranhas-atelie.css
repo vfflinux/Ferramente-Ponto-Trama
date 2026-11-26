@@ -1,0 +1,199 @@
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   PONTO & TRAMA (ÑANDUOBYETÉ) — CAMADA DAS ARANHAS VIVAS DO ATELIÊ
+   Estilos anatômicos por tema (8 temas), pivôs de cinemática de patas,
+   rastro de seda dissolvente e respeito total à acessibilidade.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+
+:root {
+  --aranha-tinta: #fcf1d0;
+  --aranha-corpo: rgba(16, 30, 74, 0.92);
+  --aranha-acento: #7ca7ff;
+  --aranha-brilho-olho: #0c173d;
+  --aranha-sombra: rgba(1, 5, 24, 0.55);
+}
+
+/* Harmonização cromática com cada um dos 8 temas */
+:root[data-tema="noite"] {
+  --aranha-tinta: #f7f1de;
+  --aranha-corpo: rgba(10, 16, 34, 0.94);
+  --aranha-acento: #80abff;
+  --aranha-brilho-olho: #050812;
+  --aranha-sombra: rgba(0, 0, 0, 0.65);
+}
+
+:root[data-tema-base="claro"] {
+  --aranha-tinta: #1a2d5c;
+  --aranha-corpo: rgba(244, 238, 225, 0.94);
+  --aranha-acento: #2d55ab;
+  --aranha-brilho-olho: #ffffff;
+  --aranha-sombra: rgba(22, 38, 77, 0.28);
+}
+
+:root[data-tema="linho"] {
+  --aranha-tinta: #3b241a;
+  --aranha-corpo: rgba(246, 239, 228, 0.95);
+  --aranha-acento: #a4472d;
+  --aranha-brilho-olho: #fffbf4;
+  --aranha-sombra: rgba(74, 42, 26, 0.28);
+}
+
+:root[data-tema="salvia"] {
+  --aranha-tinta: #1a3027;
+  --aranha-corpo: rgba(238, 244, 238, 0.95);
+  --aranha-acento: #365e4d;
+  --aranha-brilho-olho: #ffffff;
+  --aranha-sombra: rgba(24, 41, 34, 0.26);
+}
+
+:root[data-tema="ameixa"] {
+  --aranha-tinta: #eee4b1;
+  --aranha-corpo: rgba(54, 12, 74, 0.94);
+  --aranha-acento: #b58d7e;
+  --aranha-brilho-olho: #2b063d;
+  --aranha-sombra: rgba(20, 2, 30, 0.6);
+}
+
+:root[data-tema="mel"] {
+  --aranha-tinta: #f9e6a8;
+  --aranha-corpo: rgba(66, 36, 2, 0.95);
+  --aranha-acento: #f2a900;
+  --aranha-brilho-olho: #2b1600;
+  --aranha-sombra: rgba(24, 12, 0, 0.58);
+}
+
+:root[data-tema="floresta"] {
+  --aranha-tinta: #f8eadc;
+  --aranha-corpo: rgba(11, 42, 32, 0.95);
+  --aranha-acento: #d9822b;
+  --aranha-brilho-olho: #051711;
+  --aranha-sombra: rgba(2, 12, 9, 0.6);
+}
+
+/* Camada fixa transparente a cliques (z-index 45: acima do conteúdo, abaixo de modais 100+) */
+.camada-aranhas-atelie {
+  position: fixed;
+  inset: 0;
+  z-index: 45;
+  pointer-events: none;
+  overflow: hidden;
+  contain: strict;
+}
+
+.aranha-viva-ator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  color: var(--aranha-tinta);
+  opacity: 0.86;
+  will-change: transform;
+  filter: drop-shadow(0 3px 4px var(--aranha-sombra));
+}
+
+.aranha-viva-ator.especie-filhote {
+  opacity: 0.78;
+}
+
+.aranha-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  overflow: visible;
+}
+
+/* Pivôs anatômicos individuais de patas, abdômen e cefalotórax */
+.aranha-svg .pata-art {
+  will-change: transform;
+}
+
+.aranha-svg .aranha-abdomen {
+  transform-origin: 60px 62px;
+  will-change: transform;
+}
+
+.aranha-svg .aranha-cefalotorax {
+  transform-origin: 60px 52px;
+  will-change: transform;
+}
+
+.aranha-svg .aranha-palpos {
+  transform-origin: 60px 36px;
+  will-change: transform;
+}
+
+.aranha-svg .aranha-olhos-vivos {
+  transform-origin: 60px 38px;
+  animation: piscarOlhinhosAranha 5.2s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+
+/* Fio dinâmico de rapel ou ballooning */
+.aranha-fio-dinamico {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  color: var(--aranha-tinta);
+  opacity: 0.42;
+}
+
+/* Rastro pontilhado de seda deixado pela Tecelã-de-Renda (se dissolve suavemente) */
+.aranha-rastro-seda {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 3px;
+  height: 3px;
+  margin-left: -1.5px;
+  margin-top: -1.5px;
+  border-radius: 50%;
+  background: var(--aranha-tinta);
+  pointer-events: none;
+  animation: dissolverSeda 2.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Ponto luminoso sutil de ancoragem de seda (Silk Anchor Tap) */
+.aranha-ancora-seda {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 6px;
+  height: 6px;
+  margin-left: -3px;
+  margin-top: -3px;
+  border-radius: 50%;
+  border: 1.2px solid var(--aranha-tinta);
+  background: var(--aranha-acento);
+  pointer-events: none;
+  animation: brilharAncoraSeda 3.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes dissolverSeda {
+  0% { opacity: 0.48; transform: scale(1); }
+  100% { opacity: 0; transform: scale(0.25); }
+}
+
+@keyframes brilharAncoraSeda {
+  0% { opacity: 0; transform: scale(0.3); }
+  18% { opacity: 0.72; transform: scale(1.15); }
+  40% { opacity: 0.5; transform: scale(1); }
+  100% { opacity: 0; transform: scale(0.5); }
+}
+
+/* Controles rápidos de teste na seção de Configurações */
+.acoes-aranhas-cfg {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .camada-aranhas-atelie {
+    display: none !important;
+  }
+}
+
+:root[data-reduzir-animacoes="true"] .camada-aranhas-atelie {
+  display: none !important;
+}

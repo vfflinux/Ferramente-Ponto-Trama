@@ -400,9 +400,18 @@ const LeitorReceitas = (() => {
     persistir();
   }
 
+  function alternarModo(novoModo) {
+    estado.modo = ["texto", "arquivo", "tradutor", "dicionario"].includes(novoModo) ? novoModo : "texto";
+    renderizar();
+    if (estado.modo === "texto" || estado.modo === "arquivo") {
+      persistir();
+    }
+  }
+
   return {
     init,
     carregarDoProjeto,
-    definirTexto
+    definirTexto,
+    alternarModo
   };
 })();

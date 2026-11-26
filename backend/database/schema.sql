@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS fios (
     marca             TEXT    NOT NULL DEFAULT '',
     cor_nome          TEXT    NOT NULL DEFAULT '',
     cor_codigo        TEXT    DEFAULT '',
+    cor_hex           TEXT    DEFAULT '',
     lote              TEXT    DEFAULT '',
     imagem_url        TEXT    DEFAULT '',
     tex               REAL,

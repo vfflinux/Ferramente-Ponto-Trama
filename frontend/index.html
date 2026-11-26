@@ -7,51 +7,74 @@
     <link rel="manifest" href="manifest.json" />
     <title>Ponto & Trama</title>
     <!-- Carregamento paralelo de estilos (sem cascata @import) -->
-    <link rel="stylesheet" href="styles/base/global.css?v=5" />
+    <link rel="stylesheet" href="styles/base/global.css?v=14" />
     <link rel="stylesheet" href="styles/layout/barra-lateral.css?v=9" />
-    <link rel="stylesheet" href="styles/modules/home.css" />
+    <link rel="stylesheet" href="styles/layout/busca-global.css?v=1" />
+    <link rel="stylesheet" href="styles/layout/identidade-artesanal.css?v=4" />
+    <link rel="stylesheet" href="styles/layout/aranhas-atelie.css?v=2" />
+    <link rel="stylesheet" href="styles/modules/home.css?v=14" />
     <link rel="stylesheet" href="styles/modules/contador-carreiras.css?v=11" />
     <link rel="stylesheet" href="styles/modules/leitor-receitas.css?v=10" />
     <link rel="stylesheet" href="styles/modules/calculadora-precificacao.css" />
     <link rel="stylesheet" href="styles/modules/gerenciador-projetos.css?v=12" />
-    <link rel="stylesheet" href="styles/modules/inventario-fios.css" />
+    <link rel="stylesheet" href="styles/modules/inventario-fios.css?v=15" />
     <link rel="stylesheet" href="styles/modules/inventario-agulhas.css" />
     <link rel="stylesheet" href="styles/modules/calculadora-amostra.css" />
     <link rel="stylesheet" href="styles/modules/banco-amostras.css" />
     <link rel="stylesheet" href="styles/modules/editor-graficos.css" />
     <link rel="stylesheet" href="styles/modules/tabelas-conversao.css?v=11" />
-    <link rel="stylesheet" href="styles/modules/configuracoes.css?v=6" />
-    <link rel="stylesheet" href="styles/base/mobile.css?v=12" />
-    <link rel="stylesheet" href="styles/base/temas.css?v=11" />
+    <link rel="stylesheet" href="styles/modules/configuracoes.css?v=8" />
+    <link rel="stylesheet" href="styles/base/mobile.css?v=16" />
+    <link rel="stylesheet" href="styles/base/temas.css?v=18" />
 
     <!-- Core da aplicação -->
-    <script src="src/core/database.js?v=4" defer></script>
+    <script src="src/core/database.js?v=13" defer></script>
     <script src="src/core/projeto-contexto.js?v=4" defer></script>
     <script src="src/core/animations.js" defer></script>
     <script src="src/core/sidebar.js?v=10" defer></script>
+    <script src="src/core/busca-global.js?v=6" defer></script>
+    <script src="src/core/aranhas-atelie.js?v=2" defer></script>
 
     <!-- Módulos de ferramentas -->
-    <script src="src/modules/home.js?v=4" defer></script>
-    <script src="src/modules/contador-carreiras.js?v=10" defer></script>
+    <script src="src/modules/home.js?v=17" defer></script>
+    <script src="src/modules/contador-carreiras.js?v=11" defer></script>
     <script src="src/modules/calculadora-precificacao.js?v=4" defer></script>
-    <script src="src/modules/tradutor-receitas.js?v=4" defer></script>
-    <script src="src/modules/leitor-receitas.js?v=10" defer></script>
-    <script src="src/modules/gerenciador-projetos.js?v=10" defer></script>
-    <script src="src/modules/inventario-fios.js" defer></script>
-    <script src="src/modules/inventario-agulhas.js" defer></script>
+    <script src="src/modules/tradutor-receitas.js?v=5" defer></script>
+    <script src="src/modules/leitor-receitas.js?v=13" defer></script>
+    <script src="src/modules/gerenciador-projetos.js?v=13" defer></script>
+    <script src="src/modules/inventario-fios.js?v=17" defer></script>
+    <script src="src/modules/inventario-agulhas.js?v=13" defer></script>
     <script src="src/modules/calculadora-amostra.js" defer></script>
-    <script src="src/modules/banco-amostras.js" defer></script>
+    <script src="src/modules/banco-amostras.js?v=14" defer></script>
     <script src="src/modules/editor-graficos.js?v=10" defer></script>
-    <script src="src/modules/tabelas-conversao.js?v=5" defer></script>
-    <script src="src/modules/configuracoes.js?v=9" defer></script>
+    <script src="src/modules/tabelas-conversao.js?v=14" defer></script>
+    <script src="src/modules/configuracoes.js?v=12" defer></script>
 
     <!-- Bootstrap principal -->
-    <script src="src/main.js?v=5" defer></script>
+    <script src="src/main.js?v=7" defer></script>
   </head>
   <body>
     <input type="checkbox" id="opcao-menu" />
     <!-- ~~~BARRA LATERAL ~~~ -->
     <header class="barraLateral">
+      <!-- Teia de renda geométrica detalhada + mini aranha tecelã (símbolo Ñanduobyeté) -->
+      <svg class="teia-sidebar-topo" viewBox="0 0 130 130" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true">
+        <path d="M0 0 L128 0 M0 0 L118 46 M0 0 L92 92 M0 0 L46 118 M0 0 L0 128"></path>
+        <path d="M26 0 Q23 13 18 18 Q13 23 0 26"></path>
+        <path d="M54 0 Q48 25 38 38 Q25 48 0 54"></path>
+        <path d="M84 0 Q75 39 59 59 Q39 75 0 84"></path>
+        <path d="M114 0 Q101 52 80 80 Q52 101 0 114"></path>
+        <circle cx="38" cy="38" r="1.8" fill="currentColor" opacity="0.6"></circle>
+        <circle cx="59" cy="59" r="1.8" fill="currentColor" opacity="0.5"></circle>
+      </svg>
+      <svg class="aranha-sidebar-mini" viewBox="0 0 40 86" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <line class="aranha-fio-linha" x1="20" y1="0" x2="20" y2="42" stroke-dasharray="2.5 2.5"></line>
+        <path d="M15 50 L6 43 L4 35 M14 55 L5 53 L2 48 M14 59 L6 63 L4 71 M16 63 L9 71 L8 78"></path>
+        <path d="M25 50 L34 43 L36 35 M26 55 L35 53 L38 48 M26 59 L34 63 L36 71 M24 63 L31 71 L32 78"></path>
+        <path d="M20 42 L26 50 L25 60 L20 65 L15 60 L14 50 Z" fill="currentColor" fill-opacity="0.22"></path>
+        <path d="M16.5 51 L20 47.5 L23.5 51 M17 57 L20 54 L23 57" stroke-width="1.2"></path>
+        <circle cx="20" cy="68.5" r="3.4" fill="currentColor" fill-opacity="0.3"></circle>
+      </svg>
       <div class="logoArea">
         <img class="logoImagem" src="assets/images/logo.png" alt="logomarca" width="60" height="60" decoding="async" />
         <p class="nomeLogo">Ñanduobyeté</p>
@@ -405,26 +428,94 @@
         </div>
       </div>
 
-      <!-- SEÇÃO INICIAL (HOME SIMPLES) -->
+      <!-- SEÇÃO INICIAL — BANCADA DO ATELIÊ (RF01–RF07, RNF01–RNF04) -->
       <div id="secao-home" class="secao-ferramenta">
         <div class="cabecalho">
           <div class="cabecalho-conteudo">
             <div class="cabecalho-info">
-              <h1 class="titulo-ferramenta">Ponto & Trama</h1>
-              <span class="subtitulo-ferramenta"
-                >Inicie um novo trabalho ou acompanhe seus projetos</span
+              <h1 class="titulo-ferramenta" id="home-saudacao-titulo">Ponto &amp; Trama</h1>
+              <span class="subtitulo-ferramenta" id="home-saudacao-subtitulo"
+                >Sua bancada de crochê e tricô 100% offline</span
               >
+            </div>
+            <div class="cabecalho-acoes-home">
+              <span class="home-data-pill" id="home-data-hoje" aria-label="Data de hoje"></span>
             </div>
           </div>
         </div>
-        <div class="conteiner-home">
-          <div class="acoes-home">
-            <button type="button" class="btn-home-primario" id="btn-home-novo-projeto">
-              <span>+ Novo projeto</span>
-            </button>
-            <button type="button" class="btn-home-secundario" id="btn-home-ver-projetos">
-              <span>Ver meus projetos</span>
-            </button>
+
+        <div class="conteiner-home" id="conteiner-home">
+          <div class="bancada-home-inner">
+            <!-- RF02: Cartão Hero "Continue de Onde Parou" ou Boas-Vindas (estado vazio) -->
+            <section class="home-hero-slot" id="home-hero-slot" aria-label="Projeto em destaque" aria-live="polite"></section>
+
+            <!-- RF06: Faixa discreta de alertas (aparece apenas quando há prazo próximo ou fio baixo/zerado) -->
+            <div class="home-alerta-faixa" id="home-alerta-faixa" style="display: none" role="status" aria-live="polite"></div>
+
+            <!-- RF03: Resumo rápido do ateliê em 3 pílulas clicáveis -->
+            <section class="home-metricas-grid" aria-label="Resumo do ateliê">
+              <button type="button" class="home-metrica-card" id="home-metrica-projetos" title="Abrir Gerenciador de Projetos">
+                <span class="home-metrica-icone" aria-hidden="true">📂</span>
+                <div class="home-metrica-dados">
+                  <strong id="home-qtd-andamento">0</strong>
+                  <span>Em andamento</span>
+                </div>
+              </button>
+
+              <button type="button" class="home-metrica-card" id="home-metrica-fios" title="Abrir Inventário de Fios">
+                <span class="home-metrica-icone" aria-hidden="true">🧶</span>
+                <div class="home-metrica-dados">
+                  <strong id="home-qtd-fios">0</strong>
+                  <span id="home-lbl-fios">Novelos no estoque</span>
+                </div>
+              </button>
+
+              <button type="button" class="home-metrica-card" id="home-metrica-tempo" title="Ver projetos e tempo registrado">
+                <span class="home-metrica-icone" aria-hidden="true">⏱️</span>
+                <div class="home-metrica-dados">
+                  <strong id="home-tempo-total">0h 00m</strong>
+                  <span>Tempo tecido</span>
+                </div>
+              </button>
+            </section>
+
+            <!-- RF04: Atalhos rápidos de 1 clique -->
+            <section class="home-bloco-secao" aria-label="Atalhos rápidos">
+              <div class="home-bloco-topo">
+                <h2 class="home-bloco-titulo">Atalhos rápidos</h2>
+              </div>
+              <div class="home-atalhos-grid">
+                <button type="button" class="home-atalho-btn primario" id="btn-home-novo-projeto">
+                  <span class="home-atalho-ico" aria-hidden="true">＋</span>
+                  <span>Novo projeto</span>
+                </button>
+                <button type="button" class="home-atalho-btn" id="btn-home-ver-projetos">
+                  <span class="home-atalho-ico" aria-hidden="true">📂</span>
+                  <span>Meus projetos</span>
+                </button>
+                <button type="button" class="home-atalho-btn" id="btn-home-tela-toda">
+                  <span class="home-atalho-ico" aria-hidden="true">⛶</span>
+                  <span>Tela Toda</span>
+                </button>
+                <button type="button" class="home-atalho-btn" id="btn-home-tabelas">
+                  <span class="home-atalho-ico" aria-hidden="true">📏</span>
+                  <span>Tabelas</span>
+                </button>
+                <button type="button" class="home-atalho-btn" id="btn-home-graficos">
+                  <span class="home-atalho-ico" aria-hidden="true">🎨</span>
+                  <span>Gráficos</span>
+                </button>
+              </div>
+            </section>
+
+            <!-- RF05: Outros projetos recentes (exibido somente quando houver > 1 projeto) -->
+            <section class="home-bloco-secao" id="home-secao-recentes" style="display: none" aria-label="Outros projetos recentes">
+              <div class="home-bloco-topo">
+                <h2 class="home-bloco-titulo">Outros projetos recentes</h2>
+                <button type="button" class="home-link-ver-todos" id="btn-home-ver-todos-recentes">Ver todos →</button>
+              </div>
+              <div class="home-recentes-grid" id="home-recentes-grid"></div>
+            </section>
           </div>
         </div>
       </div>
@@ -513,12 +604,12 @@
                     −
                   </button>
                   <input
-                    type="number"
+                    type="text"
+                    inputmode="numeric"
+                    pattern="[0-9]*"
                     class="input-carreiras"
                     id="carreiras-1"
                     value="0"
-                    min="0"
-                    step="1"
                     aria-label="Número de carreiras"
                     title="Número de carreiras (clique para digitar manualmente)"
                   />
@@ -567,11 +658,12 @@
                     >Pontos por carreira:</label
                   >
                   <input
-                    type="number"
+                    type="text"
+                    inputmode="numeric"
+                    pattern="[0-9]*"
                     id="pontos-carreira-1"
                     class="input-pontos-carreira"
                     value="0"
-                    min="0"
                     placeholder="0"
                     aria-label="Pontos por carreira"
                     title="Clique para digitar a quantidade de pontos por carreira"
@@ -595,11 +687,12 @@
                     >Avisar na carreira:</label
                   >
                   <input
-                    type="number"
+                    type="text"
+                    inputmode="numeric"
+                    pattern="[0-9]*"
                     id="meta-1"
                     class="input-meta"
                     placeholder="0"
-                    min="0"
                     aria-label="Meta de carreiras para disparar alarme"
                     title="Clique para digitar a carreira de aviso"
                   />
@@ -610,6 +703,26 @@
 
           <!-- OVERLAY MODO "TOQUE NA TELA TODA" DO CONTADOR -->
           <div id="overlay-contador-tela-toda" class="overlay-contador-tela-toda" style="display: none" role="dialog" aria-modal="true" aria-label="Contador em tela cheia">
+            <svg class="teia-tela-toda esq" viewBox="0 0 120 120" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true">
+              <path d="M0 0 L118 0 M0 0 L108 44 M0 0 L84 84 M0 0 L44 108 M0 0 L0 118"></path>
+              <path d="M32 0 Q28 16 20 26 Q14 28 0 32"></path>
+              <path d="M68 0 Q58 32 42 52 Q28 60 0 68"></path>
+              <path d="M106 0 Q90 50 66 80 Q44 96 0 106"></path>
+            </svg>
+            <svg class="teia-tela-toda dir" viewBox="0 0 120 120" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true">
+              <path d="M0 0 L118 0 M0 0 L108 44 M0 0 L84 84 M0 0 L44 108 M0 0 L0 118"></path>
+              <path d="M32 0 Q28 16 20 26 Q14 28 0 32"></path>
+              <path d="M68 0 Q58 32 42 52 Q28 60 0 68"></path>
+              <path d="M106 0 Q90 50 66 80 Q44 96 0 106"></path>
+            </svg>
+            <svg class="aranha-tela-toda" viewBox="0 0 64 120" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line class="aranha-fio-linha" x1="32" y1="0" x2="32" y2="58" stroke-dasharray="3 3"></line>
+              <path d="M26 70 L13 58 L8 46 M24 75 L10 70 L4 62 M24 81 L11 85 L6 96 M26 86 L15 96 L12 108"></path>
+              <path d="M38 70 L51 58 L56 46 M40 75 L54 70 L60 62 M40 81 L53 85 L58 96 M38 86 L49 96 L52 108"></path>
+              <path d="M32 58 L41 68 L39 81 L32 88 L25 81 L23 68 Z" fill="currentColor" fill-opacity="0.2"></path>
+              <polygon points="32,71 36,75.5 32,80 28,75.5" fill="currentColor" fill-opacity="0.3"></polygon>
+              <path d="M27 89 L32 86.5 L37 89 L36 96 L32 98.5 L28 96 Z" fill="currentColor" fill-opacity="0.25"></path>
+            </svg>
             <div class="tela-toda-topo">
               <div class="tela-toda-info">
                 <strong id="tela-toda-nome">Contador Principal</strong>
@@ -698,7 +811,16 @@
                 </div>
               </div>
               <div class="lista-linhas-interativas" id="lista-linhas-receita-global">
-                <div class="vazio-linhas-receita">Digite sua receita ao lado para ativar o marcador interativo de linha.</div>
+                <div class="vazio-linhas-receita vazio-bloco-ilustrado">
+                  <span class="svg-vazio-artesanal compacto" aria-hidden="true">
+                    <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M14 18h36M14 29h28M14 40h32" stroke-dasharray="3 3"></path>
+                      <path d="M44 46 54 34"></path>
+                      <circle cx="55" cy="33" r="2.2" fill="currentColor"></circle>
+                    </svg>
+                  </span>
+                  <span>Digite sua receita ao lado para ativar o marcador interativo de linha.</span>
+                </div>
               </div>
             </div>
           </div>
@@ -719,7 +841,29 @@
             </div>
             <div class="area-viewer-receita" id="area-viewer-receita-global">
               <div class="vazio-viewer-receita" id="vazio-viewer-receita-global">
-                <span class="icone-vazio-rec">📖</span>
+                <span class="icone-vazio-rec svg-vazio-artesanal" aria-hidden="true">
+                  <svg viewBox="0 0 112 112" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <!-- Capa traseira e lombada do caderno de receitas -->
+                    <path d="M12 29c14-5 31-5 44 2v52c-13-6-30-6-44-1V29Z" fill="currentColor" fill-opacity="0.1"></path>
+                    <path d="M100 29c-14-5-31-5-44 2v52c13-6 30-6 44-1V29Z" fill="currentColor" fill-opacity="0.06"></path>
+                    <path d="M16 25c13-4 28-4 40 3v51c-12-6-27-6-40-2V25Z"></path>
+                    <path d="M96 25c-13-4-28-4-40 3v51c12-6 27-6 40-2V25Z"></path>
+                    <!-- Página esquerda: linhas de receita + faixa destacada de marcador -->
+                    <path d="M23 36h22" stroke-width="2.2"></path>
+                    <rect x="22" y="43" width="26" height="7" rx="2" fill="currentColor" fill-opacity="0.18" stroke="none"></rect>
+                    <path d="M24 46.5h20" stroke-width="1.6"></path>
+                    <path d="M23 56h23M23 63h18M23 70h21" stroke-width="1.5" opacity="0.68"></path>
+                    <!-- Página direita: mini diagrama circular de crochê/teia -->
+                    <circle cx="76" cy="49" r="12" stroke-dasharray="2.5 2.5" stroke-width="1.6"></circle>
+                    <circle cx="76" cy="49" r="5" stroke-width="1.5"></circle>
+                    <path d="M76 37v5M76 56v5M64 49h5M83 49h5M67.5 40.5l3.5 3.5M81 54l3.5 3.5M84.5 40.5 81 44M71 54l-3.5 3.5" stroke-width="1.3" opacity="0.72"></path>
+                    <path d="M65 69h22" stroke-width="1.5" opacity="0.65"></path>
+                    <!-- Fio marcador central descendo da lombada com pingente -->
+                    <path d="M56 28v62" stroke-dasharray="3 3" stroke-width="1.8"></path>
+                    <polygon points="56,90 60.5,95.5 56,101 51.5,95.5" fill="currentColor" fill-opacity="0.28"></polygon>
+                    <circle cx="56" cy="95.5" r="1.4" fill="currentColor" stroke="none"></circle>
+                  </svg>
+                </span>
                 <strong>Importe o PDF ou foto da sua receita</strong>
                 <p>Use a régua destacada para nunca perder a linha onde parou.</p>
               </div>
@@ -806,7 +950,16 @@
                   </div>
                 </div>
                 <div class="saida-tradutor-receita" id="saida-tradutor-receita" aria-live="polite">
-                  <div class="vazio-tradutor">Cole uma receita ou trecho ao lado para traduzir instantaneamente.</div>
+                  <div class="vazio-tradutor vazio-bloco-ilustrado">
+                    <span class="svg-vazio-artesanal compacto" aria-hidden="true">
+                      <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="32" cy="32" r="18"></circle>
+                        <path d="M14 32h36M32 14c5 5 5 31 0 36M32 14c-5 5-5 31 0 36" opacity="0.7"></path>
+                        <path d="M44 44 54 54" stroke-dasharray="2.5 2.5"></path>
+                      </svg>
+                    </span>
+                    <span>Cole uma receita ou trecho ao lado para traduzir instantaneamente.</span>
+                  </div>
                 </div>
                 <!-- RF09: Cartão de detalhe ao tocar em um termo traduzido -->
                 <div class="popover-termo-traduzido" id="popover-termo-traduzido" style="display: none" role="status"></div>
@@ -1360,13 +1513,25 @@
 
               <!-- Empty State Ilustrado -->
               <div class="estado-vazio-projetos" id="estado-vazio-projetos" style="display: none">
-                <div class="ilustracao-vazio-pasta" aria-hidden="true">
-                  <svg viewBox="0 0 120 92" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 24C12 18.5 16.5 14 22 14H46L54 24H98C103.5 24 108 28.5 108 34V74C108 79.5 103.5 84 98 84H22C16.5 84 12 79.5 12 74V24Z" fill="rgba(34,57,111,0.55)" stroke="rgba(252,241,208,0.45)" stroke-width="2.5"/>
-                    <rect x="28" y="20" width="64" height="22" rx="4" fill="rgba(252,241,208,0.16)" stroke="rgba(252,241,208,0.35)" stroke-width="1.5"/>
-                    <circle cx="60" cy="54" r="14" stroke="#fcf1d0" stroke-width="2.2"/>
-                    <path d="M51 51C55 48 63 48 69 52" stroke="#fcf1d0" stroke-width="2" stroke-linecap="round"/>
-                    <path d="M50 58C56 61 64 61 70 57" stroke="#fcf1d0" stroke-width="2" stroke-linecap="round"/>
+                <div class="ilustracao-vazio-pasta svg-vazio-artesanal" aria-hidden="true">
+                  <svg viewBox="0 0 112 112" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <!-- Aba traseira da pasta fichário -->
+                    <path d="M14 31c0-4.5 3.5-8 8-8h21l7 8h40c4.5 0 8 3.5 8 8v44c0 4.5-3.5 8-8 8H22c-4.5 0-8-3.5-8-8V31Z" fill="currentColor" fill-opacity="0.1"></path>
+                    <!-- Folha de receita saindo do fichário -->
+                    <path d="M27 31V20c0-2.5 2-4.5 4.5-4.5h48c2.5 0 4.5 2 4.5 4.5v11" fill="currentColor" fill-opacity="0.14"></path>
+                    <path d="M36 22h22M36 27h34" stroke-width="1.5" opacity="0.72"></path>
+                    <!-- Frente da pasta com costura pontilhada na base -->
+                    <path d="M14 40c0-4.5 3.5-8 8-8h68c4.5 0 8 3.5 8 8v43c0 4.5-3.5 8-8 8H22c-4.5 0-8-3.5-8-8V40Z"></path>
+                    <path d="M22 84h68" stroke-dasharray="3.5 3.5" stroke-width="1.3" opacity="0.55"></path>
+                    <!-- Novelo detalhado centralizado na capa da pasta -->
+                    <circle cx="53" cy="61" r="16" fill="currentColor" fill-opacity="0.12"></circle>
+                    <path d="M40 54c8-5 18-5 27 0M38 61c9-4 20-3 29 3M41 69c8 4 17 4 25-1" stroke-width="1.6"></path>
+                    <path d="M48 46c7 6 12 15 13 28M56 46c5 6 8 13 9 23" stroke-width="1.4" opacity="0.75"></path>
+                    <!-- Agulha de crochê saindo na diagonal do novelo -->
+                    <path d="M65 50 82 36" stroke-width="2.2"></path>
+                    <path d="M82 36c2.2-1.8 5.2-1.2 5.8 1.1s-1.2 4-3.3 4.3" stroke-width="2"></path>
+                    <!-- Fio solto saindo do novelo -->
+                    <path d="M68 69c5 3 11 2 15-2" stroke-dasharray="2.5 2.5" stroke-width="1.5"></path>
                   </svg>
                 </div>
                 <h3 class="titulo-vazio-proj" id="titulo-vazio-proj">Sua estante de projetos está vazia</h3>
@@ -1497,11 +1662,11 @@
                     <div class="ws-contador-rodape">
                       <label class="ws-mini-campo">
                         <span>Pts/carr:</span>
-                        <input type="number" id="ws-contador-pts-carr" min="0" value="0" />
+                        <input type="text" inputmode="numeric" pattern="[0-9]*" id="ws-contador-pts-carr" value="0" />
                       </label>
                       <label class="ws-mini-campo">
                         <span>Meta:</span>
-                        <input type="number" id="ws-contador-meta" min="0" placeholder="0" />
+                        <input type="text" inputmode="numeric" pattern="[0-9]*" id="ws-contador-meta" placeholder="0" />
                       </label>
                       <span class="ws-contador-total-pts" id="ws-contador-total-pts">0 pts</span>
                       <button type="button" class="btn-ws-chip" id="btn-ws-cont-zerar">Zerar</button>
@@ -2065,6 +2230,25 @@
 
             <!-- Controles de Ação de Topo -->
             <div class="acoes-topo-fios">
+              <!-- Alternador de Visualização (Prateleira Pantone vs Compacto) -->
+              <div class="grupo-modo-visualizacao-fios" role="group" aria-label="Modo de visualização dos fios">
+                <button type="button" class="btn-modo-fios ativo" id="btn-modo-pantone" data-modo="pantone" title="Visualização Prateleira de Cores (Swatches Pantone)" aria-pressed="true">
+                  <span>🎨</span>
+                  <span class="lbl-modo-fios">Prateleira</span>
+                </button>
+                <button type="button" class="btn-modo-fios" id="btn-modo-compacto" data-modo="compacto" title="Visualização Compacta em Grade" aria-pressed="false">
+                  <span>▦</span>
+                  <span class="lbl-modo-fios">Compacto</span>
+                </button>
+              </div>
+
+              <!-- Botão Simulador de Combinação de Cores -->
+              <button type="button" class="btn-simulador-fios" id="btn-abrir-simulador-cores" title="Simular combinações de 2 a 5 cores do seu estoque">
+                <span aria-hidden="true">🌈</span>
+                <span>Combinar</span>
+                <span class="badge-qtd-simulador" id="badge-qtd-simulador" style="display: none;">0</span>
+              </button>
+
               <!-- Menu Dropdown de Backup (.json) -->
               <div class="dropdown-backup-fios">
                 <button type="button" class="btn-backup-fios" id="btn-menu-backup-fios" title="Backup do inventário (JSON)" aria-haspopup="true">
@@ -2141,13 +2325,36 @@
             </div>
           </section>
 
+          <!-- 2.5 Filtro por Paleta Cromática (Prateleira de Cores) -->
+          <section class="barra-paleta-cromatica" aria-label="Filtrar fios por família de cor">
+            <span class="paleta-cromatica-rotulo">PALETA:</span>
+            <div class="paleta-cromatica-bolinhas" id="paleta-cromatica-bolinhas" role="group" aria-label="Famílias de cor"></div>
+            <span class="paleta-cromatica-ativo-texto" id="paleta-cromatica-ativo-texto">Todas as cores</span>
+          </section>
+
           <!-- 3. Grade Responsiva de Cards de Fios -->
           <div class="area-grade-fios" id="area-grade-fios">
             <div class="grade-cards-fios" id="grade-cards-fios"></div>
 
             <!-- Estado Vazio -->
             <div class="estado-vazio-fios" id="estado-vazio-fios" style="display: none;">
-              <span class="icone-vazio">🧶</span>
+              <div class="icone-vazio svg-vazio-artesanal" aria-hidden="true">
+                <svg viewBox="0 0 112 112" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <!-- Agulha de crochê ergonômica atravessando o novelo -->
+                  <path d="M22 86 85 24" stroke-width="2.3"></path>
+                  <path d="M85 24c3-3 7.5-2.6 8.6.5s-1.2 6.2-4.8 6.8" stroke-width="2.2"></path>
+                  <path d="M19 89l11-11" stroke-width="5.2" opacity="0.45"></path>
+                  <!-- Corpo do novelo com volume e feixes entrelaçados -->
+                  <circle cx="52" cy="57" r="28" fill="currentColor" fill-opacity="0.12"></circle>
+                  <path d="M27 46c13-8 31-8 47 0M25 56c15-7 34-5 51 5M28 68c14 7 30 7 45-2" stroke-width="1.8"></path>
+                  <path d="M37 33c12 9 20 23 23 49M47 30c11 10 18 23 21 44M59 31c8 9 13 19 15 33" stroke-width="1.6" opacity="0.8"></path>
+                  <path d="M30 39c6 12 10 25 11 40" stroke-width="1.5" opacity="0.68"></path>
+                  <!-- Cinturão / Etiqueta de papel abraçando o novelo -->
+                  <path d="M33 76c11-4 27-4 38 0" stroke-width="4.5" opacity="0.22"></path>
+                  <!-- Fio solto formando laço fluido -->
+                  <path d="M77 68c8 5 17 5 21-2s-1-13-7-10c-5 2.5-3 12 4 17 4 3 8 3 11 1" stroke-dasharray="3.2 3.2" stroke-width="1.7"></path>
+                </svg>
+              </div>
               <h3 class="titulo-vazio">Nenhum fio encontrado</h3>
               <p class="texto-vazio">Cadastre seus novelos clicando em "+ Novo Fio" ou ajuste os filtros acima.</p>
               <button type="button" class="btn-novo-fio" id="btn-vazio-novo-fio">+ Cadastrar Primeiro Fio</button>
@@ -2211,6 +2418,21 @@
                     <div class="grupo-campo">
                       <label for="fio-lote" class="label-form">Lote (Tintura)</label>
                       <input type="text" id="fio-lote" class="input-form" placeholder="Ex: 458920" />
+                    </div>
+                  </div>
+
+                  <!-- Amostra de Cor Real (Swatch Pantone) -->
+                  <div class="grupo-campo grupo-cor-swatch-form">
+                    <div class="cor-swatch-form-topo">
+                      <label for="fio-cor-hex" class="label-form">Cor Real da Amostra (Prateleira Pantone)</label>
+                      <button type="button" class="btn-extrair-cor-foto" id="btn-extrair-cor-foto" style="display: none;" title="Capturar a cor predominante da foto carregada">
+                        🎨 Extrair cor da foto
+                      </button>
+                    </div>
+                    <div class="cor-swatch-controles">
+                      <input type="color" id="fio-cor-hex" class="input-cor-swatch" value="#d9b99b" aria-label="Escolher cor real do fio" />
+                      <input type="text" id="fio-cor-hex-texto" class="input-form input-hex-swatch" value="#D9B99B" maxlength="7" placeholder="#D9B99B" aria-label="Código hexadecimal da cor" />
+                      <div class="sugestoes-cores-rapidas" id="sugestoes-cores-rapidas" aria-label="Sugestões rápidas de tons"></div>
                     </div>
                   </div>
 
@@ -2352,7 +2574,10 @@
                   <div class="bloco-identificacao-destaque">
                     <div class="item-destaque-cor">
                       <span class="label-detalhe">COR</span>
-                      <strong class="valor-detalhe-grande" id="det-fio-cor">—</strong>
+                      <div class="linha-det-cor-swatch">
+                        <span class="det-cor-bolinha" id="det-fio-cor-swatch" aria-hidden="true"></span>
+                        <strong class="valor-detalhe-grande" id="det-fio-cor">—</strong>
+                      </div>
                       <span class="codigo-cor-tag" id="det-fio-codigo">—</span>
                     </div>
                     <div class="item-destaque-lote">
@@ -2493,6 +2718,88 @@
                 <button type="button" class="btn-cancelar-modal" id="btn-cancelar-exclusao-fio">Cancelar</button>
                 <button type="button" class="btn-acao-perigo" id="btn-confirmar-exclusao-fio">Sim, Excluir</button>
               </div>
+            </div>
+          </div>
+
+          <!-- 7. DOCK FLUTUANTE DE SELEÇÃO PARA O SIMULADOR DE CORES -->
+          <aside class="dock-simulador-cores" id="dock-simulador-cores" style="display: none;" aria-label="Fios selecionados para simulação de cores">
+            <div class="dock-sim-esquerda">
+              <span class="dock-sim-titulo">Paleta (<strong id="dock-sim-contador">0</strong>/5)</span>
+              <div class="dock-sim-bolinhas" id="dock-sim-bolinhas"></div>
+            </div>
+            <div class="dock-sim-acoes">
+              <button type="button" class="btn-dock-limpar" id="btn-dock-limpar-sim">Limpar</button>
+              <button type="button" class="btn-dock-abrir" id="btn-dock-abrir-sim">
+                <span>🎨 Abrir Simulador</span>
+              </button>
+            </div>
+          </aside>
+
+          <!-- 8. MODAL SIMULADOR DE COMBINAÇÃO DE CORES (2 A 5 FIOS) -->
+          <div class="modal-overlay-fio" id="modal-simulador-cores" style="display: none; z-index: 1080;">
+            <div class="modal-conteudo-simulador" role="dialog" aria-modal="true" aria-labelledby="titulo-simulador-cores">
+              <header class="modal-topo">
+                <div class="modal-topo-info">
+                  <h2 class="modal-titulo" id="titulo-simulador-cores">Simulador de Combinação de Cores</h2>
+                  <span class="modal-subtitulo">Selecione de 2 a 5 fios do seu estoque e teste harmonias em Listras, Granny Square ou Pantone</span>
+                </div>
+                <button type="button" class="btn-fechar-modal" id="btn-fechar-simulador-cores" aria-label="Fechar simulador">&times;</button>
+              </header>
+
+              <div class="simulador-corpo">
+                <!-- Barra de modos e ações criativas -->
+                <div class="simulador-controles-topo">
+                  <div class="simulador-modos-grupo" role="tablist" aria-label="Modo de visualização da combinação">
+                    <button type="button" class="btn-sim-modo ativo" data-sim-modo="listras" role="tab" aria-selected="true">▤ Listras</button>
+                    <button type="button" class="btn-sim-modo" data-sim-modo="granny" role="tab" aria-selected="false">❖ Granny Square</button>
+                    <button type="button" class="btn-sim-modo" data-sim-modo="pantone" role="tab" aria-selected="false">▦ Pantone</button>
+                  </div>
+
+                  <div class="simulador-acoes-ordem">
+                    <div class="sim-espessura-wrap" id="sim-espessura-wrap">
+                      <label for="sim-espessura-listra" class="sim-mini-label">Listra:</label>
+                      <select id="sim-espessura-listra" class="select-filtro-fio sim-select-compacto" aria-label="Espessura das listras">
+                        <option value="fina">Finas</option>
+                        <option value="media" selected>Médias</option>
+                        <option value="larga">Largas</option>
+                      </select>
+                    </div>
+                    <button type="button" class="btn-sim-util" id="btn-sim-harmonia" title="Sugerir uma combinação harmoniosa automática com fios do seu estoque">✨ Harmonia</button>
+                    <button type="button" class="btn-sim-util" id="btn-sim-embaralhar" title="Embaralhar ou girar a ordem das cores">🔀 Girar</button>
+                    <button type="button" class="btn-sim-util" id="btn-sim-inverter" title="Inverter a ordem das cores">⇄ Inverter</button>
+                  </div>
+                </div>
+
+                <!-- Alerta inteligente de diferença de TEX -->
+                <div class="simulador-alerta-tex" id="simulador-alerta-tex" style="display: none;" role="status"></div>
+
+                <!-- Palco de Preview (Listras / Granny Square / Pantone) -->
+                <div class="simulador-palco" id="simulador-preview-palco"></div>
+
+                <!-- Fios Selecionados (Reordenar / Remover) -->
+                <div class="simulador-secao-selecionados">
+                  <div class="sim-secao-header">
+                    <span class="sim-secao-titulo">CORES NA COMBINAÇÃO (<span id="sim-qtd-atual">0</span>/5)</span>
+                    <button type="button" class="btn-sim-link" id="btn-sim-limpar-todos">Limpar seleção</button>
+                  </div>
+                  <div class="simulador-lista-selecionados" id="simulador-lista-selecionados"></div>
+                </div>
+
+                <!-- Seletor rápido de fios do estoque -->
+                <div class="simulador-secao-estoque">
+                  <div class="sim-secao-header">
+                    <span class="sim-secao-titulo">SEU ESTOQUE DE FIOS (TOQUE PARA ADICIONAR OU REMOVER)</span>
+                  </div>
+                  <div class="simulador-grade-estoque" id="simulador-grade-estoque"></div>
+                </div>
+              </div>
+
+              <footer class="detalhes-rodape simulador-rodape">
+                <button type="button" class="btn-acao-secundaria" id="btn-sim-copiar-lista">📋 Copiar Lista de Fios</button>
+                <div class="rodape-direita">
+                  <button type="button" class="btn-acao-primaria" id="btn-sim-baixar-png">📥 Baixar Paleta (PNG)</button>
+                </div>
+              </footer>
             </div>
           </div>
         </div>
@@ -2706,7 +3013,26 @@
 
             <!-- Estado Vazio -->
             <div class="estado-vazio-biblioteca" id="estado-vazio-biblioteca" style="display: none;">
-              <div class="icone-vazio-bib" aria-hidden="true">🪡</div>
+              <div class="icone-vazio-bib svg-vazio-artesanal" aria-hidden="true">
+                <svg viewBox="0 0 112 112" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <!-- Agulha de crochê anatômica (cabo + apoio polegar + gancho) -->
+                  <path d="M22 90 48 64" stroke-width="6.5" opacity="0.28"></path>
+                  <path d="M20 92 84 28" stroke-width="2.4"></path>
+                  <path d="M41 71l7-7" stroke-width="4.2"></path>
+                  <path d="M84 28c3.5-3.5 8.5-3 9.8.6s-1.5 6.8-5.5 7.4c-1.8.3-3.2-.4-4-1.6" stroke-width="2.2"></path>
+                  <!-- Agulha de tricô clássica (botão decorado + haste + ponta) -->
+                  <path d="M28 28 89 89" stroke-width="2.3"></path>
+                  <circle cx="24" cy="24" r="7.5" fill="currentColor" fill-opacity="0.18"></circle>
+                  <circle cx="24" cy="24" r="3" fill="currentColor"></circle>
+                  <path d="M86 86l5 5" stroke-width="1.6"></path>
+                  <!-- Marcador de ponto (cadeado) pendurado no centro -->
+                  <path d="M56 62c0 6-3.5 11-3.5 15a5.5 5.5 0 0 0 11 0c0-4-3.5-9-3.5-15" stroke-width="1.7" fill="currentColor" fill-opacity="0.12"></path>
+                  <circle cx="58" cy="77" r="1.4" fill="currentColor" stroke="none"></circle>
+                  <!-- Fio delicado ligando as hastes -->
+                  <path d="M35 80c12 9 30 9 42 0" stroke-dasharray="3.2 3.2" stroke-width="1.6" opacity="0.78"></path>
+                  <path d="M40 38c9-6 23-6 32 0" stroke-dasharray="2.5 3" stroke-width="1.4" opacity="0.5"></path>
+                </svg>
+              </div>
               <h3 class="titulo-vazio-bib">Nenhum item encontrado</h3>
               <p class="texto-vazio-bib">
                 Cadastre suas agulhas, ferramentas e aviamentos clicando em "+ Novo Item" ou ajuste os filtros ativos.
@@ -3881,7 +4207,26 @@
 
             <!-- Estado Vazio (Empty State) -->
             <div class="estado-vazio-banco" id="estado-vazio-banco" style="display: none;">
-              <div class="ilustracao-vazio-banco" aria-hidden="true">🧶</div>
+              <div class="ilustracao-vazio-banco svg-vazio-artesanal" aria-hidden="true">
+                <svg viewBox="0 0 112 112" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <!-- Quadrado de amostra com preenchimento suave e borda de costura -->
+                  <rect x="18" y="18" width="58" height="58" rx="9" fill="currentColor" fill-opacity="0.1" stroke-dasharray="4.5 3.5"></rect>
+                  <rect x="23" y="23" width="48" height="48" rx="5" stroke-width="1.2" opacity="0.45"></rect>
+                  <!-- 3 fileiras detalhadas de pontos em V / malha tecida -->
+                  <path d="M29 33l4.5 6 4.5-6M42.5 33l4.5 6 4.5-6M56 33l4.5 6 4.5-6" stroke-width="1.8"></path>
+                  <path d="M29 45l4.5 6 4.5-6M42.5 45l4.5 6 4.5-6M56 45l4.5 6 4.5-6" stroke-width="1.8"></path>
+                  <path d="M29 57l4.5 6 4.5-6M42.5 57l4.5 6 4.5-6M56 57l4.5 6 4.5-6" stroke-width="1.8"></path>
+                  <!-- Alfinetes de blocagem nos 4 cantos -->
+                  <circle cx="21" cy="21" r="2.6" fill="currentColor"></circle>
+                  <circle cx="73" cy="21" r="2.6" fill="currentColor"></circle>
+                  <circle cx="21" cy="73" r="2.6" fill="currentColor"></circle>
+                  <circle cx="73" cy="73" r="2.6" fill="currentColor"></circle>
+                  <!-- Régua graduada horizontal (largura 10 cm) -->
+                  <path d="M18 89h58M18 84v10M32.5 86v6M47 84.5v9M61.5 86v6M76 84v10" stroke-width="1.8"></path>
+                  <!-- Régua graduada vertical (altura 10 cm) -->
+                  <path d="M89 18v58M84 18h10M86 32.5h6M84.5 47h9M86 61.5h6M84 76h10" stroke-width="1.8"></path>
+                </svg>
+              </div>
               <h3 class="titulo-vazio-banco" id="titulo-vazio-banco">Seu banco de amostras está vazio</h3>
               <p class="texto-vazio-banco" id="texto-vazio-banco">
                 Cadastre seus pontos favoritos com medidas, fio, agulha e foto para reutilizar na Calculadora de Amostra em um clique.
@@ -4851,7 +5196,7 @@
                   <p>Ajuste cores, conforto visual, animações e o menu lateral</p>
                 </header>
 
-                <div class="linha-config vertical" data-busca="tema cores escuro claro pergaminho alto contraste azul marinho">
+                <div class="linha-config vertical" data-busca="tema cores escuro claro pergaminho alto contraste azul marinho linho terracota oliva salvia algodao natural artesanal ameixa roxo veludo mel cacau dourado floresta verde ambar">
                   <div class="info-linha-config">
                     <strong>Tema Visual</strong>
                     <span>Troca a paleta de cores instantaneamente em todo o aplicativo</span>
@@ -4895,6 +5240,71 @@
                       </div>
                       <span class="check-tema">✓</span>
                     </button>
+
+                    <button type="button" class="card-tema-cfg" data-tema-val="linho" role="radio" aria-checked="false">
+                      <div class="preview-tema-mini tema-prev-linho">
+                        <span class="prev-bar"></span>
+                        <span class="prev-card"></span>
+                        <span class="prev-dot"></span>
+                      </div>
+                      <div class="meta-tema-cfg">
+                        <strong>Linho &amp; Terracota</strong>
+                        <span>Creme quente, terracota e oliva</span>
+                      </div>
+                      <span class="check-tema">✓</span>
+                    </button>
+
+                    <button type="button" class="card-tema-cfg" data-tema-val="salvia" role="radio" aria-checked="false">
+                      <div class="preview-tema-mini tema-prev-salvia">
+                        <span class="prev-bar"></span>
+                        <span class="prev-card"></span>
+                        <span class="prev-dot"></span>
+                      </div>
+                      <div class="meta-tema-cfg">
+                        <strong>Sálvia &amp; Algodão</strong>
+                        <span>Verde-sálvia e leitura confortável</span>
+                      </div>
+                      <span class="check-tema">✓</span>
+                    </button>
+
+                    <button type="button" class="card-tema-cfg" data-tema-val="ameixa" role="radio" aria-checked="false">
+                      <div class="preview-tema-mini tema-prev-ameixa">
+                        <span class="prev-bar"></span>
+                        <span class="prev-card"></span>
+                        <span class="prev-dot"></span>
+                      </div>
+                      <div class="meta-tema-cfg">
+                        <strong>Ameixa &amp; Veludo</strong>
+                        <span>Roxo profundo, vinho e champanhe</span>
+                      </div>
+                      <span class="check-tema">✓</span>
+                    </button>
+
+                    <button type="button" class="card-tema-cfg" data-tema-val="mel" role="radio" aria-checked="false">
+                      <div class="preview-tema-mini tema-prev-mel">
+                        <span class="prev-bar"></span>
+                        <span class="prev-card"></span>
+                        <span class="prev-dot"></span>
+                      </div>
+                      <div class="meta-tema-cfg">
+                        <strong>Mel &amp; Cacau</strong>
+                        <span>Cacau escuro, caramelo e ouro</span>
+                      </div>
+                      <span class="check-tema">✓</span>
+                    </button>
+
+                    <button type="button" class="card-tema-cfg" data-tema-val="floresta" role="radio" aria-checked="false">
+                      <div class="preview-tema-mini tema-prev-floresta">
+                        <span class="prev-bar"></span>
+                        <span class="prev-card"></span>
+                        <span class="prev-dot"></span>
+                      </div>
+                      <div class="meta-tema-cfg">
+                        <strong>Floresta &amp; Âmbar</strong>
+                        <span>Verde noturno, âmbar e marfim</span>
+                      </div>
+                      <span class="check-tema">✓</span>
+                    </button>
                   </div>
                 </div>
 
@@ -4920,6 +5330,36 @@
                   <div class="controle-linha-config">
                     <label class="switch-cfg">
                       <input type="checkbox" id="cfg-reduzir-animacoes" />
+                      <span class="trilha-switch"></span>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="linha-config" data-busca="aranhas nanduobyete teia passeando atelie vivo discreto especies">
+                  <div class="info-linha-config">
+                    <strong>Aranhas do Ateliê (Ñanduobyeté)</strong>
+                    <span>5 espécies artesanais que às vezes passeiam pelas bordas, descem por fios ou espiam</span>
+                  </div>
+                  <div class="controle-linha-config acoes-aranhas-cfg">
+                    <div class="segmented-cfg" id="cfg-aranhas-atelie" role="group" aria-label="Frequência das aranhas do ateliê">
+                      <button type="button" class="btn-seg-cfg" data-valor="desligado">Desligado</button>
+                      <button type="button" class="btn-seg-cfg ativo" data-valor="discreto">Discreto</button>
+                      <button type="button" class="btn-seg-cfg" data-valor="vivo">Ateliê Vivo</button>
+                    </div>
+                    <button type="button" class="btn-cfg-suave" id="btn-cfg-chamar-aranha" title="Invocar uma aranha aleatória na tela agora">
+                      <span>🕷️ Chamar agora</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="linha-config" data-busca="aranha reagir mouse cursor toque fuga interacao">
+                  <div class="info-linha-config">
+                    <strong>Reação ao Cursor / Toque</strong>
+                    <span>A aranha acelera ou recolhe o fio quando o mouse chega perto (nunca bloqueia cliques)</span>
+                  </div>
+                  <div class="controle-linha-config">
+                    <label class="switch-cfg">
+                      <input type="checkbox" id="cfg-aranhas-reagir-cursor" checked />
                       <span class="trilha-switch"></span>
                     </label>
                   </div>
@@ -5510,5 +5950,88 @@
         </button>
       </nav>
     </main>
+
+    <!-- PALETA DE COMANDOS / BUSCA GLOBAL (CTRL + K) -->
+    <div
+      id="modal-busca-global"
+      class="modal-busca-global-overlay"
+      style="display: none"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Busca Global e Paleta de Comandos"
+      aria-hidden="true"
+    >
+      <div class="modal-busca-global-caixa">
+        <div class="busca-global-topo">
+          <svg
+            class="busca-global-lupa-input"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <circle cx="11" cy="11" r="7"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input
+            type="search"
+            id="input-busca-global"
+            class="input-busca-global"
+            placeholder="Busque 4.5, Amigurumi, Touca bebê, sc2tog, projetos, fios..."
+            autocomplete="off"
+            spellcheck="false"
+            role="combobox"
+            aria-expanded="true"
+            aria-controls="busca-global-lista"
+            aria-autocomplete="list"
+          />
+          <button
+            type="button"
+            id="btn-limpar-busca-global"
+            class="btn-limpar-busca-global"
+            title="Limpar busca"
+            hidden
+          >
+            Limpar
+          </button>
+          <button
+            type="button"
+            id="btn-fechar-busca-global"
+            class="btn-fechar-busca-global"
+            aria-label="Fechar busca global"
+            title="Fechar (Esc)"
+          >
+            Esc
+          </button>
+        </div>
+
+        <div class="busca-global-escopos" id="busca-global-escopos" role="group" aria-label="Filtrar resultados por categoria"></div>
+
+        <div class="busca-global-lista" id="busca-global-lista" role="listbox" aria-label="Resultados da busca global"></div>
+
+        <footer class="busca-global-rodape">
+          <div class="busca-rodape-atalhos">
+            <span><kbd>↑</kbd><kbd>↓</kbd> navegar</span>
+            <span><kbd>↵</kbd> abrir</span>
+            <span><kbd>Tab</kbd> filtrar</span>
+            <span><kbd>Esc</kbd> fechar</span>
+          </div>
+          <span class="busca-marca-aranha">
+            <svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="18" y1="1" x2="18" y2="10" stroke-dasharray="2 2"></line>
+              <path d="M14 14 L7 10 L5 5 M13 18 L5 16 L3 13 M13 21 L6 23 L4 28 M14.5 24 L9 29 L8 34"></path>
+              <path d="M22 14 L29 10 L31 5 M23 18 L31 16 L33 13 M23 21 L30 23 L32 28 M21.5 24 L27 29 L28 34"></path>
+              <path d="M18 10 L23 16 L22 23 L18 27 L14 23 L13 16 Z" fill="currentColor" fill-opacity="0.22"></path>
+              <path d="M15.5 17 L18 14.5 L20.5 17 M16 21.5 L18 19.5 L20 21.5" stroke-width="1.2"></path>
+              <circle cx="18" cy="29.5" r="2.8" fill="currentColor" fill-opacity="0.3"></circle>
+            </svg>
+            <span id="busca-global-contagem">Sugestões rápidas</span>
+          </span>
+        </footer>
+      </div>
+    </div>
   </body>
 </html>

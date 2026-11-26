@@ -490,7 +490,11 @@ const BancoAmostras = (() => {
   }
 
   async function processarFotoUpload(arquivo) {
-    if (!arquivo || !arquivo.type.startsWith("image/")) {
+    const ehImg =
+      arquivo &&
+      ((arquivo.type && arquivo.type.startsWith("image/")) ||
+        /\.(png|jpe?g|webp|gif|bmp|avif)$/i.test(arquivo.name || ""));
+    if (!ehImg) {
       mostrarToast("Selecione um arquivo de imagem válido (PNG, JPG ou WEBP).");
       return;
     }
@@ -622,9 +626,9 @@ const BancoAmostras = (() => {
       mostrarLoader(false);
     }
 
-    if (idVal) {
-      const idx = amostrasCache.findIndex((a) => Number(a.id) === Number(salvo.id));
-      if (idx !== -1) amostrasCache[idx] = salvo;
+    const idxExistente = amostrasCache.findIndex((a) => Number(a.id) === Number(salvo.id));
+    if (idxExistente !== -1) {
+      amostrasCache[idxExistente] = salvo;
     } else {
       amostrasCache.unshift(salvo);
     }
@@ -804,13 +808,17 @@ const BancoAmostras = (() => {
     const btnRemFoto = document.getElementById("btn-remover-foto-banco");
 
     if (uploadArea && inputFoto) {
+      inputFoto.addEventListener("click", (e) => {
+        e.stopPropagation();
+      });
       uploadArea.addEventListener("click", (e) => {
-        if (e.target.closest("#btn-remover-foto-banco")) return;
+        if (e.target === inputFoto || e.target.closest("#btn-remover-foto-banco")) return;
         inputFoto.click();
       });
       inputFoto.addEventListener("change", (e) => {
         const arq = e.target.files?.[0];
         if (arq) processarFotoUpload(arq);
+        e.target.value = "";
       });
       uploadArea.addEventListener("dragover", (e) => {
         e.preventDefault();
@@ -891,7 +899,11 @@ const BancoAmostras = (() => {
     });
   }
 
+  let jaInicializado = false;
+
   async function init() {
+    if (jaInicializado) return;
+    jaInicializado = true;
     // Vincula eventos primeiro para a interface responder imediatamente
     vincularEventos();
 
@@ -923,6 +935,7 @@ const BancoAmostras = (() => {
     init,
     recarregar,
     obterTodas: () => amostrasCache.map((a) => ({ ...a })),
-    abrirModalNovaAmostra: () => abrirModalForm(null)
+    abrirModalNovaAmostra: () => abrirModalForm(null),
+    abrirModalDetalhes
   };
 })();

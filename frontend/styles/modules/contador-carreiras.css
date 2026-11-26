@@ -768,7 +768,7 @@
 }
 
 .btn-tela-toda-sair {
-  border: 1.5px solid var(--creme-opacidade-35);
+  border: 1.5px solid var(--creme-opacidade-30);
   background: rgba(1, 7, 54, 0.72);
   color: var(--cor-texto-principal);
   border-radius: 12px;

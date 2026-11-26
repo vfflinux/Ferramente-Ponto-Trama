@@ -371,11 +371,11 @@ const BancoDadosPT = (() => {
     }
 
     if (!forcarDisco && cacheStores.has(storeName)) {
-      return cacheStores.get(storeName);
+      return [...cacheStores.get(storeName)];
     }
 
     if (!forcarDisco && leiturasEmVoo.has(storeName)) {
-      return leiturasEmVoo.get(storeName);
+      return leiturasEmVoo.get(storeName).then((lista) => (Array.isArray(lista) ? [...lista] : []));
     }
 
     const p = (async () => {
@@ -398,15 +398,15 @@ const BancoDadosPT = (() => {
             dados = [...dados, ...ls.filter((i) => !ids.has(Number(i.id)))];
           }
         }
-        cacheStores.set(storeName, dados);
-        return dados;
+        cacheStores.set(storeName, [...dados]);
+        return [...dados];
       } catch {
         const ls = lsLerStore(storeName);
         if (ls.length > 0) {
-          cacheStores.set(storeName, ls);
-          return ls;
+          cacheStores.set(storeName, [...ls]);
+          return [...ls];
         }
-        return cacheStores.get(storeName) || [];
+        return [...(cacheStores.get(storeName) || [])];
       } finally {
         leiturasEmVoo.delete(storeName);
       }

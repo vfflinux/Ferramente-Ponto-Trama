@@ -807,7 +807,7 @@
 .graf-imp-canvas-wrap {
   min-height: 240px;
   background: rgba(1, 7, 54, 0.72);
-  border: 1px solid var(--creme-opacidade-18);
+  border: 1px solid var(--creme-opacidade-20);
   border-radius: 12px;
   display: flex;
   align-items: center;

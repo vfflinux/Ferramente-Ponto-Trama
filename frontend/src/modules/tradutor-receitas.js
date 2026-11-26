@@ -779,11 +779,35 @@ const TradutorReceitas = (() => {
     executarTraducaoUI();
   }
 
+  async function garantirBaseDicionario() {
+    if (!basePronta || termos.length === 0) {
+      await carregarBaseDicionario();
+    }
+    return termos.length > 0 ? termos.slice() : FALLBACK_ESSENCIAL.slice();
+  }
+
+  function abrirNoDicionario(termoBusca = "") {
+    if (!jaInicializado) init();
+    if (typeof LeitorReceitas !== "undefined" && typeof LeitorReceitas.alternarModo === "function") {
+      LeitorReceitas.alternarModo("dicionario");
+    } else {
+      document.querySelector('#secao-receitas .btn-modo-receita[data-modo-receita="dicionario"]')?.click();
+    }
+    const inp = document.getElementById("input-busca-dicionario");
+    if (inp) {
+      inp.value = String(termoBusca || "");
+      renderizarDicionario();
+      setTimeout(() => inp.focus(), 60);
+    }
+  }
+
   return {
     init,
     traduzirTexto,
     filtrarTermosDicionario,
     abrirComTexto,
-    obterTermos: () => termos.slice()
+    abrirNoDicionario,
+    garantirBaseDicionario,
+    obterTermos: () => (termos.length > 0 ? termos.slice() : FALLBACK_ESSENCIAL.slice())
   };
 })();

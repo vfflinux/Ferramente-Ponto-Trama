@@ -1058,7 +1058,11 @@ const InventarioAgulhas = (() => {
   }
 
   async function processarFotoUpload(arquivo) {
-    if (!arquivo || !arquivo.type.startsWith("image/")) {
+    const ehImg =
+      arquivo &&
+      ((arquivo.type && arquivo.type.startsWith("image/")) ||
+        /\.(png|jpe?g|webp|gif|bmp|avif)$/i.test(arquivo.name || ""));
+    if (!ehImg) {
       alert("Selecione um arquivo de imagem válido (PNG, JPG ou WEBP).");
       return;
     }
@@ -1153,11 +1157,18 @@ const InventarioAgulhas = (() => {
       item.criado_em = new Date().toISOString();
     }
 
-    const salvo = await dbSalvar(item);
+    if (salvandoItemDrawer) return;
+    salvandoItemDrawer = true;
+    let salvo;
+    try {
+      salvo = await dbSalvar(item);
+    } finally {
+      salvandoItemDrawer = false;
+    }
 
-    if (idVal) {
-      const idx = itensCache.findIndex((i) => Number(i.id) === Number(salvo.id));
-      if (idx !== -1) itensCache[idx] = salvo;
+    const idxExistente = itensCache.findIndex((i) => Number(i.id) === Number(salvo.id));
+    if (idxExistente !== -1) {
+      itensCache[idxExistente] = salvo;
     } else {
       itensCache.unshift(salvo);
     }
@@ -1342,14 +1353,19 @@ const InventarioAgulhas = (() => {
     const btnRemoverFoto = document.getElementById("btn-remover-foto-bib");
 
     if (uploadArea && inputFoto) {
+      inputFoto.addEventListener("click", (e) => {
+        e.stopPropagation();
+      });
+
       uploadArea.addEventListener("click", (e) => {
-        if (e.target.closest("#btn-remover-foto-bib")) return;
+        if (e.target === inputFoto || e.target.closest("#btn-remover-foto-bib")) return;
         inputFoto.click();
       });
 
       inputFoto.addEventListener("change", (e) => {
         const arq = e.target.files?.[0];
         if (arq) processarFotoUpload(arq);
+        e.target.value = "";
       });
 
       uploadArea.addEventListener("dragover", (e) => {
@@ -1420,7 +1436,12 @@ const InventarioAgulhas = (() => {
     }
   }
 
+  let jaInicializado = false;
+  let salvandoItemDrawer = false;
+
   async function init() {
+    if (jaInicializado) return;
+    jaInicializado = true;
     vincularEventos();
     try {
       await carregarDadosIniciais();

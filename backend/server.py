@@ -120,6 +120,12 @@ def inicializar_banco() -> None:
                 if nome_col not in cols_existentes:
                     conn.execute(f"ALTER TABLE projetos ADD COLUMN {nome_col} {definicao}")
             conn.commit()
+        cols_fios = {
+            row["name"] for row in conn.execute("PRAGMA table_info(fios)").fetchall()
+        }
+        if cols_fios and "cor_hex" not in cols_fios:
+            conn.execute("ALTER TABLE fios ADD COLUMN cor_hex TEXT DEFAULT ''")
+            conn.commit()
         conn.executescript(schema_sql)
         conn.commit()
 
@@ -212,7 +218,7 @@ def inserir_ou_atualizar(conn: sqlite3.Connection, colecao: str, dados: dict, id
 
     if colecao == "fios":
         colunas = [
-            "nome", "marca", "cor_nome", "cor_codigo", "lote", "imagem_url",
+            "nome", "marca", "cor_nome", "cor_codigo", "cor_hex", "lote", "imagem_url",
             "tex", "composicao", "peso_novelo_g", "metragem_novelo_m", "agulha",
             "quantidade", "peso_restante_g", "preco_pago", "localizacao", "observacoes",
             "atualizado_em",
@@ -222,6 +228,7 @@ def inserir_ou_atualizar(conn: sqlite3.Connection, colecao: str, dados: dict, id
             str(dados.get("marca") or "").strip(),
             str(dados.get("cor_nome") or "").strip(),
             str(dados.get("cor_codigo") or "").strip(),
+            str(dados.get("cor_hex") or "").strip(),
             str(dados.get("lote") or "").strip(),
             dados.get("imagem_url") or "",
             dados.get("tex"),

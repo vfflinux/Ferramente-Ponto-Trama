@@ -1,0 +1,395 @@
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   BUSCA GLOBAL / PALETA DE COMANDOS (CTRL + K)
+   Inspirado em Linear + Raycast + Notion — 100% Offline & Responsivo
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+
+/* Botão discreto de lupa injetado no cabeçalho de todas as 12 telas */
+.btn-busca-global-topo {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 11px;
+  border-radius: 10px;
+  border: 1px solid rgba(252, 241, 208, 0.24);
+  background: rgba(1, 7, 54, 0.42);
+  color: rgba(252, 241, 208, 0.88);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease, transform 0.15s ease;
+}
+
+.btn-busca-global-topo:hover {
+  background: rgba(34, 57, 111, 0.72);
+  border-color: rgba(252, 241, 208, 0.55);
+  color: #fcf1d0;
+  transform: translateY(-1px);
+}
+
+.btn-busca-global-topo:focus-visible {
+  outline: 2px solid #fcf1d0;
+  outline-offset: 2px;
+}
+
+.icone-lupa-global {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+}
+
+.busca-topo-texto {
+  white-space: nowrap;
+}
+
+.busca-topo-kbd {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 5px;
+  background: rgba(252, 241, 208, 0.12);
+  border: 1px solid rgba(252, 241, 208, 0.22);
+  color: #fcf1d0;
+  line-height: 1.2;
+}
+
+/* ==========================================================================
+   OVERLAY E JANELA FLUTUANTE DA PALETA DE COMANDOS
+   ========================================================================== */
+.modal-busca-global-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2400;
+  background: rgba(1, 6, 36, 0.72);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 8vh 16px 24px 16px;
+  box-sizing: border-box;
+  animation: buscaFadeIn 0.14s ease-out;
+}
+
+@keyframes buscaFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes buscaSlideIn {
+  from { opacity: 0; transform: translateY(-10px) scale(0.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.modal-busca-global-caixa {
+  width: 100%;
+  max-width: 650px;
+  max-height: min(76vh, 620px);
+  display: flex;
+  flex-direction: column;
+  border-radius: 16px;
+  background: #0c193d;
+  border: 1.5px solid rgba(252, 241, 208, 0.24);
+  box-shadow: 0 28px 70px rgba(0, 0, 0, 0.72), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  overflow: hidden;
+  animation: buscaSlideIn 0.16s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Campo de Input Superior */
+.busca-global-topo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(252, 241, 208, 0.12);
+  background: rgba(1, 7, 54, 0.42);
+}
+
+.busca-global-lupa-input {
+  width: 20px;
+  height: 20px;
+  color: rgba(252, 241, 208, 0.68);
+  flex-shrink: 0;
+}
+
+.input-busca-global {
+  flex: 1;
+  min-width: 0;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--cor-texto-principal, #fcf1d0) !important;
+  font-size: 16px;
+  font-weight: 500;
+  outline: none;
+  padding: 4px 0;
+}
+
+.input-busca-global::placeholder {
+  color: rgba(252, 241, 208, 0.45);
+}
+
+.btn-limpar-busca-global,
+.btn-fechar-busca-global {
+  border: 1px solid rgba(252, 241, 208, 0.2);
+  background: rgba(252, 241, 208, 0.08);
+  color: rgba(252, 241, 208, 0.82);
+  border-radius: 7px;
+  padding: 4px 8px;
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+}
+
+.btn-limpar-busca-global:hover,
+.btn-fechar-busca-global:hover {
+  background: rgba(252, 241, 208, 0.18);
+  color: #fcf1d0;
+}
+
+/* Barra de Escopos (Chips) */
+.busca-global-escopos {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 16px;
+  border-bottom: 1px solid rgba(252, 241, 208, 0.08);
+  overflow-x: auto;
+  scrollbar-width: none;
+  flex-shrink: 0;
+}
+
+.busca-global-escopos::-webkit-scrollbar {
+  display: none;
+}
+
+.busca-escopo-chip {
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(252, 241, 208, 0.14);
+  background: transparent;
+  color: rgba(252, 241, 208, 0.7);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.busca-escopo-chip:hover {
+  color: #fcf1d0;
+  border-color: rgba(252, 241, 208, 0.35);
+}
+
+.busca-escopo-chip.ativo {
+  background: #fcf1d0;
+  color: #0d1c42;
+  border-color: #fcf1d0;
+  font-weight: 800;
+}
+
+/* Lista de Resultados */
+.busca-global-lista {
+  flex: 1;
+  min-height: 160px;
+  overflow-y: auto;
+  padding: 8px 10px 12px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  scrollbar-width: thin;
+}
+
+.busca-grupo-titulo {
+  font-size: 10.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.9px;
+  color: rgba(252, 241, 208, 0.52);
+  padding: 10px 10px 4px 10px;
+}
+
+.busca-grupo-titulo:first-child {
+  padding-top: 4px;
+}
+
+.busca-item-resultado {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 9px 11px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--cor-texto-principal, #fcf1d0);
+  text-align: left;
+  cursor: pointer;
+  box-sizing: border-box;
+  transition: background-color 0.12s ease, border-color 0.12s ease;
+}
+
+.busca-item-resultado.selecionado {
+  background: rgba(52, 85, 165, 0.42);
+  border-color: rgba(252, 241, 208, 0.28);
+}
+
+.busca-item-icone {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgba(1, 7, 54, 0.52);
+  border: 1px solid rgba(252, 241, 208, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  flex-shrink: 0;
+}
+
+.busca-item-swatch {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 2px solid rgba(252, 241, 208, 0.48);
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.25);
+  flex-shrink: 0;
+}
+
+.busca-item-textos {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.busca-item-titulo {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--cor-texto-principal, #fcf1d0);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.busca-item-sub {
+  font-size: 12px;
+  color: rgba(252, 241, 208, 0.68);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.busca-global-mark {
+  background: rgba(252, 241, 208, 0.24);
+  color: inherit;
+  border-radius: 3px;
+  padding: 0 2px;
+}
+
+.busca-item-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(1, 7, 54, 0.55);
+  border: 1px solid rgba(252, 241, 208, 0.16);
+  color: rgba(252, 241, 208, 0.85);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.busca-item-enter {
+  font-size: 13px;
+  font-weight: 700;
+  color: rgba(252, 241, 208, 0.7);
+  opacity: 0;
+  transition: opacity 0.12s ease;
+  flex-shrink: 0;
+}
+
+.busca-item-resultado.selecionado .busca-item-enter {
+  opacity: 1;
+}
+
+/* Estado Vazio */
+.busca-global-vazio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 6px;
+  padding: 40px 20px;
+  color: rgba(252, 241, 208, 0.72);
+}
+
+.busca-vazio-ico {
+  font-size: 32px;
+  opacity: 0.7;
+}
+
+.busca-global-vazio strong {
+  color: var(--cor-texto-principal, #fcf1d0);
+  font-size: 14.5px;
+}
+
+.busca-global-vazio span {
+  font-size: 12.5px;
+  max-width: 400px;
+}
+
+/* Rodapé com Dicas de Teclado */
+.busca-global-rodape {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 16px;
+  border-top: 1px solid rgba(252, 241, 208, 0.1);
+  background: rgba(1, 7, 54, 0.45);
+  font-size: 11.5px;
+  color: rgba(252, 241, 208, 0.62);
+  flex-shrink: 0;
+}
+
+.busca-rodape-atalhos {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.busca-rodape-atalhos span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.busca-rodape-atalhos kbd {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: rgba(252, 241, 208, 0.12);
+  border: 1px solid rgba(252, 241, 208, 0.22);
+  color: #fcf1d0;
+}
+
+/* Redução de Movimento */
+@media (prefers-reduced-motion: reduce) {
+  .modal-busca-global-overlay,
+  .modal-busca-global-caixa {
+    animation: none;
+  }
+}
+
+:root[data-reduzir-animacoes="true"] .modal-busca-global-overlay,
+:root[data-reduzir-animacoes="true"] .modal-busca-global-caixa {
+  animation: none;
+}

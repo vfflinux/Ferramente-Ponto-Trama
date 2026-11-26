@@ -156,12 +156,12 @@ const ContadorCarreiras = (() => {
             −
           </button>
           <input
-            type="number"
+            type="text"
+            inputmode="numeric"
+            pattern="[0-9]*"
             class="input-carreiras"
             id="carreiras-${id}"
             value="0"
-            min="0"
-            step="1"
             aria-label="Número de carreiras"
             title="Número de carreiras (clique para digitar manualmente)"
           />
@@ -199,11 +199,12 @@ const ContadorCarreiras = (() => {
         <div class="linha-input-pontos">
           <label for="pontos-carreira-${id}" class="label-pontos">Pontos por carreira:</label>
           <input
-            type="number"
+            type="text"
+            inputmode="numeric"
+            pattern="[0-9]*"
             id="pontos-carreira-${id}"
             class="input-pontos-carreira"
             value="0"
-            min="0"
             placeholder="0"
             aria-label="Pontos por carreira"
           />
@@ -221,11 +222,12 @@ const ContadorCarreiras = (() => {
         <div class="linha-meta">
           <label for="meta-${id}" class="label-meta">Avisar na carreira:</label>
           <input
-            type="number"
+            type="text"
+            inputmode="numeric"
+            pattern="[0-9]*"
             id="meta-${id}"
             class="input-meta"
             placeholder="0"
-            min="0"
             aria-label="Meta de carreiras para disparar alarme"
             title="Clique para digitar a carreira de aviso"
           />

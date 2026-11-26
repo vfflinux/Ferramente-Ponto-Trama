@@ -392,22 +392,85 @@
   }
 
   /* ========================================================================
-     3. HOME (TELA INICIAL)
+     3. HOME (BANCADA DO ATELIÊ MOBILE)
      ======================================================================== */
   .conteiner-home {
-    padding: 24px 16px;
+    padding: 14px 12px 28px 12px !important;
   }
 
-  .acoes-home {
-    max-width: 340px;
+  .bancada-home-inner {
     gap: 14px;
   }
 
-  .btn-home-primario,
-  .btn-home-secundario {
-    height: 54px;
-    font-size: 15.5px;
-    border-radius: 14px;
+  .home-boas-vindas,
+  .home-hero-card {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 16px 14px;
+    gap: 14px;
+  }
+
+  .home-bv-ilustra {
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
+  }
+
+  .home-bv-ilustra svg {
+    width: 36px;
+    height: 36px;
+  }
+
+  .home-hero-capa {
+    width: 100%;
+    height: 150px;
+  }
+
+  .home-hero-nome {
+    font-size: 19px;
+  }
+
+  .home-hero-acoes,
+  .home-bv-acoes {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .home-hero-acoes .btn-home-hero-primario,
+  .home-bv-acoes .btn-home-primario {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+
+  .home-bv-acoes .btn-home-secundario {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+
+  .home-metricas-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .home-metrica-card {
+    padding: 12px 14px;
+  }
+
+  .home-atalhos-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .home-atalho-btn:first-child {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    padding: 13px 14px;
+  }
+
+  .home-recentes-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
   }
 
   /* ========================================================================
@@ -1073,9 +1136,26 @@
 
   .acoes-topo-fios {
     width: 100%;
-    display: grid;
-    grid-template-columns: auto 1fr;
+    display: flex;
+    flex-wrap: wrap;
     gap: 8px;
+  }
+
+  .acoes-topo-fios .btn-novo-fio {
+    flex: 1;
+  }
+
+  .lbl-modo-fios {
+    display: none;
+  }
+
+  .barra-paleta-cromatica {
+    padding: 8px 10px;
+    gap: 8px;
+  }
+
+  .paleta-cromatica-ativo-texto {
+    display: none;
   }
 
   .menu-backup-popup {
@@ -1084,7 +1164,8 @@
   }
 
   .btn-novo-fio,
-  .btn-backup-fios {
+  .btn-backup-fios,
+  .btn-simulador-fios {
     justify-content: center;
     height: 40px;
   }
@@ -1125,16 +1206,75 @@
     padding-bottom: 24px;
   }
 
+  .grade-cards-fios.modo-compacto,
+  #opcao-menu:checked ~ main .grade-cards-fios.modo-compacto {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px;
+  }
+
   .modal-overlay-fio {
     padding: 8px;
   }
 
   .modal-conteudo-fio,
   .modal-conteudo-detalhes,
-  .modal-conteudo-confirmar {
+  .modal-conteudo-confirmar,
+  .modal-conteudo-simulador {
     width: 100% !important;
     max-width: 100% !important;
     max-height: 92dvh !important;
+  }
+
+  .dock-simulador-cores {
+    padding: 10px 12px;
+    gap: 10px;
+  }
+
+  .simulador-corpo {
+    padding: 12px;
+  }
+
+  .sim-granny-quadro {
+    width: 196px;
+    height: 196px;
+  }
+
+  .sim-preview-pantone {
+    min-height: 200px;
+  }
+
+  .sim-pantone-cor-nome {
+    font-size: 13px;
+  }
+
+  .simulador-grade-estoque {
+    grid-template-columns: 1fr;
+  }
+
+  /* Busca Global / Paleta de Comandos no Mobile */
+  .btn-busca-global-topo {
+    padding: 0 10px;
+    height: 36px;
+    min-width: 36px;
+    justify-content: center;
+  }
+
+  .busca-topo-texto,
+  .busca-topo-kbd {
+    display: none;
+  }
+
+  .modal-busca-global-overlay {
+    padding: 12px 10px 16px 10px;
+  }
+
+  .modal-busca-global-caixa {
+    max-height: 86dvh;
+    border-radius: 14px;
+  }
+
+  .busca-rodape-atalhos {
+    display: none;
   }
 
   .abas-modal-fio {

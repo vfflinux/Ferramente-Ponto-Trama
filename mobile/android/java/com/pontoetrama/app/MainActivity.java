@@ -54,6 +54,7 @@ public class MainActivity extends Activity {
     private WebView webView;
     private ValueCallback<Uri[]> filePathCallback;
     private String conteudoPendenteSalvar;
+    private byte[] bytesPendentesSalvar;
 
     @SuppressLint("SetJavaScriptEnabled")
     @SuppressWarnings("deprecation")
@@ -250,6 +251,7 @@ public class MainActivity extends Activity {
         @JavascriptInterface
         public void salvarArquivo(final String nomeArquivo, final String conteudo) {
             conteudoPendenteSalvar = conteudo;
+            bytesPendentesSalvar = null;
             runOnUiThread(() -> {
                 try {
                     Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
@@ -259,6 +261,29 @@ public class MainActivity extends Activity {
                     startActivityForResult(intent, REQ_SAVE_FILE);
                 } catch (Exception e) {
                     conteudoPendenteSalvar = null;
+                    Toast.makeText(MainActivity.this, "Não foi possível abrir o seletor de arquivos.", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+
+        @JavascriptInterface
+        public void salvarArquivoBase64(final String nomeArquivo, final String mimeType, final String base64Conteudo) {
+            try {
+                bytesPendentesSalvar = android.util.Base64.decode(base64Conteudo, android.util.Base64.DEFAULT);
+                conteudoPendenteSalvar = null;
+            } catch (Exception e) {
+                bytesPendentesSalvar = null;
+                return;
+            }
+            runOnUiThread(() -> {
+                try {
+                    Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+                    intent.addCategory(Intent.CATEGORY_OPENABLE);
+                    intent.setType(mimeType != null && !mimeType.isEmpty() ? mimeType : "application/octet-stream");
+                    intent.putExtra(Intent.EXTRA_TITLE, nomeArquivo != null ? nomeArquivo : "ponto-e-trama-arquivo.png");
+                    startActivityForResult(intent, REQ_SAVE_FILE);
+                } catch (Exception e) {
+                    bytesPendentesSalvar = null;
                     Toast.makeText(MainActivity.this, "Não foi possível abrir o seletor de arquivos.", Toast.LENGTH_SHORT).show();
                 }
             });
@@ -276,18 +301,23 @@ public class MainActivity extends Activity {
             return;
         }
         if (requestCode == REQ_SAVE_FILE) {
-            if (resultCode == RESULT_OK && data != null && data.getData() != null && conteudoPendenteSalvar != null) {
+            if (resultCode == RESULT_OK && data != null && data.getData() != null && (conteudoPendenteSalvar != null || bytesPendentesSalvar != null)) {
                 try (OutputStream os = getContentResolver().openOutputStream(data.getData())) {
                     if (os != null) {
-                        os.write(conteudoPendenteSalvar.getBytes(StandardCharsets.UTF_8));
+                        if (bytesPendentesSalvar != null) {
+                            os.write(bytesPendentesSalvar);
+                        } else {
+                            os.write(conteudoPendenteSalvar.getBytes(StandardCharsets.UTF_8));
+                        }
                         os.flush();
-                        Toast.makeText(this, "Backup salvo no celular!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "Arquivo salvo no celular!", Toast.LENGTH_SHORT).show();
                     }
                 } catch (Exception e) {
                     Toast.makeText(this, "Erro ao salvar arquivo.", Toast.LENGTH_SHORT).show();
                 }
             }
             conteudoPendenteSalvar = null;
+            bytesPendentesSalvar = null;
             return;
         }
         super.onActivityResult(requestCode, resultCode, data);
@@ -301,7 +331,7 @@ public class MainActivity extends Activity {
                 "(function(){" +
                 "  var chk = document.getElementById('opcao-menu');" +
                 "  if (window.innerWidth <= 768 && chk && !chk.checked) { chk.checked = true; return 'menu'; }" +
-                "  var abertos = document.querySelectorAll('.overlay-contador-tela-toda[style*=\"flex\"], .overlay-pasta-aberta.aberto, .drawer-overlay-proj.aberto, .drawer-overlay-bib.aberto, .drawer-overlay-estoque.aberto, .modal-overlay-graf[style*=\"flex\"], .modal-overlay-cfg[style*=\"flex\"], .modal-overlay-proj[style*=\"flex\"], .modal-overlay-fio[style*=\"flex\"], .modal-overlay-bib[style*=\"flex\"], .modal-overlay-amostra[style*=\"flex\"], .modal-overlay-banco[style*=\"flex\"]');" +
+                "  var abertos = document.querySelectorAll('.modal-busca-global-overlay[style*=\"flex\"], .overlay-contador-tela-toda[style*=\"flex\"], .overlay-pasta-aberta.aberto, .drawer-overlay-proj.aberto, .drawer-overlay-bib.aberto, .drawer-overlay-estoque.aberto, .modal-overlay-graf[style*=\"flex\"], .modal-overlay-cfg[style*=\"flex\"], .modal-overlay-proj[style*=\"flex\"], .modal-overlay-fio[style*=\"flex\"], .modal-overlay-bib[style*=\"flex\"], .modal-overlay-amostra[style*=\"flex\"], .modal-overlay-banco[style*=\"flex\"]');" +
                 "  if (abertos.length > 0) { document.dispatchEvent(new KeyboardEvent('keydown', {key:'Escape'})); return 'closed'; }" +
                 "  var home = document.getElementById('secao-home');" +
                 "  if (home && home.style.display === 'none') {" +

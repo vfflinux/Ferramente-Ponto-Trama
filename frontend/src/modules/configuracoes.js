@@ -15,9 +15,11 @@ const Configuracoes = (() => {
     nomeAtelie: "Ponto & Trama",
     assinaturaOrcamento: "",
     tecnicaPrincipal: "croche", // 'croche' | 'trico' | 'ambos'
-    tema: "classico", // 'classico' | 'noite' | 'claro'
+    tema: "classico", // 'classico' | 'noite' | 'claro' | 'linho' | 'salvia' | 'ameixa' | 'mel' | 'floresta'
     tamanhoFonte: "padrao", // 'compacto' | 'padrao' | 'grande'
     reduzirAnimacoes: false,
+    aranhasAtelie: "discreto", // 'desligado' | 'discreto' | 'vivo'
+    aranhasReagirCursor: true,
     sidebarInicial: "expandido", // 'expandido' | 'recolhido'
     ferramentasBarraLateral: [
       "projetos",
@@ -139,10 +141,33 @@ const Configuracoes = (() => {
         root.classList.add("transicao-tema");
         setTimeout(() => root.classList.remove("transicao-tema"), 260);
       }
-      if (prefs.tema === "classico") root.removeAttribute("data-tema");
-      else root.setAttribute("data-tema", prefs.tema);
+      const temasValidos = new Set(["classico", "noite", "claro", "linho", "salvia", "ameixa", "mel", "floresta"]);
+      const temaEfetivo = temasValidos.has(prefs.tema) ? prefs.tema : "classico";
+      const ehBaseClara = temaEfetivo === "claro" || temaEfetivo === "linho" || temaEfetivo === "salvia";
+      const ehBaseEscuraCustom = temaEfetivo === "ameixa" || temaEfetivo === "mel" || temaEfetivo === "floresta";
+
+      if (temaEfetivo === "classico") root.removeAttribute("data-tema");
+      else root.setAttribute("data-tema", temaEfetivo);
+
+      if (ehBaseClara) root.setAttribute("data-tema-base", "claro");
+      else if (ehBaseEscuraCustom) root.setAttribute("data-tema-base", "escuro-custom");
+      else root.removeAttribute("data-tema-base");
+
+      const CORES_BARRA_TEMA = {
+        classico: "#010736",
+        noite: "#050812",
+        claro: "#1b2e5a",
+        linho: "#6e3222",
+        salvia: "#243b32",
+        ameixa: "#2b063d",
+        mel: "#331b00",
+        floresta: "#051711"
+      };
+      const corBarra = CORES_BARRA_TEMA[temaEfetivo] || "#010736";
+      const metaTheme = document.querySelector('meta[name="theme-color"]');
+      if (metaTheme) metaTheme.setAttribute("content", corBarra);
+
       if (typeof window !== "undefined" && window.PontoETramaAndroid && typeof window.PontoETramaAndroid.atualizarTema === "function") {
-        const corBarra = prefs.tema === "noite" ? "#050812" : prefs.tema === "claro" ? "#1b2e5a" : "#010736";
         window.PontoETramaAndroid.atualizarTema(corBarra);
       }
     }
@@ -346,6 +371,7 @@ const Configuracoes = (() => {
     setVal("cfg-moeda", prefs.moeda);
 
     setChk("cfg-reduzir-animacoes", prefs.reduzirAnimacoes);
+    setChk("cfg-aranhas-reagir-cursor", prefs.aranhasReagirCursor !== false);
     setChk("cfg-som-alarme", prefs.somAlarme);
     setChk("cfg-alerta-visual", prefs.alertaVisual);
     setChk("cfg-vibracao", prefs.vibracao);
@@ -362,6 +388,7 @@ const Configuracoes = (() => {
     };
     ativarSegmented("cfg-tecnica-principal", prefs.tecnicaPrincipal);
     ativarSegmented("cfg-tamanho-fonte", prefs.tamanhoFonte);
+    ativarSegmented("cfg-aranhas-atelie", prefs.aranhasAtelie || "discreto");
     ativarSegmented("cfg-sidebar-inicial", prefs.sidebarInicial);
     ativarSegmented("cfg-unidade-medida", prefs.unidadeMedida);
 
@@ -1127,6 +1154,7 @@ const Configuracoes = (() => {
       });
     };
     ligarSwitch("cfg-reduzir-animacoes", "reduzirAnimacoes");
+    ligarSwitch("cfg-aranhas-reagir-cursor", "aranhasReagirCursor");
     ligarSwitch("cfg-som-alarme", "somAlarme");
     ligarSwitch("cfg-alerta-visual", "alertaVisual");
     ligarSwitch("cfg-vibracao", "vibracao");
@@ -1151,8 +1179,18 @@ const Configuracoes = (() => {
     };
     ligarSegmented("cfg-tecnica-principal", "tecnicaPrincipal");
     ligarSegmented("cfg-tamanho-fonte", "tamanhoFonte");
+    ligarSegmented("cfg-aranhas-atelie", "aranhasAtelie");
     ligarSegmented("cfg-sidebar-inicial", "sidebarInicial");
     ligarSegmented("cfg-unidade-medida", "unidadeMedida");
+
+    document.getElementById("btn-cfg-chamar-aranha")?.addEventListener("click", () => {
+      if (typeof AranhasAtelie !== "undefined" && typeof AranhasAtelie.invocarAgora === "function") {
+        const inst = AranhasAtelie.invocarAgora();
+        if (inst && inst.especie) {
+          mostrarToast(`🕷️ ${inst.especie.nome} apareceu no ateliê!`);
+        }
+      }
+    });
 
     // Cards de Tema
     document.querySelectorAll("#cfg-grade-temas .card-tema-cfg").forEach((card) => {

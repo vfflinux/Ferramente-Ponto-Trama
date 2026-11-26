@@ -10,8 +10,8 @@ Aplicação multiplataforma **100% offline e local** para organização de artes
 
 | Plataforma | Arquivo | Tamanho | Onde baixar | Como instalar / abrir |
 | :--- | :--- | :---: | :--- | :--- |
-| **Android (Celular)** | `ponto-e-trama.apk` (`v1.0.1`) | `658 KB` | [Baixar APK (`mobile/ponto-e-trama.apk`)](https://github.com/vfflinux/Ferramente-Ponto-Trama/raw/main/mobile/ponto-e-trama.apk) | Copie o `.apk` para o celular (Android 7.0 a 15+), toque no arquivo e autorize a instalação. Roda **100% local**, sem permissão de internet. |
-| **Linux / Ubuntu (Instalador `.deb`)** | `ponto-e-trama_1.0.0_all.deb` | `223 KB` | [Baixar `.deb` (`dist/ponto-e-trama_1.0.0_all.deb`)](https://github.com/vfflinux/Ferramente-Ponto-Trama/raw/main/dist/ponto-e-trama_1.0.0_all.deb) | Clique duas vezes no `.deb` (abre na Central de Aplicativos do Ubuntu) ou instale via `sudo apt install ./dist/ponto-e-trama_1.0.0_all.deb`. |
+| **Android (Celular)** | `ponto-e-trama.apk` (`v1.0.1`) | `722 KB` | [Baixar APK (`mobile/ponto-e-trama.apk`)](https://github.com/vfflinux/Ferramente-Ponto-Trama/raw/main/mobile/ponto-e-trama.apk) | Copie o `.apk` para o celular (Android 7.0 a 15+), toque no arquivo e autorize a instalação. Roda **100% local**, sem permissão de internet. |
+| **Linux / Ubuntu (Instalador `.deb`)** | `ponto-e-trama_1.0.0_all.deb` | `266 KB` | [Baixar `.deb` (`dist/ponto-e-trama_1.0.0_all.deb`)](https://github.com/vfflinux/Ferramente-Ponto-Trama/raw/main/dist/ponto-e-trama_1.0.0_all.deb) | Clique duas vezes no `.deb` (abre na Central de Aplicativos do Ubuntu) ou instale via `sudo apt install ./dist/ponto-e-trama_1.0.0_all.deb`. |
 | **Linux / Ubuntu (Atalho gráfico)** | `Ponto & Trama.desktop` / `Instalar Ponto & Trama.desktop` | — | Pasta [`dist/`](dist/) | Clique com o botão direito → *Permitir iniciar* e dê duplo clique para abrir o app (`PontoETrama`) ou o instalador gráfico GTK (`desktop/instalador-gui.py`). |
 | **Web (Navegador / PWA)** | `frontend/index.html` | — | [`frontend/index.html`](frontend/index.html) | Abra no navegador ou sirva `frontend/` (salva tudo localmente via IndexedDB + Service Worker offline-first). |
 
@@ -21,9 +21,12 @@ Aplicação multiplataforma **100% offline e local** para organização de artes
 
 > **Barra lateral enxuta, personalizável e arrastável:** em **Configurações → Aparência e Leitura**, você escolhe exatamente quais ferramentas ficam visíveis na barra lateral. As demais ficam na aba **Ferramentas**, que infla um popup conectado exibindo somente os ícones — e, com o popup aberto, basta **arrastar e soltar** ferramentas entre a barra lateral e o popup (ou reordená-las) para ativar/desativar em tempo real nas Configurações.
 
-### 1. Início (Home)
-- Tela inicial limpa com acesso direto a **`+ Novo projeto`** e **`Ver meus projetos`**.
-- Clique na logo da barra lateral (ou na aba *Início* no celular) para voltar rapidamente.
+> **Busca Global / Paleta de Comandos (`Ctrl + K`):** disponível em todas as 12 telas (pelo atalho `Ctrl + K` / `Cmd + K` / `/` ou pelo ícone de lupa no cabeçalho). Digite `4.5`, `Amigurumi`, `Touca bebê`, `sc2tog` ou o nome de um projeto/fio e salte direto para o item, dicionário, tabela de conversão ou comando rápido com 1 clique.
+
+### 1. Início — "Bancada do Ateliê"
+- **Saudação contextual** por horário (*Bom dia / Boa tarde / Boa noite*) com o nome configurado do ateliê e data formatada em `pt-BR`.
+- **Hero Card "Continue de Onde Parou":** exibe automaticamente o projeto na bancada (ou o mais recente *Em andamento*), capa/ícone, tags, anel circular SVG de progresso, contador de carreiras, tempo tecido e ações diretas (**`▶ Retomar Workspace`**, **`+1 Carreira`** com sincronização imediata e **`⛶ Tela Toda`**) — ou um cartão de Boas-Vindas limpo quando o ateliê inicia vazio.
+- **Métricas reais, alertas discretos e atalhos:** 3 cards clicáveis (*Em andamento*, *Novelos no estoque*, *Tempo tecido*), faixa condicional de prazos próximos/fios zerados, 5 atalhos de 1 toque e mini-cards dos projetos recentes.
 
 ### 2. Gerenciador de Projetos (Pastas / Fichários + Workspace)
 - **Pastas / Fichários no Dashboard:** cards em formato de fichário com aba superior, capa ou ilustração, status colorido (*Na Fila*, *Em Andamento*, *Pausado*, *Concluído*), menu `⋯` (*Workspace*, *Retirar*, *Editar*, *Duplicar*, *Arquivar*, *Excluir*) e barra de progresso.
@@ -51,9 +54,11 @@ Aplicação multiplataforma **100% offline e local** para organização de artes
 - **Integração com Estoque:** botão **Estoque** (autocomplete, cálculo de sobras e gaveta lateral de fios) e botão **`🎀 Aviamentos`** (puxa custos de *Agulhas e Acessórios*).
 - Reativa às Configurações: moeda (`R$` / `$` / `€`), valor/hora padrão, margem padrão, nome do ateliê e assinatura personalizada ao copiar o orçamento.
 
-### 6. Inventário de Fios *(inicia vazio)*
-- Cadastro de linhas com marca, cor, código, lote, TEX, composição, peso, metragem, agulha recomendada (crochê e tricô), localização, preço (na moeda selecionada nas Configurações) e foto com compressão automática.
-- Controle rápido `- / +`, resumo consolidado do estoque, tela de detalhes com ficha técnica, duplicação e backup `.json`.
+### 6. Inventário de Fios — Prateleira de Cores / Pantone *(inicia vazio)*
+- **Visualização em Amostras de Cor (Swatches Pantone & Etiqueta de Novelo):** cards com faixa ampla da cor real (`cor_hex`, com inferência automática pelo nome da cor ou extração automática da foto carregada), contraste automático WCAG, moldura estilo etiqueta quando há foto, alternador **`🎨 Prateleira`** / **`▦ Compacto`** e indicador visual de quanto resta do novelo (*Cheio*, *Médio*, *Acabando*, *Zerado*).
+- **Filtro por Paleta Cromática:** bolinhas clicáveis por família de cor no topo (*Branco & Cru*, *Bege & Terrosos*, *Amarelo*, *Rosa*, *Vermelho*, *Roxo*, *Azul*, *Verde*, *Escuros*) com contadores em tempo real.
+- **Simulador de Combinação de Cores (2 a 5 fios):** seleção via cards + dock flutuante para testar harmonias ao vivo em **Listras**, **Granny Square (SVG concêntrico)** ou **Colunas Pantone**, com sugestão automática **`✨ Harmonia`**, aviso de diferença de TEX, cópia da lista e exportação em **PNG** (inclusive nativa no Android).
+- Cadastro completo (marca, cor, código, lote, TEX, composição, peso, metragem, agulha, localização, preço e foto), controle rápido `- / +`, tela de detalhes, duplicação e backup `.json`.
 
 ### 7. Agulhas e Acessórios *(inicia vazio)*
 - Organização em **3 zonas** (abas *Todas*, *Agulhas*, *Ferramentas* e *Aviamentos* + subfiltros *Crochê*, *Tricô Reto*, *Tricô Circular*, *Tapeçaria*; busca + alternador Grade/Lista; listagem responsiva).
@@ -79,8 +84,9 @@ Aplicação multiplataforma **100% offline e local** para organização de artes
 
 ### 12. Configurações, Temas Harmonizados e Sincronização Wi-Fi
 - **Ateliê e Perfil:** nome do ateliê, assinatura para orçamentos e **Técnica Principal** (`Crochê`, `Tricô` ou `Ambos`) refletida em projetos, amostras, agulhas e placeholders.
-- **Aparência e Barra Lateral (`frontend/styles/base/temas.css`):**
-  - 3 temas visuais harmonizados com contraste AA/AAA: **Azul Marinho Clássico**, **Noite Profunda** e **Ateliê Claro**.
+- **Aparência, Micro-identidade Artesanal e 8 Temas (`frontend/styles/base/temas.css`):**
+  - **8 temas visuais harmonizados** com contraste WCAG AA/AAA (mantendo o *Azul Marinho Clássico* como padrão): **Azul Marinho Clássico**, **Noite Profunda**, **Ateliê Claro**, **Linho & Terracota** (textura sutil de linho + terracota e verde-oliva), **Sálvia & Algodão** (conforto ocular para leitura prolongada), **Ameixa & Veludo**, **Mel & Cacau** e **Floresta & Âmbar**.
+  - **Identidade Ñanduobyeté & Costura:** alinhavos pontilhados finos (`dashed`), anéis de progresso com pontas arredondadas, estados vazios ilustrados com SVGs artesanais detalhados, teias de renda discretas e o **Ecossistema Vivo de Aranhas do Ateliê** (5 espécies vetoriais com articulação individual das 8 patas, 7 coreografias e 5 comportamentos naturais configuráveis em *Desligado / Discreto / Ateliê Vivo*, com reação opcional ao cursor e botão *Chamar agora*).
   - 3 tamanhos de fonte (*Compacto*, *Padrão*, *Grande*), *Reduzir Animações*, estado inicial da barra lateral e **seletor de ferramentas da barra lateral** (as desmarcadas vão para o popup conectado da aba **Ferramentas**).
 - **Padrões das Ferramentas:** alerta sonoro offline (com teste de som), alerta visual, vibração, *Manter tela acesa* (Wake Lock + nativo Android), atalhos de teclado, valor/hora, margem padrão, moeda global (`BRL` / `USD` / `EUR`), unidade padrão (`cm`/`pol`), vínculo automático de projetos, marcação automática de agulha em uso e confetes.
 - **Sincronização Local via Wi-Fi (`backend/sync_wifi.py`):** servidor HTTP temporário no Ubuntu com **QR Code SVG 100% offline** e link manual, token temporário de uso único (5 min), seleção de direção (**PC → Celular**, **Celular → PC** ou **Mesclar** comparando `updatedAt`), página mobile embarcada sem instalação extra, validação de schema, backup automático de rollback (`backup_pre_sync.json`), encerramento limpo e diagnóstico de firewall/UFW.
@@ -113,7 +119,7 @@ Aplicação multiplataforma **100% offline e local** para organização de artes
   - **Versão Web (PWA) e App Android:** **IndexedDB (`v4`)** com auto-upgrade, fallback em `localStorage` e Service Worker offline-first ([`frontend/sw.js`](frontend/sw.js), [`frontend/manifest.json`](frontend/manifest.json)).
 - **Otimização de build e performance:**
   - Minificação automática de HTML/CSS/JS na geração dos pacotes via [`scripts/otimizar-build.py`](scripts/otimizar-build.py) (`-23%` nos assets empacotados), mantendo o código-fonte legível no repositório.
-  - Compressão `xz -z9` no `.deb` (`223 KB`), assinatura completa no `.apk` (`658 KB`) e inicialização sob demanda (*lazy init* + *lazy sync*).
+  - Compressão `xz -z9` no `.deb` (`266 KB`), assinatura completa no `.apk` (`719 KB`) e inicialização sob demanda (*lazy init* + *lazy sync*).
 
 ---
 
@@ -132,15 +138,15 @@ Ponto&Trama/
 │   └── database/
 │       └── schema.sql                       # Esquema SQL (fios, itens_biblioteca, banco_amostras, projetos)
 ├── desktop/
-│   ├── app.py                               # App nativo Ubuntu (GTK 3 + WebKit2GTK + SQLite)
+│   ├── app.py                               # App nativo Ubuntu (GTK 3 + WebKit2GTK + SQLite + Ctrl+K + FileChooser)
 │   ├── instalador-gui.py                    # Instalador gráfico GTK para Ubuntu
 │   └── build-deb.sh                         # Gera dist/ponto-e-trama_1.0.0_all.deb e lançadores .desktop
 ├── dist/
-│   ├── ponto-e-trama_1.0.0_all.deb          # Instalador oficial Ubuntu (.deb — 223 KB)
+│   ├── ponto-e-trama_1.0.0_all.deb          # Instalador oficial Ubuntu (.deb — 266 KB)
 │   ├── Ponto & Trama.desktop                # Lançador clicável do app
 │   └── Instalar Ponto & Trama.desktop       # Lançador clicável do instalador gráfico
 ├── mobile/
-│   ├── ponto-e-trama.apk                    # Aplicativo Android 100% local (.apk — 658 KB)
+│   ├── ponto-e-trama.apk                    # Aplicativo Android 100% local (.apk — 719 KB)
 │   ├── build-apk.sh                         # Compila (aapt2/javac/d8), alinha e assina o APK
 │   ├── README.md
 │   └── android/
@@ -157,12 +163,12 @@ Ponto&Trama/
     │   ├── dicionario-pontos.json           # Catálogo multilíngue de pontos (PT-BR, US, UK, ES)
     │   └── tabelas-conversao.json           # Banco de agulhas, fios (CYC/TEX) e medidas padrão
     ├── styles/
-    │   ├── base/                            # global.css, mobile.css (front celular), temas.css (3 temas)
-    │   ├── layout/                          # barra-lateral.css (barra personalizável + popup conectado)
+    │   ├── base/                            # global.css, mobile.css (front celular), temas.css (8 temas)
+    │   ├── layout/                          # barra-lateral.css, busca-global.css, identidade-artesanal.css, aranhas-atelie.css
     │   └── modules/                         # CSS modularizado das 12 ferramentas
     └── src/
         ├── main.js                          # Bootstrap com lazy init por ferramenta + registro SW
-        ├── core/                            # database.js, projeto-contexto.js, sidebar.js, animations.js
+        ├── core/                            # database.js, projeto-contexto.js, sidebar.js, busca-global.js, aranhas-atelie.js, animations.js
         └── modules/                         # JS modularizado das 12 ferramentas + tradutor-receitas.js
 ```
 

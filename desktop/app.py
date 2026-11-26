@@ -113,6 +113,7 @@ class PontoTramaDesktopApp:
         )
         self._configurar_webview()
         self.webview.connect("print", self._ao_imprimir)
+        self.webview.connect("run-file-chooser", self._ao_escolher_arquivo)
 
         self.window.add(self.webview)
         self.window.connect("destroy", self._ao_fechar)
@@ -134,6 +135,12 @@ class PontoTramaDesktopApp:
                 print(f"[App] Aviso ao carregar ícone da logo: {exc}", file=sys.stderr)
 
     def _aplicar_cor_fundo_janela(self) -> None:
+        try:
+            gtk_settings = Gtk.Settings.get_default()
+            if gtk_settings is not None:
+                gtk_settings.set_property("gtk-application-prefer-dark-theme", True)
+        except Exception:
+            pass
         css_provider = Gtk.CssProvider()
         css_provider.load_from_data(b"window { background-color: #0d1c42; }")
         Gtk.StyleContext.add_provider_for_screen(
@@ -168,8 +175,77 @@ class PontoTramaDesktopApp:
         print_operation.run_dialog(self.window)
         return True
 
+    def _ao_escolher_arquivo(self, _webview: WebKit2.WebView, request: WebKit2.FileChooserRequest) -> bool:
+        dialog = Gtk.FileChooserDialog(
+            title="Selecionar arquivo — Ponto & Trama",
+            transient_for=self.window,
+            action=Gtk.FileChooserAction.OPEN,
+        )
+        dialog.add_buttons(
+            Gtk.STOCK_CANCEL,
+            Gtk.ResponseType.CANCEL,
+            Gtk.STOCK_OPEN,
+            Gtk.ResponseType.ACCEPT,
+        )
+        dialog.set_select_multiple(bool(request.get_select_multiple()))
+
+        try:
+            mimes = request.get_mime_types() or []
+        except Exception:
+            mimes = []
+
+        if mimes:
+            filtro_esp = Gtk.FileFilter()
+            eh_img = any("image" in m for m in mimes)
+            eh_pdf = any("pdf" in m for m in mimes)
+            eh_json = any("json" in m for m in mimes)
+            if eh_img and eh_pdf:
+                filtro_esp.set_name("Imagens e PDF")
+                filtro_esp.add_mime_type("image/*")
+                filtro_esp.add_mime_type("application/pdf")
+                for ext in ("*.png", "*.jpg", "*.jpeg", "*.webp", "*.gif", "*.pdf"):
+                    filtro_esp.add_pattern(ext)
+            elif eh_img:
+                filtro_esp.set_name("Imagens (PNG, JPG, WEBP)")
+                filtro_esp.add_mime_type("image/*")
+                for ext in ("*.png", "*.jpg", "*.jpeg", "*.webp", "*.gif", "*.bmp"):
+                    filtro_esp.add_pattern(ext)
+            elif eh_json:
+                filtro_esp.set_name("Backup JSON (*.json)")
+                filtro_esp.add_mime_type("application/json")
+                filtro_esp.add_pattern("*.json")
+            else:
+                filtro_esp.set_name("Arquivos suportados")
+                for m in mimes:
+                    filtro_esp.add_mime_type(m)
+            dialog.add_filter(filtro_esp)
+
+        filtro_todos = Gtk.FileFilter()
+        filtro_todos.set_name("Todos os arquivos")
+        filtro_todos.add_pattern("*")
+        dialog.add_filter(filtro_todos)
+
+        resposta = dialog.run()
+        if resposta == Gtk.ResponseType.ACCEPT:
+            arquivos = dialog.get_filenames()
+            if arquivos:
+                request.select_files(arquivos)
+            else:
+                request.cancel()
+        else:
+            request.cancel()
+        dialog.destroy()
+        return True
+
     def _ao_pressionar_tecla(self, _widget, event: Gdk.EventKey) -> bool:
         ctrl = bool(event.state & Gdk.ModifierType.CONTROL_MASK)
+        if ctrl and event.keyval in (Gdk.KEY_k, Gdk.KEY_K):
+            self.webview.run_javascript(
+                "if (window.BuscaGlobal) { window.BuscaGlobal.alternar(); }",
+                None,
+                None,
+            )
+            return True
         if event.keyval == Gdk.KEY_F5 or (ctrl and event.keyval in (Gdk.KEY_r, Gdk.KEY_R)):
             self.webview.reload_bypass_cache()
             return True

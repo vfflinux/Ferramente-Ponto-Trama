@@ -825,7 +825,7 @@ const GerenciadorProjetos = (() => {
     const totalPts = (atual.carreiras || 0) * (atual.pontosPorCarreira || 0);
     document.getElementById("ws-contador-total-pts").textContent = `${totalPts.toLocaleString("pt-BR")} pts`;
 
-    const btnRem = document.getElementById("ws-remover-contador") || document.getElementById("btn-ws-remover-contador");
+    const btnRem = document.getElementById("btn-ws-remover-contador");
     if (btnRem) btnRem.style.display = projeto.contadores.length > 1 ? "inline-flex" : "none";
   }
 
@@ -2386,6 +2386,7 @@ const GerenciadorProjetos = (() => {
       } catch {
         mostrarToast("Selecione uma imagem válida (PNG, JPG ou WEBP).");
       }
+      e.target.value = "";
     });
     document.getElementById("btn-remover-capa-proj")?.addEventListener("click", (e) => {
       e.stopPropagation();

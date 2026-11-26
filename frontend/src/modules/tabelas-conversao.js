@@ -432,13 +432,13 @@ const TabelasConversao = (() => {
   }
 
   function atualizarCacheInventario() {
-    if (typeof BancoDadosPT === "undefined" || typeof BancoDadosPT.listar !== "function") return;
+    if (typeof BancoDadosPT === "undefined" || typeof BancoDadosPT.obterTodos !== "function") return;
     Promise.all([
-      BancoDadosPT.listar("itens_biblioteca").catch(() => []),
-      BancoDadosPT.listar("fios").catch(() => [])
+      BancoDadosPT.obterTodos("itens_biblioteca").catch(() => []),
+      BancoDadosPT.obterTodos("fios").catch(() => [])
     ]).then(([itens, fios]) => {
       inventarioCache.agulhas = Array.isArray(itens)
-        ? itens.filter((it) => it && (it.categoria === "agulha" || it.espessuraMm != null))
+        ? itens.filter((it) => it && (it.categoria === "agulha" || it.atributos?.espessura_mm != null))
         : [];
       inventarioCache.fios = Array.isArray(fios) ? fios : [];
       if (abaAtiva === "agulhas" || abaAtiva === "fios") {
@@ -451,7 +451,8 @@ const TabelasConversao = (() => {
     const alvo = Number(mm);
     if (!Number.isFinite(alvo) || !inventarioCache.agulhas.length) return 0;
     return inventarioCache.agulhas.filter((a) => {
-      const m = parseFloat(String(a.espessuraMm || a.tamanho || "").replace(",", "."));
+      const bruto = a.atributos?.espessura_mm ?? a.espessuraMm ?? a.tamanho ?? "";
+      const m = parseFloat(String(bruto).replace(",", "."));
       return Number.isFinite(m) && Math.abs(m - alvo) < 0.06;
     }).length;
   }
@@ -1584,5 +1585,26 @@ const TabelasConversao = (() => {
     jaInicializado = true;
   }
 
-  return { init, trocarAba };
+  function abrirComBusca(aba, subcategoria = null, termo = "") {
+    if (!jaInicializado) init();
+    if (aba && ["agulhas", "fios", "medidas"].includes(aba)) {
+      abaAtiva = aba;
+    }
+    if (abaAtiva === "medidas" && subcategoria && META_SUBCATEGORIAS[subcategoria]) {
+      subcategoriaAtiva = subcategoria;
+    }
+    termoBusca = String(termo || "").trim();
+    if (el.inputBusca) el.inputBusca.value = termoBusca;
+    if (el.btnLimparBusca) el.btnLimparBusca.hidden = !termoBusca;
+    renderizarTudo(true);
+    requestAnimationFrame(atualizarIndicadorAbas);
+  }
+
+  return {
+    init,
+    trocarAba,
+    abrirComBusca,
+    obterDados: () => dados,
+    obterMetaSubcategorias: () => META_SUBCATEGORIAS
+  };
 })();

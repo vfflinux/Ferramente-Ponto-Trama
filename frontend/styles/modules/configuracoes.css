@@ -473,10 +473,10 @@
   box-shadow: var(--sombra-sm);
 }
 
-/* Seletor de Temas (Miniaturas) */
+/* Seletor de Temas (Miniaturas — 5 temas incluindo Fios Naturais) */
 .grade-temas-cfg {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
   gap: 12px;
   margin-top: 6px;
 }
@@ -529,6 +529,39 @@
 .tema-prev-claro .prev-bar { position: absolute; left: 0; top: 0; bottom: 0; width: 22%; background: #1c2f5c; }
 .tema-prev-claro .prev-card { position: absolute; left: 30%; top: 14px; right: 12px; height: 26px; border-radius: 5px; background: #ffffff; border: 1px solid rgba(19, 34, 74, 0.16); }
 .tema-prev-claro .prev-dot { position: absolute; right: 18px; top: 22px; width: 10px; height: 10px; border-radius: 50%; background: #22396f; }
+
+.tema-prev-linho {
+  background:
+    repeating-linear-gradient(45deg, rgba(122, 82, 54, 0.05) 0 2px, transparent 2px 6px),
+    #f6efe4;
+  border-color: rgba(110, 50, 34, 0.25);
+}
+.tema-prev-linho .prev-bar { position: absolute; left: 0; top: 0; bottom: 0; width: 22%; background: #6e3222; }
+.tema-prev-linho .prev-card { position: absolute; left: 30%; top: 14px; right: 12px; height: 26px; border-radius: 5px; background: #fffbf4; border: 1px dashed rgba(140, 61, 39, 0.35); }
+.tema-prev-linho .prev-dot { position: absolute; right: 18px; top: 22px; width: 10px; height: 10px; border-radius: 50%; background: #4a613e; box-shadow: -14px 0 0 #a4472d; }
+
+.tema-prev-salvia {
+  background: #eaf0ea;
+  border-color: rgba(36, 59, 50, 0.24);
+}
+.tema-prev-salvia .prev-bar { position: absolute; left: 0; top: 0; bottom: 0; width: 22%; background: #243b32; }
+.tema-prev-salvia .prev-card { position: absolute; left: 30%; top: 14px; right: 12px; height: 26px; border-radius: 5px; background: #f9fbf8; border: 1px dashed rgba(47, 79, 66, 0.35); }
+.tema-prev-salvia .prev-dot { position: absolute; right: 18px; top: 22px; width: 10px; height: 10px; border-radius: 50%; background: #365e4d; box-shadow: -14px 0 0 #6b9080; }
+
+.tema-prev-ameixa { background: #430a5d; border-color: rgba(238, 228, 177, 0.25); }
+.tema-prev-ameixa .prev-bar { position: absolute; left: 0; top: 0; bottom: 0; width: 22%; background: #2b063d; }
+.tema-prev-ameixa .prev-card { position: absolute; left: 30%; top: 14px; right: 12px; height: 26px; border-radius: 5px; background: #5f374b; border: 1px solid rgba(238, 228, 177, 0.22); }
+.tema-prev-ameixa .prev-dot { position: absolute; right: 18px; top: 22px; width: 10px; height: 10px; border-radius: 50%; background: #eee4b1; box-shadow: -14px 0 0 #8c6a5d; }
+
+.tema-prev-mel { background: #4d2a00; border-color: rgba(249, 230, 168, 0.25); }
+.tema-prev-mel .prev-bar { position: absolute; left: 0; top: 0; bottom: 0; width: 22%; background: #331b00; }
+.tema-prev-mel .prev-card { position: absolute; left: 30%; top: 14px; right: 12px; height: 26px; border-radius: 5px; background: #6b3b02; border: 1px solid rgba(242, 169, 0, 0.35); }
+.tema-prev-mel .prev-dot { position: absolute; right: 18px; top: 22px; width: 10px; height: 10px; border-radius: 50%; background: #f9e6a8; box-shadow: -14px 0 0 #f2a900, -28px 0 0 #cc6f00; }
+
+.tema-prev-floresta { background: #09251c; border-color: rgba(248, 234, 220, 0.24); }
+.tema-prev-floresta .prev-bar { position: absolute; left: 0; top: 0; bottom: 0; width: 22%; background: #051711; }
+.tema-prev-floresta .prev-card { position: absolute; left: 30%; top: 14px; right: 12px; height: 26px; border-radius: 5px; background: #123b2d; border: 1px solid rgba(243, 210, 175, 0.24); }
+.tema-prev-floresta .prev-dot { position: absolute; right: 18px; top: 22px; width: 10px; height: 10px; border-radius: 50%; background: #f8eadc; box-shadow: -14px 0 0 #f3d2af, -28px 0 0 #a55704; }
 
 .meta-tema-cfg strong {
   display: block;

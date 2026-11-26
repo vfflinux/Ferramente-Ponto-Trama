@@ -45,9 +45,15 @@ document.addEventListener("DOMContentLoaded", () => {
     Configuracoes.aplicarPreferenciasIniciais();
   }
 
-  // 1. Navegação da barra lateral (instantânea)
+  // 1. Navegação da barra lateral e Busca Global Ctrl+K (instantâneas)
   if (typeof BarraLateral !== "undefined" && typeof BarraLateral.init === "function") {
     BarraLateral.init();
+  }
+  if (typeof BuscaGlobal !== "undefined" && typeof BuscaGlobal.init === "function") {
+    BuscaGlobal.init();
+  }
+  if (typeof AranhasAtelie !== "undefined" && typeof AranhasAtelie.init === "function") {
+    AranhasAtelie.init();
   }
 
   // 2. Inicializa imediatamente apenas a tela inicial visível (Home)
