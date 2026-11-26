@@ -151,8 +151,16 @@ const AranhasAtelie = (() => {
         <g class="aranha-palpos" fill="var(--aranha-acento)" fill-opacity="0.35" stroke="currentColor" stroke-width="2.3" stroke-linecap="round">
           <path d="M52 38 Q46 31 50 26 Q54 27 55 34"></path>
           <path d="M68 38 Q74 31 70 26 Q66 27 65 34"></path>
+          <circle class="palpo-mancha" cx="49.5" cy="28.5" r="2.2" fill="var(--aranha-brilho-olho)" stroke="none" opacity="0.45"></circle>
+          <circle class="palpo-mancha" cx="70.5" cy="28.5" r="2.2" fill="var(--aranha-brilho-olho)" stroke="none" opacity="0.45"></circle>
         </g>
         <g class="aranha-abdomen">
+          <g class="papa-abas-cortejo">
+            <path d="M44 74 C31 64 26 76 33 88 C39 95 45 92 48 86 Z" fill="var(--aranha-acento)" fill-opacity="0.72" stroke="currentColor" stroke-width="1.6"></path>
+            <path d="M76 74 C89 64 94 76 87 88 C81 95 75 92 72 86 Z" fill="var(--aranha-acento)" fill-opacity="0.72" stroke="currentColor" stroke-width="1.6"></path>
+            <circle cx="36" cy="79" r="2.6" fill="var(--aranha-brilho-olho)" opacity="0.88"></circle>
+            <circle cx="84" cy="79" r="2.6" fill="var(--aranha-brilho-olho)" opacity="0.88"></circle>
+          </g>
           <ellipse cx="60" cy="79" rx="18" ry="20" fill="var(--aranha-corpo)" stroke="currentColor" stroke-width="2.3"></ellipse>
           <path d="M47 72 Q60 66 73 72 M45 81 Q60 75 75 81 M49 90 Q60 85 71 90" fill="none" stroke="var(--aranha-acento)" stroke-width="2.2" stroke-linecap="round"></path>
         </g>
@@ -699,53 +707,73 @@ const AranhasAtelie = (() => {
   }
 
   function svgLagartinho() {
-    // Lagartinho / Lagartixa detalhada (~porte da Tarântula Golias!) com 4 patas em leque, língua bífida e cauda sinuosa em 3 segmentos
+    // Lagartinho / Lagartixa detalhada (~porte da Tarântula Golias!) dividida em 6 pedaços anatômicos consumíveis sequencialmente
     return `
       <svg viewBox="0 0 180 180" class="presa-svg presa-lagartinho" aria-hidden="true">
-        <!-- Patas dianteiras e traseiras com dedinhos em leque -->
+        <!-- Patas dianteiras (pedaço 1) e traseiras (pedaço 3) com dedinhos em leque -->
         <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-          <g class="pata-presa" data-lado="-1" data-par="0" style="transform-origin:81px 55px">
-            <path d="M81 55 L63 49 L55 38" stroke-width="5.2"/>
-            <path d="M81 55 L63 49 L55 38" stroke="var(--aranha-corpo)" stroke-width="2.2"/>
-            <path d="M55 38 L48 33 M55 38 L50 30 M55 38 L55 29 M55 38 L60 32" stroke-width="1.5"/>
+          <g class="pedaco-presa" data-pedaco="1" style="transform-origin:90px 55px">
+            <g class="pata-presa" data-lado="-1" data-par="0" style="transform-origin:81px 55px">
+              <path d="M81 55 L63 49 L55 38" stroke-width="5.2"/>
+              <path d="M81 55 L63 49 L55 38" stroke="var(--aranha-corpo)" stroke-width="2.2"/>
+              <path d="M55 38 L48 33 M55 38 L50 30 M55 38 L55 29 M55 38 L60 32" stroke-width="1.5"/>
+            </g>
+            <g class="pata-presa" data-lado="1" data-par="0" style="transform-origin:99px 55px">
+              <path d="M99 55 L117 49 L125 38" stroke-width="5.2"/>
+              <path d="M99 55 L117 49 L125 38" stroke="var(--aranha-corpo)" stroke-width="2.2"/>
+              <path d="M125 38 L132 33 M125 38 L130 30 M125 38 L125 29 M125 38 L120 32" stroke-width="1.5"/>
+            </g>
           </g>
-          <g class="pata-presa" data-lado="1" data-par="0" style="transform-origin:99px 55px">
-            <path d="M99 55 L117 49 L125 38" stroke-width="5.2"/>
-            <path d="M99 55 L117 49 L125 38" stroke="var(--aranha-corpo)" stroke-width="2.2"/>
-            <path d="M125 38 L132 33 M125 38 L130 30 M125 38 L125 29 M125 38 L120 32" stroke-width="1.5"/>
-          </g>
-          <g class="pata-presa" data-lado="-1" data-par="1" style="transform-origin:82px 94px">
-            <path d="M82 94 L62 100 L56 112" stroke-width="5.6"/>
-            <path d="M82 94 L62 100 L56 112" stroke="var(--aranha-corpo)" stroke-width="2.4"/>
-            <path d="M56 112 L48 114 M56 112 L50 119 M56 112 L56 121 M56 112 L62 118" stroke-width="1.5"/>
-          </g>
-          <g class="pata-presa" data-lado="1" data-par="1" style="transform-origin:98px 94px">
-            <path d="M98 94 L118 100 L124 112" stroke-width="5.6"/>
-            <path d="M98 94 L118 100 L124 112" stroke="var(--aranha-corpo)" stroke-width="2.4"/>
-            <path d="M124 112 L132 114 M124 112 L130 119 M124 112 L124 121 M124 112 L118 118" stroke-width="1.5"/>
+          <g class="pedaco-presa" data-pedaco="3" style="transform-origin:90px 94px">
+            <g class="pata-presa" data-lado="-1" data-par="1" style="transform-origin:82px 94px">
+              <path d="M82 94 L62 100 L56 112" stroke-width="5.6"/>
+              <path d="M82 94 L62 100 L56 112" stroke="var(--aranha-corpo)" stroke-width="2.4"/>
+              <path d="M56 112 L48 114 M56 112 L50 119 M56 112 L56 121 M56 112 L62 118" stroke-width="1.5"/>
+            </g>
+            <g class="pata-presa" data-lado="1" data-par="1" style="transform-origin:98px 94px">
+              <path d="M98 94 L118 100 L124 112" stroke-width="5.6"/>
+              <path d="M98 94 L118 100 L124 112" stroke="var(--aranha-corpo)" stroke-width="2.4"/>
+              <path d="M124 112 L132 114 M124 112 L130 119 M124 112 L124 121 M124 112 L118 118" stroke-width="1.5"/>
+            </g>
           </g>
         </g>
 
-        <!-- Cauda articulada em 3 segmentos aninhados (ondulação em S realista!) -->
+        <!-- Cauda articulada em 3 segmentos aninhados (pedaços 4 e 5 independentes sem ocultar a ponta antes da hora) -->
         <g class="lagarto-cauda-1" style="transform-origin:90px 102px">
-          <path d="M84 102 Q90 114 86 126 L94 126 Q90 114 96 102 Z" fill="var(--aranha-corpo)" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/>
-          <path d="M90 105 L90 124" stroke="var(--aranha-acento)" stroke-width="1.6" stroke-dasharray="3 3"/>
+          <g class="pedaco-presa" data-pedaco="4" style="transform-origin:90px 114px">
+            <path d="M84 102 Q90 114 86 126 L94 126 Q90 114 96 102 Z" fill="var(--aranha-corpo)" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/>
+            <path d="M90 105 L90 124" stroke="var(--aranha-acento)" stroke-width="1.6" stroke-dasharray="3 3"/>
+          </g>
           <g class="lagarto-cauda-2" style="transform-origin:90px 125px">
-            <path d="M86 125 L87.5 149 L92.5 149 L94 125 Z" fill="var(--aranha-corpo)" stroke="currentColor" stroke-width="2.0" stroke-linejoin="round"/>
-            <path d="M90 127 L90 147" stroke="var(--aranha-acento)" stroke-width="1.35" stroke-dasharray="2.5 2.5"/>
-            <g class="lagarto-cauda-3" style="transform-origin:90px 148px">
+            <g class="pedaco-presa" data-pedaco="5" style="transform-origin:90px 142px">
+              <path d="M86 125 L87.5 149 L92.5 149 L94 125 Z" fill="var(--aranha-corpo)" stroke="currentColor" stroke-width="2.0" stroke-linejoin="round"/>
+              <path d="M90 127 L90 147" stroke="var(--aranha-acento)" stroke-width="1.35" stroke-dasharray="2.5 2.5"/>
+            </g>
+            <g class="lagarto-cauda-3 pedaco-presa" data-pedaco="5" style="transform-origin:90px 148px">
               <path d="M87.5 148 L90 174 L92.5 148 Z" fill="var(--aranha-corpo)" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
             </g>
           </g>
         </g>
 
-        <!-- Tronco escamado -->
-        <path d="M90 42 C101 44 104 60 102 76 C100 90 98 100 90 104 C82 100 80 90 78 76 C76 60 79 44 90 42 Z" fill="var(--aranha-corpo)" stroke="currentColor" stroke-width="2.5"/>
-        <path d="M90 46 L90 100" stroke="var(--aranha-acento)" stroke-width="2.0" stroke-linecap="round"/>
-        <path d="M82 54 L90 59 L98 54 M81 65 L90 70 L99 65 M81 76 L90 81 L99 76 M83 87 L90 92 L97 87" fill="none" stroke="var(--aranha-acento)" stroke-width="1.55" stroke-linecap="round" opacity="0.82"/>
+        <!-- Tronco escamado em 3 porções contínuas (pedaços 1, 2 e 3) -->
+        <g class="pedaco-presa" data-pedaco="3" style="transform-origin:90px 92px">
+          <path d="M79 80 C80 91 83 100 90 104 C97 100 100 91 101 80 Q90 84 79 80 Z" fill="var(--aranha-corpo)" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/>
+          <path d="M90 82 L90 100" stroke="var(--aranha-acento)" stroke-width="2.0" stroke-linecap="round"/>
+          <path d="M83 87 L90 92 L97 87" fill="none" stroke="var(--aranha-acento)" stroke-width="1.55" stroke-linecap="round" opacity="0.82"/>
+        </g>
+        <g class="pedaco-presa" data-pedaco="2" style="transform-origin:90px 72px">
+          <path d="M78 60 C77 69 78 76 79 82 Q90 86 101 82 C102 76 103 69 102 60 Q90 64 78 60 Z" fill="var(--aranha-corpo)" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/>
+          <path d="M90 62 L90 83" stroke="var(--aranha-acento)" stroke-width="2.0" stroke-linecap="round"/>
+          <path d="M81 66 L90 71 L99 66 M81 76 L90 81 L99 76" fill="none" stroke="var(--aranha-acento)" stroke-width="1.55" stroke-linecap="round" opacity="0.82"/>
+        </g>
+        <g class="pedaco-presa" data-pedaco="1" style="transform-origin:90px 52px">
+          <path d="M90 42 C100 44 103 53 102 62 Q90 66 78 62 C77 53 80 44 90 42 Z" fill="var(--aranha-corpo)" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/>
+          <path d="M90 46 L90 63" stroke="var(--aranha-acento)" stroke-width="2.0" stroke-linecap="round"/>
+          <path d="M82 54 L90 59 L98 54" fill="none" stroke="var(--aranha-acento)" stroke-width="1.55" stroke-linecap="round" opacity="0.82"/>
+        </g>
 
-        <!-- Cabeça triangular + língua bífida -->
-        <g class="lagarto-cabeca" style="transform-origin:90px 44px">
+        <!-- Cabeça triangular + língua bífida (pedaço 0) -->
+        <g class="lagarto-cabeca pedaco-presa" data-pedaco="0" style="transform-origin:90px 36px">
           <g class="lagarto-lingua" style="transform-origin:90px 16px" opacity="0">
             <path d="M90 16 L90 8 L87 4 M90 8 L93 4" fill="none" stroke="var(--aranha-acento)" stroke-width="1.7" stroke-linecap="round"/>
           </g>
@@ -762,7 +790,7 @@ const AranhasAtelie = (() => {
   }
 
   function svgLagarta() {
-    // Lagarta Gigante (Mandarová / Sphingidae) — 7 segmentos com onda peristáltica real + chifrinho caudal!
+    // Lagarta Gigante (Mandarová / Sphingidae) — 7 segmentos com onda peristáltica real + chifrinho caudal (7 pedaços consumíveis!)
     const segs = [
       { y: 44, rx: 14.5, ry: 11, idx: 0, patas: "torax" },
       { y: 61, rx: 16.5, ry: 12, idx: 1, patas: "torax" },
@@ -780,7 +808,7 @@ const AranhasAtelie = (() => {
             ? `<circle cx="${90 - s.rx - 2.2}" cy="${s.y + 1}" r="3.2" fill="var(--aranha-corpo)" stroke="currentColor" stroke-width="1.8"/><circle cx="${90 + s.rx + 2.2}" cy="${s.y + 1}" r="3.2" fill="var(--aranha-corpo)" stroke="currentColor" stroke-width="1.8"/>`
             : `<path d="M90 ${s.y + 7} Q94 ${s.y + 17} 90 ${s.y + 24}" fill="none" stroke="var(--aranha-acento)" stroke-width="3.2" stroke-linecap="round"/>`;
       return `
-        <g class="lagarta-seg" data-seg="${s.idx}" style="transform-origin:90px ${s.y}px">
+        <g class="lagarta-seg pedaco-presa" data-seg="${s.idx}" data-pedaco="${s.idx}" style="transform-origin:90px ${s.y}px">
           ${pExtra}
           <ellipse cx="90" cy="${s.y}" rx="${s.rx}" ry="${s.ry}" fill="var(--aranha-corpo)" stroke="currentColor" stroke-width="2.4"/>
           <path d="M${90 - s.rx + 4} ${s.y + 2} L${90 - 4} ${s.y - 5} M${90 + s.rx - 4} ${s.y + 2} L${90 + 4} ${s.y - 5}" stroke="var(--aranha-acento)" stroke-width="1.9" stroke-linecap="round" opacity="0.88"/>
@@ -793,7 +821,7 @@ const AranhasAtelie = (() => {
     return `
       <svg viewBox="0 0 180 180" class="presa-svg presa-lagarta" aria-hidden="true">
         ${segsSvg}
-        <g class="lagarta-cabeca" style="transform-origin:90px 30px">
+        <g class="lagarta-cabeca pedaco-presa" data-pedaco="0" style="transform-origin:90px 30px">
           <path d="M84 22 L80 13 M96 22 L100 13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
           <ellipse cx="90" cy="29" rx="12" ry="10.5" fill="var(--aranha-corpo)" stroke="currentColor" stroke-width="2.5"/>
           <path d="M85 26 Q90 31 95 26" fill="none" stroke="var(--aranha-acento)" stroke-width="1.6" stroke-linecap="round"/>
@@ -953,12 +981,57 @@ const AranhasAtelie = (() => {
   function bordaMaisProxima(x, y, margem) {
     const W = window.innerWidth || 1200;
     const H = window.innerHeight || 800;
+    const m = Math.max(60, margem || 80);
+    const cx = Math.max(24, Math.min(W - 24, x));
+    const cy = Math.max(24, Math.min(H - 24, y));
     return [
-      { d: x, x: -margem, y },
-      { d: W - x, x: W + margem, y },
-      { d: y, x, y: -margem },
-      { d: H - y, x, y: H + margem }
+      { d: Math.max(0, x), x: -m, y: cy },
+      { d: Math.max(0, W - x), x: W + m, y: cy },
+      { d: Math.max(0, y), x: cx, y: -m },
+      { d: Math.max(0, H - y), x: cx, y: H + m }
     ].sort((a, b) => a.d - b.d)[0];
+  }
+
+  function estaForaDaTela(x, y, tamPx) {
+    const W = window.innerWidth || 1200;
+    const H = window.innerHeight || 800;
+    const margem = Math.max(28, (tamPx || 50) * 0.68);
+    return x < -margem || x > W + margem || y < -margem || y > H + margem;
+  }
+
+  // Garante transição suave e contínua da posição atual (st.x, st.y) até fora da borda mais próxima
+  function encaminharParaSaidaBorda(inst, velMult = 1.0, pausaInicial = 0) {
+    if (!inst || !inst.estado) return;
+    const st = inst.estado;
+    if (inst.wrap) {
+      inst.wrap.classList.remove("exibindo-cortejo");
+      inst.wrap.style.zIndex = "";
+    }
+    if (inst.fioSvg && inst.fioSvg.parentNode) {
+      inst.fioSvg.parentNode.removeChild(inst.fioSvg);
+      inst.fioSvg = null;
+      inst.fioPath = null;
+      inst.estabPath = null;
+    }
+    const saida = bordaMaisProxima(st.x, st.y, Math.max(72, inst.tamPx * 1.45));
+    const dist = Math.max(40, Math.hypot(saida.x - st.x, saida.y - st.y));
+    const mult = Math.max(0.7, velMult || 1.0);
+
+    st.tipo = "travessia_curva";
+    st.temFio = false;
+    st.temTeiaCanto = false;
+    st.temFioVento = false;
+    st.elAlvo = null;
+    st.p0 = { x: st.x, y: st.y };
+    st.p1 = { x: lerp(st.x, saida.x, 0.35), y: lerp(st.y, saida.y, 0.35) };
+    st.p2 = { x: lerp(st.x, saida.x, 0.7), y: lerp(st.y, saida.y, 0.7) };
+    st.p3 = { x: saida.x, y: saida.y };
+    st.t = 0;
+    st.velEscalar = Math.max(0.55, mult);
+    st.pausaFeita = true;
+    st.pausaRestante = Math.max(0, pausaInicial || 0);
+    st.faseSalto = "andando";
+    st.duracao = Math.max(1.5, dist / (inst.especie.velocidadeBase * mult));
   }
 
   function criarRastroPonto(x, y, ehAncora = false) {
@@ -976,13 +1049,39 @@ const AranhasAtelie = (() => {
   function criarOndaVibracao(x, y, tipo = "solo") {
     if (!camadaEl) return;
     const onda = document.createElement("span");
-    onda.className = tipo === "teia" ? "onda-vibracao-caca teia" : tipo === "impacto" ? "onda-vibracao-caca impacto" : "onda-vibracao-caca";
+    onda.className =
+      tipo === "teia"
+        ? "onda-vibracao-caca teia"
+        : tipo === "impacto"
+          ? "onda-vibracao-caca impacto"
+          : tipo === "cortejo"
+            ? "onda-vibracao-caca cortejo"
+            : "onda-vibracao-caca";
     onda.style.left = `${x.toFixed(1)}px`;
     onda.style.top = `${y.toFixed(1)}px`;
     camadaEl.appendChild(onda);
     setTimeout(() => {
       if (onda.parentNode) onda.parentNode.removeChild(onda);
-    }, tipo === "impacto" ? 650 : 900);
+    }, tipo === "impacto" ? 650 : 980);
+  }
+
+  // Micro-gotículas enzimáticas / farelos ao mastigar cada pedaço da Lagarta ou Lagartinho
+  function criarParticulasMordida(x, y) {
+    if (!camadaEl) return;
+    for (let k = 0; k < 5; k++) {
+      const pt = document.createElement("span");
+      pt.className = "particula-mordida-golias";
+      const ang = rand(0, Math.PI * 2);
+      const dist = rand(10, 26);
+      pt.style.left = `${x.toFixed(1)}px`;
+      pt.style.top = `${y.toFixed(1)}px`;
+      pt.style.setProperty("--mx", `${(Math.cos(ang) * dist).toFixed(1)}px`);
+      pt.style.setProperty("--my", `${(Math.sin(ang) * dist).toFixed(1)}px`);
+      camadaEl.appendChild(pt);
+      setTimeout(() => {
+        if (pt.parentNode) pt.parentNode.removeChild(pt);
+      }, 760);
+    }
   }
 
   function registrarEfeitoSolo(el, duracaoMs = 7000) {
@@ -1776,8 +1875,12 @@ const AranhasAtelie = (() => {
     if (!presa) return;
     if (presa.wrap && presa.wrap.parentNode) presa.wrap.parentNode.removeChild(presa.wrap);
     if (presa.cacador && presa.cacador.caca && presa.cacador.caca.presa === presa) {
-      limparFioCaca(presa.cacador);
-      presa.cacador.caca = null;
+      const cac = presa.cacador;
+      limparFioCaca(cac);
+      cac.caca = null;
+      if (!cac.fugindo && !estaForaDaTela(cac.estado.x, cac.estado.y, cac.tamPx)) {
+        encaminharParaSaidaBorda(cac, 1.0);
+      }
     }
     const idx = presasAtivas.indexOf(presa);
     if (idx !== -1) presasAtivas.splice(idx, 1);
@@ -2071,38 +2174,82 @@ const AranhasAtelie = (() => {
     return { aranha, titulo: `${aranha.especie.nome} — Camuflagem de Galhinho` };
   }
 
-  // 10. Cena Rara: Dança de Cortejo da Papa-Moscas (Maratus / Salticidae)
+  // Helper compartilhado para iniciar o ritual completo de cortejo Salticidae entre Macho e Fêmea
+  function montarRitualCortejoSalticidae(macho, femea, cx, cy, forcarPosicoes = false) {
+    const r = Math.random();
+    const desfecho = r < 0.45 ? "aceitacao" : r < 0.77 ? "rejeicao_pacifica" : "ataque";
+
+    if (forcarPosicoes) {
+      const angEixo = rand(-0.45, 0.45);
+      femea.estado.x = cx + Math.cos(angEixo) * 76;
+      femea.estado.y = cy + Math.sin(angEixo) * 46 - 24;
+      macho.estado.x = cx - Math.cos(angEixo) * 92;
+      macho.estado.y = cy - Math.sin(angEixo) * 46 + 38;
+    }
+
+    const dx = macho.estado.x - femea.estado.x;
+    const dy = macho.estado.y - femea.estado.y;
+    const distIni = Math.max(110, Math.min(195, Math.hypot(dx, dy) || 155));
+    const eixoRad = Math.atan2(dy, dx);
+
+    const ritual = {
+      desfecho,
+      femeaX: femea.estado.x,
+      femeaY: femea.estado.y,
+      eixoRad,
+      distIni,
+      ultimoTamborilamento: 0,
+      ancoraFugaCriada: false,
+      femeaSaltoOrigX: femea.estado.x,
+      femeaSaltoOrigY: femea.estado.y,
+      machoSaltoOrigX: macho.estado.x,
+      machoSaltoOrigY: macho.estado.y,
+      desfechoIniciado: false
+    };
+
+    const duracao = desfecho === "aceitacao" ? 10.6 : desfecho === "rejeicao_pacifica" ? 9.7 : 9.1;
+    macho.acaoEspecial = { tipo: "danca_cortejo", papel: "macho", parceira: femea, ritual, tempo: 0, duracao };
+    femea.acaoEspecial = { tipo: "danca_cortejo", papel: "femea", parceira: macho, ritual, tempo: 0, duracao };
+    macho.cooldownInteracao = 15;
+    femea.cooldownInteracao = 15;
+    return ritual;
+  }
+
+  // 10. Cena Rara: Ritual Completo de Cortejo da Papa-Moscas (Salticidae — 5 fases + 3 desfechos reais)
   function iniciarCenaDancaCortejo(ignorarFoco = false) {
     if (!ignorarFoco && (modoAtual === "desligado" || animacoesReduzidasAtivas() || emZonaDeFocoProtegida())) return null;
     const W = window.innerWidth || 1200;
     const H = window.innerHeight || 800;
-    const cx = rand(W * 0.38, W * 0.62);
-    const cy = rand(H * 0.38, H * 0.68);
+    const cx = rand(W * 0.36, W * 0.64);
+    const cy = rand(H * 0.36, H * 0.66);
 
-    const dancarino = gerarAranha("papa_moscas", "travessia_curva", true, {
+    const macho = gerarAranha("papa_moscas", "travessia_curva", true, {
       p0: { x: -60, y: cy + 36 },
       p1: { x: cx, y: cy + 36 },
       p2: { x: cx, y: cy + 36 },
       p3: { x: W + 70, y: cy + 36 }
     });
-    const observadora = gerarAranha("papa_moscas", "travessia_curva", true, {
+    const femea = gerarAranha("papa_moscas", "travessia_curva", true, {
       p0: { x: W + 60, y: cy - 36 },
       p1: { x: cx, y: cy - 36 },
       p2: { x: cx, y: cy - 36 },
       p3: { x: -70, y: cy - 36 }
     });
-    if (!dancarino || !observadora) return null;
+    if (!macho || !femea) return null;
 
-    dancarino.estado.x = cx - 95;
-    dancarino.estado.y = cy + 34;
-    observadora.estado.x = cx + 95;
-    observadora.estado.y = cy - 34;
+    // Fêmea ligeiramente maior (dimorfismo real em Salticidae)
+    femea.tamPx = Math.round(femea.tamPx * 1.1);
+    femea.wrap.style.width = `${femea.tamPx}px`;
+    femea.wrap.style.height = `${femea.tamPx}px`;
 
-    dancarino.acaoEspecial = { tipo: "danca_cortejo", papel: "dancarino", parceira: observadora, centroX: cx, centroY: cy, tempo: 0, duracao: 4.6 };
-    observadora.acaoEspecial = { tipo: "danca_cortejo", papel: "observadora", parceira: dancarino, centroX: cx, centroY: cy, tempo: 0, duracao: 4.6 };
-    dancarino.cooldownInteracao = 12;
-    observadora.cooldownInteracao = 12;
-    return { dancarino, observadora, titulo: "Dança de Cortejo da Papa-Moscas!" };
+    const ritual = montarRitualCortejoSalticidae(macho, femea, cx, cy, true);
+    const rotDesfecho =
+      ritual.desfecho === "aceitacao"
+        ? "Aceitação"
+        : ritual.desfecho === "rejeicao_pacifica"
+          ? "Rejeição Pacífica"
+          : "Ataque & Fuga";
+    return { dancarino: macho, observadora: femea, titulo: `Cortejo Papa-Moscas (${rotDesfecho})` };
   }
 
   // 11. Cena Lendária: Troca de Exoesqueleto / Ecdise (deixa Exúvia translúcida!)
@@ -2299,6 +2446,7 @@ const AranhasAtelie = (() => {
 
     // 3. Lagartinho: marcha diagonal + alerta (ponta da cauda tremendo + flexão) + chicoteada de cauda na luta!
     if (id === "lagartinho") {
+      if (presa.sendoDevoradaPedacos) return;
       if (movendo) presa.faseMarcha += dt * (presa.modo === "evadindo" ? 24 : 16);
       const emAlerta = presa.modo === "alerta";
       const emLuta = presa.modo === "capturada" && presa.vibrandoPresa && intensidadeLuta > 0.06;
@@ -2345,6 +2493,7 @@ const AranhasAtelie = (() => {
 
     // 4. Lagarta Gigante: onda peristáltica + postura defensiva "Esfinge" + contorção na luta!
     if (id === "lagarta") {
+      if (presa.sendoDevoradaPedacos) return;
       if (movendo) presa.faseMarcha += dt * (presa.modo === "evadindo" ? 8.2 : 5.8);
       const emEsfinge = presa.modo === "defesa_presa";
       const emLuta = presa.modo === "capturada" && presa.vibrandoPresa && intensidadeLuta > 0.06;
@@ -2968,6 +3117,7 @@ const AranhasAtelie = (() => {
             p.modo = "escapando";
             limparFioCaca(inst);
             inst.caca = null;
+            encaminharParaSaidaBorda(inst, 1.0, 0.35);
             return false;
           }
           c.fase = "bote_hidraulico";
@@ -3076,27 +3226,80 @@ const AranhasAtelie = (() => {
           c.tempoFase = 0;
         }
       } else if (c.fase === "digestao_succao") {
-        // ETAPA 6: DIGESTÃO EXTERNA & SUCÇÃO BOMBEADORA → Presa encolhe até virar o BOLUS!
+        // ETAPA 6: DIGESTÃO EXTERNA & SUCÇÃO — Para Lagarta e Lagartinho, come PEDAÇO POR PEDAÇO!
         flags.andando = false;
         flags.digestaoSuccao = true;
-        const durDig = 3.3;
+        const ehPresaGrande = p.def.id === "lagarta" || p.def.id === "lagartinho";
+        const durDig = ehPresaGrande ? 5.6 : 3.3;
         const frac = Math.min(1, c.tempoFase / durDig);
-
         const rad = ((st.angulo - 90) * Math.PI) / 180;
-        p.x = st.x + Math.cos(rad) * (inst.tamPx * 0.23);
-        p.y = st.y + Math.sin(rad) * (inst.tamPx * 0.23);
-        p.anguloAlvo = st.angulo + 65;
 
-        // Presa vai sendo liquefeita e compactada até virar uma bolinha seca (bolus)!
-        const escPresa = Math.max(0.24, 1 - frac * 0.76);
-        p.escalaExtraX = escPresa;
-        p.escalaExtraY = escPresa;
-        if (p.wrap) p.wrap.style.opacity = (0.92 - frac * 0.52).toFixed(2);
+        if (ehPresaGrande) {
+          p.sendoDevoradaPedacos = true;
+          const totalPedacos = p.def.id === "lagarta" ? 7 : 6;
+          const idxPedaco = Math.min(totalPedacos - 1, Math.floor(frac * totalPedacos));
+          const progPedaco = Math.min(1, frac * totalPedacos - idxPedaco);
+          flags.mordendoPedaco = true;
+          flags.pulsoMordida = Math.sin(progPedaco * Math.PI * 3);
+
+          // Posiciona a cabeça da presa nas quelíceras e puxa o corpo restante pedaço a pedaço para dentro da boca!
+          const bocaX = st.x + Math.cos(rad) * (inst.tamPx * 0.28);
+          const bocaY = st.y + Math.sin(rad) * (inst.tamPx * 0.28);
+          const avancoPuxada = (idxPedaco + progPedaco * 0.85) / totalPedacos;
+          // Corpo começa projetado à frente da boca e vai sendo puxado para trás (direção das quelíceras)
+          const distCentroPresa = inst.tamPx * (0.44 - avancoPuxada * 0.34);
+          p.x = st.x + Math.cos(rad) * distCentroPresa;
+          p.y = st.y + Math.sin(rad) * distCentroPresa;
+          // Alinha a cabeça da presa de frente para as quelíceras da Golias
+          p.anguloAlvo = st.angulo + 180;
+          p.escalaExtraX = 1;
+          p.escalaExtraY = 1;
+          if (p.wrap) p.wrap.style.opacity = "0.96";
+
+          // Consome os pedaços anatômicos (data-pedaco="0..N") um por um!
+          if (p.wrap) {
+            const pedacosEls = p.wrap.querySelectorAll(".pedaco-presa");
+            pedacosEls.forEach((el) => {
+              const num = parseInt(el.dataset.pedaco, 10);
+              if (isNaN(num)) return;
+              if (num < idxPedaco) {
+                el.style.opacity = "0";
+                el.style.transform = "scale(0.08)";
+              } else if (num === idxPedaco) {
+                // Mastigando e dissolvendo o pedaço atual com leve tremor!
+                const esc = Math.max(0.12, 1 - progPedaco * 0.88);
+                const tremor = Math.sin(progPedaco * 32) * 2.4;
+                el.style.opacity = Math.max(0, 1 - progPedaco * 0.95).toFixed(2);
+                el.style.transform = `translate(${tremor.toFixed(1)}px, 0px) scale(${esc.toFixed(2)})`;
+              } else {
+                el.style.opacity = "1";
+                el.style.transform = "";
+              }
+            });
+          }
+
+          // Micro-gotículas enzimáticas / farelos sutis ao arrancar cada pedaço!
+          if (c.ultimoPedacoComido !== idxPedaco && progPedaco >= 0.32) {
+            c.ultimoPedacoComido = idxPedaco;
+            criarParticulasMordida(bocaX, bocaY);
+            criarOndaVibracao(bocaX, bocaY, "solo");
+          }
+        } else {
+          // Presas menores (ex.: barata): liquefação e compactação contínua até virar o bolus
+          p.x = st.x + Math.cos(rad) * (inst.tamPx * 0.23);
+          p.y = st.y + Math.sin(rad) * (inst.tamPx * 0.23);
+          p.anguloAlvo = st.angulo + 65;
+
+          const escPresa = Math.max(0.24, 1 - frac * 0.76);
+          p.escalaExtraX = escPresa;
+          p.escalaExtraY = escPresa;
+          if (p.wrap) p.wrap.style.opacity = (0.92 - frac * 0.52).toFixed(2);
+        }
 
         if (frac >= 1) {
           // Descarta o BOLUS seco sobre o tapete de seda e encerra a refeição!
-          const bx = p.x;
-          const by = p.y;
+          const bx = st.x + Math.cos(rad) * (inst.tamPx * 0.24);
+          const by = st.y + Math.sin(rad) * (inst.tamPx * 0.24);
           removerPresa(p);
           criarBolusExoesqueleto(bx, by);
           if (c.tapeteEl) {
@@ -3106,15 +3309,7 @@ const AranhasAtelie = (() => {
           // Pausa breve limpando os pedipalpos e depois parte serenamente para a toca na borda!
           inst.caca = null;
           inst.comportamentoAtual = "grooming";
-          st.pausaRestante = 1.05;
-          st.pausaFeita = true;
-          const saida = bordaMaisProxima(st.x, st.y, inst.tamPx * 1.35);
-          st.p0 = { x: st.x, y: st.y };
-          st.p1 = { x: lerp(st.x, saida.x, 0.35), y: lerp(st.y, saida.y, 0.35) };
-          st.p2 = { x: lerp(st.x, saida.x, 0.7), y: lerp(st.y, saida.y, 0.7) };
-          st.p3 = { x: saida.x, y: saida.y };
-          st.t = 0;
-          st.duracao = Math.max(4.5, Math.hypot(saida.x - st.x, saida.y - st.y) / inst.especie.velocidadeBase);
+          encaminharParaSaidaBorda(inst, 1.0, 1.05);
           return false;
         }
       }
@@ -3186,6 +3381,7 @@ const AranhasAtelie = (() => {
             p.modo = "escapando";
             limparFioCaca(inst);
             inst.caca = null;
+            encaminharParaSaidaBorda(inst, 1.0, 0.35);
             return false;
           }
           c.fase = "bote";
@@ -3421,11 +3617,10 @@ const AranhasAtelie = (() => {
           const bGolias = b.especie.id === "tarantula_golias";
 
           if (a.especie.id === "papa_moscas" && b.especie.id === "papa_moscas" && !a.acaoEspecial && !b.acaoEspecial) {
-            // 10. Encontro entre duas Papa-Moscas dispara automaticamente a Dança de Cortejo!
+            // 10. Encontro entre duas Papa-Moscas dispara automaticamente o Ritual Completo de Cortejo Salticidae!
             const cx = (a.estado.x + b.estado.x) * 0.5;
             const cy = (a.estado.y + b.estado.y) * 0.5;
-            a.acaoEspecial = { tipo: "danca_cortejo", papel: "dancarino", parceira: b, centroX: cx, centroY: cy, tempo: 0, duracao: 4.5 };
-            b.acaoEspecial = { tipo: "danca_cortejo", papel: "observadora", parceira: a, centroX: cx, centroY: cy, tempo: 0, duracao: 4.5 };
+            montarRitualCortejoSalticidae(a, b, cx, cy, false);
           } else if (aGolias !== bGolias) {
             const gigante = aGolias ? a : b;
             const menor = aGolias ? b : a;
@@ -3555,12 +3750,19 @@ const AranhasAtelie = (() => {
     const chuteUrticante = Boolean(extras.chuteUrticante);
     const bebendoAgua = Boolean(extras.bebendoAgua);
     const dancaCortejo = Boolean(extras.dancaCortejo);
+    const cortejoZigueZague = Boolean(extras.cortejoZigueZague);
+    const cortejoExibicao = Boolean(extras.cortejoExibicao);
+    const cortejoCongelar = Boolean(extras.cortejoCongelar);
+    const cortejoTransferencia = Boolean(extras.cortejoTransferencia);
+    const femeaAceitando = Boolean(extras.femeaAceitando);
+    const mordendoPedaco = Boolean(extras.mordendoPedaco);
+    const pulsoMordida = Number(extras.pulsoMordida) || 0;
     const ecdiseContraindo = Boolean(extras.ecdiseContraindo);
     const tateandoCursor = Boolean(extras.tateandoCursor);
     const espreguicando = Boolean(extras.espreguicando);
     const encolhida = Boolean(extras.encolhida);
 
-    // 0. Quelíceras articuladas da Tarântula Golias (abrem na defesa/bote, fecham na picareta e trituram na digestão!)
+    // 0. Quelíceras articuladas da Tarântula Golias (abrem na defesa/bote, fecham na picareta e mastigam pedaço por pedaço!)
     if (inst.queliceraEsq && inst.queliceraDir) {
       let angQ = 0;
       let syQ = 1;
@@ -3568,6 +3770,10 @@ const AranhasAtelie = (() => {
         // Movimento vertical de picareta cravando as presas!
         angQ = 4;
         syQ = 1.18;
+      } else if (mordendoPedaco) {
+        // Mordidas rítmicas marcadas: abre as quelíceras, fecha cravando e tritura cada pedaço!
+        angQ = 9 + pulsoMordida * 9.5;
+        syQ = 1.06 + Math.max(0, -pulsoMordida) * 0.16;
       } else if (digestaoSuccao) {
         // Trituração lenta com a base das quelíceras durante digestão externa
         angQ = 6 + Math.sin(t * 7.5) * 4.5;
@@ -3580,7 +3786,7 @@ const AranhasAtelie = (() => {
       inst.queliceraDir.style.transform = `rotate(${angQ.toFixed(1)}deg) scaleY(${syQ.toFixed(2)})`;
     }
 
-    // 1. Respiração sutil contínua no abdômen (ou balanço na Dança da Seda / bombeamento na Sucção!)
+    // 1. Respiração sutil contínua no abdômen (ou balanço na Dança da Seda / exibição Maratus / sucção!)
     if (inst.abdomen) {
       let escX = 1 + Math.sin(t * 2.1 + inst.uid) * 0.018;
       let escY = 1 - Math.sin(t * 2.1 + inst.uid) * 0.015;
@@ -3590,11 +3796,20 @@ const AranhasAtelie = (() => {
         rotAbd = Math.sin(t * 7.8) * 19;
         escX = 1 + Math.sin(t * 7.8) * 0.035;
         escY = 1.03;
-      } else if (dancaCortejo) {
-        // 10. Dança de Cortejo Maratus: abdômen erguido balançando amplamente de um lado para o outro!
-        rotAbd = Math.sin(t * 10.5) * 23;
-        escX = 1.05;
+      } else if (cortejoExibicao) {
+        // Fase 3 Salticidae/Maratus: abdômen erguido verticalmente vibrando em alta velocidade + tamborilamento!
+        rotAbd = Math.sin(t * 22) * 22;
+        escX = 1.12;
+        escY = 0.84;
+      } else if (cortejoZigueZague || dancaCortejo) {
+        // Fase 2 Zigue-Zague: balanço rítmico acompanhando os passos laterais
+        rotAbd = Math.sin(t * 11) * 14;
+        escX = 1.04;
         escY = 0.94;
+      } else if (cortejoCongelar || femeaAceitando) {
+        rotAbd = 0;
+        escX = femeaAceitando ? 0.95 : 1;
+        escY = femeaAceitando ? 0.95 : 1;
       } else if (ecdiseContraindo) {
         // 11. Ecdise: contrações metabólicas lentas bombeando hemolinfa
         const cM = Math.sin(t * 4.2);
@@ -3636,13 +3851,17 @@ const AranhasAtelie = (() => {
     // 2. Micro-inclinação do cefalotórax & pedipalpos
     let rotCefalo = 0;
     let rotPalpos = Math.sin(t * 4.2 + inst.uid) * 3.5;
+    let tyPalpos = 0;
 
     if (emDefesa || armandoBoteGolias) {
       rotCefalo = Math.sin(t * 36) * 2.4;
       rotPalpos = Math.sin(t * 38) * 11;
-    } else if (acumulandoPressao) {
+    } else if (acumulandoPressao || cortejoCongelar) {
       rotCefalo = 0;
-      rotPalpos = Math.sin(t * 14) * 5;
+      rotPalpos = cortejoCongelar ? 0 : Math.sin(t * 14) * 5;
+    } else if (femeaAceitando) {
+      rotCefalo = 0;
+      rotPalpos = Math.sin(t * 3) * 2;
     } else if (camuflagemGalhinho) {
       rotCefalo = 0;
       rotPalpos = 0;
@@ -3652,9 +3871,23 @@ const AranhasAtelie = (() => {
     } else if (bebendoAgua) {
       rotCefalo = Math.sin(t * 4.4) * 1.8;
       rotPalpos = Math.sin(t * 8.8) * 6;
-    } else if (dancaCortejo) {
-      rotCefalo = Math.sin(t * 10.5) * 6;
-      rotPalpos = Math.sin(t * 18) * 12;
+    } else if (cortejoTransferencia) {
+      rotCefalo = Math.sin(t * 7) * 3.5;
+      rotPalpos = Math.sin(t * 16) * 11;
+      tyPalpos = Math.sin(t * 16) * 2;
+    } else if (cortejoExibicao) {
+      // Inclinação lateral do corpo + pedipalpos balançando vigorosamente para cima e para baixo!
+      rotCefalo = Math.sin(t * 8.5) * 11;
+      rotPalpos = Math.sin(t * 20) * 14;
+      tyPalpos = Math.sin(t * 20) * 3.2;
+    } else if (cortejoZigueZague || dancaCortejo) {
+      rotCefalo = Math.sin(t * 7.5) * 7.5;
+      rotPalpos = Math.sin(t * 16) * 13;
+      tyPalpos = Math.sin(t * 16) * 2.8;
+    } else if (mordendoPedaco) {
+      rotCefalo = Math.sin(t * 9.5) * 3.2;
+      rotPalpos = pulsoMordida * 15;
+      tyPalpos = Math.max(0, -pulsoMordida) * 2.5;
     } else if (digestaoSuccao) {
       rotCefalo = Math.sin(t * 5.2) * 2.2;
       rotPalpos = Math.sin(t * 7.5) * 9;
@@ -3691,7 +3924,11 @@ const AranhasAtelie = (() => {
     }
 
     if (inst.cefalo) inst.cefalo.style.transform = `rotate(${rotCefalo.toFixed(2)}deg)`;
-    if (inst.palpos) inst.palpos.style.transform = `rotate(${rotPalpos.toFixed(2)}deg)`;
+    if (inst.palpos) {
+      inst.palpos.style.transform = tyPalpos
+        ? `translateY(${tyPalpos.toFixed(2)}px) rotate(${rotPalpos.toFixed(2)}deg)`
+        : `rotate(${rotPalpos.toFixed(2)}deg)`;
+    }
 
     // 3. Cinemática Individual das 8 Patas
     if (andando && desloc > 0.02) {
@@ -3712,11 +3949,25 @@ const AranhasAtelie = (() => {
         // 2. Tarântula Golias raspa vigorosamente o 4º par traseiro no abdômen lançando pelos urticantes!
         if (p.par === 3) alvoAng = p.lado * (-22 + Math.sin(t * 44 + (p.lado === 1 ? Math.PI : 0)) * 16);
         else alvoAng = p.lado * -6;
-      } else if (dancaCortejo) {
-        // 10. Dança de Cortejo Maratus: 3º par bem erguido + 1º par acenando no ritmo!
-        if (p.par === 2) alvoAng = p.lado * (-26 + Math.sin(t * 12) * 8);
-        else if (p.par === 0) alvoAng = p.lado * (-18 + Math.sin(t * 14 + p.lado) * 10);
-        else alvoAng = Math.sin(t * 10 + p.faseBase) * 6;
+      } else if (cortejoCongelar) {
+        // Fase 1 — Macho completamente imóvel avaliando a fêmea
+        alvoAng = p.par === 0 ? p.lado * -8 : 0;
+      } else if (femeaAceitando) {
+        // Desfecho A — Fêmea recolhe as patas em postura passiva receptiva
+        alvoAng = p.par <= 1 ? p.lado * 12 : p.lado * -12;
+      } else if (cortejoExibicao) {
+        // Fase 3 — Semáforos com o 1º par + 3º par erguido no ar (Maratus/Plexippus)!
+        if (p.par === 0) alvoAng = p.lado * (-30 + Math.sin(t * 17 + (p.lado === 1 ? 0 : Math.PI * 0.35)) * 14);
+        else if (p.par === 2) alvoAng = p.lado * (-28 + Math.sin(t * 15) * 10);
+        else alvoAng = Math.sin(t * 10 + p.faseBase) * 4;
+      } else if (cortejoZigueZague || dancaCortejo) {
+        // Fase 2 — 1º par erguido amplo para o alto/lados (silhueta inconfundível) enquanto os outros marcham!
+        if (p.par === 0) alvoAng = p.lado * (-26 + Math.sin(t * 11) * 7);
+        else if (p.par === 2) alvoAng = p.lado * (-10 + Math.sin(t * 12 + p.faseBase) * 8);
+        else alvoAng = Math.sin(inst.fasePassada + p.faseBase) * 11;
+      } else if (cortejoTransferencia) {
+        // Desfecho A — Macho apoiado suavemente sobre o dorso da fêmea
+        alvoAng = p.par <= 1 ? p.lado * -12 : p.lado * 10;
       } else if (tateandoCursor) {
         // 6. Papa-Moscas tateia suavemente a pontinha do cursor parado com o 1º par!
         if (p.par === 0 && p.lado === 1) alvoAng = -22 + Math.sin(t * 12) * 9;
@@ -3742,6 +3993,11 @@ const AranhasAtelie = (() => {
         if (p.par === 0) alvoAng = p.lado * -16;
         else if (p.par >= 2) alvoAng = p.lado * -8;
         else alvoAng = p.lado * -5;
+      } else if (mordendoPedaco) {
+        // Puxando e segurando pedaço por pedaço da Lagarta / Lagartinho com os pares I e II!
+        if (p.par === 0) alvoAng = p.lado * (-22 + pulsoMordida * 7.5);
+        else if (p.par === 1) alvoAng = p.lado * (-13 - pulsoMordida * 4.5);
+        else alvoAng = Math.sin(t * 3 + p.faseBase) * 1.8;
       } else if (digestaoSuccao) {
         // Etapa 6 — Patas dianteiras apoiam suavemente a presa sob as quelíceras durante a sucção
         if (p.par === 0) alvoAng = p.lado * (-18 + Math.sin(t * 5.2) * 2.5);
@@ -3929,14 +4185,8 @@ const AranhasAtelie = (() => {
         flags.andando = false;
         inst.comportamentoAtual = "grooming";
         if (ac.tempo >= 0.95) {
-          const saida = bordaMaisProxima(st.x, st.y, inst.tamPx * 1.3);
-          st.p0 = { x: st.x, y: st.y };
-          st.p1 = { x: lerp(st.x, saida.x, 0.4), y: lerp(st.y, saida.y, 0.4) };
-          st.p2 = { x: lerp(st.x, saida.x, 0.7), y: lerp(st.y, saida.y, 0.7) };
-          st.p3 = { x: saida.x, y: saida.y };
-          st.t = 0;
-          st.duracao = Math.max(4.0, Math.hypot(saida.x - st.x, saida.y - st.y) / inst.especie.velocidadeBase);
           inst.acaoEspecial = null;
+          encaminharParaSaidaBorda(inst, 1.0);
           return false;
         }
       }
@@ -4010,33 +4260,248 @@ const AranhasAtelie = (() => {
         if (frac >= 1) {
           inst.curiosidadeFeita = true;
           inst.acaoEspecial = null;
+          encaminharParaSaidaBorda(inst, 1.0);
           return false;
         }
       }
       return true;
     }
 
-    // 10. DANÇA DE CORTEJO DA PAPA-MOSCAS (Maratus / Salticidae)
+    // 10. RITUAL REALISTA DE CORTEJO SALTICIDAE (PAPA-MOSCAS — 5 FASES + 3 DESFECHOS)
     if (ac.tipo === "danca_cortejo") {
       const outra = ac.parceira && ativas.includes(ac.parceira) ? ac.parceira : null;
-      if (!outra || ac.tempo >= ac.duracao) {
+      const rit = ac.ritual;
+      if (!outra || !rit || ac.tempo >= ac.duracao) {
         inst.acaoEspecial = null;
+        encaminharParaSaidaBorda(inst, 1.0);
         return false;
       }
-      if (ac.papel === "dancarino") {
-        flags.dancaCortejo = true;
-        // Passinhos laterais em arco (zig-zag) de frente para a parceira!
-        const alvoX = ac.centroX + Math.sin(ac.tempo * 3.1) * 44;
-        const alvoY = ac.centroY + 38 - Math.abs(Math.sin(ac.tempo * 3.1)) * 10;
-        st.x = lerp(st.x, alvoX, Math.min(1, dt * 6.5));
-        st.y = lerp(st.y, alvoY, Math.min(1, dt * 6.5));
-        st.anguloAlvo = (Math.atan2(outra.estado.y - st.y, outra.estado.x - st.x) * 180) / Math.PI + 90;
+
+      const t = ac.tempo;
+      const cosE = Math.cos(rit.eixoRad);
+      const sinE = Math.sin(rit.eixoRad);
+      // Vetor perpendicular ao eixo Fêmea -> Macho para o deslocamento lateral em arco (zigue-zague)
+      const perpX = -sinE;
+      const perpY = cosE;
+      const angParaOutra = (Math.atan2(outra.estado.y - st.y, outra.estado.x - st.x) * 180) / Math.PI + 90;
+
+      if (ac.papel === "macho") {
+        // FASE 1 (0 -> 1.05s): Alinhamento rápido dos olhos frontais + congelamento avaliativo
+        if (t < 1.05) {
+          inst.wrap.classList.remove("exibindo-cortejo");
+          flags.andando = false;
+          flags.cortejoCongelar = true;
+          const alvoX = rit.femeaX + cosE * rit.distIni;
+          const alvoY = rit.femeaY + sinE * rit.distIni;
+          st.x = lerp(st.x, alvoX, Math.min(1, dt * 7));
+          st.y = lerp(st.y, alvoY, Math.min(1, dt * 7));
+          st.anguloAlvo = angParaOutra;
+          st.angulo = lerpAngulo(st.angulo, st.anguloAlvo, Math.min(1, dt * 16));
+        }
+        // FASE 2 (1.05 -> 4.35s): Aproximação em Zigue-Zague (passos curtos laterais em arco, 1º par erguido + palpos)
+        else if (t < 4.35) {
+          inst.wrap.classList.remove("exibindo-cortejo");
+          const p = (t - 1.05) / 3.3;
+          const dist = lerp(rit.distIni, 58, p);
+          // Onda em degraus suaves para imitar passinhos laterais curtos com micro-pausas nos vértices
+          const onda = Math.sin(p * Math.PI * 5);
+          const ampLateral = lerp(52, 30, p);
+          const deslocLat = Math.sign(onda) * Math.pow(Math.abs(onda), 0.72) * ampLateral;
+          const arcoRadial = (1 - Math.cos(onda * Math.PI * 0.5)) * 12;
+
+          const alvoX = rit.femeaX + cosE * (dist + arcoRadial) + perpX * deslocLat;
+          const alvoY = rit.femeaY + sinE * (dist + arcoRadial) + perpY * deslocLat;
+          const movendo = Math.abs(Math.cos(p * Math.PI * 5)) > 0.28;
+          flags.andando = movendo;
+          flags.cortejoZigueZague = true;
+          st.x = lerp(st.x, alvoX, Math.min(1, dt * 8.5));
+          st.y = lerp(st.y, alvoY, Math.min(1, dt * 8.5));
+          st.anguloAlvo = angParaOutra;
+
+          // Sinais sísmicos sutis enquanto avança
+          if (t - rit.ultimoTamborilamento >= 0.68) {
+            rit.ultimoTamborilamento = t;
+            criarOndaVibracao(st.x, st.y, "cortejo");
+          }
+        }
+        // FASE 3 (4.35 -> 7.65s): Exibição Visual & Coreografia (avanços bruscos + pausas + abas Maratus + vibrações sísmicas!)
+        else if (t < 7.65) {
+          inst.wrap.classList.add("exibindo-cortejo");
+          const p = (t - 4.35) / 3.3;
+          const ciclo = (t - 4.35) % 0.82;
+          const avancando = ciclo < 0.24;
+          const passoIdx = Math.floor((t - 4.35) / 0.82);
+          const dist = lerp(58, 38, Math.min(1, (passoIdx + (avancando ? ciclo / 0.24 : 1)) / 4));
+          const lado = passoIdx % 2 === 0 ? 1 : -1;
+          const deslocLat = lado * (18 * (1 - p * 0.55));
+
+          const alvoX = rit.femeaX + cosE * dist + perpX * deslocLat;
+          const alvoY = rit.femeaY + sinE * dist + perpY * deslocLat;
+          st.x = lerp(st.x, alvoX, Math.min(1, dt * (avancando ? 12 : 4)));
+          st.y = lerp(st.y, alvoY, Math.min(1, dt * (avancando ? 12 : 4)));
+          st.anguloAlvo = angParaOutra + (avancando ? 0 : lado * 9);
+          flags.andando = avancando;
+          flags.cortejoExibicao = true;
+
+          // Trilha sonora invisível: tamborilamento rápido do abdômen no substrato!
+          if (t - rit.ultimoTamborilamento >= 0.42) {
+            rit.ultimoTamborilamento = t;
+            criarOndaVibracao(st.x, st.y, "cortejo");
+          }
+        }
+        // FASE 4 (7.65s+): OS 3 DESFECHOS REAIS!
+        else {
+          const td = t - 7.65;
+          if (!rit.desfechoIniciado) {
+            rit.desfechoIniciado = true;
+            rit.machoSaltoOrigX = st.x;
+            rit.machoSaltoOrigY = st.y;
+          }
+
+          if (rit.desfecho === "aceitacao") {
+            inst.wrap.classList.remove("exibindo-cortejo");
+            if (td < 0.85) {
+              // Toca delicadamente as pernas dianteiras da fêmea receptiva
+              flags.andando = td < 0.45;
+              flags.cumprimentando = true;
+              const alvoX = rit.femeaX + cosE * 24;
+              const alvoY = rit.femeaY + sinE * 24;
+              st.x = lerp(st.x, alvoX, Math.min(1, dt * 6));
+              st.y = lerp(st.y, alvoY, Math.min(1, dt * 6));
+              st.anguloAlvo = angParaOutra;
+            } else if (td < 2.25) {
+              // Sobe suavemente sobre o dorso da fêmea para transferência com os pedipalpos
+              inst.wrap.style.zIndex = "4";
+              flags.andando = false;
+              flags.cortejoTransferencia = true;
+              const alvoX = rit.femeaX + cosE * 5;
+              const alvoY = rit.femeaY + sinE * 5;
+              st.x = lerp(st.x, alvoX, Math.min(1, dt * 5));
+              st.y = lerp(st.y, alvoY, Math.min(1, dt * 5));
+              flags.escalaX = 1.04;
+              flags.escalaY = 1.04;
+              flags.sombraExtra = 3;
+            } else {
+              // Desce calmamente ao lado
+              inst.wrap.style.zIndex = "";
+              flags.andando = true;
+              const alvoX = rit.femeaX + perpX * 42 + cosE * 22;
+              const alvoY = rit.femeaY + perpY * 42 + sinE * 22;
+              st.x = lerp(st.x, alvoX, Math.min(1, dt * 5));
+              st.y = lerp(st.y, alvoY, Math.min(1, dt * 5));
+              st.anguloAlvo = (Math.atan2(alvoY - st.y, alvoX - st.x) * 180) / Math.PI + 90;
+            }
+          } else if (rit.desfecho === "rejeicao_pacifica") {
+            inst.wrap.classList.remove("exibindo-cortejo");
+            // Recua um pouco quando a fêmea ergue as pernas em aviso e depois segue caminho
+            flags.andando = td > 0.7;
+            if (td < 0.7) {
+              flags.cortejoCongelar = true;
+              st.anguloAlvo = angParaOutra;
+            } else {
+              const alvoX = rit.machoSaltoOrigX + cosE * 46;
+              const alvoY = rit.machoSaltoOrigY + sinE * 46;
+              st.x = lerp(st.x, alvoX, Math.min(1, dt * 3.5));
+              st.y = lerp(st.y, alvoY, Math.min(1, dt * 3.5));
+              st.anguloAlvo = (Math.atan2(alvoY - st.y, alvoX - st.x) * 180) / Math.PI + 90;
+            }
+          } else {
+            // ATAQUE: Fêmea avança -> Macho dá salto explosivo PARA TRÁS com fio de segurança!
+            inst.wrap.classList.remove("exibindo-cortejo");
+            if (td < 0.42) {
+              flags.andando = false;
+              flags.emDefesa = true;
+              st.anguloAlvo = angParaOutra;
+            } else if (td < 0.95) {
+              if (!rit.ancoraFugaCriada) {
+                rit.ancoraFugaCriada = true;
+                criarRastroPonto(st.x, st.y, true);
+                criarOndaVibracao(st.x, st.y, "impacto");
+              }
+              const sT = Math.min(1, (td - 0.42) / 0.53);
+              const arco = Math.sin(sT * Math.PI);
+              flags.noAr = true;
+              flags.andando = false;
+              flags.escalaX = 1 + arco * 0.2;
+              flags.escalaY = 1 + arco * 0.24;
+              flags.sombraExtra = 10 * arco;
+              // Salto para trás mantendo frente voltada à fêmea!
+              st.x = rit.machoSaltoOrigX + cosE * (145 * sT);
+              st.y = rit.machoSaltoOrigY + sinE * (145 * sT);
+              st.anguloAlvo = angParaOutra;
+            } else {
+              inst.acaoEspecial = null;
+              acionarFuga(inst);
+              return false;
+            }
+          }
+        }
       } else {
-        flags.andando = false;
-        flags.paralaxe = true;
-        st.x = lerp(st.x, ac.centroX, Math.min(1, dt * 4));
-        st.y = lerp(st.y, ac.centroY - 34, Math.min(1, dt * 4));
-        st.anguloAlvo = (Math.atan2(outra.estado.y - st.y, outra.estado.x - st.x) * 180) / Math.PI + 90;
+        // PAPEL: FÊMEA — permanece quase imóvel durante o cortejo, girando apenas o corpo para acompanhar o macho!
+        if (t < 7.65) {
+          flags.andando = false;
+          flags.paralaxe = t >= 1.05;
+          st.x = lerp(st.x, rit.femeaX, Math.min(1, dt * 5));
+          st.y = lerp(st.y, rit.femeaY, Math.min(1, dt * 5));
+          st.anguloAlvo = angParaOutra;
+        } else {
+          const td = t - 7.65;
+          if (rit.desfecho === "aceitacao") {
+            // Abaixa ligeiramente o corpo e recolhe as pernas em postura passiva
+            flags.andando = false;
+            flags.femeaAceitando = true;
+            flags.escalaX = 0.94;
+            flags.escalaY = 0.94;
+            if (td < 0.7) st.anguloAlvo = angParaOutra;
+          } else if (rit.desfecho === "rejeicao_pacifica") {
+            if (td < 0.85) {
+              // Levanta as próprias pernas dianteiras em sinal de advertência!
+              flags.andando = false;
+              flags.emDefesa = true;
+              st.anguloAlvo = angParaOutra;
+            } else if (td < 1.5) {
+              // Vira as costas e salta para longe!
+              const sT = Math.min(1, (td - 0.85) / 0.65);
+              const arco = Math.sin(sT * Math.PI);
+              flags.noAr = true;
+              flags.andando = false;
+              flags.escalaX = 1 + arco * 0.18;
+              flags.escalaY = 1 + arco * 0.22;
+              flags.sombraExtra = 9 * arco;
+              const destX = rit.femeaX - cosE * 115;
+              const destY = rit.femeaY - sinE * 115;
+              st.x = lerp(rit.femeaX, destX, sT);
+              st.y = lerp(rit.femeaY, destY, sT);
+              st.anguloAlvo = (Math.atan2(-sinE, -cosE) * 180) / Math.PI + 90;
+            } else {
+              flags.andando = true;
+              st.x -= cosE * inst.especie.velocidadeBase * 1.15 * dt;
+              st.y -= sinE * inst.especie.velocidadeBase * 1.15 * dt;
+            }
+          } else {
+            // ATAQUE: Fêmea acumula tensão e avança rapidamente tentando predar o macho!
+            if (td < 0.35) {
+              flags.andando = false;
+              flags.acumulandoPressao = true;
+              st.anguloAlvo = angParaOutra;
+            } else if (td < 0.72) {
+              const sT = Math.min(1, (td - 0.35) / 0.37);
+              const arco = Math.sin(sT * Math.PI);
+              flags.noAr = true;
+              flags.andando = false;
+              flags.boteHidraulico = true;
+              flags.escalaX = 1 + arco * 0.14;
+              flags.escalaY = 1 + arco * 0.18;
+              flags.sombraExtra = 7 * arco;
+              st.x = rit.femeaX + cosE * (58 * sT);
+              st.y = rit.femeaY + sinE * (58 * sT);
+              st.anguloAlvo = angParaOutra;
+            } else {
+              flags.andando = false;
+              flags.paralaxe = true;
+            }
+          }
+        }
       }
       return true;
     }
@@ -4087,14 +4552,8 @@ const AranhasAtelie = (() => {
         flags.espreguicando = true;
         flags.escalaY = 1 + Math.sin(Math.min(1, ac.tempo / 1.1) * Math.PI) * 0.07;
         if (ac.tempo >= 1.15) {
-          const saida = bordaMaisProxima(st.x, st.y, inst.tamPx * 1.35);
-          st.p0 = { x: st.x, y: st.y };
-          st.p1 = { x: lerp(st.x, saida.x, 0.4), y: lerp(st.y, saida.y, 0.4) };
-          st.p2 = { x: lerp(st.x, saida.x, 0.7), y: lerp(st.y, saida.y, 0.7) };
-          st.p3 = { x: saida.x, y: saida.y };
-          st.t = 0;
-          st.duracao = Math.max(4.5, Math.hypot(saida.x - st.x, saida.y - st.y) / inst.especie.velocidadeBase);
           inst.acaoEspecial = null;
+          encaminharParaSaidaBorda(inst, 1.0);
           return false;
         }
       }
@@ -4408,7 +4867,13 @@ const AranhasAtelie = (() => {
         st.y = lerp(oy, destinoY, ease);
         st.progressoSeda = Math.max(0, 1 - ease * 1.15);
         st.anguloAlvo = (Math.atan2(destinoY - oy, destinoX - ox) * 180) / Math.PI + 90;
-        if (st.t >= 1) flags.terminado = true;
+        if (st.t >= 1) {
+          if (estaForaDaTela(st.x, st.y, inst.tamPx)) {
+            flags.terminado = true;
+          } else {
+            encaminharParaSaidaBorda(inst, inst.fugindo ? 1.55 : 1.05);
+          }
+        }
       }
     } else if (st.tipo === "rapel_fio") {
       st.balancoTempo += dt;
@@ -4467,7 +4932,13 @@ const AranhasAtelie = (() => {
         const ease = st.t * st.t;
         st.x = lerp(st.xEspia, st.xFora, ease);
         st.y = lerp(st.yEspia, st.yFora, ease);
-        if (st.t >= 1) flags.terminado = true;
+        if (st.t >= 1) {
+          if (estaForaDaTela(st.x, st.y, inst.tamPx)) {
+            flags.terminado = true;
+          } else {
+            encaminharParaSaidaBorda(inst, inst.fugindo ? 1.55 : 1.05);
+          }
+        }
       }
     } else if (st.tipo === "lateral_caranguejo") {
       if (st.pausaRestante > 0) {
@@ -4584,8 +5055,16 @@ const AranhasAtelie = (() => {
     }
 
     if (flags.terminado) {
-      removerInstancia(inst);
-      return;
+      if (!estaForaDaTela(st.x, st.y, inst.tamPx)) {
+        // Garantia absoluta: nenhuma aranha pode desaparecer no meio da tela!
+        inst.fugindo = false;
+        inst.fugaAlvo = null;
+        encaminharParaSaidaBorda(inst, 1.15);
+        flags.terminado = false;
+      } else {
+        removerInstancia(inst);
+        return;
+      }
     }
 
     st.angulo = lerpAngulo(st.angulo, st.anguloAlvo, dt * (inst.fugindo ? 16 : 8));

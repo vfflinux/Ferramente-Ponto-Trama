@@ -41,6 +41,21 @@
 /* ==========================================================================
    MODAIS COMPARTILHADOS (ESFERA/CÍRCULO & PLANEJADOR DE MANTA)
    ========================================================================== */
+.modal-overlay-atelie-pro,
+.modal-overlay-atelie-pro *,
+.painel-simbolos-croche,
+.painel-simbolos-croche *,
+.secao-motivo-vinculado,
+.secao-motivo-vinculado *,
+.popover-ponto-receita,
+.popover-ponto-receita *,
+.ribblr-barra-progresso,
+.ribblr-barra-progresso *,
+.linha-receita-item.ribblr-item,
+.linha-receita-item.ribblr-item * {
+  box-sizing: border-box;
+}
+
 .modal-overlay-atelie-pro {
   position: fixed;
   inset: 0;
@@ -199,7 +214,7 @@
 
 .pro-campo-linha-2 {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 10px;
 }
 
@@ -820,7 +835,7 @@
 
 .motivo-grid-2 {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 7px;
 }
 
@@ -874,11 +889,15 @@
    ========================================================================== */
 .painel-simbolos-croche {
   display: none;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
   grid-template-columns: 240px minmax(0, 1fr) 265px;
   gap: 14px;
   width: 100%;
-  min-height: 620px;
   align-items: start;
+  align-content: start;
+  padding-bottom: 14px;
 }
 
 .simb-painel {

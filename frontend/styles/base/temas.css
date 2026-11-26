@@ -2921,23 +2921,19 @@
    Divisórias pontilhadas (alinhavo), anéis arredondados e SVGs minimalistas
    ========================================================================== */
 
-/* Divisórias sutis pontilhadas imitando alinhavo de costura */
+/* Divisórias sutis pontilhadas imitando alinhavo de costura (sempre 1px suave) */
 .card-fio-specs,
 .card-fio-rodape,
-.linha-config + .linha-config,
-.detalhes-cabecalho,
 .detalhes-rodape,
-.modal-topo,
-.observacoes-detalhe-bloco,
-.home-recentes-cabecalho {
-  border-top-style: dashed;
+.observacoes-detalhe-bloco {
+  border-top: 1px dashed var(--creme-opacidade-15);
 }
 
 .detalhes-cabecalho,
 .modal-topo,
 .busca-global-topo {
-  border-top-style: solid;
-  border-bottom-style: dashed;
+  border-top: none;
+  border-bottom: 1px dashed var(--creme-opacidade-15);
 }
 
 .home-recentes-cabecalho {

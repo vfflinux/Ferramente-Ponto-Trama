@@ -173,6 +173,69 @@
   animation: pulsoImpactoBote 0.62s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
+/* Trilha sonora invisível: vibrações sísmicas no substrato durante o cortejo Salticidae */
+.onda-vibracao-caca.cortejo {
+  border-width: 1.4px;
+  border-color: var(--aranha-acento);
+  animation: pulsoCortejoSismico 0.95s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes pulsoCortejoSismico {
+  0% { opacity: 0.56; transform: scale(0.35); }
+  55% { opacity: 0.28; }
+  100% { opacity: 0; transform: scale(5.4); }
+}
+
+/* Abas ornamentais (Maratus) e manchas iridescentes nos pedipalpos durante exibição do macho */
+.papa-abas-cortejo {
+  opacity: 0;
+  transform: scaleX(0.45);
+  transform-origin: 60px 79px;
+  transition: opacity 0.22s ease, transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.aranha-viva-ator.exibindo-cortejo .papa-abas-cortejo {
+  opacity: 0.92;
+  transform: scaleX(1.12);
+}
+
+.aranha-viva-ator.exibindo-cortejo .palpo-mancha {
+  opacity: 1 !important;
+}
+
+/* Pedaços anatômicos consumíveis da Lagarta e do Lagartinho (Golias comendo pedaço por pedaço) */
+.presa-svg .pedaco-presa {
+  transition: opacity 0.26s ease, transform 0.26s ease;
+}
+
+/* Micro-gotículas enzimáticas / farelos sutis a cada mordida da Tarântula Golias */
+.particula-mordida-golias {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 5px;
+  height: 5px;
+  margin-left: -2.5px;
+  margin-top: -2.5px;
+  border-radius: 50%;
+  background: var(--aranha-acento);
+  border: 1px solid var(--aranha-tinta);
+  pointer-events: none;
+  z-index: 3;
+  animation: dispersarMordidaGolias 0.72s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes dispersarMordidaGolias {
+  0% {
+    opacity: 0.85;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--mx, 18px), var(--my, -14px), 0) scale(0.2);
+  }
+}
+
 @keyframes pulsoVibracaoSolo {
   0% { opacity: 0.38; transform: scale(0.45); }
   100% { opacity: 0; transform: scale(4.2); }
@@ -420,14 +483,19 @@
 .acoes-aranhas-cfg {
   display: flex;
   align-items: center;
+  justify-content: flex-start;
   gap: 8px;
   flex-wrap: wrap;
+  width: 100%;
+  margin-top: 2px;
 }
 
 .select-especie-aranha-cfg {
+  flex: 1 1 190px;
   min-width: 172px;
-  max-width: 220px;
-  padding: 7px 10px;
+  max-width: 260px;
+  box-sizing: border-box;
+  padding: 7px 30px 7px 10px;
   border-radius: 10px;
   border: 1px solid var(--creme-opacidade-25);
   background: var(--cor-fundo-principal);
@@ -446,8 +514,10 @@
 /* Descrição dinâmica de frequência do modo selecionado das Aranhas */
 .desc-modo-aranhas-cfg {
   display: block;
+  width: 100%;
+  box-sizing: border-box;
   margin-top: 6px;
-  padding: 6px 10px;
+  padding: 7px 11px;
   border-radius: 8px;
   border-left: 2.5px dashed var(--aranha-acento);
   background: var(--azul-medio-opacidade-40);

@@ -115,6 +115,7 @@
   align-items: center;
   gap: 10px;
   width: 100%;
+  box-sizing: border-box;
   padding: 10px 13px;
   border-radius: 10px;
   border: 1px solid transparent;
@@ -203,9 +204,10 @@
 
 .linha-config {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: 12px 16px;
   padding: 10px 0;
   border-bottom: 1px solid var(--creme-opacidade-12);
 }
@@ -218,13 +220,20 @@
 .linha-config.vertical {
   flex-direction: column;
   align-items: stretch;
+  flex-wrap: nowrap;
 }
 
 .info-linha-config {
+  flex: 1 1 240px;
   display: flex;
   flex-direction: column;
   gap: 3px;
   min-width: 0;
+}
+
+.linha-config.vertical .info-linha-config {
+  flex: 0 0 auto;
+  width: 100%;
 }
 
 .info-linha-config strong {
@@ -236,14 +245,16 @@
 .info-linha-config span {
   font-size: 12px;
   color: var(--creme-opacidade-65);
-  line-height: 1.4;
+  line-height: 1.45;
 }
 
 .controle-linha-config {
   flex-shrink: 0;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 10px;
+  max-width: 100%;
 }
 
 .controle-linha-config.largo {
@@ -446,11 +457,14 @@
 /* Segmented Control (Pílulas) */
 .segmented-cfg {
   display: inline-flex;
+  flex-wrap: wrap;
+  max-width: 100%;
   background: rgba(1, 7, 54, 0.68);
   border: 1px solid var(--creme-opacidade-20);
   border-radius: 10px;
   padding: 3px;
   gap: 3px;
+  box-sizing: border-box;
 }
 
 .btn-seg-cfg {

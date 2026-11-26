@@ -174,7 +174,7 @@ p {
   background-color: var(--cor-destaque);
   width: 100%;
   min-height: var(--altura-cabecalho-min);
-  max-height: var(--altura-cabecalho-max);
+  max-height: none;
   display: flex;
   transition: width var(--transicao-suave), background-color 0.22s ease;
 }

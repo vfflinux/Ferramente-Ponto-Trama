@@ -303,24 +303,30 @@
 
 /* ==========================================================================
    3. DETALHES SUTIS DE COSTURA (ALINHAVO PONTILHADO EM TODAS AS TELAS)
+   Sempre define largura (1px) e cor suave para nunca gerar borda 3px branca
    ========================================================================== */
-.ws-card-cabecalho,
 .pasta-rodape,
 .ws-contador-rodape,
-.bloco-precificacao .cabecalho-bloco,
-.card-amostra-topo,
-.det-banco-notas-box,
-.det-banco-link-box,
 .card-fio-specs,
 .card-fio-rodape,
-.linha-config + .linha-config,
 .observacoes-detalhe-bloco,
 .detalhes-rodape,
 .simulador-rodape,
 .busca-global-rodape {
-  border-top-style: dashed;
+  border-top: 1px dashed var(--creme-opacidade-15);
 }
 
+.linha-config {
+  border-bottom: 1px dashed var(--creme-opacidade-15);
+}
+
+.linha-config:last-child {
+  border-bottom: none;
+}
+
+.ws-card-cabecalho,
+.bloco-precificacao .cabecalho-bloco,
+.card-amostra-topo,
 .detalhes-cabecalho,
 .modal-topo,
 .modal-banco-topo,
@@ -330,13 +336,13 @@
 .drawer-bib-topo,
 .busca-global-topo,
 .home-recentes-cabecalho {
-  border-bottom-style: dashed;
+  border-bottom: 1px dashed var(--creme-opacidade-15);
 }
 
 .tabela-conversao tbody tr,
 .tabela-biblioteca tbody tr,
 .tabela-dicionario tbody tr {
-  border-bottom-style: dashed;
+  border-bottom: 1px dashed var(--creme-opacidade-15);
 }
 
 /* ==========================================================================
