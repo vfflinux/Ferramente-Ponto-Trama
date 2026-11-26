@@ -165,6 +165,9 @@ const Configuracoes = (() => {
       if (typeof BarraLateral !== "undefined" && typeof BarraLateral.aplicarFerramentasVisiveis === "function") {
         BarraLateral.aplicarFerramentasVisiveis(prefs.ferramentasBarraLateral);
       }
+      if (jaInicializado) {
+        renderizarListaFerramentasSidebar();
+      }
     }
   }
 
@@ -402,17 +405,16 @@ const Configuracoes = (() => {
       `;
       const chk = label.querySelector("input");
       chk?.addEventListener("change", () => {
-        const atual = new Set(
-          Array.isArray(prefs.ferramentasBarraLateral)
-            ? prefs.ferramentasBarraLateral
-            : PADROES.ferramentasBarraLateral
-        );
-        if (chk.checked) atual.add(item.chave);
-        else atual.delete(item.chave);
-        const ordenada = catalogo.map((c) => c.chave).filter((k) => atual.has(k));
-        label.classList.toggle("ativa", chk.checked);
-        atualizar("ferramentasBarraLateral", ordenada);
-        atualizarResumoFerramentasSidebar(catalogo.length, ordenada.length);
+        const atualLista = Array.isArray(prefs.ferramentasBarraLateral)
+          ? [...prefs.ferramentasBarraLateral]
+          : [...PADROES.ferramentasBarraLateral];
+        let novaLista;
+        if (chk.checked) {
+          novaLista = atualLista.includes(item.chave) ? atualLista : [...atualLista, item.chave];
+        } else {
+          novaLista = atualLista.filter((k) => k !== item.chave);
+        }
+        atualizar("ferramentasBarraLateral", novaLista);
       });
       grade.appendChild(label);
     });

@@ -1908,3 +1908,17 @@
 :root[data-tema="claro"] .nota-ferramentas-sidebar-cfg {
   color: #4a5a7c;
 }
+
+:root[data-tema="noite"] .popup-ferramentas-lateral.zona-drop-hover {
+  background-color: #0e162e;
+}
+
+:root[data-tema="claro"] .popup-ferramentas-lateral.zona-drop-hover {
+  background-color: #253f7a;
+}
+
+:root[data-tema="claro"] .fantasma-arrasto-ferramenta {
+  background: #233b72;
+  color: #fcf1d0;
+  border-color: #fcf1d0;
+}
