@@ -41,6 +41,8 @@ const GerenciadorProjetos = (() => {
   let receitaModoEdicaoTexto = false;
   let fotoCapaFormBase64 = "";
   let projetoParaExcluirId = null;
+  let projetoPendenteBaixa = null;
+  let itensPendentesBaixa = [];
 
   // Cronômetro em execução
   let cronometroRodando = false;
@@ -460,6 +462,7 @@ const GerenciadorProjetos = (() => {
           </div>
           <div class="pasta-fichas-badges">
             <span class="mini-pill-ficha" title="Carreiras no contador principal">🔢 ${carrPrincipal} carr</span>
+            ${projeto.grafico && projeto.grafico.largura ? `<span class="mini-pill-ficha" title="Gráfico / Pixel Art salvo">🎨 ${projeto.grafico.largura}×${projeto.grafico.altura}</span>` : ""}
             ${etapasTotal > 0 ? `<span class="mini-pill-ficha" title="Etapas concluídas">✅ ${etapasFeitas}/${etapasTotal}</span>` : ""}
             ${projeto.tempo_gasto_seg > 0 ? `<span class="mini-pill-ficha" title="Tempo registrado">⏱️ ${formatarTempo(projeto.tempo_gasto_seg)}</span>` : ""}
             ${projeto.prazo_estimado ? `<span class="mini-pill-ficha" title="Prazo estimado">📅 ${escapeHtml(formatarDataBr(projeto.prazo_estimado))}</span>` : ""}
@@ -623,6 +626,16 @@ const GerenciadorProjetos = (() => {
     document.getElementById("dossie-ficha-precificacao").innerHTML = `<strong>⏱️ ${formatarTempo(p.tempo_gasto_seg)}</strong><br>${
       prec.precoVenda > 0 ? `Venda sugerida: ${formatarMoeda(prec.precoVenda)}` : "Pronto para precificar"
     }`;
+
+    const grafEl = document.getElementById("dossie-ficha-grafico");
+    if (grafEl) {
+      const g = p.grafico || {};
+      const nCores = Array.isArray(g.paleta) ? g.paleta.length : 0;
+      grafEl.innerHTML =
+        g.largura && g.altura
+          ? `<strong>${g.largura} × ${g.altura}</strong> (${nCores} cores)<br>Carreira ativa: ${g.carreiraAtual || 1}/${g.altura}`
+          : "Nenhum gráfico vinculado ainda";
+    }
 
     // Reinicia animação dos arquivos saindo da pasta
     const telinha = document.getElementById("telinha-dossie-pasta");
@@ -854,6 +867,15 @@ const GerenciadorProjetos = (() => {
       if (typeof ContadorCarreiras !== "undefined" && typeof ContadorCarreiras.carregarDoProjeto === "function") {
         ContadorCarreiras.carregarDoProjeto(projeto);
       }
+      if (
+        typeof EditorGraficos !== "undefined" &&
+        typeof EditorGraficos.definirCarreiraAtual === "function" &&
+        Array.isArray(projeto.contadores) &&
+        projeto.contadores[0]
+      ) {
+        const c = parseInt(projeto.contadores[0].carreiras, 10) || 1;
+        if (c >= 1) EditorGraficos.definirCarreiraAtual(c, { sincronizarComContador: false });
+      }
     }
   }
 
@@ -1058,6 +1080,7 @@ const GerenciadorProjetos = (() => {
           document.getElementById("ws-status-dot").style.backgroundColor = ctx().METADADOS_STATUS.concluido.cor;
           document.getElementById("ws-status-texto").textContent = ctx().METADADOS_STATUS.concluido.rotulo;
           mostrarToast("🎉 Parabéns! Todas as etapas concluídas — Peça Finalizada!");
+          verificarEOfertarBaixaEstoque(projeto);
         }
         renderizarEtapasWorkspace(projeto);
         atualizarProgressoWorkspace(projeto, antesPct < 100 && depoisPct >= 100);
@@ -1133,6 +1156,21 @@ const GerenciadorProjetos = (() => {
         prec.precoVenda > 0
           ? `Venda: ${formatarMoeda(prec.precoVenda)} (Custo ${formatarMoeda(prec.custoTotal)})`
           : "Calcular preço desta peça";
+    }
+
+    const graf = projeto.grafico || {};
+    const grafResumo = document.getElementById("ws-resumo-grafico");
+    if (grafResumo) {
+      grafResumo.textContent =
+        graf.largura && graf.altura
+          ? `${graf.largura}×${graf.altura} • Carr ${graf.carreiraAtual || 1}/${graf.altura}`
+          : "Desenhar ou importar gráfico";
+    }
+
+    const aumResumo = document.getElementById("ws-resumo-aum-dim");
+    if (aumResumo) {
+      const ptsRef = projeto.contadores?.[0]?.pontosPorCarreira || 0;
+      aumResumo.textContent = ptsRef >= 2 ? `Base atual: ${ptsRef} pts/carr` : "Distribuir aumentos/dim.";
     }
   }
 
@@ -1357,7 +1395,8 @@ const GerenciadorProjetos = (() => {
         fios: fiosLista,
         agulha_id: agObj ? Number(agObj.id) : null,
         agulha_mm: agMmFinal,
-        agulha_nome: agObj ? agObj.nome : agMmFinal ? `Agulha ${agMmFinal}` : ""
+        agulha_nome: agObj ? agObj.nome : agMmFinal ? `Agulha ${agMmFinal}` : "",
+        baixa_estoque_realizada: Boolean(existente?.materiais?.baixa_estoque_realizada)
       },
       amostra: dadosAmostra
     };
@@ -1401,6 +1440,9 @@ const GerenciadorProjetos = (() => {
       mostrarToast("✓ Pasta do projeto atualizada!");
       if (projetoWorkspaceId && Number(projetoWorkspaceId) === Number(salvo.id)) {
         renderizarWorkspace(salvo);
+      }
+      if (existente && existente.status !== "concluido" && salvo.status === "concluido") {
+        verificarEOfertarBaixaEstoque(salvo);
       }
     }
   }
@@ -1458,6 +1500,235 @@ const GerenciadorProjetos = (() => {
     atualizarContadoresChips();
     aplicarFiltros(false);
     mostrarToast("Pasta removida.");
+  }
+
+  // ==========================================================================
+  // PARTE 5B: BAIXA AUTOMÁTICA NO ESTOQUE AO CONCLUIR PROJETO
+  // ==========================================================================
+  function arredondar1(v) {
+    return Math.round((Number(v) || 0) * 10) / 10;
+  }
+
+  async function coletarItensParaBaixa(projeto) {
+    if (!projeto || typeof BancoDadosPT === "undefined") return [];
+    const [fiosEst, bibEst] = await Promise.all([
+      BancoDadosPT.obterTodos(STORE_FIOS).catch(() => []),
+      BancoDadosPT.obterTodos(STORE_BIBLIOTECA).catch(() => [])
+    ]);
+
+    const mapaFios = new Map();
+    const adicionarFio = (fioEst, qtdUsada, unidade = "un") => {
+      if (!fioEst) return;
+      const atual = Number(fioEst.quantidade) || 0;
+      if (atual <= 0) return;
+
+      let novelosDescontar = 0;
+      let etiquetaDesconto = "";
+      if (unidade === "g") {
+        const pesoUn = Number(fioEst.peso_novelo_g) || 100;
+        novelosDescontar = arredondar1(qtdUsada / pesoUn);
+        if (novelosDescontar <= 0) novelosDescontar = 0.1;
+        etiquetaDesconto = `−${qtdUsada}g (~${novelosDescontar} nov.)`;
+      } else {
+        novelosDescontar = arredondar1(qtdUsada);
+        if (novelosDescontar <= 0) return;
+        etiquetaDesconto = `−${novelosDescontar} nov.`;
+      }
+
+      const prev = mapaFios.get(fioEst.id);
+      if (prev) {
+        prev.deducao = arredondar1(prev.deducao + novelosDescontar);
+        prev.restante = Math.max(0, arredondar1(prev.atual - prev.deducao));
+        prev.etiqueta = `−${prev.deducao} nov.`;
+      } else {
+        const restante = Math.max(0, arredondar1(atual - novelosDescontar));
+        mapaFios.set(fioEst.id, {
+          chave: `fio-${fioEst.id}`,
+          tipo: "fio",
+          id: fioEst.id,
+          registro: fioEst,
+          icone: "🧶",
+          nome: fioEst.cor_nome ? `${fioEst.nome} — ${fioEst.cor_nome}` : fioEst.nome,
+          atual,
+          deducao: novelosDescontar,
+          restante,
+          unidade: "nov.",
+          etiqueta: etiquetaDesconto
+        });
+      }
+    };
+
+    const linhasPrec = Array.isArray(projeto.precificacao?.linhas) ? projeto.precificacao.linhas : [];
+    const fiosUsadosPrec = new Set();
+    linhasPrec.forEach((l) => {
+      if (!l || !l.fio_id) return;
+      const qtd = parseFloat(l.qtd);
+      if (!(qtd > 0)) return;
+      const fEst = fiosEst.find((f) => Number(f.id) === Number(l.fio_id));
+      if (fEst) {
+        fiosUsadosPrec.add(Number(fEst.id));
+        adicionarFio(fEst, qtd, l.unidade === "g" ? "g" : "un");
+      }
+    });
+
+    (projeto.materiais?.fios || []).forEach((f) => {
+      const qtd = Number(f.quantidade) || 1;
+      let fEst = f.fio_id ? fiosEst.find((item) => Number(item.id) === Number(f.fio_id)) : null;
+      if (!fEst && f.nome) {
+        const alvoNome = f.nome.trim().toLowerCase();
+        fEst = fiosEst.find((item) => (item.nome || "").trim().toLowerCase() === alvoNome);
+      }
+      if (fEst && !fiosUsadosPrec.has(Number(fEst.id))) {
+        adicionarFio(fEst, qtd, "un");
+      }
+    });
+
+    const itens = Array.from(mapaFios.values());
+
+    // Aviamentos vinculados na precificação do projeto
+    const avList = Array.isArray(projeto.precificacao?.aviamentos) ? projeto.precificacao.aviamentos : [];
+    avList.forEach((av) => {
+      const qtd = Number(av.quantidade) || 0;
+      if (!av.id || qtd <= 0) return;
+      const itemBib = bibEst.find((b) => Number(b.id) === Number(av.id) && b.categoria === "aviamento");
+      if (!itemBib) return;
+      const atual = Number(itemBib.atributos?.quantidade_atual) || 0;
+      if (atual <= 0) return;
+      const un = itemBib.atributos?.unidade || av.unidade || "un";
+      const restante = Math.max(0, arredondar1(atual - qtd));
+      itens.push({
+        chave: `av-${itemBib.id}`,
+        tipo: "aviamento",
+        id: itemBib.id,
+        registro: itemBib,
+        icone: "🎀",
+        nome: itemBib.nome,
+        atual,
+        deducao: qtd,
+        restante,
+        unidade: un,
+        etiqueta: `−${qtd} ${un}`
+      });
+    });
+
+    return itens;
+  }
+
+  function fecharModalBaixaEstoque() {
+    const modal = document.getElementById("modal-baixa-estoque-proj");
+    if (modal) modal.style.display = "none";
+    projetoPendenteBaixa = null;
+    itensPendentesBaixa = [];
+  }
+
+  async function verificarEOfertarBaixaEstoque(projeto) {
+    if (!projeto || projeto.materiais?.baixa_estoque_realizada) return;
+    const itens = await coletarItensParaBaixa(projeto);
+    if (!itens.length) return;
+
+    projetoPendenteBaixa = projeto;
+    itensPendentesBaixa = itens;
+
+    const listaEl = document.getElementById("lista-itens-baixa-estoque");
+    const modal = document.getElementById("modal-baixa-estoque-proj");
+    if (!listaEl || !modal) return;
+
+    listaEl.innerHTML = itens
+      .map(
+        (it, idx) => `
+          <label class="item-baixa-estoque">
+            <input type="checkbox" data-baixa-idx="${idx}" checked />
+            <div class="item-baixa-info">
+              <strong>${it.icone} ${escapeHtml(it.nome)}</strong>
+              <span>Estoque: ${it.atual} ${escapeHtml(it.unidade)} → ${it.restante} ${escapeHtml(it.unidade)}</span>
+            </div>
+            <span class="item-baixa-badge">${escapeHtml(it.etiqueta)}</span>
+          </label>
+        `
+      )
+      .join("");
+
+    modal.style.display = "flex";
+  }
+
+  async function executarBaixaEstoque() {
+    if (!projetoPendenteBaixa || !itensPendentesBaixa.length) {
+      fecharModalBaixaEstoque();
+      return;
+    }
+
+    const listaEl = document.getElementById("lista-itens-baixa-estoque");
+    const marcados = listaEl
+      ? Array.from(listaEl.querySelectorAll('input[type="checkbox"]:checked'))
+          .map((chk) => Number(chk.dataset.baixaIdx))
+          .filter((idx) => !Number.isNaN(idx) && itensPendentesBaixa[idx])
+      : [];
+
+    if (!marcados.length) {
+      fecharModalBaixaEstoque();
+      return;
+    }
+
+    let totalFios = 0;
+    let totalAv = 0;
+
+    for (const idx of marcados) {
+      const it = itensPendentesBaixa[idx];
+      try {
+        if (it.tipo === "fio") {
+          const fioAtualizado = {
+            ...it.registro,
+            quantidade: it.restante,
+            atualizado_em: new Date().toISOString()
+          };
+          await BancoDadosPT.salvar(STORE_FIOS, fioAtualizado);
+          totalFios++;
+        } else if (it.tipo === "aviamento") {
+          if (typeof InventarioAgulhas !== "undefined" && typeof InventarioAgulhas.darBaixaAviamento === "function") {
+            await InventarioAgulhas.darBaixaAviamento(it.id, it.deducao);
+          } else {
+            const bibAtualizado = {
+              ...it.registro,
+              atributos: {
+                ...(it.registro.atributos || {}),
+                quantidade_atual: it.restante
+              },
+              atualizado_em: new Date().toISOString()
+            };
+            await BancoDadosPT.salvar(STORE_BIBLIOTECA, bibAtualizado);
+          }
+          totalAv++;
+        }
+      } catch (err) {
+        console.warn("Falha ao dar baixa no item do estoque:", it.nome, err);
+      }
+    }
+
+    const proj = obterProjetoPorId(projetoPendenteBaixa.id) || projetoPendenteBaixa;
+    proj.materiais = proj.materiais || {};
+    proj.materiais.baixa_estoque_realizada = true;
+    await salvarProjeto(proj, { silencioso: true });
+
+    if (totalFios > 0) {
+      if (typeof InventarioFios !== "undefined" && typeof InventarioFios.recarregar === "function") {
+        await InventarioFios.recarregar();
+      }
+      window.dispatchEvent(new CustomEvent("ponto-trama:fios-atualizados"));
+    }
+    if (totalAv > 0) {
+      if (typeof InventarioAgulhas !== "undefined" && typeof InventarioAgulhas.recarregar === "function") {
+        await InventarioAgulhas.recarregar();
+      }
+      window.dispatchEvent(new CustomEvent("ponto-trama:biblioteca-atualizada"));
+    }
+
+    await carregarDependenciasInventarios();
+    fecharModalBaixaEstoque();
+
+    const partes = [];
+    if (totalFios > 0) partes.push(`${totalFios} fio(s)`);
+    if (totalAv > 0) partes.push(`${totalAv} aviamento(s)`);
+    mostrarToast(`✓ Estoque atualizado: baixa realizada em ${partes.join(" e ")}!`);
   }
 
   // ==========================================================================
@@ -1551,6 +1822,7 @@ const GerenciadorProjetos = (() => {
         atualizarProgressoWorkspace(p, !eraConcluido && novoSt === "concluido");
         if (!eraConcluido && novoSt === "concluido") {
           mostrarToast("🎉 Peça Finalizada! Status alterado para Concluído.");
+          verificarEOfertarBaixaEstoque(p);
         }
         await salvarProjeto(p, { silencioso: true });
       });
@@ -1630,6 +1902,7 @@ const GerenciadorProjetos = (() => {
         fecharTelinhaPasta();
         fecharDrawerForm();
         fecharModalExclusao();
+        fecharModalBaixaEstoque();
         const lb = document.getElementById("modal-lightbox-galeria");
         if (lb) lb.style.display = "none";
         return;
@@ -1783,6 +2056,26 @@ const GerenciadorProjetos = (() => {
       agendarSalvarWorkspace(p);
     });
 
+    document.getElementById("ws-slider-progresso-manual")?.addEventListener("change", (e) => {
+      const p = obterProjetoPorId(projetoWorkspaceId);
+      if (!p) return;
+      const val = Number(e.target.value) || 0;
+      if (val >= 100) {
+        if (p.status !== "concluido") {
+          p.status = "concluido";
+          const meta = ctx()?.METADADOS_STATUS?.concluido;
+          if (meta) {
+            const dot = document.getElementById("ws-status-dot");
+            const txt = document.getElementById("ws-status-texto");
+            if (dot) dot.style.backgroundColor = meta.cor;
+            if (txt) txt.textContent = meta.rotulo;
+          }
+          agendarSalvarWorkspace(p);
+        }
+        verificarEOfertarBaixaEstoque(p);
+      }
+    });
+
     document.getElementById("ws-form-nova-etapa")?.addEventListener("submit", (e) => {
       e.preventDefault();
       const p = obterProjetoPorId(projetoWorkspaceId);
@@ -1848,11 +2141,42 @@ const GerenciadorProjetos = (() => {
       irParaFerramenta(chave);
     };
     document.getElementById("btn-ws-ir-contadores")?.addEventListener("click", () => abrirNaFerramenta("contador-carreiras"));
+    document.getElementById("btn-ws-contador-tela-toda")?.addEventListener("click", async () => {
+      await abrirNaFerramenta("contador-carreiras");
+      setTimeout(() => {
+        if (typeof ContadorCarreiras !== "undefined" && typeof ContadorCarreiras.abrirTelaToda === "function") {
+          ContadorCarreiras.abrirTelaToda();
+        }
+      }, 80);
+    });
     document.getElementById("btn-ws-tempo-precificacao")?.addEventListener("click", () => abrirNaFerramenta("precificacao"));
     document.getElementById("btn-ws-ir-receitas")?.addEventListener("click", () => abrirNaFerramenta("receitas"));
+    document.getElementById("btn-ws-traduzir-receita")?.addEventListener("click", async () => {
+      const p = obterProjetoPorId(projetoWorkspaceId);
+      const texto = p?.receita?.texto || "";
+      const tec = p?.tecnica || "croche";
+      await abrirNaFerramenta("receitas");
+      setTimeout(() => {
+        if (typeof TradutorReceitas !== "undefined" && typeof TradutorReceitas.abrirComTexto === "function") {
+          TradutorReceitas.abrirComTexto(texto, tec);
+        }
+      }, 90);
+    });
     document.getElementById("btn-ws-ir-agulhas")?.addEventListener("click", () => abrirNaFerramenta("agulhas"));
     document.getElementById("btn-ws-ir-amostra")?.addEventListener("click", () => abrirNaFerramenta("amostra"));
     document.getElementById("btn-ws-ir-precificacao")?.addEventListener("click", () => abrirNaFerramenta("precificacao"));
+    document.getElementById("btn-ws-ir-grafico")?.addEventListener("click", () => abrirNaFerramenta("editor-graficos"));
+    document.getElementById("btn-ws-ir-aum-dim")?.addEventListener("click", async () => {
+      const p = obterProjetoPorId(projetoWorkspaceId);
+      const ptsRef = p?.contadores?.[0]?.pontosPorCarreira || 0;
+      const tec = p?.tecnica || "croche";
+      await abrirNaFerramenta("amostra");
+      setTimeout(() => {
+        if (typeof CalculadoraAmostra !== "undefined" && typeof CalculadoraAmostra.abrirAumDimComContexto === "function") {
+          CalculadoraAmostra.abrirAumDimComContexto({ pontosAtuais: ptsRef, tecnica: tec });
+        }
+      }, 90);
+    });
 
     // Workspace: Upload Galeria de Progresso
     document.getElementById("ws-galeria-input")?.addEventListener("change", async (e) => {
@@ -1913,11 +2237,17 @@ const GerenciadorProjetos = (() => {
       atualizarPreviewCapaForm("");
     });
 
-    // Modais de Exclusão & Lightbox
+    // Modais de Exclusão, Baixa de Estoque & Lightbox
     document.getElementById("btn-cancelar-exclusao-proj")?.addEventListener("click", fecharModalExclusao);
     document.getElementById("btn-confirmar-exclusao-proj")?.addEventListener("click", confirmarExclusao);
     document.getElementById("modal-excluir-projeto")?.addEventListener("click", (e) => {
       if (e.target.id === "modal-excluir-projeto") fecharModalExclusao();
+    });
+
+    document.getElementById("btn-cancelar-baixa-estoque")?.addEventListener("click", fecharModalBaixaEstoque);
+    document.getElementById("btn-confirmar-baixa-estoque")?.addEventListener("click", executarBaixaEstoque);
+    document.getElementById("modal-baixa-estoque-proj")?.addEventListener("click", (e) => {
+      if (e.target.id === "modal-baixa-estoque-proj") fecharModalBaixaEstoque();
     });
 
     document.getElementById("btn-fechar-lightbox-proj")?.addEventListener("click", () => {

@@ -279,8 +279,638 @@
     -webkit-overflow-scrolling: touch;
   }
 
-  .painel-receita-texto {
+  .painel-receita-texto,
+  .grid-tradutor-receita {
     grid-template-columns: 1fr;
     overflow-y: auto;
   }
+}
+
+/* ==========================================================================
+   MÓDULOS A, B & C: BADGE OFFLINE, TRADUTOR AUTOMÁTICO E DICIONÁRIO
+   ========================================================================== */
+.badge-offline-receitas {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+  background: rgba(61, 214, 140, 0.16);
+  border: 1px solid rgba(61, 214, 140, 0.45);
+  color: #9bf5c8;
+}
+
+.badge-offline-receitas.offline {
+  background: rgba(246, 201, 69, 0.2);
+  border-color: rgba(246, 201, 69, 0.65);
+  color: #ffe382;
+}
+
+.painel-receita-tradutor,
+.painel-receita-dicionario {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.barra-controles-tradutor,
+.barra-filtros-dicionario {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 10px;
+  background: rgba(1, 7, 54, 0.45);
+  border: 1px solid rgba(252, 241, 208, 0.12);
+  border-radius: 12px;
+  padding: 10px 14px;
+  flex-shrink: 0;
+}
+
+.grupo-select-trad {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 135px;
+}
+
+.grupo-select-trad label {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--creme-opacidade-65);
+  margin: 0;
+}
+
+.select-tradutor,
+.input-busca-dic {
+  height: 36px;
+  padding: 0 11px;
+  border-radius: 8px;
+  border: 1px solid var(--creme-opacidade-25);
+  background: rgba(1, 7, 54, 0.72);
+  color: var(--cor-texto-principal);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  box-sizing: border-box;
+}
+
+.btn-inverter-trad {
+  height: 36px;
+  width: 38px;
+  border-radius: 8px;
+  border: 1px solid var(--creme-opacidade-25);
+  background: rgba(34, 57, 111, 0.48);
+  color: var(--cor-texto-principal);
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.btn-inverter-trad:hover {
+  background: var(--cor-destaque-hover);
+  color: var(--cor-branco);
+}
+
+.acoes-rapidas-trad-topo {
+  margin-left: auto;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+/* Alerta US vs UK (RF10) */
+.alerta-ambiguo-tradutor {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 10px 14px;
+  border-radius: 11px;
+  background: rgba(246, 201, 69, 0.16);
+  border: 1px solid rgba(246, 201, 69, 0.55);
+  color: #ffe899;
+  font-size: 12.5px;
+  flex-shrink: 0;
+}
+
+.texto-alerta-us-uk {
+  flex: 1;
+  min-width: 200px;
+  line-height: 1.4;
+}
+
+.btn-alternar-us-uk {
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: none;
+  background: #f6c945;
+  color: #16264d;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.grid-tradutor-receita {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 16px;
+}
+
+.coluna-tradutor-entrada,
+.coluna-tradutor-saida {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: rgba(1, 7, 54, 0.45);
+  border: 1px solid rgba(252, 241, 208, 0.12);
+  border-radius: 14px;
+  padding: 14px;
+  position: relative;
+}
+
+.saida-tradutor-receita {
+  flex: 1;
+  min-height: 200px;
+  overflow-y: auto;
+  border-radius: 10px;
+  border: 1px solid var(--creme-opacidade-20);
+  background: rgba(1, 7, 54, 0.68);
+  padding: 14px;
+  font-size: 14px;
+  line-height: 1.75;
+  color: var(--cor-texto-principal);
+  word-break: break-word;
+}
+
+.vazio-tradutor {
+  color: var(--creme-opacidade-50);
+  font-size: 13px;
+  text-align: center;
+  padding: 28px 12px;
+}
+
+/* RF09: Destaque visual nos termos traduzidos */
+.termo-traduzido {
+  background: rgba(91, 135, 232, 0.28);
+  color: #ffffff;
+  border-bottom: 2px solid #80abff;
+  border-radius: 4px;
+  padding: 1px 4px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.14s ease;
+}
+
+.termo-traduzido:hover,
+.termo-traduzido:focus {
+  background: rgba(91, 135, 232, 0.55);
+  outline: none;
+}
+
+.popover-termo-traduzido {
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #08153b;
+  border: 1.5px solid #80abff;
+  font-size: 12.5px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  box-shadow: var(--sombra-md);
+}
+
+.pop-termo-linha {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 800;
+}
+
+.pop-badge-orig,
+.pop-badge-dest {
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+.pop-badge-orig {
+  background: rgba(252, 241, 208, 0.14);
+  color: var(--cor-texto-principal);
+}
+
+.pop-badge-dest {
+  background: var(--cor-destaque-hover);
+  color: #ffffff;
+}
+
+.pop-termo-nomes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--creme-opacidade-85);
+}
+
+.pop-termo-desc {
+  font-size: 12px;
+  color: var(--creme-opacidade-70);
+  margin: 0;
+}
+
+/* Módulo A: Dicionário Minimalista e Limpo */
+.painel-receita-dicionario {
+  max-width: 1080px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.barra-filtros-dicionario {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  background: transparent;
+  border: none;
+  padding: 2px 0 6px 0;
+}
+
+.campo-busca-dic {
+  position: relative;
+  flex: 1 1 280px;
+  min-width: 220px;
+  display: flex;
+  align-items: center;
+}
+
+.icone-busca-dic {
+  position: absolute;
+  left: 12px;
+  font-size: 16px;
+  color: var(--creme-opacidade-50);
+  pointer-events: none;
+}
+
+.input-busca-dic {
+  width: 100%;
+  height: 40px;
+  padding: 0 92px 0 34px;
+  border-radius: 10px;
+  border: 1px solid rgba(252, 241, 208, 0.18);
+  background: rgba(1, 7, 54, 0.52);
+  font-size: 13.5px;
+  font-weight: 500;
+}
+
+.input-busca-dic:focus {
+  outline: none;
+  border-color: var(--cor-texto-principal);
+}
+
+.contagem-dicionario {
+  position: absolute;
+  right: 12px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--creme-opacidade-50);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.seletores-dic {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.pills-tecnica-dic {
+  display: inline-flex;
+  padding: 3px;
+  border-radius: 9px;
+  background: rgba(1, 7, 54, 0.52);
+  border: 1px solid rgba(252, 241, 208, 0.14);
+  gap: 2px;
+}
+
+.btn-tec-dic {
+  border: none;
+  background: transparent;
+  color: var(--creme-opacidade-70);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 11px;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: background-color 0.14s ease, color 0.14s ease;
+}
+
+.btn-tec-dic:hover {
+  color: var(--cor-texto-principal);
+}
+
+.btn-tec-dic.ativo {
+  background: var(--cor-destaque-hover);
+  color: #ffffff;
+}
+
+.select-dic-limpo {
+  height: 36px;
+  padding: 0 10px;
+  border-radius: 9px;
+  border: 1px solid rgba(252, 241, 208, 0.14);
+  background: rgba(1, 7, 54, 0.45);
+  color: var(--creme-opacidade-85);
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-dic-limpar-discreto {
+  border: none;
+  background: transparent;
+  color: var(--creme-opacidade-70);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 8px;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.btn-dic-limpar-discreto:hover {
+  color: var(--cor-texto-principal);
+}
+
+/* Lista-Tabela Limpa do Dicionário */
+.tabela-dicionario-wrap {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: rgba(1, 7, 54, 0.36);
+  border: 1px solid rgba(252, 241, 208, 0.12);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.dic-cabecalho-lista {
+  display: grid;
+  grid-template-columns: minmax(210px, 1.8fr) repeat(4, minmax(76px, 0.72fr)) 28px;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-bottom: 1px solid rgba(252, 241, 208, 0.1);
+  background: rgba(1, 7, 54, 0.45);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--creme-opacidade-50);
+  flex-shrink: 0;
+}
+
+.dic-cabecalho-lista span:nth-child(n + 2):nth-child(-n + 5) {
+  text-align: center;
+}
+
+.grade-dicionario-pontos {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.linha-termo-dic {
+  border-bottom: 1px solid rgba(252, 241, 208, 0.08);
+  transition: background-color 0.14s ease;
+}
+
+.linha-termo-dic:last-child {
+  border-bottom: none;
+}
+
+.linha-termo-dic:hover {
+  background: rgba(34, 57, 111, 0.24);
+}
+
+.linha-termo-dic.aberto {
+  background: rgba(34, 57, 111, 0.28);
+}
+
+.dic-linha-principal {
+  display: grid;
+  grid-template-columns: minmax(210px, 1.8fr) minmax(304px, 2.88fr) 28px;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 16px;
+  cursor: pointer;
+}
+
+.dic-cel-nome {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.dic-nome-limpo {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--cor-texto-principal);
+  line-height: 1.25;
+}
+
+.dic-meta-limpo {
+  font-size: 11.5px;
+  color: var(--creme-opacidade-50);
+}
+
+.dic-tag-amb-discreta {
+  color: #f6c945;
+  font-weight: 700;
+}
+
+.dic-cel-siglas {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  align-items: center;
+}
+
+.btn-sigla-dic {
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--cor-texto-principal);
+  font-family: inherit;
+  border-radius: 7px;
+  padding: 6px 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  transition: background-color 0.14s ease, border-color 0.14s ease;
+}
+
+.btn-sigla-dic strong {
+  font-size: 13.5px;
+  font-weight: 800;
+  word-break: break-word;
+}
+
+.btn-sigla-dic:hover {
+  background: rgba(91, 135, 232, 0.24);
+  border-color: rgba(128, 171, 255, 0.45);
+}
+
+.btn-sigla-dic.destaque-idioma {
+  background: rgba(91, 135, 232, 0.2);
+  border-color: rgba(128, 171, 255, 0.42);
+}
+
+.sigla-lbl-mob {
+  display: none;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--creme-opacidade-50);
+}
+
+.dic-seta-expandir {
+  text-align: center;
+  font-size: 13px;
+  color: var(--creme-opacidade-50);
+  transition: transform 0.18s ease, color 0.18s ease;
+}
+
+.linha-termo-dic.aberto .dic-seta-expandir {
+  transform: rotate(180deg);
+  color: var(--cor-texto-principal);
+}
+
+/* Detalhes expandidos sob demanda (limpo e calmo) */
+.dic-linha-detalhes {
+  display: none;
+  padding: 0 16px 14px 16px;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.linha-termo-dic.aberto .dic-linha-detalhes {
+  display: flex;
+}
+
+.dic-nomes-4 {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  padding-top: 8px;
+  border-top: 1px dashed rgba(252, 241, 208, 0.12);
+}
+
+.dic-nomes-4 > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.dic-nomes-4 span {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--creme-opacidade-50);
+  letter-spacing: 0.4px;
+}
+
+.dic-nomes-4 strong {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--creme-opacidade-85);
+}
+
+.dic-detalhe-rodape {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.dic-descricao {
+  flex: 1;
+  min-width: 220px;
+  font-size: 12.5px;
+  color: var(--creme-opacidade-70);
+  line-height: 1.45;
+  margin: 0;
+}
+
+.btn-dic-copiar {
+  border: 1px solid var(--creme-opacidade-20);
+  background: transparent;
+  color: var(--cor-texto-principal);
+  border-radius: 7px;
+  padding: 5px 11px;
+  font-family: inherit;
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn-dic-copiar:hover {
+  background: var(--cor-destaque-hover);
+  border-color: var(--cor-destaque-hover);
+  color: #ffffff;
+}
+
+.vazio-dicionario {
+  text-align: center;
+  padding: 44px 16px;
+  color: var(--creme-opacidade-65);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.toast-receitas {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  padding: 10px 16px;
+  border-radius: 10px;
+  background: #08153b;
+  border: 1px solid rgba(252, 241, 208, 0.32);
+  color: var(--cor-texto-principal);
+  font-size: 13px;
+  font-weight: 700;
+  box-shadow: var(--sombra-lg);
+  opacity: 0;
+  transform: translateY(14px);
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 220;
+}
+
+.toast-receitas.visivel {
+  opacity: 1;
+  transform: translateY(0);
 }

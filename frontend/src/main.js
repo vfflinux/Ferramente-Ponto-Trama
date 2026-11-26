@@ -18,6 +18,8 @@ const PontoTramaApp = (() => {
     agulhas: () => typeof InventarioAgulhas !== "undefined" && InventarioAgulhas.init(),
     amostra: () => typeof CalculadoraAmostra !== "undefined" && CalculadoraAmostra.init(),
     "banco-amostras": () => typeof BancoAmostras !== "undefined" && BancoAmostras.init(),
+    "editor-graficos": () => typeof EditorGraficos !== "undefined" && EditorGraficos.init(),
+    "tabelas-conversao": () => typeof TabelasConversao !== "undefined" && TabelasConversao.init(),
     configuracoes: () => typeof Configuracoes !== "undefined" && Configuracoes.init()
   };
 
@@ -60,5 +62,17 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   } else if (typeof ProjetoContexto !== "undefined" && typeof ProjetoContexto.init === "function") {
     ProjetoContexto.init();
+  }
+
+  // 4. Registra Service Worker (PWA Offline-First) no navegador Web
+  if (
+    typeof navigator !== "undefined" &&
+    "serviceWorker" in navigator &&
+    window.location &&
+    (window.location.protocol === "https:" || window.location.protocol === "http:") &&
+    window.location.hostname !== "appassets.androidplatform.net" &&
+    window.__PONTO_TRAMA_DESKTOP__ !== true
+  ) {
+    navigator.serviceWorker.register("sw.js").catch(() => {});
   }
 });

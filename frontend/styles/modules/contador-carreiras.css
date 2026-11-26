@@ -662,3 +662,239 @@
   flex-direction: column;
   -webkit-overflow-scrolling: touch;
 }
+
+/* ==========================================
+   MODO "TOQUE NA TELA TODA" DO CONTADOR
+   ========================================== */
+.cabecalho-acoes-contador {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.btn-tela-toda-topo {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background-color: rgba(1, 7, 54, 0.55);
+  color: var(--cor-texto-principal);
+  border: 1.5px solid var(--creme-opacidade-40);
+  border-radius: var(--raio-borda-lg);
+  padding: 10px 16px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color var(--transicao-padrao), transform var(--transicao-rapida), border-color var(--transicao-padrao);
+  user-select: none;
+}
+
+.btn-tela-toda-topo:hover {
+  background-color: var(--cor-fundo-profundo);
+  border-color: var(--cor-texto-principal);
+  transform: translateY(-2px);
+}
+
+.btn-expandir-contador {
+  background-color: var(--azul-medio-opacidade-50);
+  border: 1px solid var(--creme-opacidade-30);
+  color: var(--cor-texto-principal);
+  border-radius: var(--raio-borda-redondo);
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 15px;
+  flex-shrink: 0;
+  transition: background-color var(--transicao-padrao), transform var(--transicao-rapida), border-color var(--transicao-padrao);
+}
+
+.btn-expandir-contador:hover {
+  background-color: var(--cor-destaque-hover);
+  border-color: var(--cor-texto-principal);
+  transform: scale(1.08);
+}
+
+.overlay-contador-tela-toda {
+  position: fixed;
+  inset: 0;
+  z-index: 180;
+  background: radial-gradient(circle at 50% 40%, #152b63 0%, #050d2e 100%);
+  color: var(--cor-texto-principal);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 18px 20px 22px 20px;
+  box-sizing: border-box;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+.overlay-contador-tela-toda.alarme-disparado {
+  animation: piscarTelaAlarme 0.8s infinite ease-in-out !important;
+}
+
+.tela-toda-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.tela-toda-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.tela-toda-info strong {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--cor-texto-principal);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tela-toda-meta {
+  font-size: 12.5px;
+  color: var(--creme-opacidade-75);
+}
+
+.btn-tela-toda-sair {
+  border: 1.5px solid var(--creme-opacidade-35);
+  background: rgba(1, 7, 54, 0.72);
+  color: var(--cor-texto-principal);
+  border-radius: 12px;
+  padding: 10px 16px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.btn-tela-toda-sair:hover {
+  background: var(--cor-destaque-hover);
+  color: var(--cor-branco);
+}
+
+.zona-toque-tela-toda {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  margin: 14px 0;
+  border-radius: 26px;
+  border: 2px dashed rgba(252, 241, 208, 0.22);
+  background: rgba(34, 57, 111, 0.24);
+  color: inherit;
+  font-family: inherit;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: background-color 0.14s ease, transform 0.1s ease, border-color 0.16s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.zona-toque-tela-toda:active {
+  background: rgba(65, 105, 205, 0.38);
+  border-color: var(--cor-texto-principal);
+  transform: scale(0.99);
+}
+
+.tela-toda-rotulo {
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 3px;
+  color: var(--creme-opacidade-65);
+}
+
+.tela-toda-numero {
+  font-size: clamp(96px, 24vw, 190px);
+  font-weight: 900;
+  line-height: 1;
+  color: var(--cor-texto-principal);
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 10px 30px rgba(1, 7, 54, 0.7);
+  transition: transform 0.12s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.tela-toda-numero.pulso {
+  transform: scale(1.1);
+}
+
+.tela-toda-pontos {
+  font-size: 17px;
+  font-weight: 700;
+  color: #9dc0ff;
+  min-height: 22px;
+}
+
+.tela-toda-dica {
+  margin-top: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: rgba(1, 7, 54, 0.55);
+  border: 1px solid rgba(252, 241, 208, 0.18);
+  color: var(--creme-opacidade-85);
+}
+
+.tela-toda-rodape {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  flex-shrink: 0;
+  max-width: 540px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.btn-tt-controle {
+  height: 52px;
+  border-radius: 14px;
+  border: 1.5px solid var(--creme-opacidade-25);
+  background: rgba(1, 7, 54, 0.76);
+  color: var(--cor-texto-principal);
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: background-color 0.16s ease, border-color 0.16s ease, opacity 0.16s ease;
+}
+
+.btn-tt-controle:hover:not(:disabled) {
+  background: var(--cor-destaque-hover);
+  border-color: var(--cor-texto-principal);
+}
+
+.btn-tt-controle.cadeado.travado {
+  background: rgba(46, 204, 113, 0.2);
+  border-color: rgba(46, 204, 113, 0.55);
+  color: #a8f5c2;
+}
+
+.btn-tt-controle.zerar:disabled {
+  opacity: 0.38;
+  cursor: not-allowed;
+}
+
+.btn-tt-controle.zerar.confirmando {
+  background: var(--cor-alerta);
+  border-color: #ffffff;
+  color: #ffffff;
+}

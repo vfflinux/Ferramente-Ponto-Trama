@@ -21,86 +21,6 @@ const InventarioFios = (() => {
   let indexFioAtual = -1; // Índice atual na lista filtrada para navegação < e >
   let imagemAtualBase64 = null; // Imagem temporária em edição no formulário
 
-  // Dados iniciais de amostra para primeira execução
-  const DADOS_INICIAIS = [
-    {
-      nome: "Amigurumi",
-      marca: "Círculo",
-      cor_nome: "Off-White",
-      cor_codigo: "8176",
-      lote: "482019",
-      imagem_url: "",
-      tex: 492,
-      composicao: "100% Algodão Mercerizado",
-      peso_novelo_g: 125,
-      metragem_novelo_m: 254,
-      agulha: "Crochê 2.5mm–4.0mm / Tricô 3.5mm–4.5mm",
-      quantidade: 4,
-      peso_restante_g: null,
-      preco_pago: 16.90,
-      localizacao: "Caixa 01 - Amigurumi",
-      observacoes: "Fio super macio e resistente, ótimo acabamento para bichinhos e detalhes.",
-      criado_em: new Date().toISOString()
-    },
-    {
-      nome: "Mollet",
-      marca: "Pingouin",
-      cor_nome: "Mostarda",
-      cor_codigo: "1324",
-      lote: "92841",
-      imagem_url: "",
-      tex: 500,
-      composicao: "100% Acrílico",
-      peso_novelo_g: 100,
-      metragem_novelo_m: 200,
-      agulha: "Crochê 4.0mm–5.0mm / Tricô 4.5mm–5.5mm",
-      quantidade: 1,
-      peso_restante_g: null,
-      preco_pago: 9.80,
-      localizacao: "Gaveta de Lãs",
-      observacoes: "Clássico e quente, perfeito para toucas, mantas e cachecóis.",
-      criado_em: new Date().toISOString()
-    },
-    {
-      nome: "Anne",
-      marca: "Círculo",
-      cor_nome: "Verde Musgo",
-      cor_codigo: "5398",
-      lote: "771204",
-      imagem_url: "",
-      tex: 295,
-      composicao: "100% Algodão Mercerizado",
-      peso_novelo_g: 147.5,
-      metragem_novelo_m: 500,
-      agulha: "Crochê 1.75mm–2.5mm / Tricô 3.0mm–3.5mm",
-      quantidade: 2.5,
-      peso_restante_g: null,
-      preco_pago: 21.00,
-      localizacao: "Cesto 02 - Fios Finos",
-      observacoes: "Rendimento excelente para peças de vestuário, barrados e toalhas.",
-      criado_em: new Date().toISOString()
-    },
-    {
-      nome: "Barroco Maxcolor",
-      marca: "Círculo",
-      cor_nome: "Cru / Natural",
-      cor_codigo: "0020",
-      lote: "104928",
-      imagem_url: "",
-      tex: 885,
-      composicao: "100% Algodão",
-      peso_novelo_g: 400,
-      metragem_novelo_m: 452,
-      agulha: "Crochê 4.0mm–5.0mm / Tricô 4.5mm–5.5mm",
-      quantidade: 0,
-      peso_restante_g: null,
-      preco_pago: 28.50,
-      localizacao: "Prateleira Superior",
-      observacoes: "Acabou na última encomenda. Comprar mais 2 novelos do mesmo lote se possível.",
-      criado_em: new Date().toISOString()
-    }
-  ];
-
   // ==========================================================================
   // PARTE 1: OPERAÇÕES E LÓGICA (IndexedDB, Filtros, Cálculos e Regras de Negócio)
   // ==========================================================================
@@ -137,19 +57,36 @@ const InventarioFios = (() => {
     return Promise.reject(new Error("BancoDadosPT indisponível"));
   }
 
-  // Carga inicial com sementes caso o banco esteja vazio
+  // Carga inicial limpa (sem fios de demonstração pré-cadastrados)
   async function carregarDadosIniciais() {
     let dados = await dbObterTodos();
-    const jaInicializado = localStorage.getItem("ponto_trama_fios_inicializados") === "true";
 
-    // Só carrega amostras se o banco estiver vazio E nunca tiver sido inicializado antes
-    if ((!dados || dados.length === 0) && !jaInicializado) {
-      if (typeof BancoDadosPT !== "undefined" && typeof BancoDadosPT.salvarEmLote === "function") {
-        dados = await BancoDadosPT.salvarEmLote(STORE_FIOS, DADOS_INICIAIS);
+    // Limpeza única de eventuais fios de demonstração gravados por versões anteriores
+    const demoJaLimpo = localStorage.getItem("ponto_trama_fios_demo_limpo") === "true";
+    if (!demoJaLimpo && dados && dados.length > 0) {
+      const assinaturasDemo = new Set([
+        "Amigurumi|482019|Fio super macio e resistente, ótimo acabamento para bichinhos e detalhes.",
+        "Mollet|92841|Clássico e quente, perfeito para toucas, mantas e cachecóis.",
+        "Anne|771204|Rendimento excelente para peças de vestuário, barrados e toalhas.",
+        "Barroco Maxcolor|104928|Acabou na última encomenda. Comprar mais 2 novelos do mesmo lote se possível."
+      ]);
+
+      const idsDemo = dados
+        .filter((f) => assinaturasDemo.has(`${f.nome || ""}|${f.lote || ""}|${f.observacoes || ""}`))
+        .map((f) => f.id);
+
+      if (idsDemo.length > 0 && typeof BancoDadosPT !== "undefined") {
+        for (const id of idsDemo) {
+          await BancoDadosPT.excluir(STORE_FIOS, id).catch(() => {});
+        }
+        BancoDadosPT.invalidarCache(STORE_FIOS);
+        dados = await dbObterTodos(true);
       }
-      localStorage.setItem("ponto_trama_fios_inicializados", "true");
-    } else if (dados && dados.length > 0 && !jaInicializado) {
-      localStorage.setItem("ponto_trama_fios_inicializados", "true");
+    }
+    try {
+      localStorage.setItem("ponto_trama_fios_demo_limpo", "true");
+    } catch {
+      // ignora
     }
 
     fiosCache = dados || [];

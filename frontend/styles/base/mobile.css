@@ -112,8 +112,9 @@
   }
 
   .listaNavegacao {
-    gap: 6px;
-    padding: 12px 10px 24px 10px;
+    justify-content: flex-start;
+    gap: 5px;
+    padding: 12px 10px 10px 10px;
   }
 
   .botaoFerramenta {
@@ -208,9 +209,11 @@
   }
 
   .cabecalho-acoes,
+  .cabecalho-acoes-contador,
   .cabecalho-acoes-projetos,
   .cabecalho-acoes-amostra,
   .cabecalho-acoes-receitas,
+  .cabecalho-acoes-graficos,
   .cabecalho-acoes-config {
     width: 100%;
     display: flex;
@@ -218,6 +221,32 @@
     align-items: center;
     gap: 8px;
     justify-content: flex-start;
+  }
+
+  .cabecalho .btn-tela-toda-topo {
+    flex: 1 1 120px;
+    justify-content: center;
+    height: 40px;
+    padding: 0 12px;
+    font-size: 13px;
+  }
+
+  .cabecalho-acoes-contador .btn-adicionar-contador {
+    width: auto;
+    flex: 1 1 120px;
+  }
+
+  .cabecalho .btn-calc-aum-dim {
+    flex: 1 1 auto;
+    justify-content: center;
+    min-height: 36px;
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+
+  .cabecalho .badge-offline-receitas {
+    font-size: 11px;
+    padding: 4px 8px;
   }
 
   .cabecalho .btn-adicionar-contador,
@@ -308,6 +337,7 @@
   .conteiner-receitas,
   .conteiner-precificacao,
   .conteiner-amostra,
+  .conteiner-editor-graficos,
   .conteiner-configuracoes {
     flex: 1 1 0%;
     min-height: 0;
@@ -331,6 +361,12 @@
   .layout-configuracoes,
   .painel-receita-texto,
   .painel-receita-arquivo,
+  .painel-receita-tradutor,
+  .painel-receita-dicionario,
+  .coluna-tradutor-entrada,
+  .coluna-tradutor-saida,
+  .saida-tradutor-receita,
+  .grade-dicionario-pontos,
   .coluna-inputs-precificacao,
   .coluna-outputs-precificacao,
   .bloco-precificacao,
@@ -502,6 +538,180 @@
 
   .pdf-receita-viewer {
     height: 56vh;
+  }
+
+  /* Tradutor & Dicionário Mobile-First (RNF03) */
+  .barra-controles-tradutor {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    padding: 10px;
+  }
+
+  .grupo-select-trad {
+    min-width: 0;
+  }
+
+  .btn-inverter-trad {
+    grid-column: 1 / -1;
+    width: 100%;
+    height: 36px;
+  }
+
+  .acoes-rapidas-trad-topo {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-left: 0;
+  }
+
+  .grid-tradutor-receita {
+    grid-template-columns: 1fr !important;
+    gap: 12px;
+  }
+
+  .saida-tradutor-receita {
+    min-height: 160px !important;
+    font-size: 14px;
+  }
+
+  .alerta-ambiguo-tradutor {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .btn-alternar-us-uk {
+    margin-left: 0;
+    width: 100%;
+    text-align: center;
+  }
+
+  .barra-filtros-dicionario {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    padding: 0 0 6px 0;
+  }
+
+  .campo-busca-dic {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .seletores-dic {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .pills-tecnica-dic {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .seletores-dic select {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .btn-dic-limpar-discreto {
+    grid-column: 1 / -1;
+    justify-self: end;
+  }
+
+  .tabela-dicionario-wrap {
+    flex: none !important;
+    overflow: visible !important;
+  }
+
+  .dic-cabecalho-lista {
+    display: none !important;
+  }
+
+  .dic-linha-principal {
+    grid-template-columns: 1fr 24px !important;
+    row-gap: 8px;
+    padding: 11px 12px;
+  }
+
+  .dic-cel-nome {
+    grid-column: 1 / 2;
+  }
+
+  .dic-seta-expandir {
+    grid-column: 2 / 3;
+    grid-row: 1 / 2;
+  }
+
+  .dic-cel-siglas {
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .btn-sigla-dic {
+    flex-direction: column;
+    gap: 1px;
+    padding: 5px 4px;
+    background: rgba(34, 57, 111, 0.18);
+  }
+
+  :root[data-tema="claro"] .btn-sigla-dic {
+    background: #f2ebdc;
+  }
+
+  .sigla-lbl-mob {
+    display: inline;
+  }
+
+  .dic-nomes-4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  /* Calculadora de Aumentos & Diminuições no Mobile */
+  .card-calc-aum-dim {
+    padding: 14px 12px;
+  }
+
+  .grid-inputs-aum-dim {
+    grid-template-columns: 1fr !important;
+  }
+
+  .controles-pills-aum-dim {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .grupo-pill-ad {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .btn-pill-ad {
+    text-align: center;
+  }
+
+  /* Contador Tela Toda no Mobile */
+  .overlay-contador-tela-toda {
+    padding: 14px 14px 18px 14px;
+  }
+
+  .tela-toda-rodape {
+    gap: 8px;
+  }
+
+  .btn-tt-controle {
+    height: 48px;
+    font-size: 13.5px;
   }
 
   /* ========================================================================
@@ -1264,16 +1474,142 @@
     max-height: 92dvh !important;
   }
 
+  .sync-direcao-grid,
+  .sync-qr-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .sync-mobile-acoes {
+    flex-direction: column;
+  }
+
+  .sync-mobile-acoes > * {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
   /* Toasts posicionados acima da barra inferior mobile */
   .toast-projetos,
   .toast-configuracoes,
   .toast-amostra,
-  .toast-banco-amostras {
+  .toast-banco-amostras,
+  .toast-receitas,
+  .toast-graficos {
     left: 12px !important;
     right: 12px !important;
     bottom: 68px !important;
     text-align: center;
     max-width: none;
+  }
+
+  /* ========================================================================
+     13. EDITOR DE GRÁFICOS (MOBILE-FIRST, RNF02)
+     ======================================================================== */
+  .layout-editor-graficos,
+  .layout-editor-graficos.modo-execucao-ativo {
+    flex: none !important;
+    display: flex !important;
+    flex-direction: column;
+    gap: 10px;
+    overflow: visible !important;
+  }
+
+  .graf-barra-ferramentas,
+  .graf-painel-paleta {
+    flex: none !important;
+    overflow: visible !important;
+  }
+
+  .graf-grid-tools {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+
+  .graf-palco-wrap {
+    flex: none !important;
+    height: 52vh !important;
+    min-height: 280px !important;
+  }
+
+  .graf-exec-topo {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .graf-exec-nav {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: 100%;
+  }
+
+  .btn-graf-exec-nav {
+    min-height: 50px;
+    font-size: 15px;
+    width: 100%;
+  }
+
+  .graf-lista-paleta {
+    max-height: 240px;
+  }
+
+  .modal-overlay-graf {
+    padding: 8px;
+  }
+
+  .modal-box-graf {
+    max-width: 100% !important;
+    max-height: 92dvh !important;
+  }
+
+  .graf-form-grid-2,
+  .graf-sliders-crop,
+  .graf-imp-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  #secao-tabelas-conversao .cabecalho-conteudo {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  #secao-tabelas-conversao .conv-toggle-unidade {
+    margin-left: auto;
+  }
+
+  /* Popup "Ferramentas" conectado na gaveta mobile (sem vazar da tela) */
+  .popup-ferramentas-lateral {
+    left: 10px;
+    right: 10px;
+    bottom: 62px;
+    top: auto !important;
+    margin-left: 0;
+    border-left: 1px solid var(--creme-opacidade-25);
+    border-radius: 16px;
+    transform-origin: bottom center !important;
+    transform: scale(0.75) translateY(12px);
+  }
+
+  .popup-ferramentas-lateral.aberto {
+    transform: scale(1) translateY(0);
+  }
+
+  .popup-ferramentas-grade {
+    grid-template-columns: repeat(auto-fit, minmax(48px, 1fr));
+    justify-items: center;
+  }
+
+  .btn-popup-ferramenta-icone::after {
+    display: none;
+  }
+
+  .botao-aba-ferramentas.popup-aberto {
+    margin-right: 0;
+    width: 100%;
+    padding-right: 12px;
+    border-radius: var(--raio-borda-md);
+  }
+
+  .grade-ferramentas-sidebar-cfg {
+    grid-template-columns: 1fr;
   }
 }
 

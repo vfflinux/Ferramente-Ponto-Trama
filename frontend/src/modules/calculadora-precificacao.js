@@ -346,6 +346,12 @@ const CalculadoraPrecificacao = (() => {
       "precificacao",
       {
         linhas: capturarSnapshotLinhas(),
+        aviamentos: Array.from(aviamentosSelecionados.values()).map(({ item, quantidade }) => ({
+          id: item.id,
+          nome: item.nome,
+          quantidade,
+          unidade: item.atributos?.unidade || "un"
+        })),
         horasGastas: document.getElementById("input-horas-gastas")?.value || "",
         valorHora: document.getElementById("input-valor-hora")?.value || "",
         valorAcessorios: document.getElementById("input-valor-acessorios")?.value || "",
@@ -431,6 +437,17 @@ const CalculadoraPrecificacao = (() => {
     if (inpMargem) inpMargem.value = margem;
     if (sliderMargem) sliderMargem.value = Math.min(200, Number(margem) || 30);
     if (dispMargem) dispMargem.textContent = `${margem}%`;
+
+    aviamentosSelecionados.clear();
+    if (Array.isArray(prec.aviamentos) && prec.aviamentos.length > 0) {
+      prec.aviamentos.forEach((av) => {
+        const encontrado = aviamentosEstoque.find((item) => Number(item.id) === Number(av.id));
+        if (encontrado && Number(av.quantidade) > 0) {
+          aviamentosSelecionados.set(encontrado.id, { item: encontrado, quantidade: Number(av.quantidade) });
+        }
+      });
+    }
+    renderizarChipsAviamentos();
 
     calcularPrecificacao(false);
   }

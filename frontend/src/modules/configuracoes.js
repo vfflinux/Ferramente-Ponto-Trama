@@ -19,6 +19,13 @@ const Configuracoes = (() => {
     tamanhoFonte: "padrao", // 'compacto' | 'padrao' | 'grande'
     reduzirAnimacoes: false,
     sidebarInicial: "expandido", // 'expandido' | 'recolhido'
+    ferramentasBarraLateral: [
+      "projetos",
+      "contador-carreiras",
+      "receitas",
+      "precificacao",
+      "fios"
+    ],
     somAlarme: true,
     alertaVisual: true,
     vibracao: true,
@@ -40,6 +47,15 @@ const Configuracoes = (() => {
   let wakeLockSentinela = null;
   let timerBadgeSalvo = null;
   let timerToast = null;
+
+  // Estado da Sincronização via Wi-Fi (RF01-RF06, RNF01-RNF05)
+  const STORAGE_ROLLBACK_LOCAL = "ponto_trama_backup_pre_sync_v1";
+  let syncDirecaoSelecionada = "mesclar";
+  let syncPollTimer = null;
+  let syncServidorAtivo = false;
+  let syncConcluidoTratado = false;
+  let syncUrlAtual = "";
+  let syncPortaAtual = 0;
 
   function carregarPrefsStorage() {
     try {
@@ -143,6 +159,12 @@ const Configuracoes = (() => {
 
     if (!chaveAlterada || chaveAlterada === "manterTelaAcesa") {
       gerenciarWakeLock(Boolean(prefs.manterTelaAcesa));
+    }
+
+    if (!chaveAlterada || chaveAlterada === "ferramentasBarraLateral") {
+      if (typeof BarraLateral !== "undefined" && typeof BarraLateral.aplicarFerramentasVisiveis === "function") {
+        BarraLateral.aplicarFerramentasVisiveis(prefs.ferramentasBarraLateral);
+      }
     }
   }
 
@@ -345,6 +367,68 @@ const Configuracoes = (() => {
       card.classList.toggle("ativo", ativo);
       card.setAttribute("aria-checked", ativo ? "true" : "false");
     });
+
+    renderizarListaFerramentasSidebar();
+  }
+
+  function renderizarListaFerramentasSidebar() {
+    const grade = document.getElementById("cfg-lista-ferramentas-sidebar");
+    const resumo = document.getElementById("cfg-resumo-sidebar-ferramentas");
+    if (!grade || typeof BarraLateral === "undefined" || typeof BarraLateral.obterListaCatalogoFerramentas !== "function") {
+      return;
+    }
+
+    const catalogo = BarraLateral.obterListaCatalogoFerramentas();
+    const selecionadas = new Set(
+      Array.isArray(prefs.ferramentasBarraLateral)
+        ? prefs.ferramentasBarraLateral
+        : PADROES.ferramentasBarraLateral
+    );
+
+    grade.innerHTML = "";
+    catalogo.forEach((item) => {
+      const marcada = selecionadas.has(item.chave);
+      const label = document.createElement("label");
+      label.className = `item-ferramenta-sidebar-cfg${marcada ? " ativa" : ""}`;
+      label.innerHTML = `
+        <span class="info-item-ferramenta-sidebar">
+          <span class="icone-item-ferramenta-sidebar">${item.svgHtml}</span>
+          <span class="nome-item-ferramenta-sidebar">${item.nome}</span>
+        </span>
+        <span class="switch-cfg compacto">
+          <input type="checkbox" class="chk-ferramenta-sidebar-cfg" value="${item.chave}" ${marcada ? "checked" : ""} />
+          <span class="trilha-switch"></span>
+        </span>
+      `;
+      const chk = label.querySelector("input");
+      chk?.addEventListener("change", () => {
+        const atual = new Set(
+          Array.isArray(prefs.ferramentasBarraLateral)
+            ? prefs.ferramentasBarraLateral
+            : PADROES.ferramentasBarraLateral
+        );
+        if (chk.checked) atual.add(item.chave);
+        else atual.delete(item.chave);
+        const ordenada = catalogo.map((c) => c.chave).filter((k) => atual.has(k));
+        label.classList.toggle("ativa", chk.checked);
+        atualizar("ferramentasBarraLateral", ordenada);
+        atualizarResumoFerramentasSidebar(catalogo.length, ordenada.length);
+      });
+      grade.appendChild(label);
+    });
+
+    const totalVis = catalogo.filter((c) => selecionadas.has(c.chave)).length;
+    atualizarResumoFerramentasSidebar(catalogo.length, totalVis);
+  }
+
+  function atualizarResumoFerramentasSidebar(total, naBarra) {
+    const resumo = document.getElementById("cfg-resumo-sidebar-ferramentas");
+    if (!resumo) return;
+    const noPopup = Math.max(0, total - naBarra);
+    resumo.textContent =
+      noPopup === 0
+        ? `${naBarra} na barra • Todas visíveis`
+        : `${naBarra} na barra • ${noPopup} em Ferramentas`;
   }
 
   function aplicarFiltroNavegacaoEBusca() {
@@ -432,26 +516,450 @@ const Configuracoes = (() => {
     }
   }
 
+  // ==========================================================================
+  // PARTE 3B: VALIDAÇÃO DE SCHEMA (RNF03), MERGE POR updatedAt E ROLLBACK (RF06)
+  // ==========================================================================
+
+  function extrairTimestampMs(item) {
+    if (!item || typeof item !== "object") return 0;
+    const candidatos = [item.updatedAt, item.atualizado_em, item.updated_at, item.criado_em, item.createdAt];
+    for (const val of candidatos) {
+      if (!val) continue;
+      if (typeof val === "number" && !Number.isNaN(val)) return val;
+      const ms = Date.parse(String(val));
+      if (!Number.isNaN(ms)) return ms;
+    }
+    return 0;
+  }
+
+  function validarSchemaBackupJson(json) {
+    if (!json || typeof json !== "object" || Array.isArray(json)) {
+      return { ok: false, erro: "O arquivo não contém um objeto JSON válido." };
+    }
+    const ehEnvelope = "dados" in json;
+    if (ehEnvelope) {
+      if (!json.dados || typeof json.dados !== "object" || Array.isArray(json.dados)) {
+        return { ok: false, erro: "Campo obrigatório 'dados' ausente ou inválido." };
+      }
+      if (json.preferencias !== undefined && json.preferencias !== null && typeof json.preferencias !== "object") {
+        return { ok: false, erro: "Campo 'preferencias' está corrompido." };
+      }
+    }
+    const dados = ehEnvelope ? json.dados : json;
+    const colecoes = ["projetos", "fios", "itens_biblioteca", "banco_amostras"];
+    const temAlguma = colecoes.some((c) => c in dados);
+    if (!temAlguma && !json.preferencias) {
+      return { ok: false, erro: "Arquivo JSON não pertence ao formato do Ponto & Trama." };
+    }
+
+    const dadosNorm = {};
+    for (const col of colecoes) {
+      const lista = dados[col] === undefined || dados[col] === null ? [] : dados[col];
+      if (!Array.isArray(lista)) {
+        return { ok: false, erro: `A coleção '${col}' deve ser uma lista.` };
+      }
+      for (let i = 0; i < lista.length; i++) {
+        const it = lista[i];
+        if (!it || typeof it !== "object" || Array.isArray(it)) {
+          return { ok: false, erro: `Registro #${i + 1} em '${col}' inválido.` };
+        }
+        if (typeof it.nome !== "string" || !it.nome.trim()) {
+          return { ok: false, erro: `Registro #${i + 1} em '${col}' está sem nome obrigatório.` };
+        }
+        if (col === "projetos") {
+          for (const k of ["contadores", "etapas", "galeria"]) {
+            if (it[k] !== undefined && it[k] !== null && !Array.isArray(it[k])) {
+              return { ok: false, erro: `Projeto '${it.nome}' possui '${k}' inválido.` };
+            }
+          }
+          for (const k of ["receita", "materiais", "amostra", "precificacao"]) {
+            if (it[k] !== undefined && it[k] !== null && typeof it[k] !== "object") {
+              return { ok: false, erro: `Projeto '${it.nome}' possui '${k}' inválido.` };
+            }
+          }
+        } else if (col === "fios") {
+          if (it.quantidade !== undefined && it.quantidade !== null && (Number.isNaN(Number(it.quantidade)) || Number(it.quantidade) < 0)) {
+            return { ok: false, erro: `Fio '${it.nome}' possui quantidade inválida.` };
+          }
+        } else if (col === "itens_biblioteca") {
+          const cat = it.categoria || "agulha";
+          if (!["agulha", "ferramenta", "aviamento"].includes(cat)) {
+            return { ok: false, erro: `Item '${it.nome}' possui categoria inválida.` };
+          }
+        }
+      }
+      dadosNorm[col] = lista;
+    }
+
+    return {
+      ok: true,
+      pacote: {
+        app: "Ponto & Trama",
+        versao: String(json.versao || "1.0.0"),
+        exportado_em: String(json.exportado_em || new Date().toISOString()),
+        preferencias: json.preferencias && typeof json.preferencias === "object" ? json.preferencias : null,
+        dados: dadosNorm
+      }
+    };
+  }
+
+  function chaveNaturalItem(col, item) {
+    const nome = String(item.nome || "").trim().toLowerCase();
+    if (col === "fios") {
+      return `fio|${nome}|${String(item.marca || "").trim().toLowerCase()}|${String(item.cor_nome || "").trim().toLowerCase()}|${String(item.lote || "").trim().toLowerCase()}`;
+    }
+    if (col === "itens_biblioteca") {
+      const mm = String(item.atributos?.espessura_mm || "").trim().toLowerCase();
+      return `bib|${String(item.categoria || "agulha").toLowerCase()}|${nome}|${mm}`;
+    }
+    if (col === "banco_amostras") {
+      return `am|${String(item.tecnica || "croche").toLowerCase()}|${nome}|${String(item.fio || "").trim().toLowerCase()}`;
+    }
+    const criado = String(item.criado_em || "").trim().slice(0, 19);
+    return criado ? `proj|${nome}|${String(item.categoria || "").toLowerCase()}|${criado}` : `proj|${nome}|${String(item.categoria || "").toLowerCase()}`;
+  }
+
+  function mesclarDadosPorData(dadosLocais, dadosRemotos) {
+    const saida = {};
+    for (const col of ["fios", "itens_biblioteca", "banco_amostras", "projetos"]) {
+      const mapa = new Map();
+      const ordem = [];
+      for (const it of dadosLocais[col] || []) {
+        const ch = chaveNaturalItem(col, it);
+        const ts = extrairTimestampMs(it);
+        if (!mapa.has(ch)) {
+          ordem.push(ch);
+          mapa.set(ch, { item: { ...it }, ts });
+        } else if (ts >= mapa.get(ch).ts) {
+          mapa.set(ch, { item: { ...it }, ts });
+        }
+      }
+      for (const it of dadosRemotos[col] || []) {
+        const ch = chaveNaturalItem(col, it);
+        const tsRem = extrairTimestampMs(it);
+        if (!mapa.has(ch)) {
+          ordem.push(ch);
+          mapa.set(ch, { item: { ...it }, ts: tsRem });
+        } else {
+          const prev = mapa.get(ch);
+          if (tsRem > prev.ts) {
+            mapa.set(ch, { item: { ...it }, ts: tsRem });
+          }
+        }
+      }
+      saida[col] = ordem.map((k) => mapa.get(k).item);
+    }
+    return saida;
+  }
+
+  async function salvarBackupPreSyncLocal(origem = "importacao") {
+    if (typeof BancoDadosPT === "undefined") return;
+    try {
+      const dados = await BancoDadosPT.exportarTudo();
+      const snap = {
+        app: "Ponto & Trama",
+        versao: "1.0.0",
+        tipo: "backup_pre_sync",
+        origem_acao: origem,
+        criado_em: new Date().toISOString(),
+        preferencias: { ...prefs },
+        dados
+      };
+      localStorage.setItem(STORAGE_ROLLBACK_LOCAL, JSON.stringify(snap));
+    } catch {
+      // ignora se exceder quota do localStorage
+    }
+  }
+
+  function temBackendLocalSync() {
+    if (typeof window === "undefined") return false;
+    if (window.PontoETramaAndroid) return false;
+    if (typeof BancoDadosPT !== "undefined" && BancoDadosPT.obterModo() === "sqlite") return true;
+    return window.__PONTO_TRAMA_DESKTOP__ === true || window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost";
+  }
+
+  async function atualizarEstadoRollbackUI() {
+    const linha = document.getElementById("linha-cfg-rollback-sync");
+    const txt = document.getElementById("texto-cfg-rollback-info");
+    if (!linha || !txt) return;
+
+    let info = null;
+    if (temBackendLocalSync()) {
+      try {
+        const r = await fetch("/api/sync/rollback-info", { cache: "no-store" });
+        if (r.ok) {
+          const j = await r.json();
+          if (j && j.disponivel) info = { origem: "servidor", ...j };
+        }
+      } catch {
+        // fallback local
+      }
+    }
+
+    if (!info) {
+      try {
+        const raw = localStorage.getItem(STORAGE_ROLLBACK_LOCAL);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed && parsed.dados) {
+            info = {
+              origem: "local",
+              criado_em: parsed.criado_em || "",
+              contagem: {
+                projetos: (parsed.dados.projetos || []).length,
+                fios: (parsed.dados.fios || []).length,
+                itens_biblioteca: (parsed.dados.itens_biblioteca || []).length,
+                banco_amostras: (parsed.dados.banco_amostras || []).length
+              }
+            };
+          }
+        }
+      } catch {
+        info = null;
+      }
+    }
+
+    if (!info) {
+      linha.style.display = "none";
+      return;
+    }
+
+    const dtStr = info.criado_em
+      ? new Date(info.criado_em).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })
+      : "recente";
+    const c = info.contagem || {};
+    txt.textContent = `backup_pre_sync.json (${dtStr}) — ${c.projetos || 0} proj., ${c.fios || 0} fios, ${c.itens_biblioteca || 0} acess., ${c.banco_amostras || 0} amostras`;
+    linha.style.display = "flex";
+  }
+
+  async function executarRollbackSync() {
+    if (temBackendLocalSync()) {
+      try {
+        const r = await fetch("/api/sync/rollback", { method: "POST" });
+        const j = await r.json();
+        if (r.ok && j.ok) {
+          if (j.preferencias && typeof j.preferencias === "object") {
+            prefs = { ...PADROES, ...j.preferencias };
+            aplicarNoDOM(null);
+            salvarPrefsStorage(true);
+            preencherFormularioComPrefs();
+          }
+          if (typeof BancoDadosPT !== "undefined") BancoDadosPT.invalidarCache();
+          await atualizarDiagnosticoBanco();
+          await recarregarModulosAposDados();
+          mostrarToast("↩️ Sincronização desfeita! Dados restaurados de backup_pre_sync.json.");
+          return;
+        }
+      } catch {
+        // tenta rollback local
+      }
+    }
+
+    try {
+      const raw = localStorage.getItem(STORAGE_ROLLBACK_LOCAL);
+      if (!raw) {
+        mostrarToast("Nenhum backup pré-sincronização disponível.");
+        return;
+      }
+      const parsed = JSON.parse(raw);
+      const val = validarSchemaBackupJson(parsed);
+      if (!val.ok) {
+        mostrarToast(`Rollback inválido: ${val.erro}`);
+        return;
+      }
+      await BancoDadosPT.importarTudo(val.pacote.dados, "substituir");
+      if (val.pacote.preferencias) {
+        prefs = { ...PADROES, ...val.pacote.preferencias };
+        aplicarNoDOM(null);
+        salvarPrefsStorage(true);
+        preencherFormularioComPrefs();
+      }
+      await atualizarDiagnosticoBanco();
+      await recarregarModulosAposDados();
+      mostrarToast("↩️ Sincronização desfeita! Versão anterior restaurada.");
+    } catch (err) {
+      console.error("Erro no rollback:", err);
+      mostrarToast("Não foi possível desfazer a sincronização.");
+    }
+  }
+
+  // ==========================================================================
+  // PARTE 3C: MODAL DE SINCRONIZAÇÃO VIA WI-FI (RF01-RF05, RNF01-RNF05)
+  // ==========================================================================
+
+  function formatarContagemRegressiva(seg) {
+    const s = Math.max(0, Math.floor(Number(seg) || 0));
+    const m = Math.floor(s / 60);
+    const r = s % 60;
+    return `${String(m).padStart(2, "0")}:${String(r).padStart(2, "0")}`;
+  }
+
+  function atualizarBotoesDirecaoSync(dir) {
+    syncDirecaoSelecionada = dir;
+    document.querySelectorAll("#sync-direcao-grid .btn-sync-dir").forEach((b) => {
+      const ativo = b.dataset.syncDir === dir;
+      b.classList.toggle("ativo", ativo);
+      b.setAttribute("aria-checked", ativo ? "true" : "false");
+    });
+  }
+
+  async function renderizarEstadoSyncPC(st) {
+    if (!st) return;
+    syncServidorAtivo = Boolean(st.ativo);
+    syncUrlAtual = st.url || "";
+    syncPortaAtual = Number(st.porta) || 0;
+
+    if (st.direcao) atualizarBotoesDirecaoSync(st.direcao);
+
+    const barra = document.getElementById("sync-status-barra");
+    const txt = document.getElementById("sync-status-texto");
+    const timerEl = document.getElementById("sync-timer-pill");
+    const qrBox = document.getElementById("sync-qr-box");
+    const urlEl = document.getElementById("sync-url-texto");
+    const qrGrid = document.getElementById("sync-qr-grid");
+    const diagBox = document.getElementById("sync-diagnostico-box");
+    const cmdUfw = document.getElementById("sync-cmd-ufw");
+    const btnRenovar = document.getElementById("btn-sync-renovar");
+
+    if (barra) barra.className = `sync-status-barra ${st.status || "aguardando"}`;
+    if (txt) txt.textContent = st.mensagem || "Aguardando conexão...";
+    if (timerEl) {
+      timerEl.textContent = st.ativo ? formatarContagemRegressiva(st.expira_em_seg) : st.status === "concluido" ? "✓" : "Encerrado";
+    }
+    if (qrBox && st.qr_svg && qrBox.dataset.url !== st.url) {
+      qrBox.innerHTML = st.qr_svg;
+      qrBox.dataset.url = st.url || "";
+    }
+    if (urlEl) urlEl.textContent = st.url || "Servidor encerrado";
+    if (qrGrid) qrGrid.style.opacity = st.ativo ? "1" : "0.55";
+    if (cmdUfw && syncPortaAtual > 0) cmdUfw.textContent = `sudo ufw allow ${syncPortaAtual}/tcp`;
+    if (diagBox) diagBox.style.display = st.mostrar_diagnostico_rede ? "block" : "none";
+    if (btnRenovar) btnRenovar.style.display = (!st.ativo || st.status === "expirado" || st.status === "erro") ? "inline-flex" : "none";
+
+    if (st.status === "concluido" && !syncConcluidoTratado) {
+      syncConcluidoTratado = true;
+      pararPollingSync();
+      if (st.preferencias_recebidas && typeof st.preferencias_recebidas === "object") {
+        prefs = { ...PADROES, ...st.preferencias_recebidas };
+        aplicarNoDOM(null);
+        salvarPrefsStorage(true);
+        preencherFormularioComPrefs();
+      }
+      if (typeof BancoDadosPT !== "undefined") BancoDadosPT.invalidarCache();
+      await atualizarDiagnosticoBanco();
+      await recarregarModulosAposDados();
+      await atualizarEstadoRollbackUI();
+      mostrarToast(`✅ ${st.mensagem || "Sincronização concluída!"}`);
+    } else if (st.status === "expirado" && !st.ativo) {
+      pararPollingSync();
+    }
+  }
+
+  function pararPollingSync() {
+    if (syncPollTimer) {
+      clearInterval(syncPollTimer);
+      syncPollTimer = null;
+    }
+  }
+
+  function iniciarPollingSync() {
+    pararPollingSync();
+    syncPollTimer = setInterval(async () => {
+      try {
+        const resp = await fetch("/api/sync/status", { cache: "no-store" });
+        if (!resp.ok) return;
+        const st = await resp.json();
+        await renderizarEstadoSyncPC(st);
+      } catch {
+        // ignora falha transitória
+      }
+    }, 1000);
+  }
+
+  async function iniciarSessaoSyncWifi() {
+    syncConcluidoTratado = false;
+    const qrBox = document.getElementById("sync-qr-box");
+    if (qrBox) {
+      qrBox.innerHTML = `<span style="font-size:12px;color:#16264d">Gerando QR...</span>`;
+      qrBox.dataset.url = "";
+    }
+    try {
+      const resp = await fetch("/api/sync/iniciar", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ direcao: syncDirecaoSelecionada, preferencias: { ...prefs } })
+      });
+      if (!resp.ok) throw new Error("Servidor de sincronização indisponível.");
+      const st = await resp.json();
+      await renderizarEstadoSyncPC(st);
+      iniciarPollingSync();
+    } catch (err) {
+      console.error("Erro ao iniciar Sync Wi-Fi:", err);
+      // Fallback para o modo guia (caso esteja rodando sem backend Python)
+      const pPc = document.getElementById("sync-painel-pc");
+      const pMob = document.getElementById("sync-painel-mobile");
+      if (pPc) pPc.style.display = "none";
+      if (pMob) pMob.style.display = "block";
+    }
+  }
+
+  async function abrirModalSyncWifi() {
+    const modal = document.getElementById("modal-cfg-sync-wifi");
+    const pPc = document.getElementById("sync-painel-pc");
+    const pMob = document.getElementById("sync-painel-mobile");
+    if (!modal) return;
+
+    modal.style.display = "flex";
+
+    if (temBackendLocalSync()) {
+      if (pPc) pPc.style.display = "flex";
+      if (pMob) pMob.style.display = "none";
+      await iniciarSessaoSyncWifi();
+    } else {
+      if (pPc) pPc.style.display = "none";
+      if (pMob) pMob.style.display = "block";
+    }
+  }
+
+  async function fecharModalSyncWifi() {
+    pararPollingSync();
+    fecharModal("modal-cfg-sync-wifi");
+    if (syncServidorAtivo && temBackendLocalSync()) {
+      syncServidorAtivo = false;
+      try {
+        await fetch("/api/sync/encerrar", { method: "POST" });
+      } catch {
+        // ignora
+      }
+    }
+    await atualizarEstadoRollbackUI();
+  }
+
   function prepararImportacaoArquivo(arquivo) {
     if (!arquivo) return;
     const reader = new FileReader();
     reader.onload = () => {
       try {
         const json = JSON.parse(String(reader.result || "{}"));
-        const dados = json.dados && typeof json.dados === "object" ? json.dados : json;
-        const proj = Array.isArray(dados.projetos) ? dados.projetos : [];
-        const fios = Array.isArray(dados.fios) ? dados.fios : [];
-        const bib = Array.isArray(dados.itens_biblioteca) ? dados.itens_biblioteca : [];
-        const am = Array.isArray(dados.banco_amostras) ? dados.banco_amostras : [];
+        const validacao = validarSchemaBackupJson(json);
+        if (!validacao.ok) {
+          mostrarToast(`⚠️ Backup rejeitado: ${validacao.erro}`);
+          return;
+        }
+        const pkg = validacao.pacote;
+        const proj = pkg.dados.projetos;
+        const fios = pkg.dados.fios;
+        const bib = pkg.dados.itens_biblioteca;
+        const am = pkg.dados.banco_amostras;
 
-        if (proj.length + fios.length + bib.length + am.length === 0 && !json.preferencias) {
+        if (proj.length + fios.length + bib.length + am.length === 0 && !pkg.preferencias) {
           mostrarToast("Arquivo JSON sem dados reconhecidos do Ponto & Trama.");
           return;
         }
 
         backupPendente = {
-          preferencias: json.preferencias || null,
-          dados: { projetos: proj, fios, itens_biblioteca: bib, banco_amostras: am }
+          preferencias: pkg.preferencias,
+          dados: pkg.dados
         };
 
         const badges = document.getElementById("badges-import-cfg");
@@ -475,7 +983,18 @@ const Configuracoes = (() => {
   async function executarImportacao(modo) {
     if (!backupPendente || typeof BancoDadosPT === "undefined") return;
     try {
-      const resumo = await BancoDadosPT.importarTudo(backupPendente.dados, modo);
+      // RF06: Salva backup pré-sync automático antes de sobrescrever/mesclar
+      await salvarBackupPreSyncLocal(`import_${modo}`);
+
+      let dadosAplicar = backupPendente.dados;
+      let modoDb = modo;
+      if (modo === "mesclar") {
+        const atuais = await BancoDadosPT.exportarTudo();
+        dadosAplicar = mesclarDadosPorData(atuais, backupPendente.dados);
+        modoDb = "substituir";
+      }
+
+      const resumo = await BancoDadosPT.importarTudo(dadosAplicar, modoDb);
       if (backupPendente.preferencias && typeof backupPendente.preferencias === "object") {
         prefs = { ...PADROES, ...backupPendente.preferencias };
         aplicarNoDOM(null);
@@ -485,9 +1004,10 @@ const Configuracoes = (() => {
       fecharModal("modal-cfg-importar");
       backupPendente = null;
       await atualizarDiagnosticoBanco();
+      await atualizarEstadoRollbackUI();
       await recarregarModulosAposDados();
       const total = resumo.projetos + resumo.fios + resumo.itens_biblioteca + resumo.banco_amostras;
-      mostrarToast(`✓ Backup restaurado (${total} registros importados)!`);
+      mostrarToast(`✓ Backup restaurado (${total} registros)! Rollback salvo automaticamente.`);
     } catch (err) {
       console.error("Erro na importação:", err);
       mostrarToast("Erro ao restaurar backup.");
@@ -657,11 +1177,70 @@ const Configuracoes = (() => {
       }
     });
 
-    // Diagnóstico & Backup
+    // Diagnóstico, Sincronização Wi-Fi & Backup
+    document.getElementById("btn-cfg-sidebar-enxuto")?.addEventListener("click", () => {
+      atualizar("ferramentasBarraLateral", [...PADROES.ferramentasBarraLateral]);
+      renderizarListaFerramentasSidebar();
+      mostrarToast("✨ Barra lateral ajustada para o padrão enxuto.");
+    });
+
+    document.getElementById("btn-cfg-sidebar-todas")?.addEventListener("click", () => {
+      const todas =
+        typeof BarraLateral !== "undefined" && Array.isArray(BarraLateral.FERRAMENTAS_PERSONALIZAVEIS)
+          ? [...BarraLateral.FERRAMENTAS_PERSONALIZAVEIS]
+          : [...PADROES.ferramentasBarraLateral];
+      atualizar("ferramentasBarraLateral", todas);
+      renderizarListaFerramentasSidebar();
+      mostrarToast("📋 Todas as ferramentas exibidas na barra lateral.");
+    });
+
     document.getElementById("btn-cfg-atualizar-diag")?.addEventListener("click", () => {
       atualizarDiagnosticoBanco();
+      atualizarEstadoRollbackUI();
       mostrarToast("↻ Contagem de registros atualizada.");
     });
+    document.getElementById("btn-cfg-abrir-sync-wifi")?.addEventListener("click", abrirModalSyncWifi);
+    document.getElementById("btn-cfg-desfazer-sync")?.addEventListener("click", executarRollbackSync);
+    document.getElementById("btn-fechar-sync-wifi")?.addEventListener("click", fecharModalSyncWifi);
+    document.getElementById("btn-sync-encerrar")?.addEventListener("click", fecharModalSyncWifi);
+    document.getElementById("btn-sync-renovar")?.addEventListener("click", iniciarSessaoSyncWifi);
+    document.getElementById("modal-cfg-sync-wifi")?.addEventListener("click", (e) => {
+      if (e.target.id === "modal-cfg-sync-wifi") fecharModalSyncWifi();
+    });
+
+    document.querySelectorAll("#sync-direcao-grid .btn-sync-dir").forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        const novaDir = btn.dataset.syncDir || "mesclar";
+        atualizarBotoesDirecaoSync(novaDir);
+        if (syncServidorAtivo && temBackendLocalSync()) {
+          try {
+            const resp = await fetch("/api/sync/direcao", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ direcao: novaDir })
+            });
+            if (resp.ok) await renderizarEstadoSyncPC(await resp.json());
+          } catch {
+            // ignora
+          }
+        }
+      });
+    });
+
+    document.getElementById("btn-sync-copiar-url")?.addEventListener("click", () => {
+      if (!syncUrlAtual) return;
+      navigator.clipboard?.writeText(syncUrlAtual).then(() => mostrarToast("📋 Link de sincronização copiado!")).catch(() => {});
+    });
+
+    document.getElementById("btn-sync-copiar-ufw")?.addEventListener("click", () => {
+      const cmd = document.getElementById("sync-cmd-ufw")?.textContent || "";
+      if (!cmd) return;
+      navigator.clipboard?.writeText(cmd).then(() => mostrarToast("📋 Comando UFW copiado!")).catch(() => {});
+    });
+
+    document.getElementById("btn-sync-mob-exportar")?.addEventListener("click", exportarBackupCompleto);
+    document.getElementById("btn-sync-mob-importar")?.addEventListener("click", () => fecharModal("modal-cfg-sync-wifi"));
+
     document.getElementById("btn-cfg-exportar-tudo")?.addEventListener("click", exportarBackupCompleto);
     document.getElementById("input-cfg-importar-tudo")?.addEventListener("change", (e) => {
       const arq = e.target.files?.[0];
@@ -710,9 +1289,18 @@ const Configuracoes = (() => {
 
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
+        const modalSync = document.getElementById("modal-cfg-sync-wifi");
+        if (modalSync && modalSync.style.display === "flex") fecharModalSyncWifi();
         fecharModal("modal-cfg-importar");
         fecharModal("modal-cfg-padroes");
         fecharModal("modal-cfg-limpar");
+      }
+    });
+
+    // Encerra servidor temporário ao fechar a aba/janela do navegador (RNF04)
+    window.addEventListener("beforeunload", () => {
+      if (syncServidorAtivo && temBackendLocalSync() && navigator.sendBeacon) {
+        navigator.sendBeacon("/api/sync/encerrar", "{}");
       }
     });
 
@@ -727,6 +1315,7 @@ const Configuracoes = (() => {
     window.addEventListener("ponto-trama:ferramenta-alterada", (e) => {
       if (e.detail?.ferramenta === "configuracoes") {
         atualizarDiagnosticoBanco();
+        atualizarEstadoRollbackUI();
       }
     });
   }
@@ -734,12 +1323,14 @@ const Configuracoes = (() => {
   function init() {
     if (jaInicializado) {
       atualizarDiagnosticoBanco();
+      atualizarEstadoRollbackUI();
       return;
     }
     jaInicializado = true;
     preencherFormularioComPrefs();
     vincularEventos();
     atualizarDiagnosticoBanco();
+    atualizarEstadoRollbackUI();
   }
 
   return {

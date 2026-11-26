@@ -255,10 +255,52 @@
 :root[data-tema="noite"] .toast-projetos,
 :root[data-tema="noite"] .toast-configuracoes,
 :root[data-tema="noite"] .toast-amostra,
-:root[data-tema="noite"] .toast-banco-amostras {
+:root[data-tema="noite"] .toast-banco-amostras,
+:root[data-tema="noite"] .toast-receitas,
+:root[data-tema="noite"] .toast-graficos {
   background: #162547;
   color: #f7f1de;
   border: 1px solid rgba(247, 241, 222, 0.3);
+}
+
+/* Editor de Gráficos em Noite Profunda */
+:root[data-tema="noite"] .graf-barra-ferramentas,
+:root[data-tema="noite"] .graf-barra-palco,
+:root[data-tema="noite"] .graf-barra-config-exec,
+:root[data-tema="noite"] .graf-palco-wrap,
+:root[data-tema="noite"] .graf-painel-paleta,
+:root[data-tema="noite"] .graf-barra-execucao,
+:root[data-tema="noite"] .modal-box-graf {
+  background: #0f172b;
+  border-color: rgba(247, 241, 222, 0.16);
+}
+
+/* Novos módulos em Noite Profunda: Aumentos/Dim, Tela Toda, Tradutor, Dicionário, Baixa Estoque */
+:root[data-tema="noite"] .card-calc-aum-dim,
+:root[data-tema="noite"] .barra-controles-tradutor,
+:root[data-tema="noite"] .coluna-tradutor-entrada,
+:root[data-tema="noite"] .coluna-tradutor-saida,
+:root[data-tema="noite"] .tabela-dicionario-wrap {
+  background: #0f172b;
+  border-color: rgba(247, 241, 222, 0.15);
+}
+
+:root[data-tema="noite"] .dic-cabecalho-lista,
+:root[data-tema="noite"] .pills-tecnica-dic,
+:root[data-tema="noite"] .btn-sync-dir,
+:root[data-tema="noite"] .sync-url-box,
+:root[data-tema="noite"] .resultado-calc-aum-dim,
+:root[data-tema="noite"] .receita-pronta-ad,
+:root[data-tema="noite"] .grupo-pill-ad,
+:root[data-tema="noite"] .saida-tradutor-receita,
+:root[data-tema="noite"] .popover-termo-traduzido,
+:root[data-tema="noite"] .item-baixa-estoque {
+  background: #131e38;
+  border-color: rgba(247, 241, 222, 0.16);
+}
+
+:root[data-tema="noite"] .overlay-contador-tela-toda {
+  background: radial-gradient(circle at 50% 40%, #101b36 0%, #030610 100%);
 }
 
 /* ==========================================================================
@@ -783,6 +825,7 @@
 :root[data-tema="claro"] .ficha-etapas .ficha-aba { background: rgba(132, 69, 156, 0.15); color: #672b80; }
 :root[data-tema="claro"] .ficha-amostra .ficha-aba { background: rgba(14, 118, 146, 0.15); color: #0c5d75; }
 :root[data-tema="claro"] .ficha-precificacao .ficha-aba { background: rgba(22, 38, 77, 0.13); color: #16264d; }
+:root[data-tema="claro"] .ficha-grafico .ficha-aba { background: rgba(214, 69, 80, 0.15); color: #9c222d; }
 
 /* 6. Modais, Drawers e Dropdowns (Fundo Claro + Texto Escuro) */
 :root[data-tema="claro"] .drawer-form-proj,
@@ -1206,8 +1249,662 @@
 :root[data-tema="claro"] .toast-projetos,
 :root[data-tema="claro"] .toast-configuracoes,
 :root[data-tema="claro"] .toast-amostra,
-:root[data-tema="claro"] .toast-banco-amostras {
+:root[data-tema="claro"] .toast-banco-amostras,
+:root[data-tema="claro"] .toast-receitas {
   background: #1b2e5a;
   color: #fcf1d0;
   border-color: rgba(252, 241, 208, 0.35);
+}
+
+/* 10. Novos módulos em Ateliê Claro (Aumentos/Dim, Tela Toda, Tradutor, Dicionário, Baixa Estoque) */
+:root[data-tema="claro"] .cabecalho .btn-calc-aum-dim,
+:root[data-tema="claro"] .cabecalho .btn-tela-toda-topo {
+  background-color: rgba(255, 255, 255, 0.14);
+  border-color: rgba(252, 241, 208, 0.38);
+  color: #fcf1d0;
+}
+
+:root[data-tema="claro"] .cabecalho .btn-calc-aum-dim:hover,
+:root[data-tema="claro"] .cabecalho .btn-tela-toda-topo:hover {
+  background-color: rgba(255, 255, 255, 0.24);
+  color: #ffffff;
+  border-color: #fcf1d0;
+}
+
+:root[data-tema="claro"] .cabecalho .btn-calc-aum-dim.ativo {
+  background-color: #fcf1d0;
+  color: #16264d;
+  border-color: #fcf1d0;
+}
+
+:root[data-tema="claro"] .cabecalho .badge-offline-receitas {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(252, 241, 208, 0.35);
+  color: #fcf1d0;
+}
+
+:root[data-tema="claro"] .cabecalho .badge-offline-receitas.offline {
+  background: rgba(243, 156, 18, 0.3);
+  border-color: #ffe08a;
+  color: #fff5d6;
+}
+
+:root[data-tema="claro"] .btn-expandir-contador {
+  background: #ffffff;
+  color: #16264d;
+  border-color: rgba(22, 38, 77, 0.24);
+}
+
+:root[data-tema="claro"] .btn-expandir-contador:hover {
+  background: #233b72;
+  color: #ffffff;
+  border-color: #233b72;
+}
+
+:root[data-tema="claro"] .overlay-contador-tela-toda {
+  background: radial-gradient(circle at 50% 40%, #fffdf8 0%, #eae1cf 100%);
+  color: #16264d;
+}
+
+:root[data-tema="claro"] .tela-toda-numero {
+  text-shadow: none;
+  color: #16264d;
+}
+
+:root[data-tema="claro"] .tela-toda-pontos {
+  color: #233b72;
+}
+
+:root[data-tema="claro"] .zona-toque-tela-toda {
+  background: rgba(255, 255, 255, 0.72);
+  border-color: rgba(22, 38, 77, 0.24);
+}
+
+:root[data-tema="claro"] .zona-toque-tela-toda:active {
+  background: rgba(35, 59, 114, 0.12);
+  border-color: #233b72;
+}
+
+:root[data-tema="claro"] .tela-toda-dica {
+  background: #ede5d4;
+  border-color: rgba(22, 38, 77, 0.18);
+  color: #16264d;
+}
+
+:root[data-tema="claro"] .btn-tela-toda-sair,
+:root[data-tema="claro"] .btn-tt-controle {
+  background: #ffffff;
+  border-color: rgba(22, 38, 77, 0.24);
+  color: #16264d;
+}
+
+:root[data-tema="claro"] .btn-tela-toda-sair:hover,
+:root[data-tema="claro"] .btn-tt-controle:hover:not(:disabled) {
+  background: #233b72;
+  color: #ffffff;
+  border-color: #233b72;
+}
+
+:root[data-tema="claro"] .btn-tt-controle.cadeado.travado {
+  background: rgba(15, 138, 80, 0.15);
+  border-color: #118a51;
+  color: #0b663b;
+}
+
+:root[data-tema="claro"] .card-calc-aum-dim,
+:root[data-tema="claro"] .barra-controles-tradutor,
+:root[data-tema="claro"] .coluna-tradutor-entrada,
+:root[data-tema="claro"] .coluna-tradutor-saida,
+:root[data-tema="claro"] .tabela-dicionario-wrap {
+  background: #fffdf8;
+  border-color: rgba(22, 38, 77, 0.15);
+  color: #16264d;
+}
+
+:root[data-tema="claro"] .dic-cabecalho-lista,
+:root[data-tema="claro"] .pills-tecnica-dic,
+:root[data-tema="claro"] .resultado-calc-aum-dim,
+:root[data-tema="claro"] .grupo-pill-ad,
+:root[data-tema="claro"] .saida-tradutor-receita,
+:root[data-tema="claro"] .item-baixa-estoque {
+  background: #f2ebdc;
+  border-color: rgba(22, 38, 77, 0.16);
+  color: #16264d;
+}
+
+:root[data-tema="claro"] .linha-termo-dic {
+  border-bottom-color: rgba(22, 38, 77, 0.1);
+}
+
+:root[data-tema="claro"] .linha-termo-dic:hover,
+:root[data-tema="claro"] .linha-termo-dic.aberto {
+  background: #f6f0e4;
+}
+
+:root[data-tema="claro"] .btn-tec-dic {
+  color: #253a6e;
+}
+
+:root[data-tema="claro"] .btn-tec-dic.ativo {
+  background: #233b72;
+  color: #ffffff;
+}
+
+:root[data-tema="claro"] .btn-sigla-dic {
+  color: #16264d;
+}
+
+:root[data-tema="claro"] .btn-sigla-dic:hover,
+:root[data-tema="claro"] .btn-sigla-dic.destaque-idioma {
+  background: #e4ecfc;
+  border-color: rgba(35, 59, 114, 0.35);
+  color: #16264d;
+}
+
+:root[data-tema="claro"] .dic-tag-amb-discreta {
+  color: #9e6a00;
+}
+
+:root[data-tema="claro"] .dic-nomes-4 {
+  border-top-color: rgba(22, 38, 77, 0.14);
+}
+
+:root[data-tema="claro"] .btn-dic-copiar {
+  background: #ffffff;
+  border-color: rgba(22, 38, 77, 0.24);
+  color: #16264d;
+}
+
+:root[data-tema="claro"] .btn-dic-copiar:hover {
+  background: #233b72;
+  border-color: #233b72;
+  color: #ffffff;
+}
+
+:root[data-tema="claro"] .receita-pronta-ad,
+:root[data-tema="claro"] .popover-termo-traduzido {
+  background: #e8eefb;
+  border-color: rgba(35, 59, 114, 0.32);
+  color: #16264d;
+}
+
+:root[data-tema="claro"] .resumo-pontos-ad,
+:root[data-tema="claro"] .dic-sigla,
+:root[data-tema="claro"] .dic-badge-tec {
+  color: #1d4499;
+}
+
+:root[data-tema="claro"] .dic-badge-tec {
+  background: #e4ecfc;
+  border-color: rgba(35, 59, 114, 0.25);
+}
+
+:root[data-tema="claro"] .btn-pill-ad {
+  color: #253a6e;
+}
+
+:root[data-tema="claro"] .btn-pill-ad.ativo {
+  background: #233b72;
+  color: #ffffff;
+}
+
+:root[data-tema="claro"] .btn-inverter-trad,
+:root[data-tema="claro"] .btn-copiar-dic {
+  background: #ffffff;
+  border-color: rgba(22, 38, 77, 0.24);
+  color: #16264d;
+}
+
+:root[data-tema="claro"] .btn-inverter-trad:hover,
+:root[data-tema="claro"] .btn-copiar-dic:hover {
+  background: #233b72;
+  color: #ffffff;
+  border-color: #233b72;
+}
+
+:root[data-tema="claro"] .termo-traduzido {
+  background: rgba(35, 89, 196, 0.14);
+  border-bottom-color: #233b72;
+  color: #16264d;
+}
+
+:root[data-tema="claro"] .termo-traduzido:hover,
+:root[data-tema="claro"] .termo-traduzido:focus {
+  background: #233b72;
+  color: #ffffff;
+}
+
+:root[data-tema="claro"] .alerta-ambiguo-tradutor {
+  background: rgba(196, 136, 0, 0.14);
+  border-color: #b87e00;
+  color: #6b4500;
+}
+
+:root[data-tema="claro"] .btn-alternar-us-uk {
+  background: #b87e00;
+  color: #ffffff;
+}
+
+:root[data-tema="claro"] .item-baixa-badge {
+  background: rgba(196, 136, 0, 0.16);
+  border-color: #b87e00;
+  color: #7a5200;
+}
+
+/* Sincronização via Wi-Fi em Ateliê Claro */
+:root[data-tema="claro"] .btn-sync-dir,
+:root[data-tema="claro"] .sync-url-box {
+  background: #f2ebdc;
+  border-color: rgba(22, 38, 77, 0.18);
+  color: #16264d;
+}
+
+:root[data-tema="claro"] .btn-sync-dir.ativo {
+  background: #233b72;
+  border-color: #233b72;
+  color: #ffffff;
+}
+
+:root[data-tema="claro"] .sync-status-barra {
+  background: #e4ecfc;
+  border-color: rgba(35, 59, 114, 0.3);
+  color: #16264d;
+}
+
+:root[data-tema="claro"] .sync-status-barra.conectado,
+:root[data-tema="claro"] .sync-status-barra.concluido {
+  background: rgba(15, 138, 80, 0.14);
+  border-color: #118a51;
+  color: #0b663b;
+}
+
+:root[data-tema="claro"] .sync-status-barra.erro,
+:root[data-tema="claro"] .sync-status-barra.expirado {
+  background: rgba(184, 37, 26, 0.12);
+  border-color: rgba(184, 37, 26, 0.45);
+  color: #a61e12;
+}
+
+:root[data-tema="claro"] .sync-timer-pill {
+  background: rgba(22, 38, 77, 0.12);
+  color: #16264d;
+}
+
+:root[data-tema="claro"] .sync-diagnostico-box {
+  background: rgba(196, 136, 0, 0.14);
+  border-color: #b87e00;
+  color: #6b4500;
+}
+
+:root[data-tema="claro"] .sync-diagnostico-box code {
+  background: #233b72;
+  color: #ffffff;
+}
+
+/* Editor de Gráficos em Ateliê Claro */
+:root[data-tema="claro"] .cabecalho .switch-modo-graf {
+  background: rgba(10, 20, 48, 0.45);
+  border-color: rgba(252, 241, 208, 0.32);
+}
+
+:root[data-tema="claro"] .cabecalho .btn-modo-graf {
+  color: rgba(252, 241, 208, 0.85);
+}
+
+:root[data-tema="claro"] .cabecalho .btn-modo-graf.ativo,
+:root[data-tema="claro"] .cabecalho .btn-graf-topo.primario {
+  background: #fcf1d0;
+  color: #16264d;
+  border-color: #fcf1d0;
+}
+
+:root[data-tema="claro"] .cabecalho .btn-graf-topo {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(252, 241, 208, 0.38);
+  color: #fcf1d0;
+}
+
+:root[data-tema="claro"] .graf-barra-ferramentas,
+:root[data-tema="claro"] .graf-barra-palco,
+:root[data-tema="claro"] .graf-barra-config-exec,
+:root[data-tema="claro"] .graf-painel-paleta,
+:root[data-tema="claro"] .graf-barra-execucao,
+:root[data-tema="claro"] .modal-box-graf {
+  background: #fffdf8;
+  border-color: rgba(22, 38, 77, 0.16);
+  color: #16264d;
+}
+
+:root[data-tema="claro"] .graf-palco-wrap,
+:root[data-tema="claro"] .graf-imp-secao,
+:root[data-tema="claro"] .graf-imp-canvas-wrap,
+:root[data-tema="claro"] .graf-dica-modal,
+:root[data-tema="claro"] .modal-graf-topo,
+:root[data-tema="claro"] .modal-graf-rodape {
+  background: #f2ebdc;
+  border-color: rgba(22, 38, 77, 0.16);
+  color: #16264d;
+}
+
+:root[data-tema="claro"] .btn-graf-tool,
+:root[data-tema="claro"] .btn-graf-acao-tool,
+:root[data-tema="claro"] .btn-graf-mini,
+:root[data-tema="claro"] .select-graf-mini,
+:root[data-tema="claro"] .graf-item-paleta,
+:root[data-tema="claro"] .graf-bloco-chip,
+:root[data-tema="claro"] .btn-graf-exec-nav,
+:root[data-tema="claro"] .btn-graf-sec,
+:root[data-tema="claro"] .btn-imp-prev {
+  background: #f2ebdc;
+  border-color: rgba(22, 38, 77, 0.2);
+  color: #16264d;
+}
+
+:root[data-tema="claro"] .btn-graf-tool.ativo,
+:root[data-tema="claro"] .btn-graf-acao-tool.ativo,
+:root[data-tema="claro"] .btn-graf-mini.ativo,
+:root[data-tema="claro"] .btn-graf-exec-nav.primario,
+:root[data-tema="claro"] .btn-graf-prim,
+:root[data-tema="claro"] .btn-imp-modo.ativo,
+:root[data-tema="claro"] .btn-imp-prev.ativo {
+  background: #233b72;
+  border-color: #233b72;
+  color: #ffffff;
+}
+
+:root[data-tema="claro"] .graf-item-paleta.ativa {
+  background: #e4ecfc;
+  border-color: #233b72;
+}
+
+:root[data-tema="claro"] .graf-dim-badge,
+:root[data-tema="claro"] .graf-paleta-qtd,
+:root[data-tema="claro"] .graf-coord-hud {
+  background: #e8eefb;
+  color: #16264d;
+  border-color: rgba(35, 59, 114, 0.28);
+}
+
+:root[data-tema="claro"] .graf-exec-direcao {
+  color: #1f4cb3;
+}
+
+:root[data-tema="claro"] .graf-autosave-status,
+:root[data-tema="claro"] .graf-imp-nota-rn02 {
+  color: #0b663b;
+}
+
+:root[data-tema="claro"] .toast-graficos {
+  background: #1b2e5a;
+  color: #fcf1d0;
+}
+
+/* ==========================================================================
+   TABELAS DE CONVERSÃO E MEDIDAS — TEMA CLARO (CONTRASTE WCAG AA)
+   ========================================================================== */
+:root[data-tema="claro"] .conv-toggle-unidade {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(252, 241, 208, 0.35);
+}
+
+:root[data-tema="claro"] .btn-conv-unidade {
+  color: rgba(252, 241, 208, 0.88);
+}
+
+:root[data-tema="claro"] .btn-conv-unidade.ativo {
+  background: #fcf1d0;
+  color: #16264d;
+}
+
+:root[data-tema="claro"] .conv-input-busca,
+:root[data-tema="claro"] .conv-select-sistema,
+:root[data-tema="claro"] .conv-input-valor {
+  background: #fffdf8;
+  border-color: rgba(22, 38, 77, 0.24);
+  color: #16264d;
+}
+
+:root[data-tema="claro"] .conv-input-busca::placeholder,
+:root[data-tema="claro"] .conv-busca-icone {
+  color: #546384;
+}
+
+:root[data-tema="claro"] .btn-conv-limpar-busca {
+  background: #e5ecf9;
+  border-color: rgba(22, 38, 77, 0.22);
+  color: #16264d;
+}
+
+:root[data-tema="claro"] .conv-tabs-lista {
+  background: #efe7d6;
+  border-color: rgba(22, 38, 77, 0.18);
+}
+
+:root[data-tema="claro"] .conv-tabs-indicador {
+  background: #233b72;
+  border-color: #233b72;
+}
+
+:root[data-tema="claro"] .conv-tab {
+  color: #16264d;
+}
+
+:root[data-tema="claro"] .conv-tab.ativo {
+  color: #ffffff;
+}
+
+:root[data-tema="claro"] .conv-card-rapido {
+  background: linear-gradient(135deg, #fffdf8 0%, #f3ecdd 100%);
+  border-color: rgba(22, 38, 77, 0.2);
+}
+
+:root[data-tema="claro"] .conv-titulo-rapido,
+:root[data-tema="claro"] .conv-res-valor,
+:root[data-tema="claro"] .conv-dica-contextual,
+:root[data-tema="claro"] .conv-tabela {
+  color: #16264d;
+}
+
+:root[data-tema="claro"] .conv-res-celula {
+  background: #ffffff;
+  border-color: rgba(22, 38, 77, 0.16);
+}
+
+:root[data-tema="claro"] .conv-res-celula.origem {
+  background: #e8eefb;
+  border-color: #233b72;
+}
+
+:root[data-tema="claro"] .conv-res-rotulo,
+:root[data-tema="claro"] .conv-res-sub,
+:root[data-tema="claro"] .conv-res-detalhe,
+:root[data-tema="claro"] .conv-res-vazio,
+:root[data-tema="claro"] .conv-status-busca,
+:root[data-tema="claro"] .conv-tabela .col-descricao,
+:root[data-tema="claro"] .conv-med-chip-resumo em {
+  color: #3d4d70;
+}
+
+:root[data-tema="claro"] .conv-res-rodape {
+  border-top-color: rgba(22, 38, 77, 0.14);
+}
+
+:root[data-tema="claro"] .btn-conv-inverter,
+:root[data-tema="claro"] .btn-conv-copiar,
+:root[data-tema="claro"] .conv-chip-sub,
+:root[data-tema="claro"] .conv-link-sub {
+  background: #f2ebdc;
+  border-color: rgba(22, 38, 77, 0.22);
+  color: #16264d;
+}
+
+:root[data-tema="claro"] .btn-conv-inverter:hover,
+:root[data-tema="claro"] .btn-conv-copiar:hover,
+:root[data-tema="claro"] .conv-chip-sub:hover,
+:root[data-tema="claro"] .conv-chip-sub.ativo,
+:root[data-tema="claro"] .conv-link-sub:hover {
+  background: #233b72;
+  border-color: #233b72;
+  color: #ffffff;
+}
+
+:root[data-tema="claro"] .btn-conv-copiar.copiado {
+  background: #dcf5e6;
+  border-color: #1f8a4c;
+  color: #0e5a2f;
+}
+
+:root[data-tema="claro"] .conv-badge-estoque {
+  background: #dcf5e6;
+  border-color: #1f8a4c;
+  color: #0e5a2f;
+}
+
+:root[data-tema="claro"] .conv-badge-aprox {
+  background: #fff3cd;
+  border-color: #b58105;
+  color: #6b4b00;
+}
+
+:root[data-tema="claro"] .conv-dica-contextual {
+  background: #f3ecdd;
+  border-color: rgba(22, 38, 77, 0.18);
+  border-left-color: #233b72;
+}
+
+:root[data-tema="claro"] .conv-tabela-wrapper {
+  background: #fffdf8;
+  border-color: rgba(22, 38, 77, 0.18);
+}
+
+:root[data-tema="claro"] .conv-tabela thead th {
+  background: #233b72;
+  color: #fcf1d0;
+  border-bottom-color: #16264d;
+}
+
+:root[data-tema="claro"] .conv-tabela tbody tr:nth-child(even) {
+  background: #f7f1e3;
+}
+
+:root[data-tema="claro"] .conv-tabela tbody tr:hover {
+  background: #e6eefc;
+}
+
+:root[data-tema="claro"] .conv-tabela tbody tr.linha-destacada {
+  background: #d7e4fb;
+  box-shadow: inset 4px 0 0 #233b72;
+}
+
+:root[data-tema="claro"] .conv-tabela tbody td {
+  border-bottom-color: rgba(22, 38, 77, 0.12);
+}
+
+:root[data-tema="claro"] .conv-med-chip-resumo {
+  background: #f2ebdc;
+  border-color: rgba(22, 38, 77, 0.16);
+}
+
+:root[data-tema="claro"] .conv-estado-vazio {
+  color: #16264d;
+}
+
+:root[data-tema="claro"] .btn-conv-limpar-vazio {
+  color: #16264d;
+  border-color: rgba(22, 38, 77, 0.3);
+}
+
+:root[data-tema="claro"] .toast-conversao {
+  background: #1b2e5a;
+  color: #fcf1d0;
+}
+
+@media (max-width: 600px) {
+  :root[data-tema="claro"] .conv-tabela tbody tr,
+  :root[data-tema="claro"] .conv-tabela tbody tr:nth-child(even) {
+    background: #fffdf8;
+    border-color: rgba(22, 38, 77, 0.18);
+  }
+
+  :root[data-tema="claro"] .conv-tabela tbody tr.linha-destacada {
+    background: #dce8fc;
+    border-color: #233b72;
+  }
+
+  :root[data-tema="claro"] .conv-tabela tbody td::before {
+    color: #4a5a7c;
+  }
+}
+
+/* ==========================================================================
+   POPUP CONECTADO "FERRAMENTAS" E PERSONALIZAÇÃO DA BARRA — TEMAS
+   ========================================================================== */
+:root[data-tema="noite"] .popup-ferramentas-lateral,
+:root[data-tema="noite"] .btn-popup-ferramenta-icone::after {
+  background-color: #050812;
+  border-color: rgba(252, 241, 208, 0.18);
+}
+
+:root[data-tema="claro"] .popup-ferramentas-lateral {
+  background-color: #1b2e5a;
+  border-color: rgba(252, 241, 208, 0.24);
+}
+
+:root[data-tema="claro"] .btn-popup-ferramenta-icone {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(252, 241, 208, 0.24);
+  color: #fcf1d0;
+}
+
+:root[data-tema="claro"] .btn-popup-ferramenta-icone:hover,
+:root[data-tema="claro"] .btn-popup-ferramenta-icone.ativo {
+  background: #fcf1d0;
+  border-color: #fcf1d0;
+  color: #16264d;
+}
+
+:root[data-tema="claro"] .btn-popup-ferramenta-icone::after {
+  background: #16264d;
+  color: #fcf1d0;
+  border-color: rgba(252, 241, 208, 0.28);
+}
+
+:root[data-tema="claro"] .badge-qtd-ferramentas {
+  background: rgba(252, 241, 208, 0.2);
+  border-color: rgba(252, 241, 208, 0.32);
+  color: #fcf1d0;
+}
+
+:root[data-tema="claro"] .pill-contagem-sidebar-cfg {
+  background: #e8eefb;
+  border-color: rgba(35, 59, 114, 0.24);
+  color: #16264d;
+}
+
+:root[data-tema="claro"] .item-ferramenta-sidebar-cfg {
+  background: #fffdf8;
+  border-color: rgba(22, 38, 77, 0.16);
+}
+
+:root[data-tema="claro"] .item-ferramenta-sidebar-cfg:hover {
+  background: #f2ebdc;
+  border-color: rgba(22, 38, 77, 0.28);
+}
+
+:root[data-tema="claro"] .item-ferramenta-sidebar-cfg.ativa {
+  background: #e6eefc;
+  border-color: #233b72;
+}
+
+:root[data-tema="claro"] .icone-item-ferramenta-sidebar {
+  background: rgba(35, 59, 114, 0.12);
+  color: #16264d;
+}
+
+:root[data-tema="claro"] .nome-item-ferramenta-sidebar {
+  color: #16264d;
+}
+
+:root[data-tema="claro"] .nota-ferramentas-sidebar-cfg {
+  color: #4a5a7c;
 }

@@ -93,19 +93,19 @@ const InventarioAgulhas = (() => {
         .filter((item) => assinaturasDemo.has(`${item.nome || ""}|${item.observacoes || ""}`))
         .map((item) => item.id);
 
-      if (idsDemo.length > 0) {
-        const database = await abrirBanco();
-        const tx = database.transaction(STORE_BIBLIOTECA, "readwrite");
-        const store = tx.objectStore(STORE_BIBLIOTECA);
-        idsDemo.forEach((id) => store.delete(id));
-        await new Promise((res) => {
-          tx.oncomplete = () => res();
-        });
-        if (typeof BancoDadosPT !== "undefined") BancoDadosPT.invalidarCache(STORE_BIBLIOTECA);
+      if (idsDemo.length > 0 && typeof BancoDadosPT !== "undefined") {
+        for (const id of idsDemo) {
+          await BancoDadosPT.excluir(STORE_BIBLIOTECA, id).catch(() => {});
+        }
+        BancoDadosPT.invalidarCache(STORE_BIBLIOTECA);
         dados = await dbObterTodos(true);
       }
     }
-    localStorage.setItem("ponto_trama_agulhas_demo_limpo", "true");
+    try {
+      localStorage.setItem("ponto_trama_agulhas_demo_limpo", "true");
+    } catch {
+      // ignora
+    }
 
     itensCache = dados || [];
     return itensCache;

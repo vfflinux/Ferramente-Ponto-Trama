@@ -1,0 +1,986 @@
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   EDITOR DE GRÁFICOS (PIXEL ART / TAPESTRY / C2C / JACQUARD)
+   Design System Ponto & Trama — HTML5 Canvas 60fps + Mobile-First
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+
+#secao-editor-graficos.secao-ferramenta {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  flex-direction: column;
+}
+
+.cabecalho-acoes-graficos {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+
+.switch-modo-graf {
+  display: inline-flex;
+  background: rgba(1, 7, 54, 0.72);
+  border: 1px solid var(--creme-opacidade-25);
+  border-radius: 10px;
+  padding: 3px;
+  gap: 3px;
+}
+
+.btn-modo-graf {
+  border: none;
+  background: transparent;
+  color: var(--creme-opacidade-75);
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 800;
+  padding: 6px 12px;
+  border-radius: 7px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn-modo-graf.ativo {
+  background: var(--cor-texto-principal);
+  color: var(--cor-fundo-profundo);
+}
+
+.btn-graf-topo {
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 9px;
+  border: 1px solid var(--creme-opacidade-30);
+  background: rgba(1, 7, 54, 0.65);
+  color: var(--cor-texto-principal);
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn-graf-topo:hover {
+  background: var(--cor-destaque-hover);
+  color: #ffffff;
+}
+
+.btn-graf-topo.primario {
+  background: var(--cor-texto-principal);
+  color: var(--cor-fundo-profundo);
+  border-color: var(--cor-texto-principal);
+}
+
+/* Container Principal */
+.conteiner-editor-graficos {
+  flex: 1;
+  min-height: 0;
+  padding: 12px 14px;
+  background: var(--cor-fundo-principal);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+.layout-editor-graficos {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 184px minmax(0, 1fr) 248px;
+  gap: 12px;
+}
+
+.layout-editor-graficos.modo-execucao-ativo {
+  grid-template-columns: minmax(0, 1fr) 248px;
+}
+
+/* 1. Barra de Ferramentas Esquerda */
+.graf-barra-ferramentas {
+  background: rgba(1, 7, 54, 0.48);
+  border: 1px solid rgba(252, 241, 208, 0.14);
+  border-radius: 14px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.graf-grupo-tools {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.graf-mini-titulo {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.7px;
+  color: var(--creme-opacidade-50);
+}
+
+.graf-grid-tools {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 5px;
+}
+
+.btn-graf-tool {
+  border: 1px solid rgba(252, 241, 208, 0.14);
+  background: rgba(34, 57, 111, 0.28);
+  color: var(--cor-texto-principal);
+  border-radius: 9px;
+  padding: 7px 4px;
+  font-family: inherit;
+  font-size: 15px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  transition: background-color 0.14s ease, border-color 0.14s ease;
+}
+
+.btn-graf-tool span {
+  font-size: 10.5px;
+  font-weight: 700;
+}
+
+.btn-graf-tool:hover {
+  border-color: var(--creme-opacidade-45);
+}
+
+.btn-graf-tool.ativo {
+  background: var(--cor-destaque-hover);
+  border-color: var(--cor-texto-principal);
+  color: #ffffff;
+}
+
+.graf-check-inline {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  color: var(--creme-opacidade-85);
+  cursor: pointer;
+  margin-top: 2px;
+}
+
+.graf-row-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
+}
+
+.btn-graf-acao-tool {
+  border: 1px solid rgba(252, 241, 208, 0.16);
+  background: rgba(34, 57, 111, 0.25);
+  color: var(--cor-texto-principal);
+  border-radius: 8px;
+  padding: 6px 4px;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn-graf-acao-tool:hover:not(:disabled) {
+  background: var(--cor-destaque-hover);
+  color: #ffffff;
+}
+
+.btn-graf-acao-tool.ativo {
+  background: var(--cor-texto-principal);
+  color: var(--cor-fundo-profundo);
+  border-color: var(--cor-texto-principal);
+}
+
+.btn-graf-acao-tool:disabled {
+  opacity: 0.36;
+  cursor: not-allowed;
+}
+
+/* 2. Área Central (Canvas + Controles) */
+.graf-area-central {
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.graf-barra-palco,
+.graf-barra-config-exec {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 7px 11px;
+  border-radius: 11px;
+  background: rgba(1, 7, 54, 0.48);
+  border: 1px solid rgba(252, 241, 208, 0.14);
+  flex-shrink: 0;
+}
+
+.graf-grupo-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.graf-dim-badge {
+  font-size: 12px;
+  font-weight: 800;
+  padding: 3px 9px;
+  border-radius: 7px;
+  background: rgba(34, 57, 111, 0.52);
+  color: var(--cor-texto-principal);
+}
+
+.graf-resize-mini {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.graf-zoom-pct {
+  font-size: 12px;
+  font-weight: 800;
+  min-width: 40px;
+  text-align: center;
+  color: var(--cor-texto-principal);
+}
+
+.btn-graf-mini,
+.select-graf-mini {
+  height: 29px;
+  padding: 0 9px;
+  border-radius: 7px;
+  border: 1px solid var(--creme-opacidade-20);
+  background: rgba(34, 57, 111, 0.34);
+  color: var(--cor-texto-principal);
+  font-family: inherit;
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-graf-mini:hover {
+  background: var(--cor-destaque-hover);
+  color: #ffffff;
+}
+
+.btn-graf-mini.ativo {
+  background: var(--cor-destaque-hover);
+  border-color: var(--cor-texto-principal);
+  color: #ffffff;
+}
+
+.graf-autosave-status {
+  font-size: 11px;
+  font-weight: 700;
+  color: #7bed9f;
+}
+
+.graf-lbl-exec {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--creme-opacidade-75);
+}
+
+.graf-palco-wrap {
+  flex: 1;
+  min-height: 220px;
+  position: relative;
+  border-radius: 14px;
+  background: rgba(1, 7, 54, 0.56);
+  border: 1px solid rgba(252, 241, 208, 0.14);
+  overflow: hidden;
+  touch-action: none;
+}
+
+.canvas-editor-graficos {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+}
+
+.graf-coord-hud {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(1, 7, 54, 0.82);
+  border: 1px solid rgba(252, 241, 208, 0.22);
+  color: var(--cor-texto-principal);
+  font-size: 11.5px;
+  font-weight: 700;
+  pointer-events: none;
+}
+
+/* Barra Fixa do Modo Execução (RF20 + RNF02) */
+.graf-barra-execucao {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 11px 13px;
+  border-radius: 14px;
+  background: rgba(1, 7, 54, 0.68);
+  border: 1.5px solid rgba(128, 171, 255, 0.42);
+  flex-shrink: 0;
+}
+
+.graf-exec-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.graf-exec-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.graf-exec-info strong {
+  font-size: 16px;
+  font-weight: 900;
+  color: var(--cor-texto-principal);
+}
+
+.graf-exec-direcao {
+  font-size: 12px;
+  font-weight: 700;
+  color: #9dc0ff;
+}
+
+.graf-exec-nav {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-graf-exec-nav {
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: 11px;
+  border: 1.5px solid var(--creme-opacidade-30);
+  background: rgba(34, 57, 111, 0.55);
+  color: var(--cor-texto-principal);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.btn-graf-exec-nav.primario {
+  background: var(--cor-texto-principal);
+  color: var(--cor-fundo-profundo);
+  border-color: var(--cor-texto-principal);
+}
+
+.btn-graf-exec-nav:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.graf-exec-blocos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-height: 92px;
+  overflow-y: auto;
+}
+
+.graf-bloco-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 9px;
+  border: 1px solid var(--creme-opacidade-25);
+  background: rgba(34, 57, 111, 0.38);
+  color: var(--cor-texto-principal);
+  font-family: inherit;
+  font-size: 12.5px;
+  cursor: pointer;
+}
+
+.graf-bloco-chip.feito {
+  opacity: 0.45;
+  text-decoration: line-through;
+  background: rgba(61, 214, 140, 0.16);
+  border-color: #3dd68c;
+}
+
+.graf-bloco-dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+  border: 1px solid rgba(0, 0, 0, 0.35);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.graf-bloco-check {
+  color: #7bed9f;
+  font-weight: 900;
+}
+
+/* 3. Painel Direito: Paleta & Fios */
+.graf-painel-paleta {
+  background: rgba(1, 7, 54, 0.48);
+  border: 1px solid rgba(252, 241, 208, 0.14);
+  border-radius: 14px;
+  padding: 11px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.graf-paleta-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.graf-paleta-topo h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--cor-texto-principal);
+}
+
+.graf-paleta-topo span {
+  font-size: 11px;
+  color: var(--creme-opacidade-65);
+}
+
+.graf-paleta-acoes-topo {
+  display: flex;
+  gap: 5px;
+}
+
+.graf-lista-paleta {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.graf-item-paleta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 8px;
+  border-radius: 10px;
+  border: 1.5px solid rgba(252, 241, 208, 0.12);
+  background: rgba(34, 57, 111, 0.24);
+  cursor: pointer;
+}
+
+.graf-item-paleta.ativa {
+  border-color: var(--cor-texto-principal);
+  background: rgba(44, 74, 145, 0.55);
+}
+
+.graf-swatch-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  border: 1.5px solid rgba(0, 0, 0, 0.35);
+  font-size: 12px;
+  font-weight: 900;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.graf-paleta-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.graf-paleta-info strong {
+  font-size: 12.5px;
+  color: var(--cor-texto-principal);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.graf-paleta-info span {
+  font-size: 10.5px;
+  color: var(--creme-opacidade-65);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.graf-paleta-qtd {
+  font-size: 11px;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: rgba(1, 7, 54, 0.55);
+  color: var(--cor-texto-principal);
+  font-variant-numeric: tabular-nums;
+}
+
+.btn-graf-edit-cor {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  border: 1px solid var(--creme-opacidade-20);
+  background: transparent;
+  color: var(--cor-texto-principal);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.btn-graf-edit-cor:hover {
+  background: var(--cor-destaque-hover);
+  color: #ffffff;
+}
+
+/* Modais do Editor de Gráficos */
+.modal-overlay-graf {
+  position: fixed;
+  inset: 0;
+  z-index: 150;
+  background: rgba(1, 7, 54, 0.78);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.modal-box-graf {
+  width: 100%;
+  max-width: 500px;
+  max-height: 92vh;
+  background: #0d1c42;
+  border: 1px solid rgba(252, 241, 208, 0.24);
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: var(--sombra-lg);
+}
+
+.modal-box-graf.largo {
+  max-width: 920px;
+}
+
+.modal-graf-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  background: rgba(1, 7, 54, 0.6);
+  border-bottom: 1px solid var(--creme-opacidade-15);
+}
+
+.modal-graf-topo h3 {
+  margin: 0;
+  font-size: 16px;
+  color: var(--cor-texto-principal);
+}
+
+.btn-fechar-graf {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: var(--cor-texto-principal);
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.modal-graf-corpo {
+  padding: 16px 18px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.modal-graf-rodape {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 12px 18px;
+  background: rgba(1, 7, 54, 0.5);
+  border-top: 1px solid var(--creme-opacidade-15);
+}
+
+.graf-form-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.graf-campo {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.graf-campo label {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--creme-opacidade-85);
+}
+
+.input-graf {
+  height: 38px;
+  padding: 0 11px;
+  border-radius: 9px;
+  border: 1px solid var(--creme-opacidade-25);
+  background: rgba(1, 7, 54, 0.7);
+  color: var(--cor-texto-principal);
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.graf-hex-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.graf-hex-row input[type="color"] {
+  width: 44px;
+  height: 38px;
+  padding: 2px;
+  border-radius: 8px;
+  border: 1px solid var(--creme-opacidade-25);
+  background: transparent;
+  cursor: pointer;
+}
+
+.graf-dica-modal {
+  font-size: 12px;
+  color: var(--creme-opacidade-70);
+  background: rgba(1, 7, 54, 0.42);
+  padding: 10px 12px;
+  border-radius: 9px;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.btn-graf-prim,
+.btn-graf-sec,
+.btn-graf-perigo {
+  height: 38px;
+  padding: 0 16px;
+  border-radius: 9px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.btn-graf-prim {
+  border: none;
+  background: var(--cor-texto-principal);
+  color: var(--cor-fundo-profundo);
+}
+
+.btn-graf-prim:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn-graf-sec {
+  border: 1px solid var(--creme-opacidade-25);
+  background: transparent;
+  color: var(--cor-texto-principal);
+}
+
+.btn-graf-perigo {
+  border: 1px solid rgba(231, 76, 60, 0.55);
+  background: rgba(231, 76, 60, 0.16);
+  color: #ff9a92;
+}
+
+/* Importador de Imagens */
+.graf-imp-barra-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.graf-pills-modo-imp {
+  display: inline-flex;
+  padding: 3px;
+  border-radius: 10px;
+  background: rgba(1, 7, 54, 0.68);
+  border: 1px solid var(--creme-opacidade-20);
+  gap: 3px;
+}
+
+.btn-imp-modo {
+  border: none;
+  background: transparent;
+  color: var(--creme-opacidade-75);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 7px 11px;
+  border-radius: 7px;
+  cursor: pointer;
+}
+
+.btn-imp-modo.ativo {
+  background: var(--cor-destaque-hover);
+  color: #ffffff;
+}
+
+.graf-imp-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+}
+
+.graf-imp-preview-col {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.graf-imp-abas-prev {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.btn-imp-prev {
+  border: 1px solid var(--creme-opacidade-20);
+  background: rgba(34, 57, 111, 0.28);
+  color: var(--creme-opacidade-75);
+  font-family: inherit;
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 7px 8px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.btn-imp-prev.ativo {
+  background: var(--cor-destaque-hover);
+  color: #ffffff;
+  border-color: var(--cor-texto-principal);
+}
+
+.graf-imp-canvas-wrap {
+  min-height: 240px;
+  background: rgba(1, 7, 54, 0.72);
+  border: 1px solid var(--creme-opacidade-18);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  overflow: auto;
+}
+
+.graf-imp-canvas-wrap canvas {
+  max-width: 100%;
+  height: auto;
+}
+
+.graf-imp-nota-rn02 {
+  font-size: 11.5px;
+  color: #7bed9f;
+}
+
+.graf-imp-controles-col {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.graf-imp-secao {
+  background: rgba(1, 7, 54, 0.45);
+  border: 1px solid var(--creme-opacidade-15);
+  border-radius: 11px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.graf-imp-secao > strong,
+.graf-imp-secao-topo strong {
+  font-size: 12px;
+  color: var(--cor-texto-principal);
+}
+
+.graf-imp-secao-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.graf-sliders-crop {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.graf-sliders-crop label {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 11px;
+  color: var(--creme-opacidade-75);
+}
+
+.graf-sliders-crop span {
+  font-weight: 800;
+  color: var(--cor-texto-principal);
+}
+
+.graf-imp-cores-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+.graf-imp-cor-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 7px;
+  border-radius: 8px;
+  background: rgba(34, 57, 111, 0.28);
+}
+
+.graf-imp-swatch {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  flex-shrink: 0;
+}
+
+.graf-imp-cor-txt {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.graf-imp-cor-txt strong {
+  font-size: 11.5px;
+  color: var(--cor-texto-principal);
+}
+
+.graf-imp-cor-txt small {
+  font-size: 10.5px;
+  color: var(--creme-opacidade-65);
+}
+
+.graf-imp-vazio {
+  text-align: center;
+  padding: 36px 16px;
+  color: var(--creme-opacidade-70);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.graf-imp-vazio span {
+  font-size: 36px;
+}
+
+.graf-checks-export {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.graf-checks-export label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--cor-texto-principal);
+  cursor: pointer;
+}
+
+.toast-graficos {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  padding: 10px 16px;
+  border-radius: 10px;
+  background: #08153b;
+  border: 1px solid rgba(252, 241, 208, 0.32);
+  color: var(--cor-texto-principal);
+  font-size: 13px;
+  font-weight: 700;
+  box-shadow: var(--sombra-lg);
+  opacity: 0;
+  transform: translateY(14px);
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 230;
+}
+
+.toast-graficos.visivel {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (max-width: 1024px) {
+  .layout-editor-graficos,
+  .layout-editor-graficos.modo-execucao-ativo {
+    grid-template-columns: 1fr;
+    overflow-y: auto;
+  }
+
+  .graf-grid-tools {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  .graf-imp-grid {
+    grid-template-columns: 1fr;
+  }
+}

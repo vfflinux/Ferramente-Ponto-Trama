@@ -43,7 +43,7 @@ const LeitorReceitas = (() => {
   }
 
   function renderizar() {
-    const modo = estado.modo === "arquivo" ? "arquivo" : "texto";
+    const modo = ["texto", "arquivo", "tradutor", "dicionario"].includes(estado.modo) ? estado.modo : "texto";
     document.querySelectorAll("#secao-receitas .btn-modo-receita").forEach((btn) => {
       const ativo = btn.dataset.modoReceita === modo;
       btn.classList.toggle("ativo", ativo);
@@ -52,8 +52,16 @@ const LeitorReceitas = (() => {
 
     const pTexto = document.getElementById("painel-receita-texto");
     const pArq = document.getElementById("painel-receita-arquivo");
+    const pTrad = document.getElementById("painel-receita-tradutor");
+    const pDic = document.getElementById("painel-receita-dicionario");
     if (pTexto) pTexto.style.display = modo === "texto" ? "grid" : "none";
     if (pArq) pArq.style.display = modo === "arquivo" ? "flex" : "none";
+    if (pTrad) pTrad.style.display = modo === "tradutor" ? "flex" : "none";
+    if (pDic) pDic.style.display = modo === "dicionario" ? "flex" : "none";
+
+    if ((modo === "tradutor" || modo === "dicionario") && typeof TradutorReceitas !== "undefined") {
+      TradutorReceitas.init();
+    }
 
     // Texto e linhas clicáveis
     const ta = document.getElementById("input-receita-texto-global");
@@ -138,9 +146,12 @@ const LeitorReceitas = (() => {
   function vincularEventos() {
     document.querySelectorAll("#secao-receitas .btn-modo-receita").forEach((btn) => {
       btn.addEventListener("click", () => {
-        estado.modo = btn.dataset.modoReceita === "arquivo" ? "arquivo" : "texto";
+        const alvo = btn.dataset.modoReceita || "texto";
+        estado.modo = ["texto", "arquivo", "tradutor", "dicionario"].includes(alvo) ? alvo : "texto";
         renderizar();
-        persistir();
+        if (estado.modo === "texto" || estado.modo === "arquivo") {
+          persistir();
+        }
       });
     });
 
@@ -223,8 +234,17 @@ const LeitorReceitas = (() => {
     renderizar();
   }
 
+  function definirTexto(novoTexto) {
+    estado.texto = String(novoTexto || "");
+    estado.linha_atual = 0;
+    estado.modo = "texto";
+    renderizar();
+    persistir();
+  }
+
   return {
     init,
-    carregarDoProjeto
+    carregarDoProjeto,
+    definirTexto
   };
 })();

@@ -85,7 +85,8 @@ const ProjetoContexto = (() => {
               ? Number(p.agulha_id)
               : null,
         agulha_mm: String(materiaisOrig.agulha_mm || "").trim(),
-        agulha_nome: String(materiaisOrig.agulha_nome || "").trim()
+        agulha_nome: String(materiaisOrig.agulha_nome || "").trim(),
+        baixa_estoque_realizada: Boolean(materiaisOrig.baixa_estoque_realizada)
       },
       contadores: Array.isArray(p.contadores) && p.contadores.length > 0
         ? p.contadores.map((c, idx) => ({
@@ -111,6 +112,7 @@ const ProjetoContexto = (() => {
       galeria: Array.isArray(p.galeria) ? p.galeria.map((g) => ({ ...g })) : [],
       amostra: p.amostra && typeof p.amostra === "object" ? { ...p.amostra } : {},
       precificacao: p.precificacao && typeof p.precificacao === "object" ? { ...p.precificacao } : {},
+      grafico: p.grafico && typeof p.grafico === "object" ? { ...p.grafico } : {},
       criado_em: p.criado_em || new Date().toISOString(),
       atualizado_em: p.atualizado_em || new Date().toISOString()
     };
@@ -285,6 +287,9 @@ const ProjetoContexto = (() => {
       if (jaAberta("amostra") && typeof CalculadoraAmostra !== "undefined" && typeof CalculadoraAmostra.carregarDoProjeto === "function") {
         executarSeguro("CalculadoraAmostra", () => CalculadoraAmostra.carregarDoProjeto(normalizado));
       }
+      if (jaAberta("editor-graficos") && typeof EditorGraficos !== "undefined" && typeof EditorGraficos.carregarDoProjeto === "function") {
+        executarSeguro("EditorGraficos", () => EditorGraficos.carregarDoProjeto(normalizado));
+      }
     } finally {
       setTimeout(() => {
         hidratando = false;
@@ -335,7 +340,7 @@ const ProjetoContexto = (() => {
       projetoAtivo.tempo_gasto_seg = Math.max(0, Math.floor(Number(valor) || 0));
     } else if (chaveSecao === "contadores" || chaveSecao === "etapas" || chaveSecao === "galeria") {
       projetoAtivo[chaveSecao] = Array.isArray(valor) ? valor : [];
-    } else if (chaveSecao === "receita" || chaveSecao === "amostra" || chaveSecao === "precificacao" || chaveSecao === "materiais") {
+    } else if (chaveSecao === "receita" || chaveSecao === "amostra" || chaveSecao === "precificacao" || chaveSecao === "materiais" || chaveSecao === "grafico") {
       projetoAtivo[chaveSecao] = { ...(projetoAtivo[chaveSecao] || {}), ...(valor || {}) };
     } else {
       projetoAtivo[chaveSecao] = valor;

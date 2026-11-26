@@ -25,6 +25,9 @@ from pathlib import Path
 from urllib.parse import unquote, urlparse
 
 BASE_DIR = Path(__file__).resolve().parent
+if str(BASE_DIR) not in sys.path:
+    sys.path.insert(0, str(BASE_DIR))
+import sync_wifi  # noqa: E402
 ROOT_DIR = BASE_DIR.parent
 FRONTEND_DIR = ROOT_DIR / "frontend"
 FRONTEND_RESOLVED = FRONTEND_DIR.resolve()
@@ -153,12 +156,50 @@ def linha_para_dict(colecao: str, row: sqlite3.Row) -> dict:
         d["galeria"] = extras.get("galeria") if isinstance(extras.get("galeria"), list) else []
         d["amostra"] = extras.get("amostra") if isinstance(extras.get("amostra"), dict) else {}
         d["precificacao"] = extras.get("precificacao") if isinstance(extras.get("precificacao"), dict) else {}
+        d["grafico"] = extras.get("grafico") if isinstance(extras.get("grafico"), dict) else {}
     return d
 
 
 def listar_colecao(conn: sqlite3.Connection, colecao: str) -> list[dict]:
     rows = conn.execute(f"SELECT * FROM {colecao} ORDER BY id DESC").fetchall()
     return [linha_para_dict(colecao, r) for r in rows]
+
+
+def exportar_todas_colecoes() -> dict:
+    with conectar_banco() as conn:
+        return {
+            "fios": listar_colecao(conn, "fios"),
+            "itens_biblioteca": listar_colecao(conn, "itens_biblioteca"),
+            "banco_amostras": listar_colecao(conn, "banco_amostras"),
+            "projetos": listar_colecao(conn, "projetos"),
+        }
+
+
+def substituir_todas_colecoes(dados: dict) -> dict:
+    """Substitui atomicamente todas as coleções no SQLite mantendo integridade de FKs."""
+    resumo = {"fios": 0, "itens_biblioteca": 0, "banco_amostras": 0, "projetos": 0}
+    with conectar_banco() as conn:
+        conn.execute("DELETE FROM projetos")
+        conn.execute("DELETE FROM banco_amostras")
+        conn.execute("DELETE FROM itens_biblioteca")
+        conn.execute("DELETE FROM fios")
+        for col in ("fios", "itens_biblioteca", "banco_amostras", "projetos"):
+            itens = dados.get(col) if isinstance(dados.get(col), list) else []
+            for item in itens:
+                if isinstance(item, dict):
+                    copia = dict(item)
+                    copia.pop("id", None)
+                    inserir_ou_atualizar(conn, col, copia, None)
+                    resumo[col] += 1
+        conn.commit()
+    return resumo
+
+
+SYNC_MANAGER = sync_wifi.GerenciadorSyncWifi(
+    database_dir=DATABASE_DIR,
+    exportar_fn=exportar_todas_colecoes,
+    aplicar_fn=substituir_todas_colecoes,
+)
 
 
 def inserir_ou_atualizar(conn: sqlite3.Connection, colecao: str, dados: dict, id_url: int | None = None) -> dict:
@@ -282,6 +323,7 @@ def inserir_ou_atualizar(conn: sqlite3.Connection, colecao: str, dados: dict, id
             "galeria": dados.get("galeria") if isinstance(dados.get("galeria"), list) else [],
             "amostra": dados.get("amostra") if isinstance(dados.get("amostra"), dict) else {},
             "precificacao": dados.get("precificacao") if isinstance(dados.get("precificacao"), dict) else {},
+            "grafico": dados.get("grafico") if isinstance(dados.get("grafico"), dict) else {},
         }
 
         prazo = str(dados.get("prazo_estimado") or dados.get("data_entrega") or "").strip()
@@ -442,7 +484,16 @@ class PontoTramaHandler(BaseHTTPRequestHandler):
             return
 
         rota, item_id = self.parsear_rota_api()
+        path_limpo = parsed.path.rstrip("/")
         try:
+            if path_limpo == "/api/sync/status":
+                self.enviar_json(SYNC_MANAGER.obter_status())
+                return
+
+            if path_limpo == "/api/sync/rollback-info":
+                self.enviar_json(SYNC_MANAGER.info_rollback())
+                return
+
             if rota == "saude":
                 self.enviar_json({"ok": True, "banco": "sqlite", "arquivo": str(DB_PATH.name)})
                 return
@@ -478,8 +529,34 @@ class PontoTramaHandler(BaseHTTPRequestHandler):
 
     def do_POST(self) -> None:
         rota, _ = self.parsear_rota_api()
+        path_limpo = urlparse(self.path).path.rstrip("/")
         try:
             corpo = self.ler_json_corpo()
+
+            # Endpoints de Sincronização Wi-Fi Local (RF01-RF06, RNF01-RNF05)
+            if path_limpo == "/api/sync/iniciar":
+                direcao = corpo.get("direcao", "mesclar") if isinstance(corpo, dict) else "mesclar"
+                prefs_pc = corpo.get("preferencias") if isinstance(corpo, dict) else None
+                status_sync = SYNC_MANAGER.iniciar(direcao=str(direcao), preferencias_pc=prefs_pc)
+                self.enviar_json(status_sync)
+                return
+
+            if path_limpo == "/api/sync/direcao":
+                direcao = corpo.get("direcao", "mesclar") if isinstance(corpo, dict) else "mesclar"
+                self.enviar_json(SYNC_MANAGER.alterar_direcao(str(direcao)))
+                return
+
+            if path_limpo == "/api/sync/encerrar":
+                self.enviar_json(SYNC_MANAGER.encerrar())
+                return
+
+            if path_limpo == "/api/sync/rollback":
+                ok, msg, extra = SYNC_MANAGER.executar_rollback()
+                if not ok:
+                    self.enviar_json({"ok": False, "erro": msg}, HTTPStatus.BAD_REQUEST)
+                    return
+                self.enviar_json({"ok": True, "mensagem": msg, **(extra or {})})
+                return
 
             # Importação inicial em lote (migração automática do IndexedDB -> SQLite)
             if rota == "sincronizar-inicial" and isinstance(corpo, dict):
@@ -581,6 +658,7 @@ def main() -> None:
     except KeyboardInterrupt:
         print("\nServidor encerrado.")
     finally:
+        SYNC_MANAGER.encerrar()
         servidor.server_close()
 
 

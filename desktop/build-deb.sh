@@ -38,6 +38,7 @@ if [ -f "$ROOT_DIR/scripts/otimizar-build.py" ]; then
   python3 "$ROOT_DIR/scripts/otimizar-build.py" "$OPT_DIR/frontend"
 fi
 cp "$ROOT_DIR/backend/server.py" "$OPT_DIR/backend/server.py"
+cp "$ROOT_DIR/backend/sync_wifi.py" "$OPT_DIR/backend/sync_wifi.py"
 cp "$ROOT_DIR/backend/database/schema.sql" "$OPT_DIR/backend/database/schema.sql"
 cp "$ROOT_DIR/desktop/app.py" "$OPT_DIR/desktop/app.py"
 chmod 755 "$OPT_DIR/desktop/app.py" "$OPT_DIR/backend/server.py"

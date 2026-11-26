@@ -1084,6 +1084,7 @@
 .ficha-etapas .ficha-aba { background: rgba(180, 142, 173, 0.28); color: #ebd0e6; }
 .ficha-amostra .ficha-aba { background: rgba(103, 212, 232, 0.24); color: #aef0ff; }
 .ficha-precificacao .ficha-aba { background: rgba(252, 241, 208, 0.22); color: #fcf1d0; }
+.ficha-grafico .ficha-aba { background: rgba(235, 95, 112, 0.28); color: #ffb3ba; }
 
 .ficha-conteudo {
   font-size: 12.5px;
@@ -2544,6 +2545,91 @@
   font-size: 13px;
   font-weight: 800;
   cursor: pointer;
+}
+
+/* Modal de Baixa Automática de Estoque ao Concluir Projeto */
+.modal-baixa-estoque-box {
+  max-width: 470px;
+  text-align: left;
+}
+
+.modal-baixa-estoque-box h3 {
+  font-size: 18px;
+  margin-bottom: 6px;
+}
+
+.texto-baixa-estoque-sub {
+  margin: 0 0 14px 0 !important;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.lista-itens-baixa-estoque {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 260px;
+  overflow-y: auto;
+  margin-bottom: 16px;
+}
+
+.item-baixa-estoque {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(1, 7, 54, 0.52);
+  border: 1px solid rgba(252, 241, 208, 0.16);
+  cursor: pointer;
+}
+
+.item-baixa-estoque input[type="checkbox"] {
+  width: 17px;
+  height: 17px;
+  accent-color: #3dd68c;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.item-baixa-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.item-baixa-info strong {
+  font-size: 13px;
+  color: var(--cor-texto-principal);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.item-baixa-info span {
+  font-size: 11.5px;
+  color: var(--creme-opacidade-70);
+}
+
+.item-baixa-badge {
+  font-size: 11.5px;
+  font-weight: 800;
+  padding: 4px 8px;
+  border-radius: 7px;
+  background: rgba(243, 156, 18, 0.18);
+  border: 1px solid rgba(243, 156, 18, 0.42);
+  color: #ffd670;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.acoes-modal-confirmar {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
 .lightbox-proj-box {

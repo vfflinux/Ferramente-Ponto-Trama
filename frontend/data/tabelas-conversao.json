@@ -1,0 +1,201 @@
+{
+  "agulhas_croche": [
+    { "mm": 2.0, "us": "—", "uk": "14", "letra": "—", "uso_comum": "Rendas, barrados, fios super finos" },
+    { "mm": 2.25, "us": "B-1", "uk": "13", "letra": "B", "uso_comum": "Amigurumis pequenos, fios finos" },
+    { "mm": 2.5, "us": "—", "uk": "12", "letra": "—", "uso_comum": "Amigurumis padrão, barrados" },
+    { "mm": 2.75, "us": "C-2", "uk": "12", "letra": "C", "uso_comum": "Amigurumis, vestuário leve" },
+    { "mm": 3.0, "us": "—", "uk": "11", "letra": "—", "uso_comum": "Vestuário de verão, amigurumis" },
+    { "mm": 3.25, "us": "D-3", "uk": "10", "letra": "D", "uso_comum": "Peças leves de algodão" },
+    { "mm": 3.5, "us": "E-4", "uk": "9", "letra": "E", "uso_comum": "Blusas, sousplats finos, barbante nº 4" },
+    { "mm": 3.75, "us": "F-5", "uk": "9", "letra": "F", "uso_comum": "Acessórios, mantas leves" },
+    { "mm": 4.0, "us": "G-6", "uk": "8", "letra": "G", "uso_comum": "Barbante nº 6, lãs médias, bolsas" },
+    { "mm": 4.5, "us": "7", "uk": "7", "letra": "—", "uso_comum": "Lãs acrílicas (ex: Mollet), suéteres" },
+    { "mm": 5.0, "us": "H-8", "uk": "6", "letra": "H", "uso_comum": "Cachecóis, toucas, tapetes" },
+    { "mm": 5.5, "us": "I-9", "uk": "5", "letra": "I", "uso_comum": "Mantas, suéteres quentes" },
+    { "mm": 6.0, "us": "J-10", "uk": "4", "letra": "J", "uso_comum": "Fios grossos, barbante nº 8" },
+    { "mm": 6.5, "us": "K-10.5", "uk": "3", "letra": "K", "uso_comum": "Golas volumosas, tapetes pesados" },
+    { "mm": 7.0, "us": "—", "uk": "2", "letra": "—", "uso_comum": "Fio de malha fino, cestos" },
+    { "mm": 8.0, "us": "L-11", "uk": "0", "letra": "L", "uso_comum": "Fio de malha médio, mantas chunky" },
+    { "mm": 9.0, "us": "M/N-13", "uk": "00", "letra": "M/N", "uso_comum": "Cestos estruturados, bolsas de malha" },
+    { "mm": 10.0, "us": "N/P-15", "uk": "000", "letra": "N/P", "uso_comum": "Fio de malha grosso, tapetes maxi" },
+    { "mm": 12.0, "us": "P-16", "uk": "—", "letra": "P", "uso_comum": "Maxi crochê, fios jumbo" },
+    { "mm": 15.0, "us": "Q", "uk": "—", "letra": "Q", "uso_comum": "Mantas gigantes, puffes" }
+  ],
+
+  "espessura_fios": [
+    {
+      "cyc": 0,
+      "nome_internacional": "Lace",
+      "nome_pt": "Renda / Super Fino",
+      "tex_min": 0,
+      "tex_max": 150,
+      "agulha_sugerida_mm": "1.25 – 2.25",
+      "exemplos_br": ["Cléa 1000 (151)", "Cléa 5 (196 - transição)", "Anne dupla não se aplica"]
+    },
+    {
+      "cyc": 1,
+      "nome_internacional": "Super Fine (Fingering / Sock)",
+      "nome_pt": "Fino / Bebê",
+      "tex_min": 151,
+      "tex_max": 250,
+      "agulha_sugerida_mm": "2.25 – 3.5",
+      "exemplos_br": ["Mais Bebê (200)", "Fio Brisa (200)", "Cléa 5 (196)"]
+    },
+    {
+      "cyc": 2,
+      "nome_internacional": "Fine (Sport / Baby)",
+      "nome_pt": "Leve / Sport",
+      "tex_min": 251,
+      "tex_max": 380,
+      "agulha_sugerida_mm": "3.5 – 4.5",
+      "exemplos_br": ["Anne (295)", "Charme (378)", "Bela (370)"]
+    },
+    {
+      "cyc": 3,
+      "nome_internacional": "Light (DK / Light Worsted)",
+      "nome_pt": "Médio Leve (DK)",
+      "tex_min": 381,
+      "tex_max": 500,
+      "agulha_sugerida_mm": "4.5 – 5.5",
+      "exemplos_br": ["Amigurumi (492)", "Mollet (500)", "Cisne TodoDia (400)"]
+    },
+    {
+      "cyc": 4,
+      "nome_internacional": "Medium (Worsted / Aran)",
+      "nome_pt": "Médio",
+      "tex_min": 501,
+      "tex_max": 750,
+      "agulha_sugerida_mm": "5.5 – 6.5",
+      "exemplos_br": ["Barroco Maxcolor nº 4 (590)", "Lã Família (375 a 500)", "Flash (500)"]
+    },
+    {
+      "cyc": 5,
+      "nome_internacional": "Bulky (Chunky)",
+      "nome_pt": "Grosso",
+      "tex_min": 751,
+      "tex_max": 1100,
+      "agulha_sugerida_mm": "6.5 – 9.0",
+      "exemplos_br": ["Barroco Maxcolor nº 6 (885)", "Urbano (909)", "Barbante nº 6"]
+    },
+    {
+      "cyc": 6,
+      "nome_internacional": "Super Bulky",
+      "nome_pt": "Super Grosso",
+      "tex_min": 1101,
+      "tex_max": 1800,
+      "agulha_sugerida_mm": "9.0 – 15.0",
+      "exemplos_br": ["Barroco nº 8 (1180)", "Fio Náutico 5mm", "Fio de Malha Extra Leve"]
+    },
+    {
+      "cyc": 7,
+      "nome_internacional": "Jumbo",
+      "nome_pt": "Jumbo / Maxi",
+      "tex_min": 1801,
+      "tex_max": 9999,
+      "agulha_sugerida_mm": "15.0+",
+      "exemplos_br": ["Fio de Malha Tradicional", "Lã Maxi / Braço"]
+    }
+  ],
+
+  "medidas_padrao": {
+    "toucas": {
+      "dica": "Subtraia de 2 a 4 cm da circunferência real da cabeça para garantir que a touca não fique larga após o uso.",
+      "itens": [
+        { "tamanho": "Prematuro", "circunferencia_cm": [30, 33], "diametro_coroa_cm": [9.5, 10.5], "altura_cm": [11, 12] },
+        { "tamanho": "Recém-nascido (0–3m)", "circunferencia_cm": [33, 36], "diametro_coroa_cm": [10.5, 11.5], "altura_cm": [13, 14] },
+        { "tamanho": "Bebê (3–6m)", "circunferencia_cm": [36, 41], "diametro_coroa_cm": [11.5, 13.0], "altura_cm": [14, 15] },
+        { "tamanho": "Bebê (6–12m)", "circunferencia_cm": [41, 46], "diametro_coroa_cm": [13.0, 14.5], "altura_cm": [15, 16.5] },
+        { "tamanho": "Infantil (1–3 anos)", "circunferencia_cm": [46, 49], "diametro_coroa_cm": [14.5, 15.5], "altura_cm": [17, 18] },
+        { "tamanho": "Criança (4–10 anos)", "circunferencia_cm": [49, 52], "diametro_coroa_cm": [15.5, 16.5], "altura_cm": [18, 19.5] },
+        { "tamanho": "Adolescente / Adulto P", "circunferencia_cm": [53, 55], "diametro_coroa_cm": [16.5, 17.5], "altura_cm": [20, 21] },
+        { "tamanho": "Adulto M", "circunferencia_cm": [56, 58], "diametro_coroa_cm": [17.5, 18.5], "altura_cm": [21, 22] },
+        { "tamanho": "Adulto G", "circunferencia_cm": [59, 61], "diametro_coroa_cm": [18.5, 19.5], "altura_cm": [22, 23.5] }
+      ]
+    },
+
+    "meias": {
+      "dica": "Para um caimento anatômico, faça a meia cerca de 10% menor que o comprimento e a circunferência real do pé (folga negativa).",
+      "itens": [
+        { "numeracao_br": "16–18 (Bebê)", "comprimento_pe_cm": [10.0, 11.5], "circunferencia_pe_cm": [11, 12] },
+        { "numeracao_br": "19–22 (Infantil)", "comprimento_pe_cm": [12.0, 14.5], "circunferencia_pe_cm": [13, 15] },
+        { "numeracao_br": "23–26 (Infantil)", "comprimento_pe_cm": [15.0, 17.0], "circunferencia_pe_cm": [15, 17] },
+        { "numeracao_br": "27–30 (Infantil)", "comprimento_pe_cm": [17.5, 19.5], "circunferencia_pe_cm": [17, 19] },
+        { "numeracao_br": "31–33 (Juvenil)", "comprimento_pe_cm": [20.0, 21.5], "circunferencia_pe_cm": [19, 20.5] },
+        { "numeracao_br": "34–36 (Adulto P)", "comprimento_pe_cm": [22.0, 23.5], "circunferencia_pe_cm": [20.5, 22] },
+        { "numeracao_br": "37–39 (Adulto M)", "comprimento_pe_cm": [24.0, 25.5], "circunferencia_pe_cm": [22, 24] },
+        { "numeracao_br": "40–42 (Adulto G)", "comprimento_pe_cm": [26.0, 27.5], "circunferencia_pe_cm": [24, 25.5] },
+        { "numeracao_br": "43–45 (Adulto GG)", "comprimento_pe_cm": [28.0, 29.5], "circunferencia_pe_cm": [25.5, 27] }
+      ]
+    },
+
+    "blusas_camisas": {
+      "dica": "Medidas referentes ao corpo. Para peças soltinhas (oversized), adicione de 8 a 15 cm na circunferência do busto/tórax.",
+      "itens": [
+        { "tamanho": "PP (34–36)", "busto_torax_cm": [80, 84], "cintura_cm": [62, 66], "largura_ombro_cm": 38, "comprimento_cm": 56, "manga_longa_cm": 58 },
+        { "tamanho": "P (38)", "busto_torax_cm": [85, 89], "cintura_cm": [67, 71], "largura_ombro_cm": 40, "comprimento_cm": 58, "manga_longa_cm": 59 },
+        { "tamanho": "M (40–42)", "busto_torax_cm": [90, 96], "cintura_cm": [72, 78], "largura_ombro_cm": 42, "comprimento_cm": 60, "manga_longa_cm": 60 },
+        { "tamanho": "G (44)", "busto_torax_cm": [97, 104], "cintura_cm": [79, 86], "largura_ombro_cm": 44, "comprimento_cm": 63, "manga_longa_cm": 62 },
+        { "tamanho": "GG (46–48)", "busto_torax_cm": [105, 114], "cintura_cm": [87, 96], "largura_ombro_cm": 46, "comprimento_cm": 66, "manga_longa_cm": 63 },
+        { "tamanho": "XGG (50–52)", "busto_torax_cm": [115, 124], "cintura_cm": [97, 106], "largura_ombro_cm": 48, "comprimento_cm": 68, "manga_longa_cm": 64 }
+      ]
+    },
+
+    "calcas": {
+      "dica": "O crochê tende a ceder no comprimento pelo peso do fio. Faça o teste de caimento antes de finalizar a barra.",
+      "itens": [
+        { "tamanho": "PP (36)", "cintura_cm": [62, 66], "quadril_cm": [88, 92], "altura_gancho_cm": 25, "comprimento_total_cm": 100 },
+        { "tamanho": "P (38)", "cintura_cm": [67, 71], "quadril_cm": [93, 97], "altura_gancho_cm": 26, "comprimento_total_cm": 102 },
+        { "tamanho": "M (40–42)", "cintura_cm": [72, 78], "quadril_cm": [98, 104], "altura_gancho_cm": 27, "comprimento_total_cm": 104 },
+        { "tamanho": "G (44)", "cintura_cm": [79, 86], "quadril_cm": [105, 112], "altura_gancho_cm": 29, "comprimento_total_cm": 106 },
+        { "tamanho": "GG (46–48)", "cintura_cm": [87, 96], "quadril_cm": [113, 122], "altura_gancho_cm": 31, "comprimento_total_cm": 108 }
+      ]
+    },
+
+    "vestidos": {
+      "dica": "Meça o comprimento a partir do ponto mais alto do ombro. Em pontos muito abertos, considere usar forro ou reduzir o comprimento final em 3 a 5 cm por conta do peso.",
+      "itens": [
+        { "tamanho": "PP", "busto_cm": [80, 84], "cintura_cm": [62, 66], "quadril_cm": [88, 92], "comp_curto_cm": 85, "comp_midi_cm": 110, "comp_longo_cm": 142 },
+        { "tamanho": "P", "busto_cm": [85, 89], "cintura_cm": [67, 71], "quadril_cm": [93, 97], "comp_curto_cm": 87, "comp_midi_cm": 112, "comp_longo_cm": 144 },
+        { "tamanho": "M", "busto_cm": [90, 96], "cintura_cm": [72, 78], "quadril_cm": [98, 104], "comp_curto_cm": 90, "comp_midi_cm": 115, "comp_longo_cm": 146 },
+        { "tamanho": "G", "busto_cm": [97, 104], "cintura_cm": [79, 86], "quadril_cm": [105, 112], "comp_curto_cm": 93, "comp_midi_cm": 118, "comp_longo_cm": 148 },
+        { "tamanho": "GG", "busto_cm": [105, 114], "cintura_cm": [87, 96], "quadril_cm": [113, 122], "comp_curto_cm": 96, "comp_midi_cm": 120, "comp_longo_cm": 150 }
+      ]
+    },
+
+    "cachecois": {
+      "dica": "Regra prática: o comprimento ideal de um cachecol adulto costuma ser igual à altura da pessoa que vai usá-lo.",
+      "itens": [
+        { "modelo": "Infantil (2–6 anos)", "largura_cm": [12, 15], "comprimento_cm": [100, 120] },
+        { "modelo": "Juvenil (7–12 anos)", "largura_cm": [15, 18], "comprimento_cm": [125, 145] },
+        { "modelo": "Adulto Padrão", "largura_cm": [18, 22], "comprimento_cm": [150, 175] },
+        { "modelo": "Adulto Longo / Inverno", "largura_cm": [22, 28], "comprimento_cm": [180, 210] },
+        { "modelo": "Gola Fechada (1 volta)", "largura_cm": [20, 25], "comprimento_cm": [60, 70] },
+        { "modelo": "Gola Infinita (2 voltas)", "largura_cm": [20, 28], "comprimento_cm": [130, 150] }
+      ]
+    },
+
+    "mantas": {
+      "dica": "Para camas, as medidas já incluem caimento lateral padrão. Para peseiras decorativas, use a largura da cama com 50 a 70 cm de profundidade.",
+      "itens": [
+        { "modelo": "Bebê / Carrinho", "largura_cm": 70, "comprimento_cm": 90 },
+        { "modelo": "Berço Padrão", "largura_cm": 90, "comprimento_cm": 120 },
+        { "modelo": "Manta de Sofá / Colo", "largura_cm": 120, "comprimento_cm": 150 },
+        { "modelo": "Cama Solteiro", "largura_cm": 150, "comprimento_cm": 220 },
+        { "modelo": "Cama Casal", "largura_cm": 200, "comprimento_cm": 230 },
+        { "modelo": "Cama Queen", "largura_cm": 230, "comprimento_cm": 250 },
+        { "modelo": "Cama King", "largura_cm": 260, "comprimento_cm": 260 }
+      ]
+    },
+
+    "bolsas": {
+      "dica": "Alças de crochê cedem com o peso. Faça a alça cerca de 10% a 15% menor que o tamanho final desejado ou utilize pontos mais fechados (como ponto baixo centrado ou tunisiano).",
+      "itens": [
+        { "modelo": "Clutch / Carteira de Mão", "largura_cm": [22, 26], "altura_cm": [12, 16], "profundidade_cm": [3, 5], "alca_cm": "0 (ou punho 18)" },
+        { "modelo": "Tiracolo Pequena (Crossbody)", "largura_cm": [18, 22], "altura_cm": [14, 18], "profundidade_cm": [5, 7], "alca_cm": "105 – 120" },
+        { "modelo": "Bolsa Média (Dia a Dia)", "largura_cm": [28, 34], "altura_cm": [24, 28], "profundidade_cm": [8, 12], "alca_cm": "55 – 65 (ombro)" },
+        { "modelo": "Tote / Ecobag", "largura_cm": [35, 40], "altura_cm": [38, 42], "profundidade_cm": [8, 12], "alca_cm": "60 – 70" },
+        { "modelo": "Bolsa de Praia / Maxi", "largura_cm": [42, 48], "altura_cm": [35, 40], "profundidade_cm": [14, 18], "alca_cm": "60 – 75" }
+      ]
+    }
+  }
+}

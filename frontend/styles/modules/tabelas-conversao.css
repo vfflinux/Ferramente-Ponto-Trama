@@ -1,0 +1,936 @@
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   TABELAS DE CONVERSÃO E MEDIDAS (RF01–RF08, RNF01–RNF04)
+   Design System Ponto & Trama — Mobile-First, WCAG AA & Animações
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+
+#secao-tabelas-conversao.secao-ferramenta {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  flex-direction: column;
+}
+
+.conteiner-conversao {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 20px 26px 36px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-sizing: border-box;
+  max-width: 1220px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* --- TOGGLE CM / POL NO CABEÇALHO (RF03 / RNF04) --- */
+.conv-toggle-unidade {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(1, 7, 54, 0.72);
+  border: 1px solid var(--creme-opacidade-30);
+  border-radius: 11px;
+  padding: 3px;
+  gap: 3px;
+  flex-shrink: 0;
+}
+
+.btn-conv-unidade {
+  border: none;
+  background: transparent;
+  color: var(--creme-opacidade-85);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  padding: 7px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  transition: background-color 160ms ease, color 160ms ease, transform 120ms ease;
+}
+
+.btn-conv-unidade:hover {
+  color: var(--cor-branco);
+}
+
+.btn-conv-unidade.ativo {
+  background: var(--cor-texto-principal);
+  color: var(--cor-fundo-profundo);
+  box-shadow: var(--sombra-sm);
+}
+
+.btn-conv-unidade:focus-visible {
+  outline: 2px solid var(--cor-foco-destaque);
+  outline-offset: 2px;
+}
+
+/* --- BARRA SUPERIOR: BUSCA INSTANTÂNEA + ABAS DESLIZANTES --- */
+.conv-controles-topo {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.conv-busca-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.conv-busca-icone {
+  position: absolute;
+  left: 15px;
+  width: 18px;
+  height: 18px;
+  color: var(--creme-opacidade-70);
+  pointer-events: none;
+}
+
+.conv-input-busca {
+  width: 100%;
+  height: 46px;
+  padding: 0 44px 0 44px;
+  border-radius: var(--raio-borda-lg);
+  border: 1px solid var(--creme-opacidade-25);
+  background: rgba(1, 7, 54, 0.56);
+  color: var(--cor-texto-principal);
+  font-family: inherit;
+  font-size: 14.5px;
+  box-sizing: border-box;
+  transition: border-color 160ms ease, background-color 160ms ease, box-shadow 160ms ease;
+}
+
+.conv-input-busca::placeholder {
+  color: var(--creme-opacidade-65);
+}
+
+.conv-input-busca:focus {
+  outline: none;
+  border-color: var(--cor-foco-destaque);
+  background: rgba(1, 7, 54, 0.8);
+  box-shadow: 0 0 0 3px rgba(91, 135, 232, 0.25);
+}
+
+.btn-conv-limpar-busca {
+  position: absolute;
+  right: 10px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--creme-opacidade-25);
+  background: rgba(34, 57, 111, 0.85);
+  color: var(--cor-texto-principal);
+  font-size: 16px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 150ms ease, transform 120ms ease;
+}
+
+.btn-conv-limpar-busca[hidden] {
+  display: none;
+}
+
+.btn-conv-limpar-busca:hover {
+  background: var(--cor-destaque-hover);
+  color: var(--cor-branco);
+}
+
+/* --- ABAS COM INDICADOR DESLIZANTE (RF01 + Microinteração 1) --- */
+.conv-tabs-lista {
+  position: relative;
+  display: inline-grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-self: flex-start;
+  width: 100%;
+  max-width: 620px;
+  background: rgba(1, 7, 54, 0.62);
+  border: 1px solid var(--creme-opacidade-20);
+  border-radius: 13px;
+  padding: 4px;
+  box-sizing: border-box;
+  gap: 4px;
+}
+
+.conv-tabs-indicador {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: 0;
+  width: 0;
+  border-radius: 9px;
+  background: var(--cor-destaque);
+  border: 1px solid var(--creme-opacidade-25);
+  box-shadow: var(--sombra-sm);
+  pointer-events: none;
+  z-index: 0;
+  transition:
+    transform 250ms cubic-bezier(0.4, 0, 0.2, 1),
+    width 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.conv-tab {
+  position: relative;
+  z-index: 1;
+  border: none;
+  background: transparent;
+  color: var(--creme-opacidade-85);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 10px 14px;
+  border-radius: 9px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  white-space: nowrap;
+  transition: color 180ms ease;
+}
+
+.conv-tab:hover {
+  color: var(--cor-branco);
+}
+
+.conv-tab.ativo {
+  color: var(--cor-branco);
+}
+
+.conv-tab:focus-visible {
+  outline: 2px solid var(--cor-foco-destaque);
+  outline-offset: -2px;
+}
+
+/* --- ÁREA DINÂMICA COM TRANSIÇÃO DE ENTRADA (Microinteração 2) --- */
+.conv-area-dinamica {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 0;
+}
+
+.conv-area-dinamica.conv-animar-entrada {
+  animation: convEntradaSuave 200ms cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+@keyframes convEntradaSuave {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* --- CARTÃO CONVERSOR RÁPIDO (RF02) --- */
+.conv-card-rapido {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px 18px;
+  border-radius: var(--raio-borda-xl);
+  background: linear-gradient(135deg, rgba(34, 57, 111, 0.48) 0%, rgba(1, 7, 54, 0.78) 100%);
+  border: 1px solid var(--creme-opacidade-25);
+  box-shadow: var(--sombra-md);
+}
+
+.conv-card-rapido-topo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.conv-titulo-rapido {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--cor-texto-principal);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.conv-controles-rapido {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.conv-select-sistema,
+.conv-input-valor {
+  height: 38px;
+  padding: 0 12px;
+  border-radius: 9px;
+  border: 1px solid var(--creme-opacidade-30);
+  background: rgba(1, 7, 54, 0.85);
+  color: var(--cor-texto-principal);
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  box-sizing: border-box;
+}
+
+.conv-select-sistema:focus,
+.conv-input-valor:focus {
+  outline: none;
+  border-color: var(--cor-foco-destaque);
+  box-shadow: 0 0 0 2px rgba(91, 135, 232, 0.25);
+}
+
+.conv-input-valor {
+  width: 150px;
+}
+
+.btn-conv-inverter {
+  height: 38px;
+  padding: 0 12px;
+  border-radius: 9px;
+  border: 1px solid var(--creme-opacidade-30);
+  background: rgba(34, 57, 111, 0.85);
+  color: var(--cor-texto-principal);
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background-color 150ms ease, transform 120ms ease;
+}
+
+.btn-conv-inverter:hover {
+  background: var(--cor-destaque-hover);
+  color: var(--cor-branco);
+}
+
+.btn-conv-inverter:active {
+  transform: scale(0.97);
+}
+
+.conv-res-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.conv-res-celula {
+  background: rgba(1, 7, 54, 0.56);
+  border: 1px solid var(--creme-opacidade-15);
+  border-radius: 11px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.conv-res-celula.origem {
+  border-color: var(--cor-foco-destaque);
+  background: rgba(44, 74, 145, 0.36);
+}
+
+.conv-res-rotulo {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--creme-opacidade-70);
+  font-weight: 700;
+}
+
+.conv-res-valor {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--cor-branco);
+  line-height: 1.25;
+}
+
+.conv-res-valor.compacto {
+  font-size: 14.5px;
+}
+
+.conv-res-sub {
+  font-size: 12px;
+  color: var(--creme-opacidade-85);
+}
+
+.conv-res-rodape {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--creme-opacidade-15);
+}
+
+.conv-res-detalhe {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--creme-opacidade-85);
+}
+
+.conv-badge-aprox {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  background: rgba(246, 201, 69, 0.2);
+  border: 1px solid rgba(246, 201, 69, 0.55);
+  color: #ffe282;
+}
+
+.conv-badge-estoque {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 700;
+  background: rgba(46, 204, 113, 0.16);
+  border: 1px solid rgba(46, 204, 113, 0.45);
+  color: #8cf0b4;
+}
+
+.conv-res-vazio {
+  font-size: 13.5px;
+  color: var(--creme-opacidade-85);
+  padding: 8px 4px;
+}
+
+/* --- CHIPS DE SUBCATEGORIA & DICA CONTEXTUAL (RF04 / RF08) --- */
+.conv-bloco-medidas-topo {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.conv-chips-subcategorias {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.conv-chip-sub {
+  border: 1px solid var(--creme-opacidade-25);
+  background: rgba(1, 7, 54, 0.52);
+  color: var(--cor-texto-principal);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 8px 14px;
+  border-radius: var(--raio-borda-pilula);
+  cursor: pointer;
+  transition: background-color 150ms ease, border-color 150ms ease, transform 120ms ease;
+}
+
+.conv-chip-sub:hover {
+  background: var(--azul-medio-opacidade-70);
+  color: var(--cor-branco);
+}
+
+.conv-chip-sub.ativo {
+  background: var(--cor-texto-principal);
+  color: var(--cor-fundo-profundo);
+  border-color: var(--cor-texto-principal);
+  box-shadow: var(--sombra-sm);
+}
+
+.conv-chip-sub:focus-visible {
+  outline: 2px solid var(--cor-foco-destaque);
+  outline-offset: 2px;
+}
+
+.conv-dica-contextual {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 15px;
+  border-radius: var(--raio-borda-lg);
+  background: rgba(34, 57, 111, 0.34);
+  border: 1px solid var(--creme-opacidade-20);
+  border-left: 4px solid var(--cor-texto-principal);
+  font-size: 13.5px;
+  line-height: 1.45;
+  color: var(--cor-texto-principal);
+}
+
+.conv-dica-icone {
+  font-size: 16px;
+  line-height: 1.3;
+  flex-shrink: 0;
+}
+
+.conv-dica-texto {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+/* --- STATUS + TABELA RESPONSIVA COM CABEÇALHO FIXO (RNF01) --- */
+.conv-status-busca {
+  font-size: 12.5px;
+  color: var(--creme-opacidade-75);
+  margin: 0;
+}
+
+.conv-tabela-wrapper {
+  width: 100%;
+  max-height: 540px;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: var(--raio-borda-xl);
+  border: 1px solid var(--creme-opacidade-20);
+  background: rgba(1, 7, 54, 0.56);
+  box-shadow: var(--sombra-md);
+}
+
+.conv-tabela {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 14px;
+  color: var(--cor-texto-principal);
+}
+
+.conv-tabela thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--cor-fundo-profundo);
+  color: var(--cor-texto-principal);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  text-align: left;
+  padding: 13px 14px;
+  border-bottom: 1px solid var(--creme-opacidade-25);
+  white-space: nowrap;
+}
+
+.conv-tabela tbody tr {
+  cursor: pointer;
+  transition: background-color 150ms ease, box-shadow 150ms ease;
+}
+
+.conv-tabela tbody tr:nth-child(even) {
+  background: rgba(255, 255, 255, 0.025);
+}
+
+/* Microinteração 3: Crosshair / Hover suave na linha inteira */
+.conv-tabela tbody tr:hover {
+  background: rgba(44, 74, 145, 0.42);
+}
+
+/* RF07: Destaque de linha (Modo Leitura) */
+.conv-tabela tbody tr.linha-destacada {
+  background: rgba(91, 135, 232, 0.28);
+  box-shadow: inset 4px 0 0 var(--cor-texto-principal);
+}
+
+.conv-tabela tbody tr.linha-destacada td:first-child {
+  padding-left: 16px;
+}
+
+.conv-tabela tbody tr:focus-visible {
+  outline: 2px solid var(--cor-foco-destaque);
+  outline-offset: -2px;
+}
+
+.conv-tabela tbody td {
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--creme-opacidade-12);
+  vertical-align: middle;
+}
+
+.conv-tabela tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.conv-tabela .col-acao {
+  text-align: right;
+  white-space: nowrap;
+  width: 1%;
+}
+
+.conv-tabela .col-mono {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.conv-tabela .col-descricao {
+  color: var(--creme-opacidade-85);
+  min-width: 190px;
+}
+
+.conv-pill-cyc {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: var(--cor-destaque);
+  color: var(--cor-branco);
+  font-weight: 800;
+  font-size: 13px;
+  border: 1px solid var(--creme-opacidade-25);
+}
+
+.conv-link-sub {
+  border: 1px solid var(--creme-opacidade-25);
+  background: rgba(34, 57, 111, 0.7);
+  color: var(--cor-texto-principal);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.conv-link-sub:hover {
+  background: var(--cor-destaque-hover);
+  color: var(--cor-branco);
+}
+
+.col-resumo-medidas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.conv-med-chip-resumo {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 7px;
+  background: rgba(1, 7, 54, 0.45);
+  border: 1px solid var(--creme-opacidade-15);
+  font-size: 12.5px;
+}
+
+.conv-med-chip-resumo em {
+  font-style: normal;
+  color: var(--creme-opacidade-70);
+}
+
+/* Microinteração 5: Pulso de opacidade ao alternar cm <-> pol */
+.valor-medida-conv {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.valor-medida-conv.valor-pulso-unidade {
+  animation: convPulsoUnidade 180ms ease both;
+}
+
+@keyframes convPulsoUnidade {
+  0% {
+    opacity: 0.4;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* --- BOTÃO COPIAR COM FEEDBACK CHECK VERDE (RF06 + Microinteração 4) --- */
+.btn-conv-copiar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 11px;
+  border-radius: 8px;
+  border: 1px solid var(--creme-opacidade-25);
+  background: rgba(34, 57, 111, 0.55);
+  color: var(--cor-texto-principal);
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease, transform 120ms ease;
+}
+
+.btn-conv-copiar:hover {
+  background: var(--cor-destaque-hover);
+  color: var(--cor-branco);
+}
+
+.btn-conv-copiar:active {
+  transform: scale(0.95);
+}
+
+.btn-conv-copiar .icone-btn-copiar {
+  display: inline-flex;
+  width: 14px;
+  height: 14px;
+  transition: transform 150ms ease;
+}
+
+.btn-conv-copiar .icone-btn-copiar svg {
+  width: 14px;
+  height: 14px;
+}
+
+.btn-conv-copiar.copiado {
+  background: rgba(39, 174, 96, 0.25);
+  border-color: rgba(46, 204, 113, 0.7);
+  color: #8cf0b4;
+}
+
+.btn-conv-copiar.copiado .icone-btn-copiar {
+  animation: convCheckPop 220ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes convCheckPop {
+  0% {
+    transform: scale(0.55);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* --- ESTADO VAZIO & SUGESTÕES --- */
+.conv-estado-vazio {
+  padding: 36px 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  color: var(--creme-opacidade-85);
+}
+
+.conv-estado-vazio p {
+  margin: 0;
+  font-size: 14.5px;
+}
+
+.conv-sugestoes-abas {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.btn-conv-sug-aba,
+.btn-conv-limpar-vazio {
+  border: 1px solid var(--creme-opacidade-30);
+  background: var(--cor-destaque);
+  color: var(--cor-branco);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 7px 14px;
+  border-radius: 9px;
+  cursor: pointer;
+}
+
+.btn-conv-limpar-vazio {
+  background: transparent;
+  color: var(--cor-texto-principal);
+}
+
+/* --- TOAST DISCRETO --- */
+.toast-conversao {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 160;
+  background: var(--cor-fundo-profundo);
+  color: var(--cor-texto-principal);
+  border: 1px solid var(--creme-opacidade-30);
+  border-radius: 10px;
+  padding: 10px 16px;
+  font-size: 13.5px;
+  font-weight: 700;
+  box-shadow: var(--sombra-lg);
+  opacity: 0;
+  transform: translateY(10px);
+  pointer-events: none;
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.toast-conversao.visivel {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* --- RESPONSIVIDADE (RNF01: Cartões empilhados < 600px) --- */
+@media (max-width: 900px) {
+  .conv-res-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .conteiner-conversao {
+    padding: 12px 12px 24px;
+    gap: 12px;
+  }
+
+  .conv-tabs-lista {
+    max-width: 100%;
+  }
+
+  .conv-tab {
+    font-size: 12.5px;
+    padding: 9px 6px;
+    gap: 4px;
+  }
+
+  .conv-controles-rapido {
+    width: 100%;
+  }
+
+  .conv-select-sistema,
+  .conv-input-valor,
+  .btn-conv-inverter {
+    flex: 1 1 120px;
+    width: auto;
+  }
+
+  .conv-tabela-wrapper {
+    max-height: none;
+    overflow: visible;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+  }
+
+  .conv-tabela,
+  .conv-tabela tbody {
+    display: block;
+    width: 100%;
+  }
+
+  .conv-tabela thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .conv-tabela tbody {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .conv-tabela tbody tr {
+    display: block;
+    background: rgba(1, 7, 54, 0.72);
+    border: 1px solid var(--creme-opacidade-20);
+    border-radius: var(--raio-borda-lg);
+    padding: 10px 12px;
+  }
+
+  .conv-tabela tbody tr:nth-child(even) {
+    background: rgba(1, 7, 54, 0.72);
+  }
+
+  .conv-tabela tbody tr.linha-destacada {
+    background: rgba(44, 74, 145, 0.45);
+    border-color: var(--cor-texto-principal);
+    box-shadow: inset 4px 0 0 var(--cor-texto-principal);
+  }
+
+  .conv-tabela tbody td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--creme-opacidade-12);
+    text-align: right;
+  }
+
+  .conv-tabela tbody td::before {
+    content: attr(data-label);
+    font-size: 11.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--creme-opacidade-70);
+    text-align: left;
+    flex-shrink: 0;
+  }
+
+  .conv-tabela tbody tr.linha-destacada td:first-child {
+    padding-left: 0;
+  }
+
+  .conv-tabela tbody td.col-descricao {
+    min-width: 0;
+  }
+
+  .conv-tabela tbody td.col-acao {
+    justify-content: flex-end;
+    border-bottom: none;
+    padding-top: 8px;
+    width: 100%;
+  }
+
+  .conv-tabela tbody td.col-acao::before {
+    display: none;
+  }
+
+  .conv-tabela tbody td.col-acao .btn-conv-copiar {
+    width: 100%;
+    height: 36px;
+  }
+
+  .toast-conversao {
+    left: 14px;
+    right: 14px;
+    bottom: 72px;
+    text-align: center;
+  }
+}
+
+/* --- ACESSIBILIDADE: RESPEITO A PREFERS-REDUCED-MOTION --- */
+@media (prefers-reduced-motion: reduce) {
+  .conv-tabs-indicador,
+  .conv-area-dinamica.conv-animar-entrada,
+  .conv-tabela tbody tr,
+  .btn-conv-copiar,
+  .btn-conv-copiar .icone-btn-copiar,
+  .btn-conv-copiar.copiado .icone-btn-copiar,
+  .valor-medida-conv.valor-pulso-unidade,
+  .toast-conversao {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+:root[data-animacoes="reduzidas"] .conv-tabs-indicador,
+:root[data-animacoes="reduzidas"] .conv-area-dinamica.conv-animar-entrada,
+:root[data-animacoes="reduzidas"] .btn-conv-copiar.copiado .icone-btn-copiar,
+:root[data-animacoes="reduzidas"] .valor-medida-conv.valor-pulso-unidade {
+  transition: none !important;
+  animation: none !important;
+}

@@ -139,6 +139,7 @@ const ContadorCarreiras = (() => {
     card.innerHTML = `
       <div class="card-topo">
         <input type="text" class="nome-contador" value="Contador #${id}" title="Clique para renomear" />
+        <button type="button" class="btn-expandir-contador" title="Abrir em modo Toque na Tela Toda" aria-label="Abrir em modo Toque na Tela Toda">⛶</button>
         <button type="button" class="btn-remover-contador" title="Remover este contador">✕</button>
       </div>
 
@@ -264,6 +265,14 @@ const ContadorCarreiras = (() => {
       });
 
       localStorage.setItem(CHAVE_STORAGE, JSON.stringify(dados));
+
+      if (dados.length > 0) {
+        window.dispatchEvent(
+          new CustomEvent("ponto-trama:contador-alterado", {
+            detail: { carreiras: dados[0].carreiras, origem: "contador-carreiras" }
+          })
+        );
+      }
 
       if (
         typeof ProjetoContexto !== "undefined" &&
@@ -408,6 +417,82 @@ const ContadorCarreiras = (() => {
   // PARTE 3: EVENTOS E INICIALIZAÇÃO
   // ==========================================================================
 
+  // ==========================================================================
+  // MODO "TOQUE NA TELA TODA" COM CADEADO DE SEGURANÇA
+  // ==========================================================================
+  let cardTelaToda = null;
+  let telaTodaTravada = true;
+  let confirmarZerarPendente = false;
+
+  function atualizarTelaToda() {
+    if (!cardTelaToda) return;
+    const nome = (cardTelaToda.querySelector(".nome-contador")?.value || "Contador").trim();
+    const carreiras = parseInt(cardTelaToda.querySelector(".input-carreiras")?.value, 10) || 0;
+    const ptsCarr = parseInt(cardTelaToda.querySelector(".input-pontos-carreira")?.value, 10) || 0;
+    const meta = parseInt(cardTelaToda.querySelector(".input-meta")?.value, 10) || 0;
+
+    const elNome = document.getElementById("tela-toda-nome");
+    const elMeta = document.getElementById("tela-toda-meta");
+    const elNum = document.getElementById("tela-toda-numero");
+    const elPts = document.getElementById("tela-toda-pontos");
+    const ov = document.getElementById("overlay-contador-tela-toda");
+
+    if (elNome) elNome.textContent = nome;
+    if (elNum) elNum.textContent = String(carreiras);
+    if (elPts) {
+      elPts.textContent = ptsCarr > 0 ? `${(carreiras * ptsCarr).toLocaleString("pt-BR")} pontos no total` : "";
+    }
+    if (elMeta) {
+      if (meta > 0 && carreiras >= meta) {
+        elMeta.textContent = `🔔 Meta atingida (${meta} carreiras)!`;
+      } else if (meta > 0) {
+        elMeta.textContent = `Meta: ${carreiras} / ${meta} carreiras`;
+      } else {
+        elMeta.textContent = "Toque em qualquer lugar da tela para somar +1";
+      }
+    }
+    if (ov) {
+      ov.classList.toggle("meta-atingida", meta > 0 && carreiras >= meta);
+    }
+  }
+
+  function atualizarBotoesCadeadoTelaToda() {
+    const btnCad = document.getElementById("btn-tela-toda-cadeado");
+    const btnZerar = document.getElementById("btn-tela-toda-zerar");
+    if (btnCad) {
+      btnCad.classList.toggle("travado", telaTodaTravada);
+      btnCad.setAttribute("aria-pressed", telaTodaTravada ? "true" : "false");
+      btnCad.textContent = telaTodaTravada ? "🔒 Travado" : "🔓 Destravado";
+    }
+    if (btnZerar) {
+      btnZerar.disabled = telaTodaTravada;
+      if (telaTodaTravada) {
+        confirmarZerarPendente = false;
+        btnZerar.textContent = "↺ Zerar";
+        btnZerar.classList.remove("confirmando");
+      }
+    }
+  }
+
+  function abrirTelaToda(card) {
+    const alvo = card || document.querySelector(".card-contador");
+    if (!alvo) return;
+    cardTelaToda = alvo;
+    telaTodaTravada = true;
+    confirmarZerarPendente = false;
+    atualizarBotoesCadeadoTelaToda();
+    atualizarTelaToda();
+    const ov = document.getElementById("overlay-contador-tela-toda");
+    if (ov) ov.style.display = "flex";
+  }
+
+  function fecharTelaToda() {
+    const ov = document.getElementById("overlay-contador-tela-toda");
+    if (ov) ov.style.display = "none";
+    cardTelaToda = null;
+    confirmarZerarPendente = false;
+  }
+
   function configurarEventosCard(card) {
     if (!card) return;
     const inputNome = card.querySelector(".nome-contador");
@@ -418,6 +503,7 @@ const ContadorCarreiras = (() => {
     const inputPontos = card.querySelector(".input-pontos-carreira");
     const inputMeta = card.querySelector(".input-meta");
     const btnRemover = card.querySelector(".btn-remover-contador");
+    const btnExpandir = card.querySelector(".btn-expandir-contador");
 
     if (inputNome) inputNome.addEventListener("input", salvarEstadoContadores);
     if (btnMais) btnMais.addEventListener("click", () => incrementarCarreiras(card));
@@ -427,6 +513,7 @@ const ContadorCarreiras = (() => {
     if (inputPontos) inputPontos.addEventListener("input", () => atualizarContador(card));
     if (inputMeta) inputMeta.addEventListener("input", () => atualizarContador(card));
     if (btnRemover) btnRemover.addEventListener("click", () => removerContador(card));
+    if (btnExpandir) btnExpandir.addEventListener("click", () => abrirTelaToda(card));
 
     atualizarContador(card);
   }
@@ -442,6 +529,55 @@ const ContadorCarreiras = (() => {
     if (btnSilenciarAlarme) {
       btnSilenciarAlarme.addEventListener("click", () => Animacoes.silenciarAlarmeVisual());
     }
+
+    // Eventos do modo Toque na Tela Toda
+    document.getElementById("btn-contador-tela-toda-topo")?.addEventListener("click", () => {
+      abrirTelaToda(document.querySelector(".card-contador"));
+    });
+    document.getElementById("btn-tela-toda-sair")?.addEventListener("click", fecharTelaToda);
+    document.getElementById("zona-toque-tela-toda")?.addEventListener("click", () => {
+      if (!cardTelaToda) return;
+      incrementarCarreiras(cardTelaToda);
+      atualizarTelaToda();
+      const numEl = document.getElementById("tela-toda-numero");
+      if (numEl) {
+        numEl.classList.remove("pulso");
+        void numEl.offsetWidth;
+        numEl.classList.add("pulso");
+      }
+    });
+    document.getElementById("btn-tela-toda-menos")?.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (!cardTelaToda) return;
+      decrementarCarreiras(cardTelaToda);
+      atualizarTelaToda();
+    });
+    document.getElementById("btn-tela-toda-cadeado")?.addEventListener("click", (e) => {
+      e.stopPropagation();
+      telaTodaTravada = !telaTodaTravada;
+      atualizarBotoesCadeadoTelaToda();
+      if (typeof Configuracoes !== "undefined") Configuracoes.vibrar(14);
+    });
+    document.getElementById("btn-tela-toda-zerar")?.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (!cardTelaToda || telaTodaTravada) return;
+      const btnZ = e.currentTarget;
+      if (!confirmarZerarPendente) {
+        confirmarZerarPendente = true;
+        btnZ.textContent = "Confirmar?";
+        btnZ.classList.add("confirmando");
+        return;
+      }
+      zerarContador(cardTelaToda);
+      telaTodaTravada = true;
+      atualizarBotoesCadeadoTelaToda();
+      atualizarTelaToda();
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && cardTelaToda) {
+        fecharTelaToda();
+      }
+    });
 
     // Se houver um projeto ativo na bancada, carrega os contadores dele
     const projAtivo = typeof ProjetoContexto !== "undefined" ? ProjetoContexto.obterProjetoAtivo() : null;
@@ -461,12 +597,40 @@ const ContadorCarreiras = (() => {
     }
   }
 
+  function definirCarreiraPrincipal(valor, origem = "externo") {
+    const card = document.querySelector(".card-contador");
+    const n = Math.max(0, parseInt(valor, 10) || 0);
+    if (!card) {
+      try {
+        const bruto = localStorage.getItem(CHAVE_STORAGE);
+        const lista = bruto ? JSON.parse(bruto) : [{ id: "1", nome: "Contador Principal", carreiras: 0, pontosPorCarreira: 0, meta: 0 }];
+        if (Array.isArray(lista) && lista.length > 0) {
+          lista[0].carreiras = n;
+          localStorage.setItem(CHAVE_STORAGE, JSON.stringify(lista));
+          if (typeof ProjetoContexto !== "undefined" && !ProjetoContexto.estaHidratando() && ProjetoContexto.obterProjetoAtivo()) {
+            ProjetoContexto.atualizarSecaoAtiva("contadores", lista, { origem });
+          }
+        }
+      } catch {
+        // ignora
+      }
+      return;
+    }
+    const inputCarreiras = card.querySelector(".input-carreiras");
+    if (!inputCarreiras || Number(inputCarreiras.value) === n) return;
+    inputCarreiras.value = n;
+    atualizarContador(card);
+    if (cardTelaToda === card) atualizarTelaToda();
+  }
+
   return {
     init,
     carregarDoProjeto,
     atualizarContador,
     incrementarCarreiras,
     decrementarCarreiras,
-    zerarContador
+    zerarContador,
+    definirCarreiraPrincipal,
+    abrirTelaToda
   };
 })();

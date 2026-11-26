@@ -112,6 +112,7 @@ class PontoTramaDesktopApp:
             user_content_manager=user_content_manager,
         )
         self._configurar_webview()
+        self.webview.connect("print", self._ao_imprimir)
 
         self.window.add(self.webview)
         self.window.connect("destroy", self._ao_fechar)
@@ -163,6 +164,10 @@ class PontoTramaDesktopApp:
 
         download.connect("decide-destination", decidir_destino)
 
+    def _ao_imprimir(self, _webview: WebKit2.WebView, print_operation: WebKit2.PrintOperation) -> bool:
+        print_operation.run_dialog(self.window)
+        return True
+
     def _ao_pressionar_tecla(self, _widget, event: Gdk.EventKey) -> bool:
         ctrl = bool(event.state & Gdk.ModifierType.CONTROL_MASK)
         if event.keyval == Gdk.KEY_F5 or (ctrl and event.keyval in (Gdk.KEY_r, Gdk.KEY_R)):
@@ -179,6 +184,8 @@ class PontoTramaDesktopApp:
 
     def _ao_fechar(self, *_args) -> None:
         try:
+            if hasattr(server, "SYNC_MANAGER"):
+                server.SYNC_MANAGER.encerrar()
             self.http_server.shutdown()
             self.http_server.server_close()
         except Exception:

@@ -3,10 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#010736" />
+    <link rel="manifest" href="manifest.json" />
     <title>Ponto & Trama</title>
     <!-- Carregamento paralelo de estilos (sem cascata @import) -->
-    <link rel="stylesheet" href="styles/base/global.css" />
-    <link rel="stylesheet" href="styles/layout/barra-lateral.css" />
+    <link rel="stylesheet" href="styles/base/global.css?v=5" />
+    <link rel="stylesheet" href="styles/layout/barra-lateral.css?v=7" />
     <link rel="stylesheet" href="styles/modules/home.css" />
     <link rel="stylesheet" href="styles/modules/contador-carreiras.css" />
     <link rel="stylesheet" href="styles/modules/leitor-receitas.css" />
@@ -16,30 +18,35 @@
     <link rel="stylesheet" href="styles/modules/inventario-agulhas.css" />
     <link rel="stylesheet" href="styles/modules/calculadora-amostra.css" />
     <link rel="stylesheet" href="styles/modules/banco-amostras.css" />
-    <link rel="stylesheet" href="styles/modules/configuracoes.css" />
-    <link rel="stylesheet" href="styles/base/mobile.css" />
-    <link rel="stylesheet" href="styles/base/temas.css" />
+    <link rel="stylesheet" href="styles/modules/editor-graficos.css" />
+    <link rel="stylesheet" href="styles/modules/tabelas-conversao.css?v=5" />
+    <link rel="stylesheet" href="styles/modules/configuracoes.css?v=6" />
+    <link rel="stylesheet" href="styles/base/mobile.css?v=7" />
+    <link rel="stylesheet" href="styles/base/temas.css?v=6" />
 
     <!-- Core da aplicação -->
     <script src="src/core/database.js?v=4" defer></script>
     <script src="src/core/projeto-contexto.js?v=4" defer></script>
     <script src="src/core/animations.js" defer></script>
-    <script src="src/core/sidebar.js?v=4" defer></script>
+    <script src="src/core/sidebar.js?v=6" defer></script>
 
     <!-- Módulos de ferramentas -->
     <script src="src/modules/home.js?v=4" defer></script>
     <script src="src/modules/contador-carreiras.js?v=4" defer></script>
     <script src="src/modules/calculadora-precificacao.js?v=4" defer></script>
+    <script src="src/modules/tradutor-receitas.js?v=4" defer></script>
     <script src="src/modules/leitor-receitas.js?v=4" defer></script>
     <script src="src/modules/gerenciador-projetos.js?v=4" defer></script>
     <script src="src/modules/inventario-fios.js" defer></script>
     <script src="src/modules/inventario-agulhas.js" defer></script>
     <script src="src/modules/calculadora-amostra.js" defer></script>
     <script src="src/modules/banco-amostras.js" defer></script>
-    <script src="src/modules/configuracoes.js?v=4" defer></script>
+    <script src="src/modules/editor-graficos.js?v=4" defer></script>
+    <script src="src/modules/tabelas-conversao.js?v=5" defer></script>
+    <script src="src/modules/configuracoes.js?v=6" defer></script>
 
     <!-- Bootstrap principal -->
-    <script src="src/main.js?v=4" defer></script>
+    <script src="src/main.js?v=5" defer></script>
   </head>
   <body>
     <input type="checkbox" id="opcao-menu" />
@@ -270,6 +277,81 @@
         <button
           type="button"
           class="botaoFerramenta"
+          title="Editor de Gráficos"
+          data-ferramenta="editor-graficos"
+        >
+          <svg
+            class="iconeFerramenta"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+            <line x1="9" y1="3" x2="9" y2="21"></line>
+            <line x1="15" y1="3" x2="15" y2="21"></line>
+            <line x1="3" y1="9" x2="21" y2="9"></line>
+            <line x1="3" y1="15" x2="21" y2="15"></line>
+          </svg>
+          <span>Editor de Gráficos</span>
+        </button>
+        <button
+          type="button"
+          class="botaoFerramenta"
+          title="Tabelas de Conversão e Medidas"
+          data-ferramenta="tabelas-conversao"
+        >
+          <svg
+            class="iconeFerramenta"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z"></path>
+            <path d="m14.5 12.5 2-2"></path>
+            <path d="m11.5 9.5 2-2"></path>
+            <path d="m8.5 6.5 2-2"></path>
+            <path d="m17.5 15.5 2-2"></path>
+          </svg>
+          <span>Tabelas e Medidas</span>
+        </button>
+        <button
+          type="button"
+          class="botaoFerramenta botao-aba-ferramentas"
+          id="btn-aba-ferramentas"
+          title="Ferramentas"
+          aria-haspopup="true"
+          aria-expanded="false"
+          aria-controls="popup-ferramentas-lateral"
+        >
+          <svg
+            class="iconeFerramenta"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
+            <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
+            <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
+            <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
+          </svg>
+          <span>Ferramentas</span>
+          <em class="badge-qtd-ferramentas" id="badge-qtd-ferramentas" aria-hidden="true">0</em>
+        </button>
+        <button
+          type="button"
+          class="botaoFerramenta"
           title="Configurações"
           data-ferramenta="configuracoes"
         >
@@ -290,6 +372,16 @@
           </svg>
           <span>Configurações</span>
         </button>
+      </div>
+      <!-- Popup conectado à barra lateral com ícones das ferramentas secundárias -->
+      <div
+        class="popup-ferramentas-lateral"
+        id="popup-ferramentas-lateral"
+        role="menu"
+        aria-label="Mais ferramentas"
+        aria-hidden="true"
+      >
+        <div class="popup-ferramentas-grade" id="popup-ferramentas-grade"></div>
       </div>
     </header>
     <main id="conteudo-principal">
@@ -347,15 +439,26 @@
                 >Acompanhe suas carreiras, pontos e metas</span
               >
             </div>
-            <button
-              id="btn-adicionar-contador"
-              class="btn-adicionar-contador"
-              type="button"
-              title="Adicionar novo contador simultâneo"
-            >
-              <span class="icone-mais">+</span>
-              <span>contador</span>
-            </button>
+            <div class="cabecalho-acoes-contador">
+              <button
+                id="btn-contador-tela-toda-topo"
+                class="btn-tela-toda-topo"
+                type="button"
+                title="Abrir contador principal no modo Toque na Tela Toda"
+              >
+                <span aria-hidden="true">⛶</span>
+                <span>Tela Toda</span>
+              </button>
+              <button
+                id="btn-adicionar-contador"
+                class="btn-adicionar-contador"
+                type="button"
+                title="Adicionar novo contador simultâneo"
+              >
+                <span class="icone-mais">+</span>
+                <span>contador</span>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -386,6 +489,14 @@
                   value="Contador Principal"
                   title="Clique para renomear"
                 />
+                <button
+                  type="button"
+                  class="btn-expandir-contador"
+                  title="Abrir em modo Toque na Tela Toda"
+                  aria-label="Abrir em modo Toque na Tela Toda"
+                >
+                  ⛶
+                </button>
               </div>
 
               <!-- Display Grande de Carreiras com Botões Laterais (1#) -->
@@ -496,6 +607,30 @@
               </div>
             </article>
           </div>
+
+          <!-- OVERLAY MODO "TOQUE NA TELA TODA" DO CONTADOR -->
+          <div id="overlay-contador-tela-toda" class="overlay-contador-tela-toda" style="display: none" role="dialog" aria-modal="true" aria-label="Contador em tela cheia">
+            <div class="tela-toda-topo">
+              <div class="tela-toda-info">
+                <strong id="tela-toda-nome">Contador Principal</strong>
+                <span id="tela-toda-meta" class="tela-toda-meta">Toque em qualquer lugar para somar +1</span>
+              </div>
+              <button type="button" id="btn-tela-toda-sair" class="btn-tela-toda-sair" aria-label="Sair da tela cheia">✕ Sair</button>
+            </div>
+
+            <button type="button" id="zona-toque-tela-toda" class="zona-toque-tela-toda" aria-label="Toque para somar 1 carreira">
+              <span class="tela-toda-rotulo">CARREIRAS</span>
+              <span id="tela-toda-numero" class="tela-toda-numero">0</span>
+              <span id="tela-toda-pontos" class="tela-toda-pontos"></span>
+              <span class="tela-toda-dica">Toque em qualquer área para +1</span>
+            </button>
+
+            <div class="tela-toda-rodape">
+              <button type="button" id="btn-tela-toda-menos" class="btn-tt-controle" aria-label="Diminuir 1 carreira">− 1</button>
+              <button type="button" id="btn-tela-toda-cadeado" class="btn-tt-controle cadeado travado" aria-pressed="true" title="Destravar para habilitar Zerar">🔒 Travado</button>
+              <button type="button" id="btn-tela-toda-zerar" class="btn-tt-controle zerar" disabled title="Destrave o cadeado para zerar">↺ Zerar</button>
+            </div>
+          </div>
         </section>
       </div>
 
@@ -512,12 +647,19 @@
               >
             </div>
             <div class="cabecalho-acoes-receitas">
+              <span id="badge-status-offline-receitas" class="badge-offline-receitas pronto" title="Funcionamento 100% offline">✓ Cache offline pronto</span>
               <div class="switch-modo-receita" role="tablist" aria-label="Modo da receita">
                 <button type="button" class="btn-modo-receita ativo" data-modo-receita="texto" role="tab" aria-selected="true">
-                  📝 Texto &amp; Passos
+                  📝 Texto
                 </button>
                 <button type="button" class="btn-modo-receita" data-modo-receita="arquivo" role="tab" aria-selected="false">
                   📄 PDF / Foto
+                </button>
+                <button type="button" class="btn-modo-receita" data-modo-receita="tradutor" role="tab" aria-selected="false">
+                  🔄 Tradutor
+                </button>
+                <button type="button" class="btn-modo-receita" data-modo-receita="dicionario" role="tab" aria-selected="false">
+                  📚 Dicionário
                 </button>
               </div>
             </div>
@@ -590,6 +732,146 @@
               </div>
             </div>
           </div>
+
+          <!-- MÓDULO B: TRADUTOR AUTOMÁTICO DE RECEITAS (RF06-RF11, RN01-RN04) -->
+          <div class="painel-receita-tradutor" id="painel-receita-tradutor" style="display: none">
+            <div class="barra-controles-tradutor">
+              <div class="grupo-select-trad">
+                <label for="select-trad-origem">Origem</label>
+                <select id="select-trad-origem" class="select-tradutor">
+                  <option value="auto" selected>Auto (Detectar)</option>
+                  <option value="us">Inglês (US)</option>
+                  <option value="uk">Inglês (UK)</option>
+                  <option value="es">Espanhol (ES)</option>
+                  <option value="pt">Português (BR)</option>
+                </select>
+              </div>
+              <button type="button" class="btn-inverter-trad" id="btn-inverter-idiomas-trad" title="Inverter idiomas" aria-label="Inverter idiomas">⇄</button>
+              <div class="grupo-select-trad">
+                <label for="select-trad-destino">Destino</label>
+                <select id="select-trad-destino" class="select-tradutor">
+                  <option value="pt" selected>Português (BR)</option>
+                  <option value="us">Inglês (US)</option>
+                  <option value="uk">Inglês (UK)</option>
+                  <option value="es">Espanhol (ES)</option>
+                </select>
+              </div>
+              <div class="grupo-select-trad">
+                <label for="select-trad-tecnica">Técnica (RN04)</label>
+                <select id="select-trad-tecnica" class="select-tradutor">
+                  <option value="croche">Crochê</option>
+                  <option value="trico">Tricô</option>
+                  <option value="ambos">Crochê + Tricô</option>
+                </select>
+              </div>
+              <div class="acoes-rapidas-trad-topo">
+                <button type="button" class="btn-receita-suave" id="btn-trad-exemplo">✨ Exemplo</button>
+                <button type="button" class="btn-receita-suave" id="btn-trad-limpar">Limpar</button>
+              </div>
+            </div>
+
+            <!-- RF10: Alerta de Ambiguidade US vs UK -->
+            <div class="alerta-ambiguo-tradutor" id="alerta-ambiguo-tradutor" style="display: none" role="alert">
+              <span class="icone-alerta-trad" aria-hidden="true">⚠️</span>
+              <span id="texto-alerta-us-uk" class="texto-alerta-us-uk"></span>
+              <button type="button" class="btn-alternar-us-uk" id="btn-alternar-us-uk">Alternar para Inglês UK</button>
+            </div>
+
+            <div class="grid-tradutor-receita">
+              <div class="coluna-tradutor-entrada">
+                <div class="topo-card-receita">
+                  <div>
+                    <h2 class="titulo-card-receita">Receita Original</h2>
+                    <span class="sub-card-receita">Cole trechos ou receitas inteiras — processado 100% no dispositivo</span>
+                  </div>
+                </div>
+                <textarea
+                  id="input-tradutor-receita"
+                  class="textarea-receita-global"
+                  placeholder="Cole sua receita aqui, ex.:&#10;Rnd 1: 6 sc in mr (6)&#10;Rnd 2: 6 inc (12)&#10;Rnd 3: *2 sc, inc* x6 (18)&#10;Rnd 4: 18 sc in BLO, sl st, FO"
+                  aria-label="Receita original para traduzir"
+                ></textarea>
+              </div>
+
+              <div class="coluna-tradutor-saida">
+                <div class="topo-card-receita">
+                  <div>
+                    <h2 class="titulo-card-receita">Receita Traduzida</h2>
+                    <span class="sub-card-receita" id="meta-tradutor-resultado">Toque ou passe o mouse nos termos destacados para ver detalhes</span>
+                  </div>
+                  <div class="controles-linha-receita">
+                    <button type="button" class="btn-receita-primario" id="btn-trad-copiar">📋 Copiar</button>
+                    <button type="button" class="btn-receita-suave" id="btn-trad-usar-editor" title="Enviar tradução para o leitor de linhas">📝 Usar</button>
+                    <button type="button" class="btn-receita-suave" id="btn-trad-imprimir" title="Visualização limpa para impressão/PDF">🖨️ PDF</button>
+                  </div>
+                </div>
+                <div class="saida-tradutor-receita" id="saida-tradutor-receita" aria-live="polite">
+                  <div class="vazio-tradutor">Cole uma receita ou trecho ao lado para traduzir instantaneamente.</div>
+                </div>
+                <!-- RF09: Cartão de detalhe ao tocar em um termo traduzido -->
+                <div class="popover-termo-traduzido" id="popover-termo-traduzido" style="display: none" role="status"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- MÓDULO A: DICIONÁRIO MULTILÍNGUE & BUSCA INSTANTÂNEA (RF01-RF05) -->
+          <div class="painel-receita-dicionario" id="painel-receita-dicionario" style="display: none">
+            <div class="barra-filtros-dicionario">
+              <div class="campo-busca-dic">
+                <span class="icone-busca-dic" aria-hidden="true">⌕</span>
+                <input
+                  type="search"
+                  id="input-busca-dicionario"
+                  class="input-busca-dic"
+                  placeholder="Buscar sigla ou ponto (ex.: pb, sc, dc, k2tog, cad)..."
+                  aria-label="Buscar termo no dicionário de pontos"
+                />
+                <span class="contagem-dicionario" id="contagem-dicionario-pontos"></span>
+              </div>
+              <div class="seletores-dic">
+                <div class="pills-tecnica-dic" id="pills-tecnica-dic" role="group" aria-label="Filtrar técnica">
+                  <button type="button" class="btn-tec-dic ativo" data-dic-tec="todas">Todos</button>
+                  <button type="button" class="btn-tec-dic" data-dic-tec="croche">Crochê</button>
+                  <button type="button" class="btn-tec-dic" data-dic-tec="trico">Tricô</button>
+                </div>
+                <select id="select-dic-tecnica" class="select-tradutor sr-only-select" aria-label="Técnica" style="display: none">
+                  <option value="todas">Crochê e Tricô</option>
+                  <option value="croche">Somente Crochê</option>
+                  <option value="trico">Somente Tricô</option>
+                </select>
+                <select id="select-dic-categoria" class="select-dic-limpo" aria-label="Categoria de ponto">
+                  <option value="todas">Categoria: Todas</option>
+                  <option value="basicos">Pontos Básicos</option>
+                  <option value="aumentos">Aumentos / Dim.</option>
+                  <option value="especiais">Pontos Especiais</option>
+                  <option value="acabamentos">Acabamentos</option>
+                  <option value="acoes">Ações / Estrutura</option>
+                </select>
+                <select id="select-dic-idioma" class="select-dic-limpo" aria-label="Idioma de origem">
+                  <option value="todos">Idioma: Todos</option>
+                  <option value="pt">Português (BR)</option>
+                  <option value="us">Inglês (US)</option>
+                  <option value="uk">Inglês (UK)</option>
+                  <option value="es">Espanhol (ES)</option>
+                </select>
+                <button type="button" class="btn-dic-limpar-discreto" id="btn-dic-limpar-filtros" style="display: none">Limpar</button>
+              </div>
+            </div>
+
+            <div class="tabela-dicionario-wrap">
+              <div class="dic-cabecalho-lista" aria-hidden="true">
+                <span>Ponto</span>
+                <span>PT-BR</span>
+                <span>EN · US</span>
+                <span>EN · UK</span>
+                <span>ES</span>
+                <span></span>
+              </div>
+              <div class="grade-dicionario-pontos" id="grade-dicionario-pontos"></div>
+            </div>
+          </div>
+
+          <div class="toast-receitas" id="toast-receitas" role="status" aria-live="polite"></div>
         </div>
       </div>
 
@@ -1187,6 +1469,7 @@
                       <span class="ws-card-dica">Atalhos: <kbd>Espaço</kbd> ou <kbd>↑</kbd> para +1 • <kbd>↓</kbd> para −1</span>
                     </div>
                     <div class="ws-card-acoes">
+                      <button type="button" class="btn-ws-chip" id="btn-ws-contador-tela-toda" title="Abrir contador do projeto no modo Toque na Tela Toda">⛶ Tela Toda</button>
                       <button type="button" class="btn-ws-chip" id="btn-ws-add-contador">+ Contador</button>
                       <button type="button" class="btn-ws-link" id="btn-ws-ir-contadores" title="Abrir na aba Contador de Carreiras">Abrir ferramenta ↗</button>
                     </div>
@@ -1263,6 +1546,7 @@
                         <button type="button" class="btn-ws-switch ativo" data-ws-rec-modo="texto">Texto</button>
                         <button type="button" class="btn-ws-switch" data-ws-rec-modo="arquivo">PDF/Foto</button>
                       </div>
+                      <button type="button" class="btn-ws-chip" id="btn-ws-traduzir-receita" title="Abrir esta receita no Tradutor Automático">🔄 Traduzir</button>
                       <button type="button" class="btn-ws-link" id="btn-ws-ir-receitas">Tela cheia ↗</button>
                     </div>
                   </div>
@@ -1377,7 +1661,7 @@
                     </div>
                   </div>
 
-                  <!-- Cards resumo ligados à Calculadora de Amostra e Precificação -->
+                  <!-- Cards resumo ligados às ferramentas integradas -->
                   <div class="ws-atalhos-integrados">
                     <button type="button" class="ws-atalho-card" id="btn-ws-ir-amostra">
                       <span class="ws-atalho-icone">📐</span>
@@ -1391,6 +1675,20 @@
                       <div class="ws-atalho-info">
                         <strong>Precificação</strong>
                         <span id="ws-resumo-precificacao">Calcular preço desta peça</span>
+                      </div>
+                    </button>
+                    <button type="button" class="ws-atalho-card" id="btn-ws-ir-grafico">
+                      <span class="ws-atalho-icone">🎨</span>
+                      <div class="ws-atalho-info">
+                        <strong>Gráfico / Pixel Art</strong>
+                        <span id="ws-resumo-grafico">Abrir no Editor de Gráficos</span>
+                      </div>
+                    </button>
+                    <button type="button" class="ws-atalho-card" id="btn-ws-ir-aum-dim">
+                      <span class="ws-atalho-icone">⚖️</span>
+                      <div class="ws-atalho-info">
+                        <strong>Aumentos / Dim.</strong>
+                        <span id="ws-resumo-aum-dim">Distribuir pontos na carreira</span>
                       </div>
                     </button>
                   </div>
@@ -1472,6 +1770,10 @@
                   <div class="ficha-arquivo ficha-precificacao" style="--ordem-ficha: 5">
                     <div class="ficha-aba">Tempo &amp; Preço</div>
                     <div class="ficha-conteudo" id="dossie-ficha-precificacao">—</div>
+                  </div>
+                  <div class="ficha-arquivo ficha-grafico" style="--ordem-ficha: 6">
+                    <div class="ficha-aba">Gráfico / Pixel Art</div>
+                    <div class="ficha-conteudo" id="dossie-ficha-grafico">—</div>
                   </div>
                 </div>
 
@@ -1699,6 +2001,21 @@
           <div class="camada-confetes-proj" id="camada-confetes-projeto" aria-hidden="true"></div>
 
           <!-- Toast de Feedback -->
+          <!-- MODAL DE BAIXA AUTOMÁTICA DE ESTOQUE AO CONCLUIR PROJETO -->
+          <div class="modal-overlay-proj" id="modal-baixa-estoque-proj" style="display: none">
+            <div class="modal-confirmar-proj modal-baixa-estoque-box" role="dialog" aria-modal="true" aria-labelledby="titulo-baixa-estoque">
+              <h3 id="titulo-baixa-estoque">🎉 Projeto concluído!</h3>
+              <p class="texto-baixa-estoque-sub">
+                Deseja descontar os novelos/gramas e aviamentos usados deste projeto do seu estoque?
+              </p>
+              <div id="lista-itens-baixa-estoque" class="lista-itens-baixa-estoque"></div>
+              <div class="acoes-modal-confirmar">
+                <button type="button" class="btn-cancelar-proj" id="btn-cancelar-baixa-estoque">Agora não</button>
+                <button type="button" class="btn-salvar-proj" id="btn-confirmar-baixa-estoque">✓ Descontar do Estoque</button>
+              </div>
+            </div>
+          </div>
+
           <div class="toast-projetos" id="toast-projetos" role="status" aria-live="polite"></div>
         </div>
       </div>
@@ -2767,6 +3084,18 @@
               >
             </div>
             <div class="cabecalho-acoes-amostra">
+              <!-- Botão Calculadora Rápida de Aumentos & Diminuições Uniformes -->
+              <button
+                type="button"
+                class="btn-calc-aum-dim btn-macio"
+                id="btn-toggle-calc-aum-dim"
+                aria-pressed="false"
+                title="Abrir calculadora rápida de aumentos e diminuições uniformes na carreira"
+              >
+                <span aria-hidden="true">⚖️</span>
+                <span>Aumentos / Dim.</span>
+              </button>
+
               <!-- Botão Modo Avançado (Fio + Agulha + Ponto Base + Consumo) -->
               <button
                 type="button"
@@ -2802,6 +3131,57 @@
         </div>
 
         <div class="conteiner-ferramenta conteiner-amostra" id="conteiner-amostra">
+          <!-- CALCULADORA COMPACTA DE AUMENTOS & DIMINUIÇÕES UNIFORMES (ATIVADA PELO BOTÃO DO CABEÇALHO) -->
+          <div class="painel-calc-aum-dim" id="painel-calc-aum-dim" style="display: none">
+            <div class="card-calc-aum-dim">
+              <div class="topo-calc-aum-dim">
+                <div>
+                  <h2>⚖️ Aumentos &amp; Diminuições Uniformes</h2>
+                  <p>Distribua aumentos ou diminuições de forma perfeitamente equilibrada na carreira.</p>
+                </div>
+                <button type="button" class="btn-amostra-secundario" id="btn-voltar-calc-amostra">← Voltar à Amostra</button>
+              </div>
+
+              <div class="controles-pills-aum-dim">
+                <div class="grupo-pill-ad" role="group" aria-label="Operação">
+                  <button type="button" class="btn-pill-ad ativo" data-ad-op="aumentar">➕ Aumentar</button>
+                  <button type="button" class="btn-pill-ad" data-ad-op="diminuir">➖ Diminuir</button>
+                </div>
+                <div class="grupo-pill-ad" role="group" aria-label="Técnica">
+                  <button type="button" class="btn-pill-ad ativo" data-ad-tec="croche">Crochê</button>
+                  <button type="button" class="btn-pill-ad" data-ad-tec="trico">Tricô</button>
+                </div>
+                <div class="grupo-pill-ad" role="group" aria-label="Construção">
+                  <button type="button" class="btn-pill-ad ativo" data-ad-tipo="circular">Circular</button>
+                  <button type="button" class="btn-pill-ad" data-ad-tipo="plano">Plano</button>
+                </div>
+              </div>
+
+              <div class="grid-inputs-aum-dim">
+                <div class="campo-ad">
+                  <label for="input-ad-atuais">Pontos atuais na carreira</label>
+                  <input type="number" id="input-ad-atuais" class="input-texto-amostra" min="2" max="2000" value="74" />
+                </div>
+                <div class="campo-ad">
+                  <label for="input-ad-qtd" id="label-ad-qtd">Quantos pontos aumentar?</label>
+                  <input type="number" id="input-ad-qtd" class="input-texto-amostra" min="1" max="1000" value="13" />
+                </div>
+              </div>
+
+              <div class="resultado-calc-aum-dim" id="resultado-calc-aum-dim">
+                <div class="resumo-pontos-ad">
+                  <span id="ad-resumo-contagem">74 → 87 pontos (+13 aumentos)</span>
+                </div>
+                <div class="receita-pronta-ad" id="ad-receita-pronta"></div>
+                <div class="detalhe-passos-ad" id="ad-detalhe-passos"></div>
+                <div class="acoes-calc-aum-dim">
+                  <button type="button" class="btn-amostra-primario" id="btn-ad-copiar">📋 Copiar Sequência</button>
+                  <button type="button" class="btn-amostra-secundario" id="btn-ad-enviar-receitas">📝 Enviar p/ Receitas</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- ZONA 1: SELETOR DE MODO (ABAS COM PÍLULA DESLIZANTE) -->
           <div class="barra-modo-amostra">
             <div class="seletor-modo-amostra" id="seletor-modo-amostra" role="tablist" aria-label="Modo da calculadora de amostra">
@@ -3786,7 +4166,575 @@
       </div>
 
       <!-- ================================================================= -->
-      <!-- 9. CONFIGURAÇÕES                                                  -->
+      <!-- 8B. EDITOR DE GRÁFICOS (PIXEL ART / TAPESTRY / C2C / JACQUARD)    -->
+      <!-- ================================================================= -->
+      <div
+        id="secao-editor-graficos"
+        class="secao-ferramenta"
+        style="display: none"
+      >
+        <div class="cabecalho">
+          <div class="cabecalho-conteudo">
+            <div class="cabecalho-info">
+              <h1 class="titulo-ferramenta">Editor de Gráficos</h1>
+              <span class="subtitulo-ferramenta"
+                >Desenhe padrões em grade, importe pixel art quadriculada e acompanhe carreira por carreira</span
+              >
+            </div>
+            <div class="cabecalho-acoes-graficos">
+              <div class="switch-modo-graf" role="tablist" aria-label="Modo do Editor de Gráficos">
+                <button type="button" class="btn-modo-graf ativo" id="btn-graf-modo-edicao" data-graf-modo="edicao" role="tab" aria-selected="true">
+                  ✏️ Edição
+                </button>
+                <button type="button" class="btn-modo-graf" id="btn-graf-modo-execucao" data-graf-modo="execucao" role="tab" aria-selected="false">
+                  🧶 Execução
+                </button>
+              </div>
+              <button type="button" class="btn-graf-topo" id="btn-graf-nova-grade" title="Configurar ou redimensionar grade">⊞ Grade</button>
+              <button type="button" class="btn-graf-topo" id="btn-graf-importar-img" title="Importar foto ou pixel art quadriculada">🖼️ Importar</button>
+              <button type="button" class="btn-graf-topo" id="btn-graf-salvar-proj" title="Vincular e salvar gráfico em um projeto">💾 Projeto</button>
+              <button type="button" class="btn-graf-topo primario" id="btn-graf-exportar" title="Exportar gráfico em PNG ou PDF">📤 Exportar</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="conteiner-ferramenta conteiner-editor-graficos" id="conteiner-editor-graficos">
+          <!-- Workspace em 3 colunas: Ferramentas | Canvas + Execução | Paleta & Fios -->
+          <div class="layout-editor-graficos" id="layout-editor-graficos">
+            <!-- 1. BARRA LATERAL DE FERRAMENTAS (MODO EDIÇÃO) -->
+            <aside class="graf-barra-ferramentas" id="graf-barra-ferramentas" aria-label="Ferramentas de desenho">
+              <div class="graf-grupo-tools">
+                <span class="graf-mini-titulo">DESENHO</span>
+                <div class="graf-grid-tools">
+                  <button type="button" class="btn-graf-tool ativo" data-graf-tool="pincel" title="Pincel / Lápis (B)">✏️<span>Pincel</span></button>
+                  <button type="button" class="btn-graf-tool" data-graf-tool="borracha" title="Borracha (E)">🧽<span>Borracha</span></button>
+                  <button type="button" class="btn-graf-tool" data-graf-tool="balde" title="Balde de Tinta / Flood Fill (G)">🪣<span>Balde</span></button>
+                  <button type="button" class="btn-graf-tool" data-graf-tool="contagotas" title="Conta-gotas (I)">💧<span>Pegar cor</span></button>
+                  <button type="button" class="btn-graf-tool" data-graf-tool="linha" title="Linha reta (L)">╱<span>Linha</span></button>
+                  <button type="button" class="btn-graf-tool" data-graf-tool="retangulo" title="Retângulo (R)">▭<span>Retâng.</span></button>
+                  <button type="button" class="btn-graf-tool" data-graf-tool="elipse" title="Elipse / Círculo (O)">◯<span>Elipse</span></button>
+                  <button type="button" class="btn-graf-tool" data-graf-tool="selecao" title="Selecionar / Mover / Copiar (S)">⬚<span>Seleção</span></button>
+                  <button type="button" class="btn-graf-tool" data-graf-tool="pan" title="Arrastar tela / Pan (Espaço)">✋<span>Mover</span></button>
+                </div>
+                <label class="graf-check-inline" title="Preencher interior de retângulos e elipses">
+                  <input type="checkbox" id="chk-graf-forma-cheia" />
+                  <span>Forma preenchida</span>
+                </label>
+              </div>
+
+              <div class="graf-grupo-tools">
+                <span class="graf-mini-titulo">SIMETRIA &amp; ESPELHO</span>
+                <div class="graf-row-2">
+                  <button type="button" class="btn-graf-acao-tool" id="btn-graf-sim-h" aria-pressed="false" title="Espelhar desenho horizontalmente em tempo real">⇄ Sim. H</button>
+                  <button type="button" class="btn-graf-acao-tool" id="btn-graf-sim-v" aria-pressed="false" title="Espelhar desenho verticalmente em tempo real">⇅ Sim. V</button>
+                </div>
+                <div class="graf-row-2">
+                  <button type="button" class="btn-graf-acao-tool" id="btn-graf-espelhar-h" title="Espelhar seleção (ou toda a grade) na horizontal">↔ Virar H</button>
+                  <button type="button" class="btn-graf-acao-tool" id="btn-graf-espelhar-v" title="Espelhar seleção (ou toda a grade) na vertical">↕ Virar V</button>
+                </div>
+              </div>
+
+              <div class="graf-grupo-tools" id="graf-acoes-selecao">
+                <span class="graf-mini-titulo">REGIÃO &amp; HISTÓRICO</span>
+                <div class="graf-row-2">
+                  <button type="button" class="btn-graf-acao-tool" id="btn-graf-copiar-sel" title="Copiar região selecionada">📋 Copiar</button>
+                  <button type="button" class="btn-graf-acao-tool" id="btn-graf-colar-sel" title="Colar região copiada">📌 Colar</button>
+                </div>
+                <div class="graf-row-2">
+                  <button type="button" class="btn-graf-acao-tool" id="btn-graf-undo" title="Desfazer (Ctrl+Z)">↶ Desfazer</button>
+                  <button type="button" class="btn-graf-acao-tool" id="btn-graf-redo" title="Refazer (Ctrl+Y)">↷ Refazer</button>
+                </div>
+              </div>
+            </aside>
+
+            <!-- 2. PALCO CENTRAL (HTML5 CANVAS 60FPS + EXECUÇÃO) -->
+            <section class="graf-area-central">
+              <!-- Barra superior de navegação, zoom, guias e redimensionamento -->
+              <div class="graf-barra-palco">
+                <div class="graf-grupo-inline">
+                  <span class="graf-dim-badge" id="graf-dim-badge" title="Largura (pontos) × Altura (carreiras)">24 × 24</span>
+                  <div class="graf-resize-mini" id="graf-resize-mini">
+                    <button type="button" class="btn-graf-mini" id="btn-graf-add-col" title="Adicionar coluna à direita">+Col</button>
+                    <button type="button" class="btn-graf-mini" id="btn-graf-rem-col" title="Remover última coluna">−Col</button>
+                    <button type="button" class="btn-graf-mini" id="btn-graf-add-row" title="Adicionar carreira no topo">+Carr</button>
+                    <button type="button" class="btn-graf-mini" id="btn-graf-rem-row" title="Remover carreira do topo">−Carr</button>
+                  </div>
+                </div>
+
+                <div class="graf-grupo-inline">
+                  <button type="button" class="btn-graf-mini" id="btn-graf-zoom-out" title="Afastar zoom">−</button>
+                  <span class="graf-zoom-pct" id="graf-zoom-pct">100%</span>
+                  <button type="button" class="btn-graf-mini" id="btn-graf-zoom-in" title="Aproximar zoom">+</button>
+                  <button type="button" class="btn-graf-mini" id="btn-graf-zoom-fit" title="Ajustar grade na tela">⊡ Ajustar</button>
+                </div>
+
+                <div class="graf-grupo-inline">
+                  <select id="select-graf-divisoria" class="select-graf-mini" aria-label="Linhas divisórias de contagem" title="Destacar divisórias a cada 5 ou 10 pontos">
+                    <option value="5" selected>Guia: 5 pts</option>
+                    <option value="10">Guia: 10 pts</option>
+                    <option value="0">Sem guia</option>
+                  </select>
+                  <button type="button" class="btn-graf-mini" id="btn-graf-toggle-simbolos" aria-pressed="false" title="Exibir símbolos nas células (acessibilidade / impressão P&B)">Aa Símbolos</button>
+                  <button type="button" class="btn-graf-mini ativo" id="btn-graf-toggle-grade" aria-pressed="true" title="Mostrar/ocultar linhas da grade"># Grade</button>
+                  <span class="graf-autosave-status" id="graf-autosave-status" role="status">✓ Salvo</span>
+                </div>
+              </div>
+
+              <!-- Configurações do Modo Execução (visível apenas em Execução) -->
+              <div class="graf-barra-config-exec" id="graf-barra-config-exec" style="display: none">
+                <div class="graf-grupo-inline">
+                  <label class="graf-lbl-exec" for="select-graf-tipo-trab">Trabalho:</label>
+                  <select id="select-graf-tipo-trab" class="select-graf-mini">
+                    <option value="plano">Plano (Ida e Volta)</option>
+                    <option value="circular">Circular (Tubular)</option>
+                  </select>
+                </div>
+                <div class="graf-grupo-inline">
+                  <label class="graf-lbl-exec" for="select-graf-mao">Perfil:</label>
+                  <select id="select-graf-mao" class="select-graf-mini">
+                    <option value="destro">Destro</option>
+                    <option value="canhoto">Canhoto</option>
+                  </select>
+                </div>
+                <button type="button" class="btn-graf-mini" id="btn-graf-alto-contraste" aria-pressed="false" title="Modo de alto contraste para o marcador de carreira">◐ Alto Contraste</button>
+                <button type="button" class="btn-graf-mini ativo" id="btn-graf-sync-contador" aria-pressed="true" title="Sincronização bidirecional com o Contador de Carreiras">🔗 Sync Contador</button>
+              </div>
+
+              <!-- Viewport Canvas -->
+              <div class="graf-palco-wrap" id="graf-palco-wrap">
+                <canvas id="canvas-editor-graficos" class="canvas-editor-graficos"></canvas>
+                <div class="graf-coord-hud" id="graf-coord-hud">Carr 1 · Pt 1</div>
+              </div>
+
+              <!-- Barra Fixa do Modo Execução (Leitura em Blocos + Botões Amplos Mobile-First) -->
+              <div class="graf-barra-execucao" id="graf-barra-execucao" style="display: none">
+                <div class="graf-exec-topo">
+                  <div class="graf-exec-info">
+                    <strong id="graf-exec-titulo">Carreira 1 / 24</strong>
+                    <span class="graf-exec-direcao" id="graf-exec-direcao">← Direita → Esquerda (D → E)</span>
+                  </div>
+                  <div class="graf-exec-nav">
+                    <button type="button" class="btn-graf-exec-nav" id="btn-graf-exec-ant" aria-label="Carreira anterior">◀ Anterior</button>
+                    <button type="button" class="btn-graf-exec-nav primario" id="btn-graf-exec-prox" aria-label="Próxima carreira">Próxima ▶</button>
+                  </div>
+                </div>
+                <div class="graf-exec-blocos" id="graf-exec-blocos" aria-label="Sequência de blocos de cores da carreira atual"></div>
+              </div>
+            </section>
+
+            <!-- 3. PAINEL DIREITO: PALETA DE CORES, FIOS E CONTAGEM DE PONTOS -->
+            <aside class="graf-painel-paleta" id="graf-painel-paleta" aria-label="Paleta de cores e fios">
+              <div class="graf-paleta-topo">
+                <div>
+                  <h3>Paleta &amp; Fios</h3>
+                  <span id="graf-total-pontos-resumo">576 células</span>
+                </div>
+                <div class="graf-paleta-acoes-topo">
+                  <button type="button" class="btn-graf-mini" id="btn-graf-add-cor" title="Adicionar nova cor manual">+ Cor</button>
+                  <button type="button" class="btn-graf-mini" id="btn-graf-add-fio" title="Adicionar cor de um fio do inventário">🧶 Fio</button>
+                </div>
+              </div>
+              <div class="graf-lista-paleta" id="graf-lista-paleta"></div>
+            </aside>
+          </div>
+
+          <!-- MODAL 1: CONFIGURAR / REDIMENSIONAR GRADE (RF01, RF04, RN04) -->
+          <div class="modal-overlay-graf" id="modal-graf-nova-grade" style="display: none">
+            <div class="modal-box-graf" role="dialog" aria-modal="true" aria-labelledby="titulo-modal-graf-grade">
+              <div class="modal-graf-topo">
+                <h3 id="titulo-modal-graf-grade">⊞ Configurar Grade do Gráfico</h3>
+                <button type="button" class="btn-fechar-graf" id="btn-fechar-modal-grade" aria-label="Fechar">&times;</button>
+              </div>
+              <div class="modal-graf-corpo">
+                <div class="graf-form-grid-2">
+                  <div class="graf-campo">
+                    <label for="input-graf-largura">Largura (pontos: 5 a 200)</label>
+                    <input type="number" id="input-graf-largura" class="input-graf" min="5" max="200" value="24" />
+                  </div>
+                  <div class="graf-campo">
+                    <label for="input-graf-altura">Altura (carreiras: 5 a 200)</label>
+                    <input type="number" id="input-graf-altura" class="input-graf" min="5" max="200" value="24" />
+                  </div>
+                </div>
+                <div class="graf-campo">
+                  <div class="graf-imp-secao-topo">
+                    <label for="select-graf-proporcao">Proporção da Célula (ponto)</label>
+                    <button type="button" class="btn-graf-mini" id="btn-graf-puxar-amostra" title="Usar pontos e carreiras da Calculadora de Amostra ou do projeto ativo">📐 Puxar da Amostra</button>
+                  </div>
+                  <select id="select-graf-proporcao" class="input-graf">
+                    <option value="1">Quadrada 1:1 (Ponto Baixo / C2C)</option>
+                    <option value="0.8">Vertical 4:5 (Ponto Alto / Meio Ponto)</option>
+                    <option value="1.25">Horizontal 5:4 (Ponto Malha / Tricô)</option>
+                    <option value="custom">Customizada (conforme minha amostra)</option>
+                  </select>
+                </div>
+                <div class="graf-form-grid-2" id="graf-box-prop-custom" style="display: none">
+                  <div class="graf-campo">
+                    <label for="input-graf-prop-w">Pontos em 10cm (amostra)</label>
+                    <input type="number" id="input-graf-prop-w" class="input-graf" min="1" step="0.5" value="18" />
+                  </div>
+                  <div class="graf-campo">
+                    <label for="input-graf-prop-h">Carreiras em 10cm (amostra)</label>
+                    <input type="number" id="input-graf-prop-h" class="input-graf" min="1" step="0.5" value="22" />
+                  </div>
+                </div>
+                <div class="graf-campo">
+                  <label for="input-graf-nome-padrao">Nome do Padrão / Gráfico</label>
+                  <input type="text" id="input-graf-nome-padrao" class="input-graf" placeholder="Ex.: Coração Tapestry, Almofada Geométrica..." />
+                </div>
+                <p class="graf-dica-modal">
+                  <strong>Redimensionar:</strong> preserva seu desenho atual ao adicionar ou remover colunas/carreiras.<br />
+                  <strong>Nova Grade Limpa:</strong> inicia uma matriz em branco com as novas dimensões.
+                </p>
+              </div>
+              <div class="modal-graf-rodape">
+                <button type="button" class="btn-graf-sec" id="btn-graf-cancelar-grade">Cancelar</button>
+                <button type="button" class="btn-graf-sec" id="btn-graf-aplicar-resize">Redimensionar (Manter)</button>
+                <button type="button" class="btn-graf-prim" id="btn-graf-criar-limpa">Criar Grade Limpa</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- MODAL 2: IMPORTAÇÃO DE IMAGEM (PIXEL ART QUADRICULADA + FOTO) (RF06-RF11, RF13, RN02) -->
+          <div class="modal-overlay-graf" id="modal-graf-importar-img" style="display: none">
+            <div class="modal-box-graf largo" role="dialog" aria-modal="true" aria-labelledby="titulo-modal-graf-imp">
+              <div class="modal-graf-topo">
+                <h3 id="titulo-modal-graf-imp">🖼️ Importar Imagem / Pixel Art Quadriculada</h3>
+                <button type="button" class="btn-fechar-graf" id="btn-fechar-modal-imp" aria-label="Fechar">&times;</button>
+              </div>
+              <div class="modal-graf-corpo graf-imp-corpo">
+                <div class="graf-imp-barra-topo">
+                  <label class="btn-graf-prim" for="input-graf-img-file">
+                    <span>📤 Selecionar Imagem (PNG, JPG, WebP)</span>
+                    <input type="file" id="input-graf-img-file" accept="image/png,image/jpeg,image/webp,image/*" style="display: none" />
+                  </label>
+                  <div class="graf-pills-modo-imp" role="group" aria-label="Modo de importação">
+                    <button type="button" class="btn-imp-modo ativo" data-imp-modo="quadriculada">⊞ Pixel Art Quadriculada</button>
+                    <button type="button" class="btn-imp-modo" data-imp-modo="foto">📷 Foto / Ilustração</button>
+                  </div>
+                </div>
+
+                <div class="graf-imp-grid" id="graf-imp-conteudo" style="display: none">
+                  <!-- Coluna Esquerda: Prévia interativa (Crop + Grid Overlay vs Resultado) -->
+                  <div class="graf-imp-preview-col">
+                    <div class="graf-imp-abas-prev">
+                      <button type="button" class="btn-imp-prev ativo" data-imp-visao="calibrar">1. Recorte &amp; Calibração da Malha</button>
+                      <button type="button" class="btn-imp-prev" data-imp-visao="resultado">2. Prévia da Grade Extraída</button>
+                    </div>
+                    <div class="graf-imp-canvas-wrap">
+                      <canvas id="canvas-graf-imp-calibrar"></canvas>
+                      <canvas id="canvas-graf-imp-resultado" style="display: none"></canvas>
+                    </div>
+                    <small class="graf-imp-nota-rn02" id="graf-imp-nota-rn02">
+                      ✓ Amostragem Central (RN02): lê apenas os 45% centrais de cada célula, ignorando linhas da grade original.
+                    </small>
+                  </div>
+
+                  <!-- Coluna Direita: Controles de Crop, Malha e Limpeza de Cores -->
+                  <div class="graf-imp-controles-col">
+                    <div class="graf-imp-secao">
+                      <strong>Recorte da Área Útil (Crop)</strong>
+                      <div class="graf-sliders-crop">
+                        <label>Esquerda <span id="lbl-crop-l">0%</span><input type="range" id="imp-crop-l" min="0" max="45" step="0.5" value="0" /></label>
+                        <label>Direita <span id="lbl-crop-r">0%</span><input type="range" id="imp-crop-r" min="0" max="45" step="0.5" value="0" /></label>
+                        <label>Topo <span id="lbl-crop-t">0%</span><input type="range" id="imp-crop-t" min="0" max="45" step="0.5" value="0" /></label>
+                        <label>Base <span id="lbl-crop-b">0%</span><input type="range" id="imp-crop-b" min="0" max="45" step="0.5" value="0" /></label>
+                      </div>
+                    </div>
+
+                    <div class="graf-imp-secao">
+                      <div class="graf-imp-secao-topo">
+                        <strong>Malha (Colunas × Linhas)</strong>
+                        <button type="button" class="btn-graf-mini" id="btn-imp-auto-grade" title="Detectar automaticamente linhas de grade na imagem">✨ Detectar Grade</button>
+                      </div>
+                      <div class="graf-form-grid-2">
+                        <div class="graf-campo">
+                          <label for="imp-cols">Colunas (5–200)</label>
+                          <input type="number" id="imp-cols" class="input-graf" min="5" max="200" value="32" />
+                        </div>
+                        <div class="graf-campo">
+                          <label for="imp-rows">Linhas (5–200)</label>
+                          <input type="number" id="imp-rows" class="input-graf" min="5" max="200" value="32" />
+                        </div>
+                      </div>
+                      <div class="graf-sliders-crop" id="graf-imp-box-calibracao">
+                        <label>Offset X <span id="lbl-off-x">0 px</span><input type="range" id="imp-off-x" min="-30" max="30" step="0.5" value="0" /></label>
+                        <label>Offset Y <span id="lbl-off-y">0 px</span><input type="range" id="imp-off-y" min="-30" max="30" step="0.5" value="0" /></label>
+                        <label>Escala X <span id="lbl-esc-x">100%</span><input type="range" id="imp-esc-x" min="85" max="115" step="0.2" value="100" /></label>
+                        <label>Escala Y <span id="lbl-esc-y">100%</span><input type="range" id="imp-esc-y" min="85" max="115" step="0.2" value="100" /></label>
+                      </div>
+                    </div>
+
+                    <div class="graf-imp-secao">
+                      <strong>Limpeza &amp; Mesclagem de Cores (RF10 + RF13)</strong>
+                      <div class="graf-sliders-crop">
+                        <label>Máx. cores <span id="lbl-max-cores">8</span><input type="range" id="imp-max-cores" min="2" max="24" step="1" value="8" /></label>
+                        <label>Mesclar tons parecidos <span id="lbl-tol-cor">24</span><input type="range" id="imp-tol-cor" min="0" max="80" step="2" value="24" /></label>
+                      </div>
+                      <div class="graf-imp-cores-lista" id="graf-imp-cores-lista"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="graf-imp-vazio" id="graf-imp-vazio">
+                  <span>🖼️</span>
+                  <strong>Envie uma foto ou imagem quadriculada de pixel art</strong>
+                  <p>No modo <em>Pixel Art Quadriculada</em>, você pode recortar margens, alinhar a grade virtual e extrair a cor exata do centro de cada quadradinho.</p>
+                </div>
+              </div>
+              <div class="modal-graf-rodape">
+                <button type="button" class="btn-graf-sec" id="btn-graf-cancelar-imp">Cancelar</button>
+                <button type="button" class="btn-graf-prim" id="btn-graf-confirmar-imp" disabled>✓ Carregar no Editor</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- MODAL 3: EDITAR COR / VINCULAR FIO DO INVENTÁRIO (RF12, RF14, RF15, RN03) -->
+          <div class="modal-overlay-graf" id="modal-graf-editar-cor" style="display: none">
+            <div class="modal-box-graf" role="dialog" aria-modal="true" aria-labelledby="titulo-modal-graf-cor">
+              <div class="modal-graf-topo">
+                <h3 id="titulo-modal-graf-cor">🎨 Editar Cor / Vincular Fio</h3>
+                <button type="button" class="btn-fechar-graf" id="btn-fechar-modal-cor" aria-label="Fechar">&times;</button>
+              </div>
+              <div class="modal-graf-corpo">
+                <input type="hidden" id="graf-cor-edit-idx" value="" />
+                <div class="graf-campo">
+                  <label for="select-graf-fio-inv">Vincular a um Fio do Inventário (opcional)</label>
+                  <select id="select-graf-fio-inv" class="input-graf">
+                    <option value="">Cor manual (sem vínculo de estoque)</option>
+                  </select>
+                </div>
+                <div class="graf-form-grid-2">
+                  <div class="graf-campo">
+                    <label for="input-graf-cor-hex">Cor (Seletor / HEX)</label>
+                    <div class="graf-hex-row">
+                      <input type="color" id="input-graf-cor-picker" value="#fcf1d0" />
+                      <input type="text" id="input-graf-cor-hex" class="input-graf" value="#fcf1d0" maxlength="7" />
+                    </div>
+                  </div>
+                  <div class="graf-campo">
+                    <label for="input-graf-cor-simbolo">Símbolo / Letra (1–2 chars)</label>
+                    <input type="text" id="input-graf-cor-simbolo" class="input-graf" maxlength="2" placeholder="A" />
+                  </div>
+                </div>
+                <div class="graf-campo">
+                  <label for="input-graf-cor-nome">Nome da Cor / Fio</label>
+                  <input type="text" id="input-graf-cor-nome" class="input-graf" placeholder="Ex.: Branco, Azul Marinho, Amigurumi 8001..." />
+                </div>
+                <p class="graf-dica-modal">
+                  A troca atualiza instantaneamente todas as células desta cor na grade. Mesmo se o fio for excluído do inventário no futuro, o HEX e o nome ficam protegidos em cache.
+                </p>
+              </div>
+              <div class="modal-graf-rodape">
+                <button type="button" class="btn-graf-perigo" id="btn-graf-remover-cor" style="margin-right: auto; display: none">Remover Cor</button>
+                <button type="button" class="btn-graf-sec" id="btn-graf-cancelar-cor">Cancelar</button>
+                <button type="button" class="btn-graf-prim" id="btn-graf-salvar-cor">✓ Aplicar na Grade</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- MODAL 4: EXPORTAR PNG / PDF (RF22) -->
+          <div class="modal-overlay-graf" id="modal-graf-exportar" style="display: none">
+            <div class="modal-box-graf" role="dialog" aria-modal="true" aria-labelledby="titulo-modal-graf-exp">
+              <div class="modal-graf-topo">
+                <h3 id="titulo-modal-graf-exp">📤 Exportar Gráfico</h3>
+                <button type="button" class="btn-fechar-graf" id="btn-fechar-modal-exp" aria-label="Fechar">&times;</button>
+              </div>
+              <div class="modal-graf-corpo">
+                <div class="graf-checks-export">
+                  <label><input type="checkbox" id="chk-exp-grade" checked /> Incluir linhas da grade e divisórias</label>
+                  <label><input type="checkbox" id="chk-exp-numeros" checked /> Incluir numeração de carreiras (1 embaixo) e colunas</label>
+                  <label><input type="checkbox" id="chk-exp-simbolos" /> Incluir símbolos dentro das células (ideal p/ P&amp;B e daltonismo)</label>
+                  <label><input type="checkbox" id="chk-exp-legenda" checked /> Incluir legenda de fios/cores e contagem de pontos</label>
+                  <label><input type="checkbox" id="chk-exp-receita" checked /> Incluir receita escrita carreira por carreira (no PDF)</label>
+                </div>
+              </div>
+              <div class="modal-graf-rodape">
+                <button type="button" class="btn-graf-sec" id="btn-graf-cancelar-exp">Fechar</button>
+                <button type="button" class="btn-graf-sec" id="btn-graf-enviar-receitas" title="Enviar receita escrita carreira por carreira para Receitas e Anotações">📝 Enviar p/ Receitas</button>
+                <button type="button" class="btn-graf-sec" id="btn-graf-baixar-png">🖼️ Baixar PNG</button>
+                <button type="button" class="btn-graf-prim" id="btn-graf-gerar-pdf">🖨️ Gerar PDF / Imprimir</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- MODAL 5: SALVAR / CARREGAR EM PROJETO (RF21) -->
+          <div class="modal-overlay-graf" id="modal-graf-salvar-proj" style="display: none">
+            <div class="modal-box-graf" role="dialog" aria-modal="true" aria-labelledby="titulo-modal-graf-proj">
+              <div class="modal-graf-topo">
+                <h3 id="titulo-modal-graf-proj">💾 Vincular Gráfico a um Projeto</h3>
+                <button type="button" class="btn-fechar-graf" id="btn-fechar-modal-proj" aria-label="Fechar">&times;</button>
+              </div>
+              <div class="modal-graf-corpo">
+                <div class="graf-campo">
+                  <label for="select-graf-projeto-alvo">Projeto do Gerenciador de Projetos</label>
+                  <select id="select-graf-projeto-alvo" class="input-graf">
+                    <option value="">Carregando projetos...</option>
+                  </select>
+                </div>
+                <label class="graf-check-inline">
+                  <input type="checkbox" id="chk-graf-sync-fios-proj" checked />
+                  <span>Sincronizar fios vinculados na paleta com a Ficha Técnica do projeto</span>
+                </label>
+                <p class="graf-dica-modal">
+                  Salva a matriz completa, paleta/fios vinculados, sentido de leitura e carreira atual dentro da pasta do projeto selecionado.
+                </p>
+              </div>
+              <div class="modal-graf-rodape">
+                <button type="button" class="btn-graf-sec" id="btn-graf-cancelar-proj">Cancelar</button>
+                <button type="button" class="btn-graf-sec" id="btn-graf-carregar-de-proj">📂 Carregar do Projeto</button>
+                <button type="button" class="btn-graf-prim" id="btn-graf-confirmar-salvar-proj">💾 Salvar no Projeto</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="toast-graficos" id="toast-graficos" role="status" aria-live="polite"></div>
+        </div>
+      </div>
+
+      <!-- ================================================================= -->
+      <!-- 9. TABELAS DE CONVERSÃO E MEDIDAS (RF01–RF08, RNF01–RNF04)        -->
+      <!-- ================================================================= -->
+      <div
+        id="secao-tabelas-conversao"
+        class="secao-ferramenta"
+        style="display: none"
+      >
+        <div class="cabecalho">
+          <div class="cabecalho-conteudo">
+            <div class="cabecalho-info">
+              <h1 class="titulo-ferramenta">Tabelas de Conversão e Medidas</h1>
+              <span class="subtitulo-ferramenta"
+                >Equivalências de agulhas, espessura de fios (CYC/TEX) e medidas padrão para peças</span
+              >
+            </div>
+            <div class="conv-toggle-unidade" id="conv-toggle-unidade" role="group" aria-label="Unidade de medida">
+              <button type="button" class="btn-conv-unidade ativo" id="btn-conv-unidade-cm" aria-pressed="true">
+                cm
+              </button>
+              <button type="button" class="btn-conv-unidade" id="btn-conv-unidade-pol" aria-pressed="false">
+                pol
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="conteiner-ferramenta conteiner-conversao" id="conteiner-conversao">
+          <!-- Busca Instantânea (RF05) + Abas com Indicador Deslizante (RF01) -->
+          <div class="conv-controles-topo">
+            <div class="conv-busca-wrap">
+              <svg class="conv-busca-icone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input
+                type="text"
+                id="input-busca-conversao"
+                class="conv-input-busca"
+                placeholder="Ex: 4.5mm, TEX 500, Worsted, DK, Touca bebê, GG..."
+                aria-label="Buscar nas tabelas de conversão e medidas"
+                autocomplete="off"
+              />
+              <button
+                type="button"
+                id="btn-limpar-busca-conversao"
+                class="btn-conv-limpar-busca"
+                aria-label="Limpar busca"
+                title="Limpar busca"
+                hidden
+              >
+                &times;
+              </button>
+            </div>
+
+            <div class="conv-tabs-lista" id="conv-tabs-lista" role="tablist" aria-label="Categorias de referência">
+              <span class="conv-tabs-indicador" id="conv-tabs-indicador" aria-hidden="true"></span>
+              <button
+                type="button"
+                class="conv-tab ativo"
+                id="tab-conv-agulhas"
+                data-aba="agulhas"
+                role="tab"
+                aria-selected="true"
+                aria-controls="conv-area-dinamica"
+              >
+                Agulhas
+              </button>
+              <button
+                type="button"
+                class="conv-tab"
+                id="tab-conv-fios"
+                data-aba="fios"
+                role="tab"
+                aria-selected="false"
+                aria-controls="conv-area-dinamica"
+                tabindex="-1"
+              >
+                Espessura de Fios
+              </button>
+              <button
+                type="button"
+                class="conv-tab"
+                id="tab-conv-medidas"
+                data-aba="medidas"
+                role="tab"
+                aria-selected="false"
+                aria-controls="conv-area-dinamica"
+                tabindex="-1"
+              >
+                Medidas Padrão
+              </button>
+            </div>
+          </div>
+
+          <!-- Área Dinâmica -->
+          <div class="conv-area-dinamica" id="conv-area-dinamica" role="tabpanel" aria-labelledby="tab-conv-agulhas">
+            <!-- Conversor Rápido (RF02 — visível em Agulhas e Espessura de Fios) -->
+            <section class="conv-card-rapido" id="conv-card-rapido" aria-label="Conversor rápido">
+              <div class="conv-card-rapido-topo">
+                <h2 class="conv-titulo-rapido" id="conv-titulo-rapido">Conversor Rápido de Agulhas</h2>
+                <div class="conv-controles-rapido">
+                  <select id="conv-select-sistema" class="conv-select-sistema" aria-label="Sistema de origem"></select>
+                  <input
+                    type="text"
+                    id="conv-input-valor"
+                    class="conv-input-valor"
+                    list="conv-datalist-valores"
+                    placeholder="Ex.: 4.0"
+                    aria-label="Valor para converter"
+                    autocomplete="off"
+                  />
+                  <datalist id="conv-datalist-valores"></datalist>
+                  <button
+                    type="button"
+                    id="btn-conv-inverter-origem"
+                    class="btn-conv-inverter"
+                    title="Alternar sistema de origem"
+                  >
+                    ⇄ Alternar origem
+                  </button>
+                </div>
+              </div>
+              <div class="conv-resultado-rapido" id="conv-resultado-rapido" aria-live="polite"></div>
+            </section>
+
+            <!-- Subcategorias + Dica Contextual (RF04 / RF08 — visível em Medidas Padrão) -->
+            <section class="conv-bloco-medidas-topo" id="conv-bloco-medidas-topo" style="display: none" aria-label="Subcategorias de medidas padrão">
+              <div class="conv-chips-subcategorias" id="conv-chips-subcategorias" role="group" aria-label="Filtrar por tipo de peça"></div>
+              <div class="conv-dica-contextual" id="conv-dica-contextual" role="note"></div>
+            </section>
+
+            <!-- Status / Contador + Tabela -->
+            <p class="conv-status-busca" id="conv-status-busca" aria-live="polite"></p>
+            <div class="conv-tabela-wrapper" id="conv-tabela-wrapper"></div>
+          </div>
+
+          <div class="toast-conversao" id="toast-conversao" role="status" aria-live="polite"></div>
+        </div>
+      </div>
+
+      <!-- ================================================================= -->
+      <!-- 10. CONFIGURAÇÕES                                                 -->
       <!-- ================================================================= -->
       <div
         id="secao-configuracoes"
@@ -3988,6 +4936,24 @@
                       <button type="button" class="btn-seg-cfg" data-valor="recolhido">Recolhido</button>
                     </div>
                   </div>
+                </div>
+
+                <div class="linha-config vertical" data-busca="ferramentas barra lateral menu personalizar ocultar popup icones abas atalhos">
+                  <div class="topo-ferramentas-sidebar-cfg">
+                    <div class="info-linha-config">
+                      <strong>Ferramentas na Barra Lateral</strong>
+                      <span>Marque as ferramentas que ficam fixas na barra lateral. As desmarcadas aparecem como ícones na aba <strong>Ferramentas</strong>.</span>
+                    </div>
+                    <div class="acoes-ferramentas-sidebar-cfg">
+                      <span class="pill-contagem-sidebar-cfg" id="cfg-resumo-sidebar-ferramentas">5 na barra • 5 em Ferramentas</span>
+                      <button type="button" class="btn-cfg-suave compacto" id="btn-cfg-sidebar-enxuto">Padrão enxuto</button>
+                      <button type="button" class="btn-cfg-suave compacto" id="btn-cfg-sidebar-todas">Mostrar todas</button>
+                    </div>
+                  </div>
+                  <div class="grade-ferramentas-sidebar-cfg" id="cfg-lista-ferramentas-sidebar" role="group" aria-label="Selecionar ferramentas visíveis na barra lateral"></div>
+                  <p class="nota-ferramentas-sidebar-cfg">
+                    <strong>Início</strong> e <strong>Configurações</strong> permanecem sempre visíveis na barra lateral; a aba <strong>Ferramentas</strong> aparece automaticamente quando há ferramentas recolhidas.
+                  </p>
                 </div>
               </section>
 
@@ -4206,6 +5172,30 @@
                   </div>
                 </div>
 
+                <div class="linha-config" data-busca="sincronizar sincronizacao wifi wi-fi qr code celular pc ubuntu rede local merge mesclar rollback">
+                  <div class="info-linha-config">
+                    <strong>Sincronizar via Wi-Fi (PC ↔ Celular)</strong>
+                    <span>Transfira ou mescle seus dados na rede local via QR Code, 100% offline e com backup de segurança</span>
+                  </div>
+                  <div class="controle-linha-config">
+                    <button type="button" class="btn-cfg-primario" id="btn-cfg-abrir-sync-wifi">
+                      <span>📶 Sincronizar via Wi-Fi</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="linha-config linha-rollback-sync" id="linha-cfg-rollback-sync" style="display: none" data-busca="rollback desfazer sincronizacao backup pre sync restaurar">
+                  <div class="info-linha-config">
+                    <strong>Backup Pré-Sincronização (Rollback)</strong>
+                    <span id="texto-cfg-rollback-info">Cópia de segurança pronta caso precise desfazer a última sincronização</span>
+                  </div>
+                  <div class="controle-linha-config">
+                    <button type="button" class="btn-cfg-aviso" id="btn-cfg-desfazer-sync">
+                      <span>↩️ Desfazer Sync</span>
+                    </button>
+                  </div>
+                </div>
+
                 <div class="linha-config" data-busca="exportar backup json salvar tudo transferir celular pc">
                   <div class="info-linha-config">
                     <strong>Exportar Backup Completo (.json)</strong>
@@ -4303,6 +5293,103 @@
                 <span>🔍</span>
                 <strong>Nenhuma configuração encontrada</strong>
                 <p>Tente pesquisar por "tema", "som", "backup", "fonte" ou "moeda".</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- MODAL 0: SINCRONIZAÇÃO LOCAL VIA WI-FI (PC UBUNTU <-> CELULAR) -->
+          <div class="modal-overlay-cfg" id="modal-cfg-sync-wifi" style="display: none">
+            <div class="modal-box-cfg modal-sync-wifi-box" role="dialog" aria-modal="true" aria-labelledby="titulo-modal-sync-wifi">
+              <div class="modal-cfg-topo">
+                <h3 id="titulo-modal-sync-wifi">📶 Sincronização via Wi-Fi</h3>
+                <button type="button" class="btn-fechar-cfg" id="btn-fechar-sync-wifi" aria-label="Encerrar e fechar">&times;</button>
+              </div>
+
+              <div class="modal-cfg-corpo sync-wifi-corpo">
+                <!-- MODO PC (SERVIDOR LOCAL TEMPORÁRIO) -->
+                <div id="sync-painel-pc" style="display: none">
+                  <div class="sync-direcao-bloco">
+                    <span class="sync-rotulo">1. Direção da Sincronização</span>
+                    <div class="sync-direcao-grid" id="sync-direcao-grid" role="radiogroup" aria-label="Direção da sincronização">
+                      <button type="button" class="btn-sync-dir" data-sync-dir="pc_para_celular" aria-checked="false">
+                        <strong>💻 → 📱 PC → Celular</strong>
+                        <span>Envia o .json do Ubuntu para o celular</span>
+                      </button>
+                      <button type="button" class="btn-sync-dir" data-sync-dir="celular_para_pc" aria-checked="false">
+                        <strong>📱 → 💻 Celular → PC</strong>
+                        <span>Puxa o .json do celular para o Ubuntu</span>
+                      </button>
+                      <button type="button" class="btn-sync-dir ativo" data-sync-dir="mesclar" aria-checked="true">
+                        <strong>🔄 Mesclar (Merge)</strong>
+                        <span>Mantém a versão mais recente de cada item</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="sync-status-barra aguardando" id="sync-status-barra" role="status" aria-live="polite">
+                    <span class="sync-status-dot" id="sync-status-dot"></span>
+                    <span class="sync-status-texto" id="sync-status-texto">Iniciando servidor local temporário...</span>
+                    <span class="sync-timer-pill" id="sync-timer-pill">05:00</span>
+                  </div>
+
+                  <div class="sync-qr-grid" id="sync-qr-grid">
+                    <div class="sync-qr-wrap">
+                      <div class="sync-qr-box" id="sync-qr-box"></div>
+                      <small class="sync-qr-legenda">Aponte a câmera do celular (100% offline)</small>
+                    </div>
+                    <div class="sync-link-coluna">
+                      <span class="sync-rotulo">2. Ou acesse pelo navegador do celular</span>
+                      <p class="sync-instrucao-curta">Abra o link abaixo no celular conectado ao mesmo Wi-Fi — não precisa instalar nada extra:</p>
+                      <div class="sync-url-box">
+                        <code id="sync-url-texto">—</code>
+                        <button type="button" class="btn-cfg-suave" id="btn-sync-copiar-url">📋 Copiar</button>
+                      </div>
+                      <div class="sync-seguranca-nota">
+                        🔒 Token temporário de uso único (expira em 5 min). Um backup <code>backup_pre_sync.json</code> é salvo automaticamente antes de alterar dados.
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- RNF05: Diagnóstico de Rede / Firewall -->
+                  <div class="sync-diagnostico-box" id="sync-diagnostico-box" style="display: none">
+                    <strong>⚠️ Demorando para conectar? Verifique a rede e o firewall:</strong>
+                    <ul>
+                      <li>Confirme que o PC e o celular estão na <strong>mesma rede Wi-Fi</strong> (desative dados móveis/4G/5G).</li>
+                      <li>Se o firewall do Ubuntu (UFW) estiver ativo, libere temporariamente a porta:
+                        <code id="sync-cmd-ufw">sudo ufw allow 0/tcp</code>
+                        <button type="button" class="btn-sync-mini-copiar" id="btn-sync-copiar-ufw">Copiar</button>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+
+                <!-- MODO CELULAR / WEB SEM BACKEND PYTHON -->
+                <div id="sync-painel-mobile" style="display: none">
+                  <div class="sync-mobile-guia">
+                    <p class="texto-modal-cfg">
+                      Para sincronizar com o seu <strong>PC Ubuntu via Wi-Fi</strong>:
+                    </p>
+                    <ol class="sync-passos-mobile">
+                      <li>No Ponto &amp; Trama do <strong>Ubuntu</strong>, abra <em>Configurações → Sincronizar via Wi-Fi</em>.</li>
+                      <li>Escaneie o <strong>QR Code</strong> com a câmera do celular (ou digite o link no navegador).</li>
+                      <li>Use os atalhos abaixo para gerar seu backup antes de enviar ou importar o arquivo baixado do PC:</li>
+                    </ol>
+                    <div class="sync-mobile-acoes">
+                      <button type="button" class="btn-cfg-primario" id="btn-sync-mob-exportar">📥 Exportar .json deste Aparelho</button>
+                      <label class="btn-cfg-suave" for="input-cfg-importar-tudo" id="btn-sync-mob-importar">
+                        <span>📤 Importar .json do PC</span>
+                      </label>
+                    </div>
+                    <p class="dica-modal-cfg">
+                      🔒 Antes de importar qualquer arquivo neste aparelho, o sistema valida a estrutura do JSON e salva uma cópia pré-sync automática para permitir desfazer (Rollback).
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="modal-cfg-rodape">
+                <button type="button" class="btn-cfg-suave" id="btn-sync-renovar" style="display: none">🔄 Novo QR Code</button>
+                <button type="button" class="btn-cfg-primario" id="btn-sync-encerrar">Encerrar e Fechar</button>
               </div>
             </div>
           </div>

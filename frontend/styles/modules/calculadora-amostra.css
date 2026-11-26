@@ -1564,3 +1564,198 @@
   grid-template-columns: 1.4fr 0.8fr;
   gap: 8px;
 }
+
+/* ==========================================================================
+   CALCULADORA DE AUMENTOS & DIMINUIÇÕES UNIFORMES (HEADER TOGGLE + PAINEL)
+   ========================================================================== */
+.btn-calc-aum-dim {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 36px;
+  padding: 0 13px;
+  border-radius: var(--raio-borda-pilula);
+  border: 1.5px solid var(--creme-opacidade-30);
+  background-color: rgba(1, 7, 54, 0.72);
+  color: var(--cor-texto-principal);
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn-calc-aum-dim:hover {
+  background-color: var(--cor-destaque-hover);
+  border-color: var(--cor-texto-principal);
+  color: var(--cor-branco);
+}
+
+.btn-calc-aum-dim.ativo {
+  background: var(--cor-texto-principal);
+  color: var(--cor-fundo-profundo);
+  border-color: var(--cor-texto-principal);
+  box-shadow: 0 4px 14px rgba(252, 241, 208, 0.25);
+}
+
+/* Quando ativa, alterna o layout para exibir apenas a calculadora compacta */
+#conteiner-amostra.modo-aum-dim-ativo > .barra-modo-amostra,
+#conteiner-amostra.modo-aum-dim-ativo > .grid-principal-amostra {
+  display: none !important;
+}
+
+.painel-calc-aum-dim {
+  width: 100%;
+  max-width: 680px;
+  margin: 8px auto 24px auto;
+  animation: fadeInModoAmostra 0.2s ease-out;
+}
+
+.card-calc-aum-dim {
+  background: rgba(34, 57, 111, 0.34);
+  border: 1.5px solid rgba(252, 241, 208, 0.16);
+  border-radius: 18px;
+  padding: 20px;
+  box-shadow: var(--sombra-card);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.topo-calc-aum-dim {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.topo-calc-aum-dim h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--cor-texto-principal);
+}
+
+.topo-calc-aum-dim p {
+  margin: 4px 0 0 0;
+  font-size: 12.5px;
+  color: var(--creme-opacidade-70);
+}
+
+.controles-pills-aum-dim {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.grupo-pill-ad {
+  display: inline-flex;
+  background: rgba(1, 7, 54, 0.65);
+  border: 1px solid rgba(252, 241, 208, 0.18);
+  border-radius: 10px;
+  padding: 3px;
+  gap: 3px;
+}
+
+.btn-pill-ad {
+  border: none;
+  background: transparent;
+  color: var(--creme-opacidade-75);
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 700;
+  padding: 7px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.16s ease, color 0.16s ease;
+}
+
+.btn-pill-ad:hover {
+  color: var(--cor-texto-principal);
+}
+
+.btn-pill-ad.ativo {
+  background: var(--cor-destaque-hover);
+  color: var(--cor-branco);
+}
+
+.grid-inputs-aum-dim {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.campo-ad {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.campo-ad label {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--creme-opacidade-75);
+}
+
+.campo-ad .input-texto-amostra {
+  width: 100%;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--cor-texto-principal);
+}
+
+.resultado-calc-aum-dim {
+  background: rgba(1, 7, 54, 0.56);
+  border: 1px solid rgba(252, 241, 208, 0.16);
+  border-radius: 14px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.resumo-pontos-ad {
+  font-size: 12.5px;
+  font-weight: 800;
+  color: #8ab0ff;
+  letter-spacing: 0.3px;
+}
+
+.receita-pronta-ad {
+  background: rgba(34, 57, 111, 0.42);
+  border: 1.5px solid rgba(252, 241, 208, 0.25);
+  border-radius: 10px;
+  padding: 14px 16px;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--cor-texto-principal);
+  line-height: 1.55;
+  word-break: break-word;
+}
+
+.receita-pronta-ad.erro-ad {
+  background: rgba(231, 76, 60, 0.16);
+  border-color: rgba(231, 76, 60, 0.45);
+  color: #ffb3ad;
+  font-size: 13.5px;
+}
+
+.detalhe-passos-ad {
+  font-size: 12.5px;
+  color: var(--creme-opacidade-75);
+  line-height: 1.5;
+}
+
+.acoes-calc-aum-dim {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.acoes-calc-aum-dim .btn-amostra-primario,
+.acoes-calc-aum-dim .btn-amostra-secundario {
+  flex: 1 1 180px;
+}

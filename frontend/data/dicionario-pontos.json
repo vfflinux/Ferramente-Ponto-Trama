@@ -1,0 +1,471 @@
+{
+  "versao": "1.0.0",
+  "atualizado_em": "2026-11-25",
+  "idiomas": {
+    "pt": "Português (BR)",
+    "us": "Inglês (US)",
+    "uk": "Inglês (UK)",
+    "es": "Espanhol (ES)"
+  },
+  "termos": [
+    {
+      "id": "corr",
+      "tecnica": "croche",
+      "categoria": "basicos",
+      "siglas": { "pt": ["corr", "cor", "corr."], "us": ["ch", "chs"], "uk": ["ch", "chs"], "es": ["cad", "pc", "c"] },
+      "nomes": { "pt": "Correntinha", "us": "Chain", "uk": "Chain", "es": "Cadeneta" },
+      "descricao": "Laçada base que forma a fundação ou a altura inicial das carreiras de crochê."
+    },
+    {
+      "id": "pbx",
+      "tecnica": "croche",
+      "categoria": "basicos",
+      "siglas": { "pt": ["pbx", "p.b.x.", "pbx.", "p.bx"], "us": ["sl st", "slst", "ss"], "uk": ["sl st", "slst", "ss"], "es": ["pe", "pr", "p.e.", "p.r.", "p.desl"] },
+      "nomes": { "pt": "Ponto Baixíssimo", "us": "Slip Stitch", "uk": "Slip Stitch", "es": "Punto Enano / Raso" },
+      "descricao": "Ponto sem altura usado para fechar carreiras circulares, unir partes ou caminhar sobre o trabalho."
+    },
+    {
+      "id": "pb",
+      "tecnica": "croche",
+      "categoria": "basicos",
+      "ambiguo_en": true,
+      "siglas": { "pt": ["pb", "p.b.", "pb."], "us": ["sc"], "uk": ["dc"], "es": ["pb", "mp", "p.b."] },
+      "nomes": { "pt": "Ponto Baixo", "us": "Single Crochet", "uk": "Double Crochet", "es": "Punto Bajo / Medio Punto" },
+      "descricao": "Ponto firme e fechado, muito usado em amigurumis, bolsas e peças estruturadas."
+    },
+    {
+      "id": "mpa",
+      "tecnica": "croche",
+      "categoria": "basicos",
+      "ambiguo_en": true,
+      "siglas": { "pt": ["mpa", "m.p.a.", "pma"], "us": ["hdc"], "uk": ["htr"], "es": ["mpa", "mv", "pma"] },
+      "nomes": { "pt": "Meio Ponto Alto", "us": "Half Double Crochet", "uk": "Half Treble Crochet", "es": "Medio Punto Alto / Media Vareta" },
+      "descricao": "Altura intermediária entre o ponto baixo e o ponto alto; fecha as 3 laçadas da agulha de uma vez."
+    },
+    {
+      "id": "pa",
+      "tecnica": "croche",
+      "categoria": "basicos",
+      "ambiguo_en": true,
+      "siglas": { "pt": ["pa", "p.a.", "pa."], "us": ["dc"], "uk": ["tr"], "es": ["pa", "v", "p.a."] },
+      "nomes": { "pt": "Ponto Alto", "us": "Double Crochet", "uk": "Treble Crochet", "es": "Punto Alto / Vareta" },
+      "descricao": "Um dos pontos mais versáteis do crochê: 1 laçada na agulha, puxa e fecha de 2 em 2."
+    },
+    {
+      "id": "pad",
+      "tecnica": "croche",
+      "categoria": "basicos",
+      "ambiguo_en": true,
+      "siglas": { "pt": ["pad", "p.a.d.", "pa2"], "us": ["tr", "trc"], "uk": ["dtr"], "es": ["pad", "vd", "p.a.d."] },
+      "nomes": { "pt": "Ponto Alto Duplo", "us": "Treble Crochet", "uk": "Double Treble Crochet", "es": "Punto Alto Doble / Vareta Doble" },
+      "descricao": "Ponto alongado feito com 2 laçadas iniciais na agulha, fechando de 2 em 2."
+    },
+    {
+      "id": "pat",
+      "tecnica": "croche",
+      "categoria": "basicos",
+      "ambiguo_en": true,
+      "siglas": { "pt": ["pat", "p.a.t.", "pa3"], "us": ["dtr"], "uk": ["ttr"], "es": ["pat", "vt", "p.a.t."] },
+      "nomes": { "pt": "Ponto Alto Triplo", "us": "Double Treble Crochet", "uk": "Triple Treble Crochet", "es": "Punto Alto Triple / Vareta Triple" },
+      "descricao": "Ponto bem alto com 3 laçadas iniciais na agulha, comum em rendados."
+    },
+    {
+      "id": "am",
+      "tecnica": "croche",
+      "categoria": "basicos",
+      "siglas": { "pt": ["am", "anel mágico", "cm"], "us": ["mr", "mc", "magic ring"], "uk": ["mr", "mc", "magic ring"], "es": ["am", "anillo mágico"] },
+      "nomes": { "pt": "Anel Mágico", "us": "Magic Ring / Circle", "uk": "Magic Ring / Circle", "es": "Anillo Mágico" },
+      "descricao": "Início circular ajustável que fecha completamente o miolo sem deixar buraco."
+    },
+    {
+      "id": "aum",
+      "tecnica": "ambos",
+      "categoria": "aumentos",
+      "siglas": { "pt": ["aum", "aum."], "us": ["inc", "incr"], "uk": ["inc", "incr"], "es": ["aum", "aum."] },
+      "nomes": { "pt": "Aumento", "us": "Increase", "uk": "Increase", "es": "Aumento" },
+      "descricao": "Fazer 2 pontos no mesmo ponto de base para expandir a largura ou circunferência."
+    },
+    {
+      "id": "aum_triplo",
+      "tecnica": "croche",
+      "categoria": "aumentos",
+      "siglas": { "pt": ["aumT", "aum triplo", "3pbj"], "us": ["inc3", "3sc in same st"], "uk": ["inc3", "3dc in same st"], "es": ["aum3", "aum triple"] },
+      "nomes": { "pt": "Aumento Triplo", "us": "Triple Increase", "uk": "Triple Increase", "es": "Aumento Triple" },
+      "descricao": "Fazer 3 pontos juntos no mesmo ponto de base (muito usado em cantos e curvas acentuadas)."
+    },
+    {
+      "id": "dim",
+      "tecnica": "ambos",
+      "categoria": "aumentos",
+      "siglas": { "pt": ["dim", "dim."], "us": ["dec", "decr"], "uk": ["dec", "decr"], "es": ["dism", "dis", "dim"] },
+      "nomes": { "pt": "Diminuição", "us": "Decrease", "uk": "Decrease", "es": "Disminución" },
+      "descricao": "Unir 2 pontos de base em 1 único ponto para reduzir a largura da peça."
+    },
+    {
+      "id": "dim_inv",
+      "tecnica": "croche",
+      "categoria": "aumentos",
+      "siglas": { "pt": ["dim inv", "dimi"], "us": ["invdec", "inv dec"], "uk": ["invdec", "inv dec"], "es": ["dism inv", "dis inv"] },
+      "nomes": { "pt": "Diminuição Invisível", "us": "Invisible Decrease", "uk": "Invisible Decrease", "es": "Disminución Invisible" },
+      "descricao": "Diminuição pegando apenas as alças da frente de 2 pontos, deixando acabamento liso em amigurumi."
+    },
+    {
+      "id": "sc2tog",
+      "tecnica": "croche",
+      "categoria": "aumentos",
+      "ambiguo_en": true,
+      "siglas": { "pt": ["2pbj", "2 pb juntos"], "us": ["sc2tog"], "uk": ["dc2tog"], "es": ["2pbj", "dism pb"] },
+      "nomes": { "pt": "2 Pontos Baixos Fechados Juntos", "us": "Single Crochet 2 Together", "uk": "Double Crochet 2 Together", "es": "2 Puntos Bajos Juntos" },
+      "descricao": "Diminuição clássica unindo 2 pontos baixos em um único topo."
+    },
+    {
+      "id": "hdc2tog",
+      "tecnica": "croche",
+      "categoria": "aumentos",
+      "ambiguo_en": true,
+      "siglas": { "pt": ["2mpaj", "2 mpa juntos"], "us": ["hdc2tog"], "uk": ["htr2tog"], "es": ["2mpaj"] },
+      "nomes": { "pt": "2 Meios Pontos Altos Juntos", "us": "Half Double Crochet 2 Together", "uk": "Half Treble 2 Together", "es": "2 Medios Puntos Altos Juntos" },
+      "descricao": "Diminuição unindo 2 meios pontos altos fechados em uma só laçada."
+    },
+    {
+      "id": "dc2tog",
+      "tecnica": "croche",
+      "categoria": "aumentos",
+      "ambiguo_en": true,
+      "siglas": { "pt": ["2paj", "2 pa juntos"], "us": ["dc2tog"], "uk": ["tr2tog"], "es": ["2paj"] },
+      "nomes": { "pt": "2 Pontos Altos Fechados Juntos", "us": "Double Crochet 2 Together", "uk": "Treble 2 Together", "es": "2 Puntos Altos Juntos" },
+      "descricao": "Diminuição trabalhando 2 pontos altos inacabados e finalizando ambos juntos."
+    },
+    {
+      "id": "blo",
+      "tecnica": "croche",
+      "categoria": "especiais",
+      "siglas": { "pt": ["BLO", "alça de trás", "at"], "us": ["BLO", "bl"], "uk": ["BLO", "bl"], "es": ["BLO", "hebra trasera", "ht"] },
+      "nomes": { "pt": "Somente Alça de Trás (BLO)", "us": "Back Loop Only", "uk": "Back Loop Only", "es": "Solo Hebra Trasera" },
+      "descricao": "Inserir a agulha apenas na alça traseira do ponto para criar nervura/relevo ou quina."
+    },
+    {
+      "id": "flo",
+      "tecnica": "croche",
+      "categoria": "especiais",
+      "siglas": { "pt": ["FLO", "alça da frente", "af"], "us": ["FLO", "fl"], "uk": ["FLO", "fl"], "es": ["FLO", "hebra delantera", "hd"] },
+      "nomes": { "pt": "Somente Alça da Frente (FLO)", "us": "Front Loop Only", "uk": "Front Loop Only", "es": "Solo Hebra Delantera" },
+      "descricao": "Inserir a agulha apenas na alça dianteira do ponto, muito usada para babados e detalhes."
+    },
+    {
+      "id": "pa_relevo_frente",
+      "tecnica": "croche",
+      "categoria": "especiais",
+      "ambiguo_en": true,
+      "siglas": { "pt": ["parf", "pa relevo frente"], "us": ["FPdc", "fpdc"], "uk": ["FPtr", "fptr"], "es": ["parf", "pa relieve delante"] },
+      "nomes": { "pt": "Ponto Alto em Relevo pela Frente", "us": "Front Post Double Crochet", "uk": "Front Post Treble Crochet", "es": "Punto Alto en Relieve por Delante" },
+      "descricao": "Ponto alto abraçando o corpo do ponto anterior pela frente para efeito barra/canelado."
+    },
+    {
+      "id": "pa_relevo_tras",
+      "tecnica": "croche",
+      "categoria": "especiais",
+      "ambiguo_en": true,
+      "siglas": { "pt": ["part", "pa relevo trás"], "us": ["BPdc", "bpdc"], "uk": ["BPtr", "bptr"], "es": ["part", "pa relieve detrás"] },
+      "nomes": { "pt": "Ponto Alto em Relevo por Trás", "us": "Back Post Double Crochet", "uk": "Back Post Treble Crochet", "es": "Punto Alto en Relieve por Detrás" },
+      "descricao": "Ponto alto abraçando o corpo do ponto anterior por trás, alternado com relevo frente em punhos."
+    },
+    {
+      "id": "pb_relevo_frente",
+      "tecnica": "croche",
+      "categoria": "especiais",
+      "ambiguo_en": true,
+      "siglas": { "pt": ["pbrf"], "us": ["FPsc", "fpsc"], "uk": ["FPdc", "fpdc"], "es": ["pbrf"] },
+      "nomes": { "pt": "Ponto Baixo em Relevo pela Frente", "us": "Front Post Single Crochet", "uk": "Front Post Double Crochet", "es": "Punto Bajo en Relieve por Delante" },
+      "descricao": "Ponto baixo abraçando o haste do ponto da carreira abaixo pela frente."
+    },
+    {
+      "id": "pipoca",
+      "tecnica": "croche",
+      "categoria": "especiais",
+      "siglas": { "pt": ["pipoca", "pp"], "us": ["pc", "popcorn"], "uk": ["pc", "popcorn"], "es": ["pop", "palomita"] },
+      "nomes": { "pt": "Ponto Pipoca", "us": "Popcorn Stitch", "uk": "Popcorn Stitch", "es": "Punto Palomita" },
+      "descricao": "Grupo de 4 a 5 pontos altos no mesmo ponto, unidos do primeiro ao último formando relevo 3D."
+    },
+    {
+      "id": "puff",
+      "tecnica": "croche",
+      "categoria": "especiais",
+      "siglas": { "pt": ["puff", "p.puff"], "us": ["puff", "ps"], "uk": ["puff", "ps"], "es": ["puff", "p.puff"] },
+      "nomes": { "pt": "Ponto Puff", "us": "Puff Stitch", "uk": "Puff Stitch", "es": "Punto Puff" },
+      "descricao": "Múltiplas laçadas alongadas puxadas no mesmo ponto e fechadas todas juntas."
+    },
+    {
+      "id": "bobble",
+      "tecnica": "croche",
+      "categoria": "especiais",
+      "siglas": { "pt": ["bolha", "p.bolha"], "us": ["bo", "bobble"], "uk": ["bo", "bobble"], "es": ["burbuja", "garbanzo"] },
+      "nomes": { "pt": "Ponto Bolha", "us": "Bobble Stitch", "uk": "Bobble Stitch", "es": "Punto Burbuja / Garbanzo" },
+      "descricao": "3 a 5 pontos altos incompletos no mesmo ponto fechados juntos para criar bolinha em relevo."
+    },
+    {
+      "id": "picot",
+      "tecnica": "croche",
+      "categoria": "acabamentos",
+      "siglas": { "pt": ["picô", "picot"], "us": ["picot", "pic"], "uk": ["picot", "pic"], "es": ["picot", "piquillo"] },
+      "nomes": { "pt": "Ponto Picô", "us": "Picot Stitch", "uk": "Picot Stitch", "es": "Punto Picot" },
+      "descricao": "3 correntinhas fechadas com baixíssimo na base, criando pontinhas delicadas em barrados."
+    },
+    {
+      "id": "esp_corr",
+      "tecnica": "croche",
+      "categoria": "acoes",
+      "siglas": { "pt": ["esp", "esp. corr"], "us": ["ch-sp", "sp"], "uk": ["ch-sp", "sp"], "es": ["esp", "esp. cad"] },
+      "nomes": { "pt": "Espaço de Correntinhas", "us": "Chain Space", "uk": "Chain Space", "es": "Espacio de Cadenetas" },
+      "descricao": "Trabalhar dentro do vão/arco formado por correntinhas da carreira anterior."
+    },
+    {
+      "id": "pular",
+      "tecnica": "croche",
+      "categoria": "acoes",
+      "siglas": { "pt": ["pul", "pular"], "us": ["sk", "skip"], "uk": ["miss", "sk"], "es": ["salt", "saltar"] },
+      "nomes": { "pt": "Pular Ponto", "us": "Skip", "uk": "Miss / Skip", "es": "Saltar Punto" },
+      "descricao": "Deixar o ponto seguinte sem trabalhar e seguir para o próximo."
+    },
+    {
+      "id": "meia",
+      "tecnica": "trico",
+      "categoria": "basicos",
+      "siglas": { "pt": ["m", "meia"], "us": ["k", "knit"], "uk": ["k", "knit"], "es": ["der", "d", "p.der"] },
+      "nomes": { "pt": "Ponto Meia", "us": "Knit", "uk": "Knit", "es": "Punto Derecho" },
+      "descricao": "Ponto fundamental do tricô que forma um 'V' liso no lado direito da malha."
+    },
+    {
+      "id": "trico_pt",
+      "tecnica": "trico",
+      "categoria": "basicos",
+      "siglas": { "pt": ["t", "tricô"], "us": ["p", "purl"], "uk": ["p", "purl"], "es": ["rev", "r", "p.rev"] },
+      "nomes": { "pt": "Ponto Tricô", "us": "Purl", "uk": "Purl", "es": "Punto Revés" },
+      "descricao": "Ponto fundamental do tricô que forma uma ondinha/nó horizontal na superfície."
+    },
+    {
+      "id": "montar",
+      "tecnica": "trico",
+      "categoria": "acabamentos",
+      "siglas": { "pt": ["mont", "montar"], "us": ["CO", "cast on"], "uk": ["CO", "cast on"], "es": ["mont", "montar"] },
+      "nomes": { "pt": "Montar Pontos", "us": "Cast On", "uk": "Cast On", "es": "Montar Puntos" },
+      "descricao": "Colocar os pontos iniciais na agulha para começar a peça de tricô."
+    },
+    {
+      "id": "arrematar_trico",
+      "tecnica": "trico",
+      "categoria": "acabamentos",
+      "siglas": { "pt": ["arrem", "arrematar"], "us": ["BO", "bind off"], "uk": ["COff", "cast off"], "es": ["cerr", "cerrar"] },
+      "nomes": { "pt": "Arrematar Pontos", "us": "Bind Off", "uk": "Cast Off", "es": "Cerrar Puntos" },
+      "descricao": "Encerrar e prender os pontos da agulha de tricô para que a trama não desmanche."
+    },
+    {
+      "id": "lacada",
+      "tecnica": "trico",
+      "categoria": "aumentos",
+      "siglas": { "pt": ["laç", "lac"], "us": ["yo", "yfwd"], "uk": ["yo", "yfwd", "yrn"], "es": ["laz", "heb"] },
+      "nomes": { "pt": "Laçada", "us": "Yarn Over", "uk": "Yarn Over / Forward", "es": "Lazada / Hebra" },
+      "descricao": "Envolver o fio na agulha criando um novo ponto e um furinho decorativo (rendas/raglan)."
+    },
+    {
+      "id": "k2tog",
+      "tecnica": "trico",
+      "categoria": "aumentos",
+      "siglas": { "pt": ["2jm", "2pjm"], "us": ["k2tog"], "uk": ["k2tog"], "es": ["2pj der", "2pjd"] },
+      "nomes": { "pt": "2 Pontos Juntos em Meia", "us": "Knit 2 Together", "uk": "Knit 2 Together", "es": "2 Puntos Juntos del Derecho" },
+      "descricao": "Diminuição de tricô inclinada para a direita, tricotando 2 pontos juntos em meia."
+    },
+    {
+      "id": "p2tog",
+      "tecnica": "trico",
+      "categoria": "aumentos",
+      "siglas": { "pt": ["2jt", "2pjt"], "us": ["p2tog"], "uk": ["p2tog"], "es": ["2pj rev", "2pjr"] },
+      "nomes": { "pt": "2 Pontos Juntos em Tricô", "us": "Purl 2 Together", "uk": "Purl 2 Together", "es": "2 Puntos Juntos del Revés" },
+      "descricao": "Diminuição tricotando 2 pontos juntos em ponto tricô."
+    },
+    {
+      "id": "ssk",
+      "tecnica": "trico",
+      "categoria": "aumentos",
+      "siglas": { "pt": ["mate", "ms"], "us": ["ssk", "skp"], "uk": ["ssk", "skpo"], "es": ["surjete", "dism izq"] },
+      "nomes": { "pt": "Mate Simples (SSK)", "us": "Slip, Slip, Knit", "uk": "Slip, Slip, Knit / SKPO", "es": "Surjete Simple" },
+      "descricao": "Diminuição inclinada para a esquerda: passa 2 pontos sem fazer como meia e tricota ambos juntos."
+    },
+    {
+      "id": "sk2p",
+      "tecnica": "trico",
+      "categoria": "aumentos",
+      "siglas": { "pt": ["md", "mate duplo"], "us": ["sk2p", "cdd", "s2kp"], "uk": ["sk2po", "sl1-k2tog-psso"], "es": ["surjete doble", "sd"] },
+      "nomes": { "pt": "Mate Duplo", "us": "Slip 1, K2tog, Pass Slipped Over", "uk": "Slip 1, K2tog, Pass Over", "es": "Surjete Doble" },
+      "descricao": "Diminuição dupla que transforma 3 pontos em 1, muito usada em xales e rendas."
+    },
+    {
+      "id": "kfb",
+      "tecnica": "trico",
+      "categoria": "aumentos",
+      "siglas": { "pt": ["aum fb", "1m frente e trás"], "us": ["kfb", "k1f&b"], "uk": ["kfb", "k1f&b"], "es": ["aum dt", "tejer delante y detrás"] },
+      "nomes": { "pt": "Aumento Frente e Trás em Meia", "us": "Knit Front and Back", "uk": "Knit Front and Back", "es": "Tejer Derecho por Delante y Detrás" },
+      "descricao": "Tricota o mesmo ponto pela alça da frente e depois pela de trás, criando 1 ponto extra."
+    },
+    {
+      "id": "m1l",
+      "tecnica": "trico",
+      "categoria": "aumentos",
+      "siglas": { "pt": ["aum E", "aum1E"], "us": ["M1L", "m1l"], "uk": ["M1L", "m1l"], "es": ["aum I", "aum1I"] },
+      "nomes": { "pt": "Aumento Intercalado p/ Esquerda", "us": "Make 1 Left", "uk": "Make 1 Left", "es": "Aumento Intercalado Izquierdo" },
+      "descricao": "Levanta o fio entre dois pontos de frente para trás e tricota pela alça de trás."
+    },
+    {
+      "id": "m1r",
+      "tecnica": "trico",
+      "categoria": "aumentos",
+      "siglas": { "pt": ["aum D", "aum1D"], "us": ["M1R", "m1r"], "uk": ["M1R", "m1r"], "es": ["aum D", "aum1D"] },
+      "nomes": { "pt": "Aumento Intercalado p/ Direita", "us": "Make 1 Right", "uk": "Make 1 Right", "es": "Aumento Intercalado Derecho" },
+      "descricao": "Levanta o fio entre dois pontos de trás para frente e tricota pela alça da frente."
+    },
+    {
+      "id": "m1",
+      "tecnica": "trico",
+      "categoria": "aumentos",
+      "siglas": { "pt": ["aum1", "aum intercalado"], "us": ["M1", "m1"], "uk": ["M1", "m1"], "es": ["aum1"] },
+      "nomes": { "pt": "Aumento Intercalado (1 pt)", "us": "Make 1", "uk": "Make 1", "es": "Aumento Intercalado" },
+      "descricao": "Cria 1 novo ponto levantando a barra horizontal entre dois pontos."
+    },
+    {
+      "id": "psf",
+      "tecnica": "trico",
+      "categoria": "especiais",
+      "siglas": { "pt": ["psf", "s/f"], "us": ["sl", "sl1"], "uk": ["sl", "sl1"], "es": ["p.s.t", "desl"] },
+      "nomes": { "pt": "Passar Ponto Sem Fazer", "us": "Slip Stitch", "uk": "Slip Stitch", "es": "Pasar Punto Sin Tejer" },
+      "descricao": "Transfere o ponto da agulha esquerda para a direita sem tricotar."
+    },
+    {
+      "id": "ktbl",
+      "tecnica": "trico",
+      "categoria": "especiais",
+      "siglas": { "pt": ["mt", "meia torcido"], "us": ["ktbl", "k1tbl"], "uk": ["ktbl", "k1tbl"], "es": ["der ret", "dt"] },
+      "nomes": { "pt": "Meia Torcido (Alça de Trás)", "us": "Knit Through Back Loop", "uk": "Knit Through Back Loop", "es": "Derecho Retorcido" },
+      "descricao": "Tricota o ponto meia pegando pela alça traseira, torcendo a base do ponto."
+    },
+    {
+      "id": "wyif",
+      "tecnica": "trico",
+      "categoria": "acoes",
+      "siglas": { "pt": ["fio frente", "ff"], "us": ["wyif"], "uk": ["wyif"], "es": ["hebra delante"] },
+      "nomes": { "pt": "Com o Fio na Frente", "us": "With Yarn in Front", "uk": "With Yarn in Front", "es": "Con la Hebra por Delante" },
+      "descricao": "Mantém o fio de trabalho voltado para você ao passar o ponto sem fazer."
+    },
+    {
+      "id": "wyib",
+      "tecnica": "trico",
+      "categoria": "acoes",
+      "siglas": { "pt": ["fio trás", "ft"], "us": ["wyib"], "uk": ["wyib"], "es": ["hebra detrás"] },
+      "nomes": { "pt": "Com o Fio Atrás", "us": "With Yarn in Back", "uk": "With Yarn in Back", "es": "Con la Hebra por Detrás" },
+      "descricao": "Mantém o fio de trabalho atrás da agulha ao passar o ponto sem fazer."
+    },
+    {
+      "id": "pm",
+      "tecnica": "ambos",
+      "categoria": "acoes",
+      "siglas": { "pt": ["col. marc", "cmarc"], "us": ["pm"], "uk": ["pm"], "es": ["col. marc", "pm"] },
+      "nomes": { "pt": "Colocar Marcador", "us": "Place Marker", "uk": "Place Marker", "es": "Colocar Marcador" },
+      "descricao": "Insere um marcador de ponto na agulha ou na carreira para sinalizar início ou aumento."
+    },
+    {
+      "id": "sm",
+      "tecnica": "trico",
+      "categoria": "acoes",
+      "siglas": { "pt": ["pass. marc", "pmarc"], "us": ["sm", "slm"], "uk": ["sm", "slm"], "es": ["pas. marc"] },
+      "nomes": { "pt": "Passar Marcador", "us": "Slip Marker", "uk": "Slip Marker", "es": "Pasar Marcador" },
+      "descricao": "Transfere o marcador da agulha esquerda para a direita sem removê-lo."
+    },
+    {
+      "id": "rm",
+      "tecnica": "ambos",
+      "categoria": "acoes",
+      "siglas": { "pt": ["ret. marc", "rmarc"], "us": ["rm"], "uk": ["rm"], "es": ["ret. marc"] },
+      "nomes": { "pt": "Retirar Marcador", "us": "Remove Marker", "uk": "Remove Marker", "es": "Retirar Marcador" },
+      "descricao": "Remove o marcador de ponto que não será mais necessário."
+    },
+    {
+      "id": "cn",
+      "tecnica": "trico",
+      "categoria": "especiais",
+      "siglas": { "pt": ["ag. aux", "aa"], "us": ["cn"], "uk": ["cn"], "es": ["ag. aux"] },
+      "nomes": { "pt": "Agulha Auxiliar (Tranças)", "us": "Cable Needle", "uk": "Cable Needle", "es": "Aguja Auxiliar de Trenzas" },
+      "descricao": "Agulha curta usada para segurar pontos em espera durante o cruzamento de tranças."
+    },
+    {
+      "id": "rs",
+      "tecnica": "ambos",
+      "categoria": "acoes",
+      "siglas": { "pt": ["LD", "dir."], "us": ["RS"], "uk": ["RS"], "es": ["LD", "derecho"] },
+      "nomes": { "pt": "Lado Direito da Peça", "us": "Right Side", "uk": "Right Side", "es": "Lado Derecho" },
+      "descricao": "Face externa/visível da peça pronta."
+    },
+    {
+      "id": "ws",
+      "tecnica": "ambos",
+      "categoria": "acoes",
+      "siglas": { "pt": ["LA", "avesso"], "us": ["WS"], "uk": ["WS"], "es": ["LR", "revés"] },
+      "nomes": { "pt": "Lado Avesso da Peça", "us": "Wrong Side", "uk": "Wrong Side", "es": "Lado Revés" },
+      "descricao": "Face interna/traseira da peça."
+    },
+    {
+      "id": "carr",
+      "tecnica": "ambos",
+      "categoria": "acoes",
+      "siglas": { "pt": ["carr", "carr.", "volta"], "us": ["rnd", "rnds", "row", "rows"], "uk": ["rnd", "rnds", "row", "rows"], "es": ["vta", "vueltas", "hil"] },
+      "nomes": { "pt": "Carreira / Volta", "us": "Round / Row", "uk": "Round / Row", "es": "Vuelta / Hilera" },
+      "descricao": "Indica uma carreira plana (row) ou volta circular (round)."
+    },
+    {
+      "id": "pt",
+      "tecnica": "ambos",
+      "categoria": "acoes",
+      "siglas": { "pt": ["pt", "pts", "p."], "us": ["st", "sts"], "uk": ["st", "sts"], "es": ["p.", "pto", "ptos"] },
+      "nomes": { "pt": "Ponto(s)", "us": "Stitch(es)", "uk": "Stitch(es)", "es": "Punto(s)" },
+      "descricao": "Unidade de contagem dos pontos na receita."
+    },
+    {
+      "id": "rep",
+      "tecnica": "ambos",
+      "categoria": "acoes",
+      "siglas": { "pt": ["rep", "rep."], "us": ["rep"], "uk": ["rep"], "es": ["rep", "rep."] },
+      "nomes": { "pt": "Repetir", "us": "Repeat", "uk": "Repeat", "es": "Repetir" },
+      "descricao": "Repete a sequência destacada entre asteriscos *...* ou colchetes [...]."
+    },
+    {
+      "id": "arrem_final",
+      "tecnica": "ambos",
+      "categoria": "acabamentos",
+      "siglas": { "pt": ["arrematar", "finalizar"], "us": ["FO", "fasten off"], "uk": ["FO", "fasten off"], "es": ["rematar", "cerrar"] },
+      "nomes": { "pt": "Arrematar / Cortar Fio", "us": "Fasten Off", "uk": "Fasten Off", "es": "Rematar" },
+      "descricao": "Cortar o fio, puxar pela última laçada e esconder a ponta para concluir a peça."
+    },
+    {
+      "id": "tog",
+      "tecnica": "ambos",
+      "categoria": "acoes",
+      "siglas": { "pt": ["juntos", "jts"], "us": ["tog"], "uk": ["tog"], "es": ["juntos", "jts"] },
+      "nomes": { "pt": "Juntos", "us": "Together", "uk": "Together", "es": "Juntos" },
+      "descricao": "Indica que dois ou mais pontos devem ser trabalhados ou fechados juntos."
+    },
+    {
+      "id": "rem",
+      "tecnica": "ambos",
+      "categoria": "acoes",
+      "siglas": { "pt": ["rest", "restantes"], "us": ["rem"], "uk": ["rem"], "es": ["rest", "restantes"] },
+      "nomes": { "pt": "Restante(s)", "us": "Remaining", "uk": "Remaining", "es": "Restante(s)" },
+      "descricao": "Refere-se aos pontos que ainda restam até o fim da carreira."
+    },
+    {
+      "id": "beg",
+      "tecnica": "ambos",
+      "categoria": "acoes",
+      "siglas": { "pt": ["iníc", "início"], "us": ["beg"], "uk": ["beg"], "es": ["inic", "inicio"] },
+      "nomes": { "pt": "Início", "us": "Beginning", "uk": "Beginning", "es": "Inicio" },
+      "descricao": "Marca o início de uma carreira ou volta."
+    }
+  ]
+}

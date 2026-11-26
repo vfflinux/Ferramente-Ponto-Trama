@@ -1708,6 +1708,228 @@ const CalculadoraAmostra = (() => {
     });
 
     window.addEventListener("resize", atualizarTextoBotaoCalcular);
+
+    // ========================================================================
+    // CALCULADORA COMPACTA DE AUMENTOS & DIMINUIÇÕES UNIFORMES
+    // ========================================================================
+    inicializarCalcAumDim();
+  }
+
+  let adEstado = {
+    aberto: false,
+    operacao: "aumentar", // 'aumentar' | 'diminuir'
+    tecnica: "croche", // 'croche' | 'trico'
+    tipo: "circular", // 'circular' | 'plano'
+    receitaTexto: ""
+  };
+
+  function calcularDistribuicaoUniforme({ operacao, tecnica, tipo, atuais, qtd }) {
+    const base = Math.max(0, parseInt(atuais, 10) || 0);
+    const n = Math.max(0, parseInt(qtd, 10) || 0);
+
+    if (base < 2 || n < 1) {
+      return { erro: "Informe pelo menos 2 pontos atuais e 1 aumento/diminuição." };
+    }
+
+    const ptSimples = tecnica === "trico" ? "m" : "pb";
+    const ptAcao = operacao === "diminuir" ? (tecnica === "trico" ? "2jm" : "dim") : "aum";
+    const finais = operacao === "diminuir" ? base - n : base + n;
+
+    if (operacao === "diminuir" && n > Math.floor(base / 2)) {
+      return {
+        erro: `Com ${base} pontos atuais, o máximo de diminuições (2 pts juntos) nesta carreira é ${Math.floor(base / 2)}.`
+      };
+    }
+
+    // Crochê: aum usa 1 pt de base (2 pb no mesmo pt); Tricô: aum intercalado (M1) usa 0 pts de base; Dim usa 2 pts de base
+    const consumoPorAcao = operacao === "diminuir" ? 2 : tecnica === "croche" ? 1 : 0;
+    if (operacao === "aumentar" && tecnica === "croche" && n > base) {
+      return {
+        erro: `Em crochê (2 pb no mesmo ponto), o máximo de aumentos em ${base} pontos é ${base} (dobra a carreira).`
+      };
+    }
+
+    const simplesTotal = base - n * consumoPorAcao;
+    let receita = "";
+    let detalhe = "";
+
+    if (tipo === "circular" || n === 1) {
+      const q = Math.floor(simplesTotal / n);
+      const r = simplesTotal % n;
+      const qtdMenor = n - r;
+      const qtdMaior = r;
+
+      const partes = [];
+      if (qtdMenor > 0) {
+        partes.push(q > 0 ? `*${q} ${ptSimples}, 1 ${ptAcao}* ×${qtdMenor}` : `*1 ${ptAcao}* ×${qtdMenor}`);
+      }
+      if (qtdMaior > 0) {
+        partes.push(`*${q + 1} ${ptSimples}, 1 ${ptAcao}* ×${qtdMaior}`);
+      }
+      receita = partes.join("; ");
+      detalhe = `✓ Conferência: consome exatamente ${base} pts de base → termina com ${finais} pts (${tecnica === "trico" && operacao === "aumentar" ? "usando aumento intercalado M1/laç entre pontos" : operacao === "aumentar" ? "2 pontos no mesmo ponto de base" : "2 pontos fechados juntos"}).`;
+    } else {
+      // Modo Plano (Ida e Volta): divide os pontos simples em (n + 1) espaços para equilibrar as duas bordas
+      const espacos = n + 1;
+      const q = Math.floor(simplesTotal / espacos);
+      const r = simplesTotal % espacos;
+      const blocos = [];
+      for (let i = 0; i < espacos; i++) {
+        // Distribui o resto no centro para manter bordas simétricas
+        const inicioResto = Math.floor((espacos - r) / 2);
+        const extra = i >= inicioResto && i < inicioResto + r ? 1 : 0;
+        blocos.push(q + extra);
+      }
+      const bordaIni = blocos[0];
+      const bordaFim = blocos[blocos.length - 1];
+      const miolo = blocos.slice(1, -1); // n - 1 intervalos internos entre as n ações
+
+      // Agrupa intervalos internos contíguos ou por tamanho
+      const cont = new Map();
+      miolo.forEach((v) => cont.set(v, (cont.get(v) || 0) + 1));
+
+      const seq = [];
+      if (bordaIni > 0) seq.push(`${bordaIni} ${ptSimples}`);
+      seq.push(`1 ${ptAcao}`);
+      cont.forEach((vezes, pts) => {
+        if (vezes === 1) {
+          seq.push(pts > 0 ? `${pts} ${ptSimples}, 1 ${ptAcao}` : `1 ${ptAcao}`);
+        } else {
+          seq.push(pts > 0 ? `*${pts} ${ptSimples}, 1 ${ptAcao}* ×${vezes}` : `*1 ${ptAcao}* ×${vezes}`);
+        }
+      });
+      if (bordaFim > 0) seq.push(`${bordaFim} ${ptSimples}`);
+
+      receita = seq.join(", ");
+      detalhe = `✓ Simetria plana (ida e volta): ${bordaIni} ${ptSimples} no início e ${bordaFim} ${ptSimples} no fim • ${base} pts de base → ${finais} pts finais.`;
+    }
+
+    return {
+      erro: null,
+      base,
+      n,
+      finais,
+      receita,
+      detalhe,
+      resumo: `${base} → ${finais} pontos (${operacao === "diminuir" ? `−${n} diminuições` : `+${n} aumentos`})`
+    };
+  }
+
+  function atualizarCalcAumDim() {
+    const inpAtuais = document.getElementById("input-ad-atuais");
+    const inpQtd = document.getElementById("input-ad-qtd");
+    const lblQtd = document.getElementById("label-ad-qtd");
+    const resCont = document.getElementById("ad-resumo-contagem");
+    const resRec = document.getElementById("ad-receita-pronta");
+    const resDet = document.getElementById("ad-detalhe-passos");
+    if (!inpAtuais || !inpQtd || !resRec) return;
+
+    if (lblQtd) {
+      lblQtd.textContent = adEstado.operacao === "diminuir" ? "Quantos pontos diminuir?" : "Quantos pontos aumentar?";
+    }
+
+    const r = calcularDistribuicaoUniforme({
+      operacao: adEstado.operacao,
+      tecnica: adEstado.tecnica,
+      tipo: adEstado.tipo,
+      atuais: inpAtuais.value,
+      qtd: inpQtd.value
+    });
+
+    if (r.erro) {
+      adEstado.receitaTexto = "";
+      if (resCont) resCont.textContent = "Ajuste os valores";
+      resRec.textContent = r.erro;
+      resRec.classList.add("erro-ad");
+      if (resDet) resDet.textContent = "";
+      return;
+    }
+
+    adEstado.receitaTexto = r.receita;
+    resRec.classList.remove("erro-ad");
+    if (resCont) resCont.textContent = r.resumo;
+    resRec.textContent = r.receita;
+    if (resDet) resDet.textContent = r.detalhe;
+  }
+
+  function alternarCalcAumDim(forcarEstado = null) {
+    const prox = forcarEstado !== null ? Boolean(forcarEstado) : !adEstado.aberto;
+    adEstado.aberto = prox;
+
+    const btn = document.getElementById("btn-toggle-calc-aum-dim");
+    const cont = document.getElementById("conteiner-amostra");
+    const painel = document.getElementById("painel-calc-aum-dim");
+
+    if (btn) {
+      btn.classList.toggle("ativo", prox);
+      btn.setAttribute("aria-pressed", prox ? "true" : "false");
+    }
+    if (cont) cont.classList.toggle("modo-aum-dim-ativo", prox);
+    if (painel) painel.style.display = prox ? "flex" : "none";
+
+    if (prox) {
+      if (typeof Configuracoes !== "undefined" && typeof Configuracoes.obterTecnicaEfetiva === "function") {
+        adEstado.tecnica = Configuracoes.obterTecnicaEfetiva();
+        document.querySelectorAll("[data-ad-tec]").forEach((b) => {
+          b.classList.toggle("ativo", b.dataset.adTec === adEstado.tecnica);
+        });
+      }
+      atualizarCalcAumDim();
+    }
+  }
+
+  function inicializarCalcAumDim() {
+    document.getElementById("btn-toggle-calc-aum-dim")?.addEventListener("click", () => alternarCalcAumDim());
+    document.getElementById("btn-voltar-calc-amostra")?.addEventListener("click", () => alternarCalcAumDim(false));
+
+    document.querySelectorAll("[data-ad-op]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        adEstado.operacao = btn.dataset.adOp;
+        document.querySelectorAll("[data-ad-op]").forEach((b) => b.classList.toggle("ativo", b === btn));
+        atualizarCalcAumDim();
+      });
+    });
+
+    document.querySelectorAll("[data-ad-tec]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        adEstado.tecnica = btn.dataset.adTec;
+        document.querySelectorAll("[data-ad-tec]").forEach((b) => b.classList.toggle("ativo", b === btn));
+        atualizarCalcAumDim();
+      });
+    });
+
+    document.querySelectorAll("[data-ad-tipo]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        adEstado.tipo = btn.dataset.adTipo;
+        document.querySelectorAll("[data-ad-tipo]").forEach((b) => b.classList.toggle("ativo", b === btn));
+        atualizarCalcAumDim();
+      });
+    });
+
+    document.getElementById("input-ad-atuais")?.addEventListener("input", atualizarCalcAumDim);
+    document.getElementById("input-ad-qtd")?.addEventListener("input", atualizarCalcAumDim);
+
+    document.getElementById("btn-ad-copiar")?.addEventListener("click", () => {
+      if (!adEstado.receitaTexto) return;
+      if (navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
+        navigator.clipboard.writeText(adEstado.receitaTexto).then(() => mostrarToast("📋 Sequência copiada!")).catch(() => {});
+      }
+    });
+
+    document.getElementById("btn-ad-enviar-receitas")?.addEventListener("click", () => {
+      if (!adEstado.receitaTexto) return;
+      const btnRec = document.querySelector('.barraLateral .botaoFerramenta[data-ferramenta="receitas"]');
+      if (btnRec) btnRec.click();
+      setTimeout(() => {
+        const ta = document.getElementById("input-receita-texto-global");
+        const atual = (ta?.value || "").trim();
+        const linha = `Distribuição (${adEstado.operacao === "diminuir" ? "Dim." : "Aum."}): ${adEstado.receitaTexto}`;
+        const novo = atual ? `${atual}\n${linha}` : linha;
+        if (typeof LeitorReceitas !== "undefined" && typeof LeitorReceitas.definirTexto === "function") {
+          LeitorReceitas.definirTexto(novo);
+        }
+      }, 60);
+    });
   }
 
   async function init() {
@@ -1743,10 +1965,39 @@ const CalculadoraAmostra = (() => {
     }
   }
 
+  function obterDadosAmostraAtual() {
+    return {
+      largura: lerNumero("amostra-largura") || 10,
+      altura: lerNumero("amostra-altura") || 10,
+      pontos: lerNumero("amostra-pontos") || 0,
+      carreiras: lerNumero("amostra-carreiras") || 0,
+      unidade: unidadeAtual
+    };
+  }
+
+  function abrirAumDimComContexto({ pontosAtuais = 0, tecnica = null } = {}) {
+    alternarCalcAumDim(true);
+    if (tecnica === "croche" || tecnica === "trico") {
+      adEstado.tecnica = tecnica;
+      document.querySelectorAll("[data-ad-tec]").forEach((b) => {
+        b.classList.toggle("ativo", b.dataset.adTec === tecnica);
+      });
+    }
+    const inpAtuais = document.getElementById("input-ad-atuais");
+    if (inpAtuais && Number(pontosAtuais) >= 2) {
+      inpAtuais.value = Math.round(Number(pontosAtuais));
+    }
+    atualizarCalcAumDim();
+  }
+
   return {
     init,
     carregarDoProjeto,
     calcular: calcularTensaodoPonto,
+    calcularDistribuicaoUniforme,
+    alternarCalcAumDim,
+    abrirAumDimComContexto,
+    obterDadosAmostraAtual,
     alternarModoAvancado,
     carregarDoBancoDeAmostras,
     obterAmostrasSalvas: () => [...amostrasSalvas]
