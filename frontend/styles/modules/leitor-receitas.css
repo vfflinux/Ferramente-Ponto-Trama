@@ -239,6 +239,37 @@
   max-width: 100%;
   height: auto;
   display: block;
+  transform-origin: center center;
+  touch-action: pinch-zoom;
+  will-change: transform;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.palco-arquivo-receita.img-com-zoom .img-receita-viewer {
+  touch-action: none;
+}
+
+.badge-zoom-receita-touch {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 6;
+  background: rgba(1, 7, 54, 0.88);
+  color: var(--cor-texto-principal);
+  border: 1px solid var(--creme-opacidade-30);
+  border-radius: 999px;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 800;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 180ms ease;
+}
+
+.badge-zoom-receita-touch.visivel {
+  opacity: 1;
 }
 
 .pdf-receita-viewer {
@@ -251,16 +282,25 @@
   position: absolute;
   left: 0;
   right: 0;
-  height: 36px;
+  height: 38px;
   background: rgba(252, 241, 208, 0.22);
   border-top: 2px solid #fcf1d0;
   border-bottom: 2px solid #fcf1d0;
-  pointer-events: none;
+  pointer-events: auto;
+  touch-action: none;
+  cursor: ns-resize;
   display: flex;
   align-items: center;
   justify-content: flex-end;
   padding-right: 12px;
-  transition: top 0.08s linear;
+  z-index: 4;
+  transition: top 0.08s linear, background-color 140ms ease;
+}
+
+.regua-marcadora-receita.arrastando {
+  transition: none;
+  background: rgba(252, 241, 208, 0.34);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
 }
 
 .etiqueta-regua {
@@ -268,8 +308,10 @@
   font-weight: 800;
   background: var(--cor-texto-principal);
   color: var(--cor-fundo-profundo);
-  padding: 2px 8px;
+  padding: 4px 10px;
   border-radius: 999px;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 @media (max-width: 900px) {

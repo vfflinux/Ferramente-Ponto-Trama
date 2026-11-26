@@ -796,9 +796,12 @@
   }
 
   .conv-tab {
-    font-size: 12.5px;
-    padding: 9px 6px;
+    font-size: 12px;
+    padding: 8px 4px;
     gap: 4px;
+    white-space: normal;
+    text-align: center;
+    line-height: 1.2;
   }
 
   .conv-controles-rapido {

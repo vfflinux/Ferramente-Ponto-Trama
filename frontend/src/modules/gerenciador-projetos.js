@@ -1196,7 +1196,7 @@ const GerenciadorProjetos = (() => {
 
       card.addEventListener("click", (e) => {
         if (e.target.closest(".btn-ws-rem-foto")) return;
-        abrirLightboxGaleria(foto);
+        abrirLightboxGaleria(foto, fotos, idx);
       });
 
       card.querySelector(".btn-ws-rem-foto")?.addEventListener("click", (e) => {
@@ -1210,16 +1210,172 @@ const GerenciadorProjetos = (() => {
     });
   }
 
-  function abrirLightboxGaleria(foto) {
-    const modal = document.getElementById("modal-lightbox-galeria");
+  let lightboxListaFotos = [];
+  let lightboxIndiceAtual = 0;
+  const lightboxZoom = { escala: 1, x: 0, y: 0 };
+
+  function resetarZoomLightbox() {
+    lightboxZoom.escala = 1;
+    lightboxZoom.x = 0;
+    lightboxZoom.y = 0;
+    const img = document.getElementById("lightbox-proj-img");
+    if (img) {
+      img.style.transform = "";
+      img.style.transition = "";
+    }
+    const box = document.querySelector("#modal-lightbox-galeria .lightbox-proj-box");
+    if (box) {
+      box.style.transform = "";
+      box.style.opacity = "";
+    }
+  }
+
+  function aplicarTransformLightbox() {
+    const img = document.getElementById("lightbox-proj-img");
+    if (!img) return;
+    if (lightboxZoom.escala <= 1.02) {
+      lightboxZoom.escala = 1;
+      lightboxZoom.x = 0;
+      lightboxZoom.y = 0;
+      img.style.transform = "";
+    } else {
+      img.style.transform = `translate3d(${Math.round(lightboxZoom.x)}px, ${Math.round(lightboxZoom.y)}px, 0) scale(${lightboxZoom.escala.toFixed(3)})`;
+    }
+  }
+
+  function renderizarFotoLightboxAtual() {
+    const foto = lightboxListaFotos[lightboxIndiceAtual];
+    if (!foto) return;
     const img = document.getElementById("lightbox-proj-img");
     const dataEl = document.getElementById("lightbox-proj-data");
     const legEl = document.getElementById("lightbox-proj-legenda");
-    if (!modal || !img) return;
-    img.src = foto.foto_url;
-    if (dataEl) dataEl.textContent = formatarDataBr(foto.data) || "";
+    resetarZoomLightbox();
+    if (img) img.src = foto.foto_url;
+    const contadorTxt =
+      lightboxListaFotos.length > 1 ? ` (${lightboxIndiceAtual + 1}/${lightboxListaFotos.length})` : "";
+    if (dataEl) dataEl.textContent = `${formatarDataBr(foto.data) || ""}${contadorTxt}`;
     if (legEl) legEl.textContent = foto.legenda || "Registro de progresso";
+  }
+
+  function abrirLightboxGaleria(foto, lista = null, indice = 0) {
+    const modal = document.getElementById("modal-lightbox-galeria");
+    const img = document.getElementById("lightbox-proj-img");
+    if (!modal || !img) return;
+    lightboxListaFotos = Array.isArray(lista) && lista.length > 0 ? lista : [foto];
+    lightboxIndiceAtual = Math.max(0, Math.min(indice || 0, lightboxListaFotos.length - 1));
+    renderizarFotoLightboxAtual();
     modal.style.display = "flex";
+  }
+
+  function vincularGestosTouchLightbox() {
+    const modal = document.getElementById("modal-lightbox-galeria");
+    const img = document.getElementById("lightbox-proj-img");
+    const box = modal?.querySelector(".lightbox-proj-box");
+    if (!modal || !img || img.dataset.touchLigado === "1") return;
+    img.dataset.touchLigado = "1";
+    img.style.touchAction = "none";
+
+    const toques = new Map();
+    let pinchIni = null;
+    let dragIni = null;
+    let ultimoToqueLb = 0;
+
+    img.addEventListener("pointerdown", (e) => {
+      if (e.pointerType !== "touch") return;
+      toques.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      img.setPointerCapture?.(e.pointerId);
+
+      if (toques.size === 2) {
+        const [a, b] = Array.from(toques.values());
+        pinchIni = {
+          dist: Math.max(12, Math.hypot(b.x - a.x, b.y - a.y)),
+          midX: (a.x + b.x) / 2,
+          midY: (a.y + b.y) / 2,
+          escala: lightboxZoom.escala,
+          x: lightboxZoom.x,
+          y: lightboxZoom.y
+        };
+        dragIni = null;
+      } else if (toques.size === 1) {
+        const agora = Date.now();
+        if (agora - ultimoToqueLb < 300) {
+          ultimoToqueLb = 0;
+          if (lightboxZoom.escala > 1.1) resetarZoomLightbox();
+          else {
+            lightboxZoom.escala = 2.2;
+            lightboxZoom.x = 0;
+            lightboxZoom.y = 0;
+            aplicarTransformLightbox();
+          }
+          if (typeof Configuracoes !== "undefined") Configuracoes.vibrar(12);
+          return;
+        }
+        ultimoToqueLb = agora;
+        dragIni = { x: e.clientX, y: e.clientY, ox: lightboxZoom.x, oy: lightboxZoom.y };
+      }
+    });
+
+    img.addEventListener("pointermove", (e) => {
+      if (!toques.has(e.pointerId)) return;
+      toques.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+      if (toques.size === 2 && pinchIni) {
+        e.preventDefault();
+        const [a, b] = Array.from(toques.values());
+        const dist = Math.max(12, Math.hypot(b.x - a.x, b.y - a.y));
+        const midX = (a.x + b.x) / 2;
+        const midY = (a.y + b.y) / 2;
+        lightboxZoom.escala = Math.max(1, Math.min(4, pinchIni.escala * (dist / pinchIni.dist)));
+        lightboxZoom.x = pinchIni.x + (midX - pinchIni.midX);
+        lightboxZoom.y = pinchIni.y + (midY - pinchIni.midY);
+        aplicarTransformLightbox();
+      } else if (toques.size === 1 && dragIni) {
+        const dx = e.clientX - dragIni.x;
+        const dy = e.clientY - dragIni.y;
+        if (lightboxZoom.escala > 1.05) {
+          e.preventDefault();
+          lightboxZoom.x = dragIni.ox + dx;
+          lightboxZoom.y = dragIni.oy + dy;
+          aplicarTransformLightbox();
+        } else if (dy > 16 && Math.abs(dy) > Math.abs(dx) && box) {
+          box.style.transform = `translateY(${Math.min(140, dy)}px)`;
+          box.style.opacity = String(Math.max(0.35, 1 - dy / 280));
+        }
+      }
+    });
+
+    const aoSoltar = (e) => {
+      if (!toques.has(e.pointerId)) return;
+      const pos = toques.get(e.pointerId);
+      toques.delete(e.pointerId);
+
+      if (toques.size === 0 && dragIni && lightboxZoom.escala <= 1.05) {
+        const dx = pos.x - dragIni.x;
+        const dy = pos.y - dragIni.y;
+        if (dy > 90 && Math.abs(dy) > Math.abs(dx)) {
+          resetarZoomLightbox();
+          modal.style.display = "none";
+          if (typeof Configuracoes !== "undefined") Configuracoes.vibrar(12);
+        } else {
+          if (box) {
+            box.style.transform = "";
+            box.style.opacity = "";
+          }
+          if (Math.abs(dx) >= 60 && Math.abs(dy) < 55 && lightboxListaFotos.length > 1) {
+            if (dx < 0) lightboxIndiceAtual = (lightboxIndiceAtual + 1) % lightboxListaFotos.length;
+            else lightboxIndiceAtual = (lightboxIndiceAtual - 1 + lightboxListaFotos.length) % lightboxListaFotos.length;
+            renderizarFotoLightboxAtual();
+            if (typeof Configuracoes !== "undefined") Configuracoes.vibrar(12);
+          }
+        }
+      }
+
+      if (toques.size < 2) pinchIni = null;
+      if (toques.size === 0) dragIni = null;
+    };
+
+    img.addEventListener("pointerup", aoSoltar);
+    img.addEventListener("pointercancel", aoSoltar);
   }
 
   // ==========================================================================
@@ -2251,11 +2407,16 @@ const GerenciadorProjetos = (() => {
     });
 
     document.getElementById("btn-fechar-lightbox-proj")?.addEventListener("click", () => {
+      resetarZoomLightbox();
       document.getElementById("modal-lightbox-galeria").style.display = "none";
     });
     document.getElementById("modal-lightbox-galeria")?.addEventListener("click", (e) => {
-      if (e.target.id === "modal-lightbox-galeria") e.target.style.display = "none";
+      if (e.target.id === "modal-lightbox-galeria") {
+        resetarZoomLightbox();
+        e.target.style.display = "none";
+      }
     });
+    vincularGestosTouchLightbox();
 
     // Fecha dropdowns abertos ao clicar fora
     document.addEventListener("click", (e) => {

@@ -59,12 +59,14 @@
     pointer-events: auto;
   }
 
-  /* Gaveta lateral de todas as 10 ferramentas */
+  /* Gaveta lateral de todas as ferramentas (compatível com WindowInsets Android 15) */
   .barraLateral {
     position: fixed;
     left: 0;
     top: 0;
     bottom: 0;
+    height: 100%;
+    min-height: 0;
     width: 272px;
     max-width: 82vw;
     z-index: 95;
@@ -338,6 +340,7 @@
   .conteiner-precificacao,
   .conteiner-amostra,
   .conteiner-editor-graficos,
+  .conteiner-conversao,
   .conteiner-configuracoes {
     flex: 1 1 0%;
     min-height: 0;
@@ -1494,7 +1497,8 @@
   .toast-amostra,
   .toast-banco-amostras,
   .toast-receitas,
-  .toast-graficos {
+  .toast-graficos,
+  .toast-conversao {
     left: 12px !important;
     right: 12px !important;
     bottom: 68px !important;
@@ -1505,6 +1509,12 @@
   /* ========================================================================
      13. EDITOR DE GRÁFICOS (MOBILE-FIRST, RNF02)
      ======================================================================== */
+  .cabecalho-acoes-graficos .btn-graf-topo {
+    height: 34px;
+    padding: 0 9px;
+    font-size: 11.5px;
+  }
+
   .layout-editor-graficos,
   .layout-editor-graficos.modo-execucao-ativo {
     flex: none !important;
@@ -1512,6 +1522,11 @@
     flex-direction: column;
     gap: 10px;
     overflow: visible !important;
+  }
+
+  /* Canvas no topo do celular para visualizar e desenhar imediatamente sem rolar */
+  .graf-area-central {
+    order: -1;
   }
 
   .graf-barra-ferramentas,
@@ -1575,17 +1590,26 @@
     margin-left: auto;
   }
 
-  /* Popup "Ferramentas" conectado na gaveta mobile (sem vazar da tela) */
+  /* Popup "Ferramentas" conectado na gaveta mobile (sem vazar da tela nem cobrir rolagem) */
+  .barraLateral.modo-arrastar-ferramentas .listaNavegacao {
+    padding-bottom: 136px;
+  }
+
   .popup-ferramentas-lateral {
     left: 10px;
     right: 10px;
-    bottom: 62px;
+    bottom: 12px;
     top: auto !important;
+    z-index: 98;
     margin-left: 0;
     border-left: 1px solid var(--creme-opacidade-25);
     border-radius: 16px;
     transform-origin: bottom center !important;
     transform: scale(0.75) translateY(12px);
+  }
+
+  .area-viewer-receita:has(.img-com-zoom) {
+    overflow: hidden !important;
   }
 
   .popup-ferramentas-lateral.aberto {

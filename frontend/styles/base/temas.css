@@ -1922,3 +1922,8 @@
   color: #fcf1d0;
   border-color: #fcf1d0;
 }
+
+:root[data-tema="claro"] .lightbox-proj-meta {
+  background: #fffdf8;
+  color: #16264d;
+}

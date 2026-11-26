@@ -10,8 +10,8 @@ Aplicação multiplataforma **100% offline e local** para organização de artes
 
 | Plataforma | Arquivo | Tamanho | Onde baixar | Como instalar / abrir |
 | :--- | :--- | :---: | :--- | :--- |
-| **Android (Celular)** | `ponto-e-trama.apk` (`v1.0.1`) | `650 KB` | [Baixar APK (`mobile/ponto-e-trama.apk`)](https://github.com/vfflinux/Ferramente-Ponto-Trama/raw/main/mobile/ponto-e-trama.apk) | Copie o `.apk` para o celular (Android 7.0 a 15+), toque no arquivo e autorize a instalação. Roda **100% local**, sem permissão de internet. |
-| **Linux / Ubuntu (Instalador `.deb`)** | `ponto-e-trama_1.0.0_all.deb` | `217 KB` | [Baixar `.deb` (`dist/ponto-e-trama_1.0.0_all.deb`)](https://github.com/vfflinux/Ferramente-Ponto-Trama/raw/main/dist/ponto-e-trama_1.0.0_all.deb) | Clique duas vezes no `.deb` (abre na Central de Aplicativos do Ubuntu) ou instale via `sudo apt install ./dist/ponto-e-trama_1.0.0_all.deb`. |
+| **Android (Celular)** | `ponto-e-trama.apk` (`v1.0.1`) | `658 KB` | [Baixar APK (`mobile/ponto-e-trama.apk`)](https://github.com/vfflinux/Ferramente-Ponto-Trama/raw/main/mobile/ponto-e-trama.apk) | Copie o `.apk` para o celular (Android 7.0 a 15+), toque no arquivo e autorize a instalação. Roda **100% local**, sem permissão de internet. |
+| **Linux / Ubuntu (Instalador `.deb`)** | `ponto-e-trama_1.0.0_all.deb` | `223 KB` | [Baixar `.deb` (`dist/ponto-e-trama_1.0.0_all.deb`)](https://github.com/vfflinux/Ferramente-Ponto-Trama/raw/main/dist/ponto-e-trama_1.0.0_all.deb) | Clique duas vezes no `.deb` (abre na Central de Aplicativos do Ubuntu) ou instale via `sudo apt install ./dist/ponto-e-trama_1.0.0_all.deb`. |
 | **Linux / Ubuntu (Atalho gráfico)** | `Ponto & Trama.desktop` / `Instalar Ponto & Trama.desktop` | — | Pasta [`dist/`](dist/) | Clique com o botão direito → *Permitir iniciar* e dê duplo clique para abrir o app (`PontoETrama`) ou o instalador gráfico GTK (`desktop/instalador-gui.py`). |
 | **Web (Navegador / PWA)** | `frontend/index.html` | — | [`frontend/index.html`](frontend/index.html) | Abra no navegador ou sirva `frontend/` (salva tudo localmente via IndexedDB + Service Worker offline-first). |
 
@@ -19,7 +19,7 @@ Aplicação multiplataforma **100% offline e local** para organização de artes
 
 ## As 12 Ferramentas Integradas
 
-> **Barra lateral enxuta e personalizável:** em **Configurações → Aparência e Leitura**, você escolhe exatamente quais ferramentas ficam visíveis diretamente na barra lateral. As demais ficam agrupadas na aba **Ferramentas**, que infla um popup conectado à lateral exibindo somente os ícones (com tooltip ao passar o mouse).
+> **Barra lateral enxuta, personalizável e arrastável:** em **Configurações → Aparência e Leitura**, você escolhe exatamente quais ferramentas ficam visíveis na barra lateral. As demais ficam na aba **Ferramentas**, que infla um popup conectado exibindo somente os ícones — e, com o popup aberto, basta **arrastar e soltar** ferramentas entre a barra lateral e o popup (ou reordená-las) para ativar/desativar em tempo real nas Configurações.
 
 ### 1. Início (Home)
 - Tela inicial limpa com acesso direto a **`+ Novo projeto`** e **`Ver meus projetos`**.
@@ -95,9 +95,13 @@ Aplicação multiplataforma **100% offline e local** para organização de artes
   - **Compatibilidade com Android 15 Edge-to-Edge (`WindowInsets`):** aplica automaticamente os recuos de barra de status, barra de navegação, notch/câmera e teclado virtual.
   - **Ponte nativa Android (`PontoETramaAndroid`):** sincroniza cor das barras com o tema, ativa `FLAG_KEEP_SCREEN_ON`, vibração háptica e exportação nativa de arquivos (`ACTION_CREATE_DOCUMENT`).
   - **Ícone adaptativo com fundo escuro:** todas as densidades (`mdpi`–`xxxhdpi` + `mipmap-anydpi-v26`), preservando a logo transparente original no Web e no App Ubuntu.
-- **Front mobile dedicado (`frontend/styles/base/mobile.css`):**
-  - **Barra de navegação inferior nativa** (telas ≤ 768 px) com acesso rápido a *Início*, *Projetos*, *Contador*, *Preço* e *Mais* (gaveta lateral com suporte à aba **Ferramentas**).
-  - Top App Bar flexível, tabelas em cartões empilhados abaixo de `600 px`, editor de gráficos adaptado ao toque e modais/drawers em largura total.
+- **Front mobile dedicado (`frontend/styles/base/mobile.css`) e Gestos Touch Nativos:**
+  - **Barra de navegação inferior nativa** (telas ≤ 768 px) com acesso rápido a *Início*, *Projetos*, *Contador*, *Preço* e *Mais*, além de **gesto de borda esquerda** (deslizar da borda para abrir e para a esquerda para fechar a gaveta lateral).
+  - **Editor de Gráficos (Touch):** canvas posicionado logo no topo da tela no celular, **pinça para zoom (`0.18×–4.5×`) + pan com 2 dedos** (sem deixar pontos acidentais), **toque com 2 dedos = Desfazer**, **toque com 3 dedos = Refazer**, **pressionar e segurar = Conta-gotas instantâneo**, **toque duplo** para enquadrar no Modo Execução e **deslizar na barra de execução** para trocar de carreira.
+  - **Receitas (Foto/PDF):** **pinça para zoom + toque duplo (`1× ↔ 2.2×`)** na imagem da receita e **régua "⇅ Onde parei" arrastável diretamente com o dedo**.
+  - **Contador de Carreiras:** no modo *Toque na Tela Toda*, toque soma `+1` e **deslizar para baixo ou esquerda** subtrai `−1`; nos botões `+` e `−`, **pressão longa** avança ou recua carreiras continuamente.
+  - **Galeria de Progresso (Lightbox):** **pinça para zoom**, **toque duplo**, **deslizar esquerda/direita** para trocar de foto e **deslizar para baixo** para fechar.
+  - Top App Bar flexível, tabelas em cartões empilhados abaixo de `600 px` e modais/drawers em largura total.
 
 ---
 
@@ -108,7 +112,7 @@ Aplicação multiplataforma **100% offline e local** para organização de artes
   - **Versão Web (PWA) e App Android:** **IndexedDB (`v4`)** com auto-upgrade, fallback em `localStorage` e Service Worker offline-first ([`frontend/sw.js`](frontend/sw.js), [`frontend/manifest.json`](frontend/manifest.json)).
 - **Otimização de build e performance:**
   - Minificação automática de HTML/CSS/JS na geração dos pacotes via [`scripts/otimizar-build.py`](scripts/otimizar-build.py) (`-23%` nos assets empacotados), mantendo o código-fonte legível no repositório.
-  - Compressão `xz -z9` no `.deb` (`217 KB`), assinatura completa no `.apk` (`650 KB`) e inicialização sob demanda (*lazy init* + *lazy sync*).
+  - Compressão `xz -z9` no `.deb` (`223 KB`), assinatura completa no `.apk` (`658 KB`) e inicialização sob demanda (*lazy init* + *lazy sync*).
 
 ---
 
@@ -131,11 +135,11 @@ Ponto&Trama/
 │   ├── instalador-gui.py                    # Instalador gráfico GTK para Ubuntu
 │   └── build-deb.sh                         # Gera dist/ponto-e-trama_1.0.0_all.deb e lançadores .desktop
 ├── dist/
-│   ├── ponto-e-trama_1.0.0_all.deb          # Instalador oficial Ubuntu (.deb — 217 KB)
+│   ├── ponto-e-trama_1.0.0_all.deb          # Instalador oficial Ubuntu (.deb — 223 KB)
 │   ├── Ponto & Trama.desktop                # Lançador clicável do app
 │   └── Instalar Ponto & Trama.desktop       # Lançador clicável do instalador gráfico
 ├── mobile/
-│   ├── ponto-e-trama.apk                    # Aplicativo Android 100% local (.apk — 650 KB)
+│   ├── ponto-e-trama.apk                    # Aplicativo Android 100% local (.apk — 658 KB)
 │   ├── build-apk.sh                         # Compila (aapt2/javac/d8), alinha e assina o APK
 │   ├── README.md
 │   └── android/

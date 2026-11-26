@@ -19,6 +19,48 @@ const LeitorReceitas = (() => {
     regua_pct: 18
   };
 
+  // Zoom / Pan tátil na foto da receita (pinça + toque duplo + arraste)
+  const zoomImg = { escala: 1, x: 0, y: 0 };
+  let timerBadgeZoomRec = null;
+
+  function aplicarTransformImgReceita(mostrarBadge = false) {
+    const imgEl = document.getElementById("img-receita-global");
+    const palco = document.getElementById("palco-arquivo-receita-global");
+    if (!imgEl) return;
+    if (zoomImg.escala <= 1.01) {
+      zoomImg.escala = 1;
+      zoomImg.x = 0;
+      zoomImg.y = 0;
+      imgEl.style.transform = "";
+      palco?.classList.remove("img-com-zoom");
+    } else {
+      imgEl.style.transform = `translate3d(${Math.round(zoomImg.x)}px, ${Math.round(zoomImg.y)}px, 0) scale(${zoomImg.escala.toFixed(3)})`;
+      palco?.classList.add("img-com-zoom");
+    }
+
+    if (mostrarBadge && palco) {
+      let badge = document.getElementById("badge-zoom-receita-touch");
+      if (!badge) {
+        badge = document.createElement("div");
+        badge.id = "badge-zoom-receita-touch";
+        badge.className = "badge-zoom-receita-touch";
+        badge.setAttribute("aria-live", "polite");
+        palco.appendChild(badge);
+      }
+      badge.textContent = `${Math.round(zoomImg.escala * 100)}%`;
+      badge.classList.add("visivel");
+      clearTimeout(timerBadgeZoomRec);
+      timerBadgeZoomRec = setTimeout(() => badge.classList.remove("visivel"), 900);
+    }
+  }
+
+  function resetarZoomImgReceita() {
+    zoomImg.escala = 1;
+    zoomImg.x = 0;
+    zoomImg.y = 0;
+    aplicarTransformImgReceita(false);
+  }
+
   function escapeHtml(texto) {
     return String(texto || "")
       .replace(/&/g, "&amp;")
@@ -205,10 +247,126 @@ const LeitorReceitas = (() => {
       persistir();
     });
 
+    // Arrastar a régua "Onde parei" diretamente com o dedo ou mouse
+    const reguaEl = document.getElementById("regua-marcadora-global");
+    const palcoEl = document.getElementById("palco-arquivo-receita-global");
+    if (reguaEl && palcoEl) {
+      let arrastandoRegua = false;
+      const atualizarPosicaoRegua = (clientY) => {
+        const rect = palcoEl.getBoundingClientRect();
+        if (rect.height <= 0) return;
+        const pct = Math.max(2, Math.min(94, ((clientY - rect.top - 18) / rect.height) * 100));
+        estado.regua_pct = Math.round(pct * 10) / 10;
+        reguaEl.style.top = `${estado.regua_pct}%`;
+        const slider = document.getElementById("slider-regua-receita-global");
+        if (slider) slider.value = String(Math.round(estado.regua_pct));
+      };
+
+      reguaEl.addEventListener("pointerdown", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        arrastandoRegua = true;
+        reguaEl.classList.add("arrastando");
+        reguaEl.setPointerCapture?.(e.pointerId);
+        atualizarPosicaoRegua(e.clientY);
+      });
+      reguaEl.addEventListener("pointermove", (e) => {
+        if (!arrastandoRegua) return;
+        e.preventDefault();
+        atualizarPosicaoRegua(e.clientY);
+      });
+      const encerrarRegua = () => {
+        if (!arrastandoRegua) return;
+        arrastandoRegua = false;
+        reguaEl.classList.remove("arrastando");
+        persistir();
+      };
+      reguaEl.addEventListener("pointerup", encerrarRegua);
+      reguaEl.addEventListener("pointercancel", encerrarRegua);
+    }
+
+    // Pinça para Zoom (2 dedos) + Pan + Toque Duplo na foto da receita
+    const imgEl = document.getElementById("img-receita-global");
+    if (imgEl) {
+      const toques = new Map();
+      let pinchIni = null;
+      let panIni = null;
+      let ultimoToqueImgMs = 0;
+
+      imgEl.addEventListener("pointerdown", (e) => {
+        if (e.pointerType !== "touch") return;
+        toques.set(e.pointerId, { x: e.clientX, y: e.clientY });
+        imgEl.setPointerCapture?.(e.pointerId);
+
+        if (toques.size === 2) {
+          const [a, b] = Array.from(toques.values());
+          pinchIni = {
+            dist: Math.max(12, Math.hypot(b.x - a.x, b.y - a.y)),
+            midX: (a.x + b.x) / 2,
+            midY: (a.y + b.y) / 2,
+            escala: zoomImg.escala,
+            x: zoomImg.x,
+            y: zoomImg.y
+          };
+          panIni = null;
+        } else if (toques.size === 1) {
+          const agora = Date.now();
+          if (agora - ultimoToqueImgMs < 300) {
+            ultimoToqueImgMs = 0;
+            if (zoomImg.escala > 1.1) {
+              resetarZoomImgReceita();
+            } else {
+              zoomImg.escala = 2.2;
+              zoomImg.x = 0;
+              zoomImg.y = 0;
+              aplicarTransformImgReceita(true);
+            }
+            if (typeof Configuracoes !== "undefined") Configuracoes.vibrar(12);
+            return;
+          }
+          ultimoToqueImgMs = agora;
+          if (zoomImg.escala > 1.05) {
+            panIni = { x: e.clientX, y: e.clientY, ox: zoomImg.x, oy: zoomImg.y };
+          }
+        }
+      });
+
+      imgEl.addEventListener("pointermove", (e) => {
+        if (!toques.has(e.pointerId)) return;
+        toques.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+        if (toques.size === 2 && pinchIni) {
+          e.preventDefault();
+          const [a, b] = Array.from(toques.values());
+          const dist = Math.max(12, Math.hypot(b.x - a.x, b.y - a.y));
+          const midX = (a.x + b.x) / 2;
+          const midY = (a.y + b.y) / 2;
+          zoomImg.escala = Math.max(1, Math.min(4, pinchIni.escala * (dist / pinchIni.dist)));
+          zoomImg.x = pinchIni.x + (midX - pinchIni.midX);
+          zoomImg.y = pinchIni.y + (midY - pinchIni.midY);
+          aplicarTransformImgReceita(true);
+        } else if (toques.size === 1 && panIni && zoomImg.escala > 1.05) {
+          e.preventDefault();
+          zoomImg.x = panIni.ox + (e.clientX - panIni.x);
+          zoomImg.y = panIni.oy + (e.clientY - panIni.y);
+          aplicarTransformImgReceita(false);
+        }
+      });
+
+      const soltarImg = (e) => {
+        toques.delete(e.pointerId);
+        if (toques.size < 2) pinchIni = null;
+        if (toques.size === 0) panIni = null;
+      };
+      imgEl.addEventListener("pointerup", soltarImg);
+      imgEl.addEventListener("pointercancel", soltarImg);
+    }
+
     document.getElementById("btn-remover-arquivo-receita-global")?.addEventListener("click", () => {
       estado.arquivo_nome = "";
       estado.arquivo_tipo = "";
       estado.arquivo_url = "";
+      resetarZoomImgReceita();
       renderizar();
       persistir();
     });

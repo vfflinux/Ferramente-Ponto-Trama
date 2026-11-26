@@ -493,6 +493,42 @@ const ContadorCarreiras = (() => {
     confirmarZerarPendente = false;
   }
 
+  function vincularRepeticaoPressaoLonga(botao, acao) {
+    if (!botao) return;
+    let timerEspera = null;
+    let timerIntervalo = null;
+    let repetiu = false;
+
+    const parar = () => {
+      clearTimeout(timerEspera);
+      clearInterval(timerIntervalo);
+      timerEspera = null;
+      timerIntervalo = null;
+    };
+
+    botao.addEventListener("pointerdown", (e) => {
+      if (e.button !== 0 && e.pointerType === "mouse") return;
+      repetiu = false;
+      parar();
+      timerEspera = setTimeout(() => {
+        repetiu = true;
+        acao();
+        timerIntervalo = setInterval(acao, 110);
+      }, 420);
+    });
+
+    botao.addEventListener("pointerup", parar);
+    botao.addEventListener("pointercancel", parar);
+    botao.addEventListener("pointerleave", parar);
+    botao.addEventListener("click", (e) => {
+      if (repetiu) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        repetiu = false;
+      }
+    }, true);
+  }
+
   function configurarEventosCard(card) {
     if (!card) return;
     const inputNome = card.querySelector(".nome-contador");
@@ -506,8 +542,14 @@ const ContadorCarreiras = (() => {
     const btnExpandir = card.querySelector(".btn-expandir-contador");
 
     if (inputNome) inputNome.addEventListener("input", salvarEstadoContadores);
-    if (btnMais) btnMais.addEventListener("click", () => incrementarCarreiras(card));
-    if (btnMenos) btnMenos.addEventListener("click", () => decrementarCarreiras(card));
+    if (btnMais) {
+      btnMais.addEventListener("click", () => incrementarCarreiras(card));
+      vincularRepeticaoPressaoLonga(btnMais, () => incrementarCarreiras(card));
+    }
+    if (btnMenos) {
+      btnMenos.addEventListener("click", () => decrementarCarreiras(card));
+      vincularRepeticaoPressaoLonga(btnMenos, () => decrementarCarreiras(card));
+    }
     if (inputCarreiras) inputCarreiras.addEventListener("input", () => atualizarContador(card));
     if (btnZerar) btnZerar.addEventListener("click", () => zerarContador(card));
     if (inputPontos) inputPontos.addEventListener("input", () => atualizarContador(card));
@@ -535,16 +577,60 @@ const ContadorCarreiras = (() => {
       abrirTelaToda(document.querySelector(".card-contador"));
     });
     document.getElementById("btn-tela-toda-sair")?.addEventListener("click", fecharTelaToda);
-    document.getElementById("zona-toque-tela-toda")?.addEventListener("click", () => {
-      if (!cardTelaToda) return;
-      incrementarCarreiras(cardTelaToda);
-      atualizarTelaToda();
+    const zonaTelaToda = document.getElementById("zona-toque-tela-toda");
+    let swipeTelaToda = null;
+    let ignorarProximoClickTelaToda = false;
+
+    const pulsarNumeroTelaToda = () => {
       const numEl = document.getElementById("tela-toda-numero");
       if (numEl) {
         numEl.classList.remove("pulso");
         void numEl.offsetWidth;
         numEl.classList.add("pulso");
       }
+    };
+
+    zonaTelaToda?.addEventListener(
+      "touchstart",
+      (e) => {
+        if (e.touches.length !== 1) return;
+        swipeTelaToda = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+      },
+      { passive: true }
+    );
+
+    zonaTelaToda?.addEventListener(
+      "touchend",
+      (e) => {
+        if (!swipeTelaToda || !cardTelaToda || e.changedTouches.length !== 1) return;
+        const dx = e.changedTouches[0].clientX - swipeTelaToda.x;
+        const dy = e.changedTouches[0].clientY - swipeTelaToda.y;
+        swipeTelaToda = null;
+
+        // Deslizar para baixo ou para a esquerda (>= 55px) subtrai -1 carreira
+        if (dy >= 55 || dx <= -55) {
+          ignorarProximoClickTelaToda = true;
+          decrementarCarreiras(cardTelaToda);
+          atualizarTelaToda();
+          pulsarNumeroTelaToda();
+          if (typeof Configuracoes !== "undefined") Configuracoes.vibrar([12, 30, 12]);
+          setTimeout(() => { ignorarProximoClickTelaToda = false; }, 260);
+        } else if (dy <= -55 || dx >= 55) {
+          ignorarProximoClickTelaToda = true;
+          incrementarCarreiras(cardTelaToda);
+          atualizarTelaToda();
+          pulsarNumeroTelaToda();
+          setTimeout(() => { ignorarProximoClickTelaToda = false; }, 260);
+        }
+      },
+      { passive: true }
+    );
+
+    zonaTelaToda?.addEventListener("click", () => {
+      if (!cardTelaToda || ignorarProximoClickTelaToda) return;
+      incrementarCarreiras(cardTelaToda);
+      atualizarTelaToda();
+      pulsarNumeroTelaToda();
     });
     document.getElementById("btn-tela-toda-menos")?.addEventListener("click", (e) => {
       e.stopPropagation();

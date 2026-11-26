@@ -10,38 +10,38 @@
     <link rel="stylesheet" href="styles/base/global.css?v=5" />
     <link rel="stylesheet" href="styles/layout/barra-lateral.css?v=9" />
     <link rel="stylesheet" href="styles/modules/home.css" />
-    <link rel="stylesheet" href="styles/modules/contador-carreiras.css" />
-    <link rel="stylesheet" href="styles/modules/leitor-receitas.css" />
+    <link rel="stylesheet" href="styles/modules/contador-carreiras.css?v=11" />
+    <link rel="stylesheet" href="styles/modules/leitor-receitas.css?v=10" />
     <link rel="stylesheet" href="styles/modules/calculadora-precificacao.css" />
-    <link rel="stylesheet" href="styles/modules/gerenciador-projetos.css" />
+    <link rel="stylesheet" href="styles/modules/gerenciador-projetos.css?v=11" />
     <link rel="stylesheet" href="styles/modules/inventario-fios.css" />
     <link rel="stylesheet" href="styles/modules/inventario-agulhas.css" />
     <link rel="stylesheet" href="styles/modules/calculadora-amostra.css" />
     <link rel="stylesheet" href="styles/modules/banco-amostras.css" />
     <link rel="stylesheet" href="styles/modules/editor-graficos.css" />
-    <link rel="stylesheet" href="styles/modules/tabelas-conversao.css?v=5" />
+    <link rel="stylesheet" href="styles/modules/tabelas-conversao.css?v=11" />
     <link rel="stylesheet" href="styles/modules/configuracoes.css?v=6" />
-    <link rel="stylesheet" href="styles/base/mobile.css?v=7" />
-    <link rel="stylesheet" href="styles/base/temas.css?v=9" />
+    <link rel="stylesheet" href="styles/base/mobile.css?v=11" />
+    <link rel="stylesheet" href="styles/base/temas.css?v=11" />
 
     <!-- Core da aplicação -->
     <script src="src/core/database.js?v=4" defer></script>
     <script src="src/core/projeto-contexto.js?v=4" defer></script>
     <script src="src/core/animations.js" defer></script>
-    <script src="src/core/sidebar.js?v=9" defer></script>
+    <script src="src/core/sidebar.js?v=10" defer></script>
 
     <!-- Módulos de ferramentas -->
     <script src="src/modules/home.js?v=4" defer></script>
-    <script src="src/modules/contador-carreiras.js?v=4" defer></script>
+    <script src="src/modules/contador-carreiras.js?v=10" defer></script>
     <script src="src/modules/calculadora-precificacao.js?v=4" defer></script>
     <script src="src/modules/tradutor-receitas.js?v=4" defer></script>
-    <script src="src/modules/leitor-receitas.js?v=4" defer></script>
-    <script src="src/modules/gerenciador-projetos.js?v=4" defer></script>
+    <script src="src/modules/leitor-receitas.js?v=10" defer></script>
+    <script src="src/modules/gerenciador-projetos.js?v=10" defer></script>
     <script src="src/modules/inventario-fios.js" defer></script>
     <script src="src/modules/inventario-agulhas.js" defer></script>
     <script src="src/modules/calculadora-amostra.js" defer></script>
     <script src="src/modules/banco-amostras.js" defer></script>
-    <script src="src/modules/editor-graficos.js?v=4" defer></script>
+    <script src="src/modules/editor-graficos.js?v=10" defer></script>
     <script src="src/modules/tabelas-conversao.js?v=5" defer></script>
     <script src="src/modules/configuracoes.js?v=9" defer></script>
 
@@ -622,7 +622,7 @@
               <span class="tela-toda-rotulo">CARREIRAS</span>
               <span id="tela-toda-numero" class="tela-toda-numero">0</span>
               <span id="tela-toda-pontos" class="tela-toda-pontos"></span>
-              <span class="tela-toda-dica">Toque em qualquer área para +1</span>
+              <span class="tela-toda-dica">Toque para +1 • Deslize para baixo para −1</span>
             </button>
 
             <div class="tela-toda-rodape">
@@ -726,8 +726,8 @@
               <div class="palco-arquivo-receita" id="palco-arquivo-receita-global" style="display: none">
                 <img id="img-receita-global" class="img-receita-viewer" alt="Receita importada" style="display: none" />
                 <iframe id="pdf-receita-global" class="pdf-receita-viewer" title="Visualizador de PDF da receita" style="display: none"></iframe>
-                <div class="regua-marcadora-receita" id="regua-marcadora-global" style="top: 18%">
-                  <span class="etiqueta-regua">📍 Onde parei</span>
+                <div class="regua-marcadora-receita" id="regua-marcadora-global" style="top: 18%" title="Arraste para cima ou para baixo">
+                  <span class="etiqueta-regua">⇅ Onde parei</span>
                 </div>
               </div>
             </div>

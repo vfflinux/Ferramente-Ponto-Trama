@@ -2649,9 +2649,14 @@
   max-height: 74vh;
   object-fit: contain;
   background: #010736;
+  position: relative;
+  z-index: 1;
 }
 
 .lightbox-proj-meta {
+  position: relative;
+  z-index: 4;
+  background: #08153b;
   padding: 10px 14px;
   display: flex;
   justify-content: space-between;

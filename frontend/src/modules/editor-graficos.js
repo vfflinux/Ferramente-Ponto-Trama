@@ -92,7 +92,7 @@ const EditorGraficos = (() => {
     redoStack: []
   };
 
-  // Interação de ponteiro no Canvas
+  // Interação de ponteiro e gestos multi-touch no Canvas
   let ponteiroAtivo = false;
   let botaoMeioOuEspaco = false;
   let espacoPressionado = false;
@@ -102,6 +102,19 @@ const EditorGraficos = (() => {
   let celulaHover = null;
   let previaForma = []; // [{x, y}]
   let fiosInventarioCache = [];
+
+  // Estado multi-touch (Pinch-to-Zoom, Pan 2 dedos, Undo 2 dedos, Redo 3 dedos, Long-Press Conta-gotas)
+  const ponteirosToque = new Map(); // pointerId -> { x, y, startX, startY, ts }
+  let gestoMultiAtivo = false;
+  let gestoMultiMaxDedos = 0;
+  let gestoMultiInicioMs = 0;
+  let gestoMultiMoveu = false;
+  let pinchRef = null; // { dist, midX, midY, zoom, panX, panY }
+  let tracoRecenteUndo = null; // { ts, cel, undoLenAntes }
+  let timerLongPress = null;
+  let longPressDisparado = false;
+  let execDragPendente = null; // { x, y, panX, panY, arrastou, cel }
+  let ultimoToqueExecMs = 0;
 
   // Estado do Importador de Imagens (RF06-RF11, RN02)
   const impEstado = {
@@ -2026,9 +2039,38 @@ const EditorGraficos = (() => {
     agendarAutosave();
   }
 
-  function iniciarInteracaoCanvas(clientX, clientY, button = 0) {
+  function cancelarLongPressCanvas() {
+    if (timerLongPress) {
+      clearTimeout(timerLongPress);
+      timerLongPress = null;
+    }
+  }
+
+  function reverterTracoAcidentalSeRecente() {
+    if (!tracoRecenteUndo) return;
+    const snap = tracoRecenteUndo;
+    tracoRecenteUndo = null;
+    if (Date.now() - snap.ts <= 520 && estado.undoStack.length > snap.undoLenAntes) {
+      const anterior = estado.undoStack.pop();
+      if (anterior) {
+        estado.largura = anterior.largura;
+        estado.altura = anterior.altura;
+        estado.celulas = new Uint8Array(anterior.celulas);
+        estado.paleta = anterior.paleta.map((c) => ({ ...c }));
+        atualizarBotoesHistorico();
+        renderizarPaletaUI();
+        solicitarRedesenho();
+      }
+    }
+  }
+
+  function iniciarInteracaoCanvas(clientX, clientY, button = 0, pointerType = "mouse") {
     const cel = clientParaCelula(clientX, clientY);
     ponteiroAtivo = true;
+    longPressDisparado = false;
+    execDragPendente = null;
+    tracoRecenteUndo = null;
+    cancelarLongPressCanvas();
 
     // Pan com ferramenta Mão, botão do meio ou Espaço
     if (estado.ferramenta === "pan" || button === 1 || espacoPressionado) {
@@ -2037,16 +2079,16 @@ const EditorGraficos = (() => {
       return;
     }
 
-    // Modo Execução: tocar/clicar numa carreira pula para ela e sincroniza o contador (RF19)
+    // Modo Execução: arrastar faz pan suave em qualquer lugar; toque rápido seleciona a carreira; toque duplo enquadra
     if (estado.modo === "execucao") {
-      if (cel) {
-        definirCarreiraAtual(yParaCarreira(cel.y), { sincronizarComContador: true });
-        if (typeof Configuracoes !== "undefined") Configuracoes.vibrar(14);
-      } else {
-        // Arrastar fora da grade permite pan suave mesmo na execução
-        botaoMeioOuEspaco = true;
-        panInicio = { x: clientX, y: clientY, panX: estado.panX, panY: estado.panY };
-      }
+      execDragPendente = {
+        x: clientX,
+        y: clientY,
+        panX: estado.panX,
+        panY: estado.panY,
+        arrastou: false,
+        cel
+      };
       return;
     }
 
@@ -2059,6 +2101,31 @@ const EditorGraficos = (() => {
     celulaInicio = cel;
     celulaAnterior = cel;
 
+    // Pressionar e segurar (460ms) no toque -> Conta-gotas instantâneo sem trocar de ferramenta
+    if (pointerType === "touch" && estado.ferramenta !== "contagotas" && estado.ferramenta !== "selecao") {
+      const corOriginalCel = estado.celulas[cel.y * estado.largura + cel.x] || 0;
+      const sx = clientX;
+      const sy = clientY;
+      timerLongPress = setTimeout(() => {
+        timerLongPress = null;
+        if (!ponteiroAtivo || gestoMultiAtivo) return;
+        const pAtual = Array.from(ponteirosToque.values())[0];
+        if (pAtual && Math.hypot(pAtual.x - sx, pAtual.y - sy) > 10) return;
+
+        longPressDisparado = true;
+        reverterTracoAcidentalSeRecente();
+        estado.corAtivaIdx = corOriginalCel;
+        renderizarPaletaUI();
+        if (estado.ferramenta === "borracha") selecionarFerramenta("pincel");
+        if (typeof Configuracoes !== "undefined") Configuracoes.vibrar(22);
+        mostrarToast(`💧 Cor capturada: ${estado.paleta[estado.corAtivaIdx]?.nome || ""}`);
+        ponteiroAtivo = false;
+        previaForma = [];
+        celulaInicio = null;
+        celulaAnterior = null;
+      }, 460);
+    }
+
     if (estado.ferramenta === "contagotas") {
       estado.corAtivaIdx = estado.celulas[cel.y * estado.largura + cel.x] || 0;
       renderizarPaletaUI();
@@ -2069,7 +2136,9 @@ const EditorGraficos = (() => {
     }
 
     if (estado.ferramenta === "balde") {
+      const undoAntes = estado.undoStack.length;
       empilharHistorico();
+      tracoRecenteUndo = { ts: Date.now(), cel, undoLenAntes: undoAntes };
       floodFill(cel.x, cel.y, estado.corAtivaIdx);
       if (estado.simetriaH) floodFill(estado.largura - 1 - cel.x, cel.y, estado.corAtivaIdx);
       if (estado.simetriaV) floodFill(cel.x, estado.altura - 1 - cel.y, estado.corAtivaIdx);
@@ -2080,7 +2149,9 @@ const EditorGraficos = (() => {
     }
 
     if (estado.ferramenta === "pincel" || estado.ferramenta === "borracha") {
+      const undoAntes = estado.undoStack.length;
       empilharHistorico();
+      tracoRecenteUndo = { ts: Date.now(), cel, undoLenAntes: undoAntes };
       const cor = estado.ferramenta === "borracha" ? 0 : estado.corAtivaIdx;
       pintarCelulaComSimetria(cel.x, cel.y, cor);
       solicitarRedesenho();
@@ -2132,6 +2203,20 @@ const EditorGraficos = (() => {
 
     if (!ponteiroAtivo) return;
 
+    if (execDragPendente) {
+      const dx = clientX - execDragPendente.x;
+      const dy = clientY - execDragPendente.y;
+      if (!execDragPendente.arrastou && Math.hypot(dx, dy) > 8) {
+        execDragPendente.arrastou = true;
+      }
+      if (execDragPendente.arrastou) {
+        estado.panX = execDragPendente.panX + dx;
+        estado.panY = execDragPendente.panY + dy;
+        solicitarRedesenho();
+      }
+      return;
+    }
+
     if (botaoMeioOuEspaco) {
       estado.panX = panInicio.panX + (clientX - panInicio.x);
       estado.panY = panInicio.panY + (clientY - panInicio.y);
@@ -2140,6 +2225,10 @@ const EditorGraficos = (() => {
     }
 
     if (estado.modo !== "edicao" || !cel) return;
+
+    if (celulaInicio && (cel.x !== celulaInicio.x || cel.y !== celulaInicio.y)) {
+      cancelarLongPressCanvas();
+    }
 
     if (estado.ferramenta === "pincel" || estado.ferramenta === "borracha") {
       const cor = estado.ferramenta === "borracha" ? 0 : estado.corAtivaIdx;
@@ -2189,11 +2278,40 @@ const EditorGraficos = (() => {
   }
 
   function finalizarInteracaoCanvas() {
-    if (!ponteiroAtivo) return;
+    cancelarLongPressCanvas();
+    if (!ponteiroAtivo) {
+      execDragPendente = null;
+      return;
+    }
     ponteiroAtivo = false;
+
+    if (execDragPendente) {
+      const infoExec = execDragPendente;
+      execDragPendente = null;
+      if (!infoExec.arrastou) {
+        const agora = Date.now();
+        if (agora - ultimoToqueExecMs < 320) {
+          ultimoToqueExecMs = 0;
+          ajustarZoomNaTela();
+          if (typeof Configuracoes !== "undefined") Configuracoes.vibrar(12);
+          return;
+        }
+        ultimoToqueExecMs = agora;
+        if (infoExec.cel) {
+          definirCarreiraAtual(yParaCarreira(infoExec.cel.y), { sincronizarComContador: true });
+          if (typeof Configuracoes !== "undefined") Configuracoes.vibrar(14);
+        }
+      }
+      return;
+    }
 
     if (botaoMeioOuEspaco) {
       botaoMeioOuEspaco = false;
+      return;
+    }
+
+    if (longPressDisparado) {
+      longPressDisparado = false;
       return;
     }
 
@@ -2215,21 +2333,183 @@ const EditorGraficos = (() => {
     celulaAnterior = null;
   }
 
+  function calcularMetricasPinch(wrap) {
+    const pts = Array.from(ponteirosToque.values());
+    if (pts.length < 2 || !wrap) return null;
+    const rect = wrap.getBoundingClientRect();
+    const p1 = pts[0];
+    const p2 = pts[1];
+    const dist = Math.hypot(p2.x - p1.x, p2.y - p1.y);
+    const midX = (p1.x + p2.x) / 2 - rect.left;
+    const midY = (p1.y + p2.y) / 2 - rect.top;
+    return { dist: Math.max(12, dist), midX, midY };
+  }
+
   function vincularEventos() {
     const canvas = document.getElementById("canvas-editor-graficos");
     const wrap = document.getElementById("graf-palco-wrap");
 
-    // Pointer Events unificados (mouse + caneta + toque no celular)
+    // Pointer Events unificados (mouse + caneta + multi-touch no celular)
+    // Suporta: Pinça para Zoom + Pan com 2 dedos, Toque 2 dedos = Desfazer,
+    // Toque 3 dedos = Refazer, Long-Press = Conta-gotas e Toque Duplo na Execução = Enquadrar.
     canvas?.addEventListener("pointerdown", (e) => {
       e.preventDefault();
       canvas.setPointerCapture?.(e.pointerId);
-      iniciarInteracaoCanvas(e.clientX, e.clientY, e.button);
+
+      if (e.pointerType === "touch") {
+        ponteirosToque.set(e.pointerId, {
+          x: e.clientX,
+          y: e.clientY,
+          startX: e.clientX,
+          startY: e.clientY,
+          ts: Date.now()
+        });
+
+        if (ponteirosToque.size >= 2) {
+          cancelarLongPressCanvas();
+          // Reverte ponto acidental pintado pelo 1º dedo logo antes do 2º dedo encostar
+          if (!gestoMultiAtivo) {
+            reverterTracoAcidentalSeRecente();
+            ponteiroAtivo = false;
+            botaoMeioOuEspaco = false;
+            execDragPendente = null;
+            previaForma = [];
+            celulaInicio = null;
+            celulaAnterior = null;
+            gestoMultiAtivo = true;
+            gestoMultiInicioMs = Date.now();
+            gestoMultiMoveu = false;
+          }
+          gestoMultiMaxDedos = Math.max(gestoMultiMaxDedos, ponteirosToque.size);
+          const m = calcularMetricasPinch(wrap);
+          if (m) {
+            pinchRef = {
+              dist: m.dist,
+              midX: m.midX,
+              midY: m.midY,
+              zoom: estado.zoom,
+              panX: estado.panX,
+              panY: estado.panY
+            };
+          }
+          return;
+        }
+      }
+
+      if (!gestoMultiAtivo) {
+        iniciarInteracaoCanvas(e.clientX, e.clientY, e.button, e.pointerType);
+      }
     });
+
     canvas?.addEventListener("pointermove", (e) => {
+      if (e.pointerType === "touch" && ponteirosToque.has(e.pointerId)) {
+        const reg = ponteirosToque.get(e.pointerId);
+        reg.x = e.clientX;
+        reg.y = e.clientY;
+        if (Math.hypot(reg.x - reg.startX, reg.y - reg.startY) > 10) {
+          cancelarLongPressCanvas();
+        }
+      }
+
+      if (gestoMultiAtivo) {
+        if (ponteirosToque.size >= 2 && pinchRef) {
+          const m = calcularMetricasPinch(wrap);
+          if (!m) return;
+          const distDelta = Math.abs(m.dist - pinchRef.dist);
+          const panDelta = Math.hypot(m.midX - pinchRef.midX, m.midY - pinchRef.midY);
+          if (distDelta > 8 || panDelta > 10) {
+            gestoMultiMoveu = true;
+          }
+          const fator = m.dist / pinchRef.dist;
+          const novoZoom = clamp(pinchRef.zoom * fator, 0.18, 4.5);
+          const razao = novoZoom / pinchRef.zoom;
+          estado.zoom = novoZoom;
+          estado.panX = m.midX - (pinchRef.midX - pinchRef.panX) * razao;
+          estado.panY = m.midY - (pinchRef.midY - pinchRef.panY) * razao;
+          atualizarIndicadorZoom();
+          solicitarRedesenho();
+        }
+        return;
+      }
+
       moverInteracaoCanvas(e.clientX, e.clientY);
     });
-    canvas?.addEventListener("pointerup", finalizarInteracaoCanvas);
-    canvas?.addEventListener("pointercancel", finalizarInteracaoCanvas);
+
+    const aoSoltarPonteiro = (e) => {
+      if (e.pointerType === "touch") {
+        ponteirosToque.delete(e.pointerId);
+        if (gestoMultiAtivo) {
+          if (ponteirosToque.size >= 2) {
+            const m = calcularMetricasPinch(wrap);
+            if (m) {
+              pinchRef = {
+                dist: m.dist,
+                midX: m.midX,
+                midY: m.midY,
+                zoom: estado.zoom,
+                panX: estado.panX,
+                panY: estado.panY
+              };
+            }
+          } else if (ponteirosToque.size === 0) {
+            const duracao = Date.now() - gestoMultiInicioMs;
+            const foiTapRapido = !gestoMultiMoveu && duracao < 280;
+            const dedos = gestoMultiMaxDedos;
+            gestoMultiAtivo = false;
+            gestoMultiMaxDedos = 0;
+            pinchRef = null;
+
+            if (foiTapRapido && estado.modo === "edicao") {
+              if (dedos === 2 && estado.undoStack.length > 0) {
+                desfazer();
+                if (typeof Configuracoes !== "undefined") Configuracoes.vibrar(14);
+                mostrarToast("↩ Desfeito (toque com 2 dedos)");
+              } else if (dedos >= 3 && estado.redoStack.length > 0) {
+                refazer();
+                if (typeof Configuracoes !== "undefined") Configuracoes.vibrar(14);
+                mostrarToast("↪ Refeito (toque com 3 dedos)");
+              }
+            }
+          }
+          return;
+        }
+      }
+      finalizarInteracaoCanvas();
+    };
+
+    canvas?.addEventListener("pointerup", aoSoltarPonteiro);
+    canvas?.addEventListener("pointercancel", aoSoltarPonteiro);
+
+    // Swipe horizontal na barra de execução para avançar / voltar carreira no toque
+    const barraExec = document.getElementById("graf-barra-execucao");
+    let swipeExec = null;
+    barraExec?.addEventListener(
+      "touchstart",
+      (e) => {
+        if (e.touches.length !== 1) return;
+        swipeExec = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+      },
+      { passive: true }
+    );
+    barraExec?.addEventListener(
+      "touchend",
+      (e) => {
+        if (!swipeExec || e.changedTouches.length !== 1) return;
+        const dx = e.changedTouches[0].clientX - swipeExec.x;
+        const dy = e.changedTouches[0].clientY - swipeExec.y;
+        swipeExec = null;
+        if (Math.abs(dx) >= 60 && Math.abs(dy) < 42) {
+          if (dx < 0 && estado.carreiraAtual < estado.altura) {
+            definirCarreiraAtual(estado.carreiraAtual + 1, { sincronizarComContador: true });
+            if (typeof Configuracoes !== "undefined") Configuracoes.vibrar(16);
+          } else if (dx > 0 && estado.carreiraAtual > 1) {
+            definirCarreiraAtual(estado.carreiraAtual - 1, { sincronizarComContador: true });
+            if (typeof Configuracoes !== "undefined") Configuracoes.vibrar(16);
+          }
+        }
+      },
+      { passive: true }
+    );
 
     // Zoom com roda do mouse centrado no cursor (RF04)
     wrap?.addEventListener(

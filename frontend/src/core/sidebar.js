@@ -727,6 +727,54 @@ const BarraLateral = (() => {
         }
       });
     }
+
+    // Gesto nativo mobile: deslizar da borda esquerda abre a gaveta; deslizar para a esquerda fecha
+    let edgeSwipe = null;
+    document.addEventListener(
+      "touchstart",
+      (e) => {
+        if (!chkMenu || window.innerWidth > 768 || e.touches.length !== 1) return;
+        const t = e.touches[0];
+        const alvo = e.target;
+        if (
+          alvo?.closest?.("#canvas-editor-graficos, #overlay-contador-tela-toda, #modal-lightbox-galeria, #popup-ferramentas-lateral")
+        ) {
+          edgeSwipe = null;
+          return;
+        }
+        const gavetaFechada = chkMenu.checked;
+        if (gavetaFechada && t.clientX <= 28) {
+          edgeSwipe = { modo: "abrir", x: t.clientX, y: t.clientY };
+        } else if (!gavetaFechada && !popupAberto && alvo?.closest?.(".barraLateral")) {
+          edgeSwipe = { modo: "fechar", x: t.clientX, y: t.clientY };
+        } else {
+          edgeSwipe = null;
+        }
+      },
+      { passive: true }
+    );
+
+    document.addEventListener(
+      "touchend",
+      (e) => {
+        if (!edgeSwipe || !chkMenu || e.changedTouches.length !== 1) return;
+        const t = e.changedTouches[0];
+        const dx = t.clientX - edgeSwipe.x;
+        const dy = t.clientY - edgeSwipe.y;
+        const modo = edgeSwipe.modo;
+        edgeSwipe = null;
+
+        if (Math.abs(dy) > 50) return;
+        if (modo === "abrir" && dx >= 52) {
+          chkMenu.checked = false;
+          if (typeof Configuracoes !== "undefined") Configuracoes.vibrar(12);
+        } else if (modo === "fechar" && dx <= -55) {
+          chkMenu.checked = true;
+          fecharPopupFerramentas();
+        }
+      },
+      { passive: true }
+    );
   }
 
   return {
