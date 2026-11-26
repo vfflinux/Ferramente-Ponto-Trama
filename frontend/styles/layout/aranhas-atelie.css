@@ -94,6 +94,242 @@
   opacity: 0.78;
 }
 
+/* Tarântula Golias (Comedora-de-Pássaros — 146 px): presença imponente e sombra aterrada */
+.aranha-viva-ator.especie-tarantula_golias {
+  opacity: 0.94;
+  z-index: 2;
+  filter: drop-shadow(0 7px 9px var(--aranha-sombra));
+}
+
+.golias-quelicera-esq,
+.golias-quelicera-dir {
+  transition: transform 0.14s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+/* Aranha Tecelã de Canto (Argiope): contraste nítido sobre as teias dos cantos */
+.aranha-viva-ator.especie-tecela_canto {
+  opacity: 0.9;
+}
+
+/* Presas vivas (Mosca, Mosquito, Barata, Lagartinho, Lagarta Gigante) */
+.presa-viva-ator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  pointer-events: none;
+  color: var(--aranha-tinta);
+  opacity: 0.9;
+  will-change: transform;
+  filter: drop-shadow(0 3px 4px var(--aranha-sombra));
+}
+
+.presa-viva-ator.presa-lagartinho,
+.presa-viva-ator.presa-lagarta {
+  opacity: 0.93;
+  filter: drop-shadow(0 6px 7px var(--aranha-sombra));
+}
+
+.presa-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  overflow: visible;
+}
+
+.presa-svg .presa-casulo-seda {
+  transition: opacity 0.25s ease;
+}
+
+.presa-svg .lagarto-lingua {
+  transition: opacity 0.08s linear;
+}
+
+/* Ondas sutis de vibração tátil no chão / teia (radar natural da caçada) */
+.onda-vibracao-caca {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 22px;
+  height: 22px;
+  margin-left: -11px;
+  margin-top: -11px;
+  border-radius: 50%;
+  border: 1.25px solid var(--aranha-tinta);
+  pointer-events: none;
+  will-change: transform, opacity;
+  animation: pulsoVibracaoSolo 0.88s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.onda-vibracao-caca.teia {
+  border-color: var(--aranha-acento);
+  border-style: dashed;
+}
+
+.onda-vibracao-caca.impacto {
+  border-width: 1.8px;
+  border-color: var(--aranha-acento);
+  animation: pulsoImpactoBote 0.62s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes pulsoVibracaoSolo {
+  0% { opacity: 0.38; transform: scale(0.45); }
+  100% { opacity: 0; transform: scale(4.2); }
+}
+
+@keyframes pulsoImpactoBote {
+  0% { opacity: 0.55; transform: scale(0.5); }
+  100% { opacity: 0; transform: scale(3.1); }
+}
+
+/* Tapete circular de seda tecido na "Dança da Seda" da Tarântula Golias */
+.tapete-seda-golias {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 118px;
+  height: 118px;
+  pointer-events: none;
+  color: var(--aranha-tinta);
+  opacity: 0;
+  z-index: 0;
+  transform: translate(-50%, -50%) scale(0.38);
+  transition: opacity 0.85s ease;
+}
+
+.tapete-seda-golias svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.tapete-seda-golias.desvanecendo {
+  opacity: 0 !important;
+}
+
+/* Bolus: pequena bola seca de exoesqueleto descartada após a digestão externa */
+.bolus-exoesqueleto {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 11px;
+  height: 9px;
+  margin-left: -5.5px;
+  margin-top: -4.5px;
+  border-radius: 44% 56% 52% 48% / 48% 44% 56% 52%;
+  background: var(--aranha-corpo);
+  border: 1.4px solid var(--aranha-tinta);
+  box-shadow: inset 0 0 0 2px var(--aranha-acento), 0 2px 3px var(--aranha-sombra);
+  opacity: 0.82;
+  pointer-events: none;
+  z-index: 1;
+  transition: opacity 0.85s ease, transform 0.85s ease;
+}
+
+.bolus-exoesqueleto.desvanecendo {
+  opacity: 0;
+  transform: scale(0.5);
+}
+
+/* 1. Gota de Orvalho translúcida com reflexo especular */
+.gota-orvalho-atelie {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 24px;
+  height: 24px;
+  pointer-events: none;
+  color: var(--aranha-tinta);
+  transform: translate(-50%, -50%);
+  z-index: 1;
+  filter: drop-shadow(0 2px 4px var(--aranha-sombra));
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.gota-orvalho-atelie svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* 2. Micro-nuvem de pelos urticantes (Tarântula Golias) */
+.particula-urticante {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 7px;
+  height: 1.5px;
+  border-radius: 2px;
+  background: var(--aranha-acento);
+  pointer-events: none;
+  z-index: 3;
+  animation: dispersarUrticante 1.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes dispersarUrticante {
+  0% {
+    opacity: 0.78;
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(0.7);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--ux, 40px), var(--uy, -30px), 0) rotate(var(--urot, 80deg)) scale(1.1);
+  }
+}
+
+/* 11. Exúvia (casca translúcida vazia deixada na Ecdise) & brilho pós-muda */
+.exuvia-aranha {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  color: var(--aranha-tinta);
+  opacity: 0.34;
+  filter: saturate(0.2) contrast(0.85);
+  z-index: 0;
+  transition: opacity 0.9s ease;
+}
+
+.exuvia-aranha.desvanecendo {
+  opacity: 0;
+}
+
+.aranha-viva-ator.recem-mudada {
+  opacity: 0.98;
+  filter: drop-shadow(0 0 6px var(--aranha-acento));
+}
+
+/* 12. Ooteca (casulo esférico prateado carregado pela Ñanduobyeté Mãe) */
+.ooteca-seda {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 24px;
+  height: 24px;
+  pointer-events: none;
+  z-index: 2;
+  will-change: transform;
+  filter: drop-shadow(0 2px 4px var(--aranha-sombra));
+}
+
+.ooteca-seda svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.aranha-fio-dinamico.teia-canto-efemera {
+  opacity: 0.42;
+  transition: opacity 0.35s ease;
+}
+
+.aranha-estabilimento-seda {
+  color: var(--aranha-acento);
+  opacity: 0.72;
+  filter: drop-shadow(0 0 2px var(--aranha-sombra));
+}
+
 .aranha-svg {
   width: 100%;
   height: 100%;
@@ -186,6 +422,50 @@
   align-items: center;
   gap: 8px;
   flex-wrap: wrap;
+}
+
+.select-especie-aranha-cfg {
+  min-width: 172px;
+  max-width: 220px;
+  padding: 7px 10px;
+  border-radius: 10px;
+  border: 1px solid var(--creme-opacidade-25);
+  background: var(--cor-fundo-principal);
+  color: var(--cor-texto-principal);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+:root[data-tema-base="claro"] .select-especie-aranha-cfg {
+  background: #ffffff;
+  color: var(--cor-texto-principal);
+  border-color: var(--creme-opacidade-30);
+}
+
+/* Descrição dinâmica de frequência do modo selecionado das Aranhas */
+.desc-modo-aranhas-cfg {
+  display: block;
+  margin-top: 6px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border-left: 2.5px dashed var(--aranha-acento);
+  background: var(--azul-medio-opacidade-40);
+  color: var(--cor-texto-principal);
+  font-size: 12px;
+  line-height: 1.4;
+  opacity: 0.92;
+  transition: opacity 0.2s ease, border-color 0.2s ease;
+}
+
+.desc-modo-aranhas-cfg[data-modo="desligado"] {
+  opacity: 0.72;
+  border-left-color: var(--creme-opacidade-30);
+}
+
+:root[data-tema-base="claro"] .desc-modo-aranhas-cfg {
+  background: var(--creme-opacidade-12);
+  color: var(--cor-texto-principal);
 }
 
 @media (prefers-reduced-motion: reduce) {

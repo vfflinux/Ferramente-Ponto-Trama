@@ -14,11 +14,20 @@ const PontoTramaApp = (() => {
     receitas: () => typeof LeitorReceitas !== "undefined" && LeitorReceitas.init(),
     precificacao: () => typeof CalculadoraPrecificacao !== "undefined" && CalculadoraPrecificacao.init(),
     projetos: () => typeof GerenciadorProjetos !== "undefined" && GerenciadorProjetos.init(),
-    fios: () => typeof InventarioFios !== "undefined" && InventarioFios.init(),
+    fios: () => {
+      if (typeof InventarioFios !== "undefined") InventarioFios.init();
+      if (typeof PlanejadorManta !== "undefined") PlanejadorManta.init();
+    },
     agulhas: () => typeof InventarioAgulhas !== "undefined" && InventarioAgulhas.init(),
-    amostra: () => typeof CalculadoraAmostra !== "undefined" && CalculadoraAmostra.init(),
+    amostra: () => {
+      if (typeof CalculadoraAmostra !== "undefined") CalculadoraAmostra.init();
+      if (typeof GeradorEsferaCirculo !== "undefined") GeradorEsferaCirculo.init();
+    },
     "banco-amostras": () => typeof BancoAmostras !== "undefined" && BancoAmostras.init(),
-    "editor-graficos": () => typeof EditorGraficos !== "undefined" && EditorGraficos.init(),
+    "editor-graficos": () => {
+      if (typeof EditorGraficos !== "undefined") EditorGraficos.init();
+      if (typeof EditorSimbolosCroche !== "undefined") EditorSimbolosCroche.init();
+    },
     "tabelas-conversao": () => typeof TabelasConversao !== "undefined" && TabelasConversao.init(),
     configuracoes: () => typeof Configuracoes !== "undefined" && Configuracoes.init()
   };

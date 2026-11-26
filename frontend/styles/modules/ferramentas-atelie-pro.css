@@ -1,0 +1,1182 @@
+/* ==========================================================================
+   PONTO & TRAMA — FERRAMENTAS AVANÇADAS DE ATELIÊ
+   Estilos unificados para:
+   1. Gerador de Esfera (Amigurumi) & Círculo Plano Perfeito
+   2. Gerador de Listras & Planejador de Manta (Stripe / Temperature Blanket)
+   3. Leitor Interativo estilo Ribblr (Checklist por Carreira + Popover de Ponto)
+   4. Contadores Vinculados com Lembrete de Motivo (estilo KnitCompanion)
+   5. Editor de Gráfico com Símbolos de Crochê (Fileiras & Circular)
+   100% compatível com os 8 temas (escuros e claros) e responsivo mobile.
+   ========================================================================== */
+
+/* ==========================================================================
+   BOTÕES DE ACESSO RÁPIDO NOS CABEÇALHOS
+   ========================================================================== */
+.btn-atalho-pro {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 14px;
+  border-radius: var(--raio-borda-md);
+  border: 1px solid var(--creme-opacidade-30);
+  background: var(--azul-medio-opacidade-55);
+  color: var(--cor-texto-principal);
+  font-size: 0.86rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+}
+
+.btn-atalho-pro:hover {
+  background: var(--cor-destaque-hover);
+  border-color: var(--creme-opacidade-65);
+  transform: translateY(-1px);
+}
+
+.btn-atalho-pro:active {
+  transform: scale(0.97);
+}
+
+/* ==========================================================================
+   MODAIS COMPARTILHADOS (ESFERA/CÍRCULO & PLANEJADOR DE MANTA)
+   ========================================================================== */
+.modal-overlay-atelie-pro {
+  position: fixed;
+  inset: 0;
+  z-index: 1050;
+  background: rgba(1, 7, 54, 0.76);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+}
+
+.modal-box-atelie-pro {
+  width: 100%;
+  max-width: 980px;
+  max-height: 90vh;
+  background: var(--cor-fundo-principal);
+  color: var(--cor-texto-principal);
+  border: 1px solid var(--creme-opacidade-25);
+  border-radius: var(--raio-borda-xl);
+  box-shadow: var(--sombra-card);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.modal-box-atelie-pro.largo {
+  max-width: 1120px;
+}
+
+.modal-pro-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 22px;
+  background: var(--cor-fundo-profundo);
+  border-bottom: 1px solid var(--creme-opacidade-20);
+}
+
+.modal-pro-topo-titulo h3 {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--cor-texto-principal);
+}
+
+.modal-pro-topo-titulo p {
+  margin: 3px 0 0;
+  font-size: 0.82rem;
+  color: var(--creme-opacidade-70);
+}
+
+.btn-fechar-pro {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid var(--creme-opacidade-25);
+  background: transparent;
+  color: var(--cor-texto-principal);
+  font-size: 1.35rem;
+  line-height: 1;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background-color 0.2s ease, transform 0.15s ease;
+}
+
+.btn-fechar-pro:hover {
+  background: var(--azul-medio-opacidade-70);
+  transform: scale(1.06);
+}
+
+.modal-pro-corpo {
+  padding: 18px 22px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.modal-pro-grid {
+  display: grid;
+  grid-template-columns: minmax(300px, 400px) minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.modal-pro-painel {
+  background: var(--azul-profundo-opacidade-40);
+  border: 1px solid var(--creme-opacidade-15);
+  border-radius: var(--raio-borda-lg);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+}
+
+.pro-segmento {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  background: var(--azul-profundo-opacidade-65);
+  padding: 4px;
+  border-radius: var(--raio-borda-md);
+  border: 1px solid var(--creme-opacidade-15);
+}
+
+.pro-segmento.quatro {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.btn-seg-pro {
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--creme-opacidade-75);
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+}
+
+.btn-seg-pro.ativo {
+  background: var(--cor-destaque);
+  color: var(--cor-branco);
+  border-color: var(--creme-opacidade-30);
+}
+
+.pro-campo {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.pro-campo label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--creme-opacidade-85);
+}
+
+.pro-campo input[type="text"],
+.pro-campo input[type="number"],
+.pro-campo select {
+  width: 100%;
+  padding: 9px 11px;
+  border-radius: var(--raio-borda-md);
+  border: 1px solid var(--creme-opacidade-25);
+  background: var(--cor-fundo-profundo);
+  color: var(--cor-texto-principal);
+  font-size: 0.9rem;
+  font-family: inherit;
+}
+
+.pro-campo-linha-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.pro-check-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--raio-borda-md);
+  background: var(--azul-medio-opacidade-40);
+  border: 1px solid var(--creme-opacidade-20);
+  cursor: pointer;
+  font-size: 0.84rem;
+  line-height: 1.35;
+}
+
+.pro-check-card input[type="checkbox"] {
+  margin-top: 2px;
+  accent-color: var(--cor-destaque-hover);
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.pro-check-card small {
+  display: block;
+  color: var(--creme-opacidade-70);
+  font-size: 0.76rem;
+  margin-top: 2px;
+}
+
+.pro-resumo-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pro-chip-metrica {
+  flex: 1 1 110px;
+  background: var(--cor-fundo-profundo);
+  border: 1px solid var(--creme-opacidade-20);
+  border-radius: var(--raio-borda-md);
+  padding: 8px 10px;
+  text-align: center;
+}
+
+.pro-chip-metrica span {
+  display: block;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--creme-opacidade-65);
+}
+
+.pro-chip-metrica strong {
+  display: block;
+  margin-top: 2px;
+  font-size: 1rem;
+  color: var(--cor-texto-principal);
+}
+
+.pro-svg-preview {
+  width: 100%;
+  min-height: 175px;
+  background: var(--cor-fundo-profundo);
+  border: 1px solid var(--creme-opacidade-20);
+  border-radius: var(--raio-borda-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+}
+
+.pro-svg-preview svg {
+  max-width: 190px;
+  max-height: 170px;
+  width: 100%;
+  height: auto;
+}
+
+.pro-lista-receita {
+  max-height: 360px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding-right: 4px;
+}
+
+.pro-linha-receita {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 7px 10px;
+  border-radius: 7px;
+  background: var(--cor-fundo-profundo);
+  border: 1px solid var(--creme-opacidade-12);
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.pro-linha-receita.secao-div {
+  background: var(--azul-medio-opacidade-55);
+  border-color: var(--creme-opacidade-25);
+  font-weight: 700;
+  color: var(--cor-texto-principal);
+  margin-top: 4px;
+}
+
+.pro-linha-receita.dica-enchimento {
+  background: rgba(245, 196, 81, 0.13);
+  border-color: rgba(245, 196, 81, 0.35);
+  font-weight: 600;
+}
+
+.pro-badge-pts {
+  flex-shrink: 0;
+  padding: 2px 8px;
+  border-radius: var(--raio-borda-pilula);
+  background: var(--azul-medio-opacidade-70);
+  border: 1px solid var(--creme-opacidade-25);
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--cor-texto-principal);
+}
+
+.pro-acoes-barra {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--creme-opacidade-15);
+}
+
+.btn-pro-primario {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 14px;
+  border-radius: var(--raio-borda-md);
+  border: 1px solid var(--creme-opacidade-30);
+  background: var(--cor-destaque);
+  color: var(--cor-branco);
+  font-size: 0.86rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.18s ease, transform 0.14s ease;
+}
+
+.btn-pro-primario:hover {
+  background: var(--cor-destaque-hover);
+  transform: translateY(-1px);
+}
+
+.btn-pro-sec {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 13px;
+  border-radius: var(--raio-borda-md);
+  border: 1px solid var(--creme-opacidade-25);
+  background: var(--azul-profundo-opacidade-65);
+  color: var(--cor-texto-principal);
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.18s ease, border-color 0.18s ease;
+}
+
+.btn-pro-sec:hover {
+  background: var(--azul-medio-opacidade-55);
+  border-color: var(--creme-opacidade-50);
+}
+
+/* ==========================================================================
+   PLANEJADOR DE MANTA (LISTRAS & TEMPERATURA)
+   ========================================================================== */
+.manta-grid-cores {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  max-height: 150px;
+  overflow-y: auto;
+  padding: 4px 2px;
+}
+
+.manta-swatch-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 10px;
+  border-radius: var(--raio-borda-pilula);
+  border: 1px solid var(--creme-opacidade-20);
+  background: var(--cor-fundo-profundo);
+  color: var(--cor-texto-principal);
+  font-size: 0.79rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.manta-swatch-btn.selecionado {
+  border-color: var(--cor-texto-principal);
+  background: var(--cor-destaque);
+  color: var(--cor-branco);
+  box-shadow: 0 0 0 1px var(--creme-opacidade-45);
+}
+
+.manta-bolinha-cor {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  flex-shrink: 0;
+}
+
+.manta-add-cor-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.manta-add-cor-wrap input[type="color"] {
+  width: 36px;
+  height: 34px;
+  padding: 2px;
+  border: 1px solid var(--creme-opacidade-30);
+  border-radius: 6px;
+  background: var(--cor-fundo-profundo);
+  cursor: pointer;
+}
+
+.manta-canvas-wrap {
+  width: 100%;
+  background: var(--cor-fundo-profundo);
+  border: 1px solid var(--creme-opacidade-25);
+  border-radius: var(--raio-borda-md);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.manta-canvas-wrap canvas {
+  width: 100%;
+  max-height: 290px;
+  border-radius: 6px;
+  display: block;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+}
+
+.manta-tabela-consumo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.manta-consumo-row {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1.3fr) auto auto;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px;
+  border-radius: 7px;
+  background: var(--cor-fundo-profundo);
+  border: 1px solid var(--creme-opacidade-15);
+  font-size: 0.82rem;
+}
+
+.manta-consumo-alerta {
+  font-size: 0.74rem;
+  padding: 2px 7px;
+  border-radius: var(--raio-borda-pilula);
+  background: rgba(231, 76, 60, 0.2);
+  border: 1px solid rgba(231, 76, 60, 0.5);
+  color: #ffb8b0;
+}
+
+.manta-consumo-ok {
+  font-size: 0.74rem;
+  padding: 2px 7px;
+  border-radius: var(--raio-borda-pilula);
+  background: rgba(66, 185, 131, 0.18);
+  border: 1px solid rgba(66, 185, 131, 0.45);
+  color: #a9f0cc;
+}
+
+.manta-temp-faixas {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: var(--cor-fundo-profundo);
+  border: 1px solid var(--creme-opacidade-15);
+  border-radius: var(--raio-borda-md);
+  padding: 10px;
+}
+
+.manta-temp-linha {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+}
+
+.manta-temp-linha input {
+  width: 66px;
+  padding: 4px 6px;
+  font-size: 0.78rem;
+}
+
+/* ==========================================================================
+   LEITOR INTERATIVO ESTILO RIBBLR (CHECKLIST + POPOVER DE PONTO)
+   ========================================================================== */
+.ribblr-barra-progresso {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 9px 12px;
+  border-radius: var(--raio-borda-md);
+  background: var(--azul-profundo-opacidade-50);
+  border: 1px solid var(--creme-opacidade-15);
+  margin-bottom: 10px;
+}
+
+.ribblr-barra-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 0.8rem;
+}
+
+.ribblr-sync-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--creme-opacidade-85);
+}
+
+.ribblr-sync-label input {
+  accent-color: var(--cor-destaque-hover);
+  width: 15px;
+  height: 15px;
+}
+
+.ribblr-trilha {
+  width: 100%;
+  height: 7px;
+  border-radius: var(--raio-borda-pilula);
+  background: var(--creme-opacidade-15);
+  overflow: hidden;
+}
+
+.ribblr-preenchimento {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--cor-destaque-hover), #6fd6a3);
+  border-radius: var(--raio-borda-pilula);
+  transition: width 0.25s ease;
+}
+
+.linha-receita-item.ribblr-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  position: relative;
+}
+
+.ribblr-check-btn {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  border: 1.5px solid var(--creme-opacidade-45);
+  background: transparent;
+  color: var(--cor-branco);
+  font-size: 0.78rem;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+  cursor: pointer;
+  transition: background-color 0.16s ease, border-color 0.16s ease, transform 0.14s ease;
+}
+
+.ribblr-check-btn.marcado {
+  background: #2f9e66;
+  border-color: #54c98d;
+  color: #ffffff;
+}
+
+.ribblr-check-btn:hover {
+  transform: scale(1.08);
+}
+
+.ribblr-linha-conteudo {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px;
+  line-height: 1.55;
+}
+
+.linha-receita-item.riscada .ribblr-linha-texto {
+  text-decoration: line-through;
+  opacity: 0.58;
+}
+
+.ribblr-badge-carreira {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 7px;
+  border-radius: var(--raio-borda-pilula);
+  background: var(--azul-medio-opacidade-70);
+  border: 1px solid var(--creme-opacidade-25);
+  font-size: 0.74rem;
+  font-weight: 700;
+  margin-right: 4px;
+}
+
+.ribblr-badge-pontos {
+  margin-left: auto;
+  flex-shrink: 0;
+  padding: 2px 8px;
+  border-radius: var(--raio-borda-pilula);
+  background: rgba(111, 214, 163, 0.16);
+  border: 1px solid rgba(111, 214, 163, 0.4);
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--cor-texto-principal);
+}
+
+.chip-sigla-receita {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 5px;
+  margin: 0 1px;
+  border-radius: 5px;
+  border: 1px dashed var(--creme-opacidade-45);
+  background: var(--azul-medio-opacidade-40);
+  color: var(--cor-texto-principal);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.chip-sigla-receita:hover {
+  background: var(--cor-destaque-hover);
+  border-style: solid;
+  border-color: var(--cor-texto-principal);
+  color: var(--cor-branco);
+}
+
+.popover-ponto-receita {
+  position: fixed;
+  z-index: 1200;
+  width: min(320px, calc(100vw - 24px));
+  background: var(--cor-fundo-profundo);
+  color: var(--cor-texto-principal);
+  border: 1px solid var(--creme-opacidade-40);
+  border-radius: var(--raio-borda-lg);
+  box-shadow: var(--sombra-card);
+  padding: 13px 14px;
+  display: none;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.popover-ponto-topo {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.popover-ponto-titulo {
+  font-size: 0.96rem;
+  font-weight: 700;
+  color: var(--cor-texto-principal);
+}
+
+.popover-ponto-tecnica {
+  display: inline-block;
+  margin-top: 2px;
+  font-size: 0.72rem;
+  padding: 1px 7px;
+  border-radius: var(--raio-borda-pilula);
+  background: var(--azul-medio-opacidade-70);
+  color: var(--cor-texto-principal);
+}
+
+.popover-ponto-desc {
+  margin: 0;
+  font-size: 0.83rem;
+  line-height: 1.45;
+  color: var(--creme-opacidade-85);
+}
+
+.popover-ponto-idiomas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  padding-top: 6px;
+  border-top: 1px solid var(--creme-opacidade-15);
+  font-size: 0.74rem;
+}
+
+.popover-ponto-idiomas span {
+  padding: 2px 7px;
+  border-radius: 5px;
+  background: var(--azul-medio-opacidade-40);
+  border: 1px solid var(--creme-opacidade-20);
+}
+
+/* ==========================================================================
+   CONTADORES VINCULADOS COM LEMBRETE DE MOTIVO (ESTILO KNITCOMPANION)
+   ========================================================================== */
+.secao-motivo-vinculado {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--creme-opacidade-20);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.motivo-cabecalho {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.btn-toggle-motivo {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: transparent;
+  border: none;
+  padding: 2px 0;
+  color: var(--creme-opacidade-85);
+  font-size: 0.79rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-toggle-motivo:hover {
+  color: var(--cor-texto-principal);
+}
+
+.badge-ciclo-motivo {
+  display: none;
+  padding: 2px 8px;
+  border-radius: var(--raio-borda-pilula);
+  background: var(--azul-medio-opacidade-70);
+  border: 1px solid var(--creme-opacidade-30);
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--cor-texto-principal);
+}
+
+.badge-ciclo-motivo.visivel {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.alerta-motivo-card {
+  display: none;
+  padding: 8px 10px;
+  border-radius: var(--raio-borda-md);
+  background: rgba(245, 196, 81, 0.18);
+  border: 1px solid rgba(245, 196, 81, 0.65);
+  color: var(--cor-texto-principal);
+  font-size: 0.82rem;
+  font-weight: 700;
+  align-items: center;
+  gap: 7px;
+  animation: pulsoMotivoDiscreto 1.8s ease-in-out infinite;
+}
+
+.alerta-motivo-card.ativo {
+  display: flex;
+}
+
+@keyframes pulsoMotivoDiscreto {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(245, 196, 81, 0.35); }
+  50% { box-shadow: 0 0 0 5px rgba(245, 196, 81, 0); }
+}
+
+.motivo-config-corpo {
+  display: none;
+  flex-direction: column;
+  gap: 7px;
+  background: var(--azul-profundo-opacidade-50);
+  border: 1px solid var(--creme-opacidade-15);
+  border-radius: var(--raio-borda-md);
+  padding: 9px 10px;
+}
+
+.motivo-config-corpo.aberto {
+  display: flex;
+}
+
+.motivo-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
+}
+
+.motivo-campo {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.motivo-campo label {
+  font-size: 0.72rem;
+  color: var(--creme-opacidade-70);
+  font-weight: 600;
+}
+
+.motivo-campo input {
+  width: 100%;
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--creme-opacidade-25);
+  background: var(--cor-fundo-profundo);
+  color: var(--cor-texto-principal);
+  font-size: 0.82rem;
+}
+
+.tela-toda-motivo {
+  display: none;
+  margin-top: 10px;
+  padding: 7px 14px;
+  border-radius: var(--raio-borda-pilula);
+  background: var(--azul-medio-opacidade-70);
+  border: 1px solid var(--creme-opacidade-30);
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--cor-texto-principal);
+}
+
+.tela-toda-motivo.visivel {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.tela-toda-motivo.disparado {
+  background: rgba(245, 196, 81, 0.26);
+  border-color: rgba(245, 196, 81, 0.85);
+}
+
+/* ==========================================================================
+   EDITOR DE GRÁFICO COM SÍMBOLOS DE CROCHÊ (FILEIRAS & CIRCULAR)
+   ========================================================================== */
+.painel-simbolos-croche {
+  display: none;
+  grid-template-columns: 240px minmax(0, 1fr) 265px;
+  gap: 14px;
+  width: 100%;
+  min-height: 620px;
+  align-items: start;
+}
+
+.simb-painel {
+  background: var(--azul-profundo-opacidade-50);
+  border: 1px solid var(--creme-opacidade-20);
+  border-radius: var(--raio-borda-lg);
+  padding: 13px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.simb-mini-titulo {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--creme-opacidade-65);
+}
+
+.simb-grid-ferramentas {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+}
+
+.btn-simb-ponto {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 7px 5px;
+  border-radius: var(--raio-borda-md);
+  border: 1px solid var(--creme-opacidade-15);
+  background: var(--cor-fundo-profundo);
+  color: var(--cor-texto-principal);
+  font-size: 0.73rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.16s ease, border-color 0.16s ease, transform 0.12s ease;
+}
+
+.btn-simb-ponto svg {
+  width: 26px;
+  height: 26px;
+}
+
+.btn-simb-ponto:hover {
+  border-color: var(--creme-opacidade-50);
+  background: var(--azul-medio-opacidade-50);
+}
+
+.btn-simb-ponto.ativo {
+  background: var(--cor-destaque);
+  border-color: var(--cor-texto-principal);
+  color: var(--cor-branco);
+  box-shadow: 0 0 0 1px var(--creme-opacidade-40);
+}
+
+.simb-palco-coluna {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+.simb-barra-topo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 13px;
+  background: var(--azul-profundo-opacidade-50);
+  border: 1px solid var(--creme-opacidade-20);
+  border-radius: var(--raio-borda-lg);
+}
+
+.simb-grupo-inline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.simb-canvas-box {
+  background: #fcfaf3;
+  border: 1px solid var(--creme-opacidade-30);
+  border-radius: var(--raio-borda-lg);
+  min-height: 490px;
+  max-height: 68vh;
+  overflow: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px;
+  position: relative;
+}
+
+.simb-canvas-box svg {
+  display: block;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+.simb-slot-hit {
+  cursor: pointer;
+  transition: fill 0.12s ease, stroke 0.12s ease;
+}
+
+.simb-slot-hit:hover {
+  fill: rgba(44, 74, 145, 0.16);
+}
+
+.simb-lista-carreiras {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 230px;
+  overflow-y: auto;
+  padding-right: 3px;
+}
+
+.simb-carr-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 6px 8px;
+  border-radius: 7px;
+  background: var(--cor-fundo-profundo);
+  border: 1px solid var(--creme-opacidade-15);
+  font-size: 0.78rem;
+}
+
+.simb-carr-item input[type="color"] {
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+}
+
+.simb-carr-qtd {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.simb-carr-qtd button {
+  width: 22px;
+  height: 22px;
+  border-radius: 5px;
+  border: 1px solid var(--creme-opacidade-25);
+  background: var(--azul-medio-opacidade-50);
+  color: var(--cor-texto-principal);
+  cursor: pointer;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.simb-legenda-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.simb-legenda-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.79rem;
+  padding: 5px 8px;
+  border-radius: 6px;
+  background: var(--cor-fundo-profundo);
+  border: 1px solid var(--creme-opacidade-12);
+}
+
+.simb-legenda-item svg {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+}
+
+.simb-templates-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* ==========================================================================
+   AJUSTES PARA TEMAS CLAROS (CLARO, LINHO, SÁLVIA)
+   ========================================================================== */
+:root[data-tema-base="claro"] .modal-overlay-atelie-pro {
+  background: rgba(25, 32, 48, 0.55);
+}
+
+:root[data-tema-base="claro"] .modal-pro-painel,
+:root[data-tema-base="claro"] .simb-painel,
+:root[data-tema-base="claro"] .simb-barra-topo,
+:root[data-tema-base="claro"] .ribblr-barra-progresso,
+:root[data-tema-base="claro"] .motivo-config-corpo {
+  background: rgba(255, 255, 255, 0.72);
+  border-color: var(--creme-opacidade-25);
+}
+
+:root[data-tema-base="claro"] .pro-linha-receita,
+:root[data-tema-base="claro"] .pro-chip-metrica,
+:root[data-tema-base="claro"] .pro-svg-preview,
+:root[data-tema-base="claro"] .manta-consumo-row,
+:root[data-tema-base="claro"] .manta-swatch-btn,
+:root[data-tema-base="claro"] .manta-temp-faixas,
+:root[data-tema-base="claro"] .btn-simb-ponto,
+:root[data-tema-base="claro"] .simb-carr-item,
+:root[data-tema-base="claro"] .simb-legenda-item,
+:root[data-tema-base="claro"] .popover-ponto-receita {
+  background: #ffffff;
+  border-color: var(--creme-opacidade-25);
+  color: var(--cor-texto-principal);
+}
+
+:root[data-tema-base="claro"] .manta-swatch-btn.selecionado,
+:root[data-tema-base="claro"] .btn-simb-ponto.ativo,
+:root[data-tema-base="claro"] .btn-seg-pro.ativo,
+:root[data-tema-base="claro"] .btn-pro-primario {
+  background: var(--cor-destaque);
+  color: #ffffff;
+}
+
+:root[data-tema-base="claro"] .manta-consumo-alerta {
+  background: rgba(214, 58, 47, 0.14);
+  color: #9e1f16;
+}
+
+:root[data-tema-base="claro"] .manta-consumo-ok {
+  background: rgba(31, 143, 86, 0.14);
+  color: #16663d;
+}
+
+:root[data-tema-base="claro"] .alerta-motivo-card {
+  background: rgba(217, 152, 22, 0.18);
+  border-color: rgba(186, 125, 10, 0.65);
+  color: #5c3d00;
+}
+
+:root[data-tema-base="claro"] .ribblr-badge-pontos {
+  background: rgba(31, 143, 86, 0.14);
+  border-color: rgba(31, 143, 86, 0.35);
+  color: #155c37;
+}
+
+/* ==========================================================================
+   RESPONSIVIDADE MOBILE / TABLET
+   ========================================================================== */
+@media (max-width: 1080px) {
+  .painel-simbolos-croche {
+    grid-template-columns: 1fr;
+  }
+
+  .simb-grid-ferramentas {
+    grid-template-columns: repeat(auto-fill, minmax(76px, 1fr));
+  }
+}
+
+@media (max-width: 860px) {
+  .modal-pro-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-box-atelie-pro {
+    max-height: 94vh;
+  }
+
+  .modal-pro-topo,
+  .modal-pro-corpo {
+    padding: 13px 14px;
+  }
+}
+
+@media (max-width: 600px) {
+  .modal-overlay-atelie-pro {
+    padding: 8px;
+  }
+
+  .manta-consumo-row {
+    grid-template-columns: 16px 1fr;
+    gap: 6px;
+  }
+
+  .pro-campo-linha-2,
+  .motivo-grid-2 {
+    grid-template-columns: 1fr;
+  }
+
+  .simb-canvas-box {
+    min-height: 360px;
+  }
+}

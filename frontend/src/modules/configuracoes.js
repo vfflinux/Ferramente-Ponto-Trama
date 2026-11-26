@@ -18,7 +18,7 @@ const Configuracoes = (() => {
     tema: "classico", // 'classico' | 'noite' | 'claro' | 'linho' | 'salvia' | 'ameixa' | 'mel' | 'floresta'
     tamanhoFonte: "padrao", // 'compacto' | 'padrao' | 'grande'
     reduzirAnimacoes: false,
-    aranhasAtelie: "discreto", // 'desligado' | 'discreto' | 'vivo'
+    aranhasAtelie: "discreto", // 'desligado' | 'raro' | 'discreto' | 'vivo'
     aranhasReagirCursor: true,
     sidebarInicial: "expandido", // 'expandido' | 'recolhido'
     ferramentasBarraLateral: [
@@ -386,9 +386,25 @@ const Configuracoes = (() => {
         btn.classList.toggle("ativo", btn.dataset.valor === val);
       });
     };
+    const DESCRICOES_MODO_ARANHAS = {
+      desligado: "Desligado — Nenhuma aranha ou presa aparece na tela (0% de uso em segundo plano).",
+      raro: "Raro — Aparições bem espaçadas (a cada 1m35s–3m15s, máx. 1 na tela), quase sempre pelas bordas/teias, caçadas raríssimas (~4,6%) e Tarântula Golias lendária.",
+      discreto: "Discreto (Padrão) — Ritmo calmo (a cada 38s–78s, máx. 1 na tela), passeios suaves com caçadas ocasionais (~8,4%) e Tarântula Golias lendária.",
+      vivo: "Ateliê Vivo — Mais frequente (a cada 14s–30s, até 2 na tela), encontros entre aranhas, caçadas mais ativas (~13,4%) e maior chance de eventos raros."
+    };
+
+    const atualizarDescAranhas = (modo) => {
+      const el = document.getElementById("cfg-desc-modo-aranhas");
+      if (!el) return;
+      const chave = DESCRICOES_MODO_ARANHAS[modo] ? modo : "discreto";
+      el.textContent = DESCRICOES_MODO_ARANHAS[chave];
+      el.dataset.modo = chave;
+    };
+
     ativarSegmented("cfg-tecnica-principal", prefs.tecnicaPrincipal);
     ativarSegmented("cfg-tamanho-fonte", prefs.tamanhoFonte);
     ativarSegmented("cfg-aranhas-atelie", prefs.aranhasAtelie || "discreto");
+    atualizarDescAranhas(prefs.aranhasAtelie || "discreto");
     ativarSegmented("cfg-sidebar-inicial", prefs.sidebarInicial);
     ativarSegmented("cfg-unidade-medida", prefs.unidadeMedida);
 
@@ -1170,6 +1186,20 @@ const Configuracoes = (() => {
         btn.addEventListener("click", () => {
           document.querySelectorAll(`#${containerId} .btn-seg-cfg`).forEach((b) => b.classList.toggle("ativo", b === btn));
           atualizar(chave, btn.dataset.valor);
+          if (chave === "aranhasAtelie") {
+            const descEl = document.getElementById("cfg-desc-modo-aranhas");
+            const mapasDesc = {
+              desligado: "Desligado — Nenhuma aranha ou presa aparece na tela (0% de uso em segundo plano).",
+              raro: "Raro — Aparições bem espaçadas (a cada 1m35s–3m15s, máx. 1 na tela), quase sempre pelas bordas/teias, caçadas raríssimas (~4,6%) e Tarântula Golias lendária.",
+              discreto: "Discreto (Padrão) — Ritmo calmo (a cada 38s–78s, máx. 1 na tela), passeios suaves com caçadas ocasionais (~8,4%) e Tarântula Golias lendária.",
+              vivo: "Ateliê Vivo — Mais frequente (a cada 14s–30s, até 2 na tela), encontros entre aranhas, caçadas mais ativas (~13,4%) e maior chance de eventos raros."
+            };
+            const m = mapasDesc[btn.dataset.valor] ? btn.dataset.valor : "discreto";
+            if (descEl) {
+              descEl.textContent = mapasDesc[m];
+              descEl.dataset.modo = m;
+            }
+          }
           if (chave === "sidebarInicial" && window.innerWidth > 768) {
             const chk = document.getElementById("opcao-menu");
             if (chk) chk.checked = btn.dataset.valor === "recolhido";
@@ -1184,8 +1214,15 @@ const Configuracoes = (() => {
     ligarSegmented("cfg-unidade-medida", "unidadeMedida");
 
     document.getElementById("btn-cfg-chamar-aranha")?.addEventListener("click", () => {
-      if (typeof AranhasAtelie !== "undefined" && typeof AranhasAtelie.invocarAgora === "function") {
-        const inst = AranhasAtelie.invocarAgora();
+      if (typeof AranhasAtelie === "undefined") return;
+      const val = document.getElementById("cfg-especie-aranha-teste")?.value || "";
+      if (val.startsWith("cena:") && typeof AranhasAtelie.invocarCena === "function") {
+        const cena = AranhasAtelie.invocarCena(val.slice(5));
+        if (cena && cena.titulo) {
+          mostrarToast(`🕷️ ${cena.titulo}`);
+        }
+      } else if (typeof AranhasAtelie.invocarAgora === "function") {
+        const inst = AranhasAtelie.invocarAgora(val || null);
         if (inst && inst.especie) {
           mostrarToast(`🕷️ ${inst.especie.nome} apareceu no ateliê!`);
         }

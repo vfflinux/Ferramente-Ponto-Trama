@@ -331,7 +331,7 @@ public class MainActivity extends Activity {
                 "(function(){" +
                 "  var chk = document.getElementById('opcao-menu');" +
                 "  if (window.innerWidth <= 768 && chk && !chk.checked) { chk.checked = true; return 'menu'; }" +
-                "  var abertos = document.querySelectorAll('.modal-busca-global-overlay[style*=\"flex\"], .overlay-contador-tela-toda[style*=\"flex\"], .overlay-pasta-aberta.aberto, .drawer-overlay-proj.aberto, .drawer-overlay-bib.aberto, .drawer-overlay-estoque.aberto, .modal-overlay-graf[style*=\"flex\"], .modal-overlay-cfg[style*=\"flex\"], .modal-overlay-proj[style*=\"flex\"], .modal-overlay-fio[style*=\"flex\"], .modal-overlay-bib[style*=\"flex\"], .modal-overlay-amostra[style*=\"flex\"], .modal-overlay-banco[style*=\"flex\"]');" +
+                "  var abertos = document.querySelectorAll('.modal-busca-global-overlay[style*=\"flex\"], .modal-overlay-atelie-pro[style*=\"flex\"], .popover-ponto-receita[style*=\"flex\"], .overlay-contador-tela-toda[style*=\"flex\"], .overlay-pasta-aberta.aberto, .drawer-overlay-proj.aberto, .drawer-overlay-bib.aberto, .drawer-overlay-estoque.aberto, .modal-overlay-graf[style*=\"flex\"], .modal-overlay-cfg[style*=\"flex\"], .modal-overlay-proj[style*=\"flex\"], .modal-overlay-fio[style*=\"flex\"], .modal-overlay-bib[style*=\"flex\"], .modal-overlay-amostra[style*=\"flex\"], .modal-overlay-banco[style*=\"flex\"]');" +
                 "  if (abertos.length > 0) { document.dispatchEvent(new KeyboardEvent('keydown', {key:'Escape'})); return 'closed'; }" +
                 "  var home = document.getElementById('secao-home');" +
                 "  if (home && home.style.display === 'none') {" +

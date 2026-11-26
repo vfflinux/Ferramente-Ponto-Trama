@@ -1,6 +1,8 @@
 // ==========================================================================
 // PONTO & TRAMA - FERRAMENTA: RECEITAS E ANOTAÇÕES
-// - Modo Texto & Passos: editor + marcador interativo de linha atual
+// - Modo Texto & Passos: editor + Leitor Interativo estilo Ribblr
+//   (checklist por carreira que soma +1 no Contador, badge de pontos
+//    esperados e popover instantâneo ao tocar em siglas de pontos)
 // - Modo PDF / Foto: visualizador + régua destacada "Onde parei"
 // - Ligado automaticamente ao Projeto Ativo via ProjetoContexto
 // ==========================================================================
@@ -9,10 +11,16 @@ const LeitorReceitas = (() => {
   const STORAGE_AVULSO = "ponto_trama_receita_avulsa";
 
   let jaInicializado = false;
+  let mapaSiglas = new Map();
+  let regexSiglas = null;
+  let dicionarioCarregado = false;
+
   let estado = {
     modo: "texto",
     texto: "",
     linha_atual: 0,
+    concluidas: [],
+    sync_contador: true,
     arquivo_nome: "",
     arquivo_tipo: "",
     arquivo_url: "",
@@ -69,6 +77,161 @@ const LeitorReceitas = (() => {
       .replace(/"/g, "&quot;");
   }
 
+  // ==========================================================================
+  // BASE DE SIGLAS PARA POPOVER INSTANTÂNEO (ESTILO RIBBLR)
+  // ==========================================================================
+  const SIGLAS_IGNORADAS = new Set([
+    "c", "v", "m", "t", "p", "k", "r", "l", "f", "b", "a", "e", "o", "x", "de", "em", "no", "na", "por"
+  ]);
+
+  function montarMapaSiglas(termos) {
+    if (!Array.isArray(termos) || termos.length === 0) return;
+    const novoMapa = new Map();
+    const chaves = [];
+
+    termos.forEach((termo) => {
+      if (!termo || !termo.siglas) return;
+      ["pt", "us", "uk", "es"].forEach((lang) => {
+        const arr = termo.siglas[lang];
+        if (!Array.isArray(arr)) return;
+        arr.forEach((raw) => {
+          const limpo = String(raw || "").trim().replace(/\.$/, "");
+          const key = limpo.toLowerCase();
+          if (key.length < 2 || SIGLAS_IGNORADAS.has(key)) return;
+          if (!novoMapa.has(key)) {
+            novoMapa.set(key, termo);
+            chaves.push(limpo);
+          }
+        });
+      });
+    });
+
+    // Ordena do mais longo ao mais curto para casar "sl st" / "sc2tog" antes de "sc"
+    chaves.sort((a, b) => b.length - a.length);
+    const escapadas = chaves.map((s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+    if (escapadas.length > 0) {
+      mapaSiglas = novoMapa;
+      regexSiglas = new RegExp(`(^|[^a-zA-ZÀ-ÿ0-9_])(${escapadas.join("|")})(?=$|[^a-zA-ZÀ-ÿ0-9_])`, "gi");
+    }
+  }
+
+  async function garantirDicionarioSiglas() {
+    if (dicionarioCarregado && mapaSiglas.size > 0) return;
+    dicionarioCarregado = true;
+    try {
+      let termos = [];
+      if (typeof TradutorReceitas !== "undefined" && typeof TradutorReceitas.garantirBaseDicionario === "function") {
+        termos = await TradutorReceitas.garantirBaseDicionario();
+      } else {
+        const resp = await fetch("data/dicionario-pontos.json");
+        if (resp.ok) {
+          const json = await resp.json();
+          termos = json.termos || [];
+        }
+      }
+      if (Array.isArray(termos) && termos.length > 0) {
+        montarMapaSiglas(termos);
+        renderizar();
+      }
+    } catch {
+      // ignora silenciosamente se offline sem cache ainda
+    }
+  }
+
+  function formatarTextoComSiglas(texto) {
+    const seguro = escapeHtml(texto);
+    if (!regexSiglas || mapaSiglas.size === 0) return seguro;
+    regexSiglas.lastIndex = 0;
+    return seguro.replace(regexSiglas, (match, prefixo, token) => {
+      const key = String(token || "").toLowerCase();
+      const termo = mapaSiglas.get(key);
+      if (!termo) return match;
+      return `${prefixo}<button type="button" class="chip-sigla-receita" data-sigla-chave="${escapeHtml(key)}" title="Ver explicação de ${escapeHtml(token)}">${token}</button>`;
+    });
+  }
+
+  function analisarLinhaReceita(linhaBruta) {
+    let restante = String(linhaBruta || "").trim();
+    let badgeCarreira = "";
+    let badgePontos = "";
+
+    // Reconhece cabeçalho de carreira: "Carr 4:", "Carreira 4-8:", "R4:", "Row 4:", "Rnd 4:", "Vta 4:"
+    const mCarr = restante.match(/^((?:carr(?:eira)?s?|r(?:ow|nd)?|vta|volta|fila)\s*\d+(?:\s*[-–a]\s*\d+)?)\s*[:.-]\s*/i);
+    if (mCarr) {
+      badgeCarreira = mCarr[1].trim();
+      restante = restante.slice(mCarr[0].length).trim();
+    }
+
+    // Reconhece total esperado de pontos no fim: "[24]", "[24 pts]", "(24)", "(24 pts)", "= 24 pts"
+    const mPts = restante.match(/(?:\[(\d+)\s*(?:pts?|pontos?|sts?)?\]|\((\d+)\s*(?:pts?|pontos?|sts?)?\)|=\s*(\d+)\s*(?:pts?|pontos?|sts?))\s*$/i);
+    if (mPts) {
+      const num = mPts[1] || mPts[2] || mPts[3];
+      if (num) {
+        badgePontos = `${num} pts`;
+        restante = restante.slice(0, mPts.index).trim();
+      }
+    }
+
+    return { badgeCarreira, badgePontos, corpo: restante || linhaBruta };
+  }
+
+  function abrirPopoverPonto(chave, ancoraEl) {
+    const pop = document.getElementById("popover-ponto-receita");
+    const termo = mapaSiglas.get(String(chave || "").toLowerCase());
+    if (!pop || !termo) return;
+
+    const nomePt = termo.nomes?.pt || termo.id;
+    const tec = termo.tecnica === "trico" ? "Tricô" : termo.tecnica === "ambos" ? "Crochê / Tricô" : "Crochê";
+    const ptS = (termo.siglas?.pt || []).slice(0, 3).join(", ");
+    const usS = (termo.siglas?.us || []).slice(0, 3).join(", ");
+    const ukS = (termo.siglas?.uk || []).slice(0, 3).join(", ");
+    const esS = (termo.siglas?.es || []).slice(0, 3).join(", ");
+
+    const elTit = document.getElementById("popover-ponto-titulo");
+    const elTec = document.getElementById("popover-ponto-tecnica");
+    const elDesc = document.getElementById("popover-ponto-desc");
+    const elIdiomas = document.getElementById("popover-ponto-idiomas");
+
+    if (elTit) elTit.textContent = nomePt;
+    if (elTec) elTec.textContent = tec;
+    if (elDesc) elDesc.textContent = termo.descricao || termo.nomes?.us || "";
+    if (elIdiomas) {
+      elIdiomas.innerHTML = [
+        ptS ? `<span><strong>PT:</strong> ${escapeHtml(ptS)}</span>` : "",
+        usS ? `<span><strong>US:</strong> ${escapeHtml(usS)}</span>` : "",
+        ukS ? `<span><strong>UK:</strong> ${escapeHtml(ukS)}</span>` : "",
+        esS ? `<span><strong>ES:</strong> ${escapeHtml(esS)}</span>` : ""
+      ].filter(Boolean).join("");
+    }
+
+    pop.style.display = "flex";
+    pop.setAttribute("aria-hidden", "false");
+
+    // Posiciona próximo ao chip clicado sem sair da janela
+    if (ancoraEl && typeof ancoraEl.getBoundingClientRect === "function") {
+      const rect = ancoraEl.getBoundingClientRect();
+      const popRect = pop.getBoundingClientRect();
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      let left = rect.left + rect.width / 2 - popRect.width / 2;
+      left = Math.max(12, Math.min(vw - popRect.width - 12, left));
+      let top = rect.bottom + 8;
+      if (top + popRect.height > vh - 12) {
+        top = Math.max(12, rect.top - popRect.height - 8);
+      }
+      pop.style.left = `${Math.round(left)}px`;
+      pop.style.top = `${Math.round(top)}px`;
+    }
+  }
+
+  function fecharPopoverPonto() {
+    const pop = document.getElementById("popover-ponto-receita");
+    if (pop) {
+      pop.style.display = "none";
+      pop.setAttribute("aria-hidden", "true");
+    }
+  }
+
   function persistir() {
     if (typeof ProjetoContexto !== "undefined" && ProjetoContexto.estaHidratando()) return;
 
@@ -82,6 +245,35 @@ const LeitorReceitas = (() => {
     } catch {
       // ignora limite de quota em arquivos muito grandes
     }
+  }
+
+  function alternarConclusaoLinha(idx, totalLinhas) {
+    if (!Array.isArray(estado.concluidas)) estado.concluidas = [];
+    const set = new Set(estado.concluidas);
+    const marcando = !set.has(idx);
+
+    if (marcando) {
+      set.add(idx);
+      if (idx + 1 < totalLinhas) {
+        estado.linha_atual = idx + 1;
+      } else {
+        estado.linha_atual = idx;
+      }
+      if (estado.sync_contador && typeof ContadorCarreiras !== "undefined" && typeof ContadorCarreiras.incrementarPrincipal === "function") {
+        ContadorCarreiras.incrementarPrincipal("receitas");
+      }
+    } else {
+      set.delete(idx);
+      estado.linha_atual = idx;
+      if (estado.sync_contador && typeof ContadorCarreiras !== "undefined" && typeof ContadorCarreiras.decrementarPrincipal === "function") {
+        ContadorCarreiras.decrementarPrincipal("receitas");
+      }
+    }
+
+    estado.concluidas = Array.from(set).filter((n) => n >= 0 && n < totalLinhas).sort((a, b) => a - b);
+    if (typeof Configuracoes !== "undefined") Configuracoes.vibrar(marcando ? 16 : 10);
+    renderizar();
+    persistir();
   }
 
   function renderizar() {
@@ -105,35 +297,89 @@ const LeitorReceitas = (() => {
       TradutorReceitas.init();
     }
 
-    // Texto e linhas clicáveis
+    // Texto e linhas clicáveis estilo Ribblr
     const ta = document.getElementById("input-receita-texto-global");
     if (ta && ta.value !== estado.texto) ta.value = estado.texto;
 
+    const chkSync = document.getElementById("chk-ribblr-sync-contador");
+    if (chkSync) chkSync.checked = estado.sync_contador !== false;
+
     const lista = document.getElementById("lista-linhas-receita-global");
     const info = document.getElementById("info-linha-atual-global");
+    const progTxt = document.getElementById("ribblr-progresso-texto");
+    const progFill = document.getElementById("ribblr-progresso-fill");
     const linhas = (estado.texto || "").split("\n").filter((l) => l.trim() !== "");
+
+    if (!Array.isArray(estado.concluidas)) estado.concluidas = [];
+    const setConcluidas = new Set(estado.concluidas.filter((n) => n >= 0 && n < linhas.length));
 
     if (lista) {
       lista.innerHTML = "";
       if (linhas.length === 0) {
-        lista.innerHTML = `<div class="vazio-linhas-receita">Digite sua receita ao lado para ativar o marcador interativo de linha.</div>`;
-        if (info) info.textContent = "Clique em qualquer linha para marcar seu progresso";
+        lista.innerHTML = `<div class="vazio-linhas-receita">Cole ou escreva sua receita ao lado: cada carreira vira um checklist interativo com siglas clicáveis.</div>`;
+        if (info) info.textContent = "Toque em ✓ para riscar a carreira ou clique em qualquer sigla (pb, mpa, aum...)";
+        if (progTxt) progTxt.textContent = "0 / 0 carreiras (0%)";
+        if (progFill) progFill.style.width = "0%";
       } else {
         const atual = Math.max(0, Math.min(estado.linha_atual || 0, linhas.length - 1));
         estado.linha_atual = atual;
-        if (info) info.textContent = `Linha atual: ${atual + 1} de ${linhas.length}`;
+        const pct = Math.round((setConcluidas.size / linhas.length) * 100);
+        if (info) info.textContent = `Linha atual: ${atual + 1} de ${linhas.length} • Toque nas siglas para ver o ponto`;
+        if (progTxt) progTxt.textContent = `${setConcluidas.size} / ${linhas.length} concluídas (${pct}%)`;
+        if (progFill) progFill.style.width = `${pct}%`;
 
         linhas.forEach((linhaTxt, idx) => {
-          const btn = document.createElement("button");
-          btn.type = "button";
-          btn.className = `linha-receita-item ${idx === atual ? "atual" : idx < atual ? "concluida" : ""}`;
-          btn.innerHTML = `<span class="linha-receita-num">${idx + 1}.</span><span>${escapeHtml(linhaTxt)}</span>`;
-          btn.addEventListener("click", () => {
+          const feita = setConcluidas.has(idx);
+          const analisada = analisarLinhaReceita(linhaTxt);
+
+          const item = document.createElement("div");
+          item.className = `linha-receita-item ribblr-item ${idx === atual ? "atual" : ""} ${feita ? "concluida riscada" : ""}`;
+          item.setAttribute("role", "button");
+          item.setAttribute("tabindex", "0");
+
+          const badgeCarrHtml = analisada.badgeCarreira
+            ? `<span class="ribblr-badge-carreira">${escapeHtml(analisada.badgeCarreira)}</span>`
+            : `<span class="linha-receita-num">${idx + 1}.</span>`;
+          const badgePtsHtml = analisada.badgePontos
+            ? `<span class="ribblr-badge-pontos">${escapeHtml(analisada.badgePontos)}</span>`
+            : "";
+
+          item.innerHTML = `
+            <button type="button" class="ribblr-check-btn ${feita ? "marcado" : ""}" aria-label="${feita ? "Desmarcar carreira" : "Marcar carreira como concluída"}" title="${feita ? "Desmarcar" : "Concluir carreira (+1 no Contador)"}">${feita ? "✓" : ""}</button>
+            <div class="ribblr-linha-conteudo">
+              ${badgeCarrHtml}
+              <span class="ribblr-linha-texto">${formatarTextoComSiglas(analisada.corpo)}</span>
+              ${badgePtsHtml}
+            </div>
+          `;
+
+          const btnCheck = item.querySelector(".ribblr-check-btn");
+          btnCheck?.addEventListener("click", (e) => {
+            e.stopPropagation();
+            alternarConclusaoLinha(idx, linhas.length);
+          });
+
+          item.querySelectorAll(".chip-sigla-receita").forEach((chip) => {
+            chip.addEventListener("click", (e) => {
+              e.stopPropagation();
+              abrirPopoverPonto(chip.dataset.siglaChave, chip);
+            });
+          });
+
+          item.addEventListener("click", () => {
             estado.linha_atual = idx;
             renderizar();
             persistir();
           });
-          lista.appendChild(btn);
+
+          item.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              alternarConclusaoLinha(idx, linhas.length);
+            }
+          });
+
+          lista.appendChild(item);
         });
       }
     }
@@ -177,6 +423,8 @@ const LeitorReceitas = (() => {
       modo: rec.modo === "arquivo" ? "arquivo" : "texto",
       texto: String(rec.texto || ""),
       linha_atual: Math.max(0, parseInt(rec.linha_atual, 10) || 0),
+      concluidas: Array.isArray(rec.concluidas) ? rec.concluidas : [],
+      sync_contador: rec.sync_contador !== false,
       arquivo_nome: String(rec.arquivo_nome || ""),
       arquivo_tipo: String(rec.arquivo_tipo || ""),
       arquivo_url: String(rec.arquivo_url || ""),
@@ -190,6 +438,7 @@ const LeitorReceitas = (() => {
       btn.addEventListener("click", () => {
         const alvo = btn.dataset.modoReceita || "texto";
         estado.modo = ["texto", "arquivo", "tradutor", "dicionario"].includes(alvo) ? alvo : "texto";
+        fecharPopoverPonto();
         renderizar();
         if (estado.modo === "texto" || estado.modo === "arquivo") {
           persistir();
@@ -206,6 +455,20 @@ const LeitorReceitas = (() => {
     document.getElementById("btn-receita-limpar-texto")?.addEventListener("click", () => {
       estado.texto = "";
       estado.linha_atual = 0;
+      estado.concluidas = [];
+      fecharPopoverPonto();
+      renderizar();
+      persistir();
+    });
+
+    document.getElementById("chk-ribblr-sync-contador")?.addEventListener("change", (e) => {
+      estado.sync_contador = Boolean(e.target.checked);
+      persistir();
+    });
+
+    document.getElementById("btn-ribblr-reiniciar-checks")?.addEventListener("click", () => {
+      estado.concluidas = [];
+      estado.linha_atual = 0;
       renderizar();
       persistir();
     });
@@ -219,9 +482,27 @@ const LeitorReceitas = (() => {
     document.getElementById("btn-receita-linha-prox")?.addEventListener("click", () => {
       const total = (estado.texto || "").split("\n").filter((l) => l.trim() !== "").length;
       if (total <= 0) return;
-      estado.linha_atual = Math.min(total - 1, (estado.linha_atual || 0) + 1);
-      renderizar();
-      persistir();
+      const atual = Math.max(0, Math.min(estado.linha_atual || 0, total - 1));
+      if (!Array.isArray(estado.concluidas)) estado.concluidas = [];
+      if (!estado.concluidas.includes(atual)) {
+        alternarConclusaoLinha(atual, total);
+      } else {
+        estado.linha_atual = Math.min(total - 1, atual + 1);
+        renderizar();
+        persistir();
+      }
+    });
+
+    document.getElementById("btn-fechar-popover-ponto")?.addEventListener("click", fecharPopoverPonto);
+    document.addEventListener("click", (e) => {
+      const pop = document.getElementById("popover-ponto-receita");
+      if (!pop || pop.style.display !== "flex") return;
+      if (!pop.contains(e.target) && !e.target.closest?.(".chip-sigla-receita")) {
+        fecharPopoverPonto();
+      }
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") fecharPopoverPonto();
     });
 
     document.getElementById("input-receita-arquivo-global")?.addEventListener("change", (e) => {
@@ -376,6 +657,7 @@ const LeitorReceitas = (() => {
     if (jaInicializado) return;
     jaInicializado = true;
     vincularEventos();
+    garantirDicionarioSiglas();
 
     const ativo = typeof ProjetoContexto !== "undefined" ? ProjetoContexto.obterProjetoAtivo() : null;
     if (ativo) {
@@ -395,13 +677,16 @@ const LeitorReceitas = (() => {
   function definirTexto(novoTexto) {
     estado.texto = String(novoTexto || "");
     estado.linha_atual = 0;
+    estado.concluidas = [];
     estado.modo = "texto";
+    garantirDicionarioSiglas();
     renderizar();
     persistir();
   }
 
   function alternarModo(novoModo) {
     estado.modo = ["texto", "arquivo", "tradutor", "dicionario"].includes(novoModo) ? novoModo : "texto";
+    fecharPopoverPonto();
     renderizar();
     if (estado.modo === "texto" || estado.modo === "arquivo") {
       persistir();

@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="styles/layout/barra-lateral.css?v=9" />
     <link rel="stylesheet" href="styles/layout/busca-global.css?v=1" />
     <link rel="stylesheet" href="styles/layout/identidade-artesanal.css?v=4" />
-    <link rel="stylesheet" href="styles/layout/aranhas-atelie.css?v=2" />
+    <link rel="stylesheet" href="styles/layout/aranhas-atelie.css?v=9" />
     <link rel="stylesheet" href="styles/modules/home.css?v=14" />
     <link rel="stylesheet" href="styles/modules/contador-carreiras.css?v=11" />
     <link rel="stylesheet" href="styles/modules/leitor-receitas.css?v=10" />
@@ -24,6 +24,7 @@
     <link rel="stylesheet" href="styles/modules/editor-graficos.css" />
     <link rel="stylesheet" href="styles/modules/tabelas-conversao.css?v=11" />
     <link rel="stylesheet" href="styles/modules/configuracoes.css?v=8" />
+    <link rel="stylesheet" href="styles/modules/ferramentas-atelie-pro.css?v=1" />
     <link rel="stylesheet" href="styles/base/mobile.css?v=16" />
     <link rel="stylesheet" href="styles/base/temas.css?v=18" />
 
@@ -32,26 +33,29 @@
     <script src="src/core/projeto-contexto.js?v=4" defer></script>
     <script src="src/core/animations.js" defer></script>
     <script src="src/core/sidebar.js?v=10" defer></script>
-    <script src="src/core/busca-global.js?v=6" defer></script>
-    <script src="src/core/aranhas-atelie.js?v=2" defer></script>
+    <script src="src/core/busca-global.js?v=10" defer></script>
+    <script src="src/core/aranhas-atelie.js?v=9" defer></script>
 
     <!-- Módulos de ferramentas -->
     <script src="src/modules/home.js?v=17" defer></script>
-    <script src="src/modules/contador-carreiras.js?v=11" defer></script>
+    <script src="src/modules/contador-carreiras.js?v=12" defer></script>
     <script src="src/modules/calculadora-precificacao.js?v=4" defer></script>
     <script src="src/modules/tradutor-receitas.js?v=5" defer></script>
-    <script src="src/modules/leitor-receitas.js?v=13" defer></script>
+    <script src="src/modules/leitor-receitas.js?v=14" defer></script>
     <script src="src/modules/gerenciador-projetos.js?v=13" defer></script>
     <script src="src/modules/inventario-fios.js?v=17" defer></script>
+    <script src="src/modules/planejador-manta.js?v=1" defer></script>
     <script src="src/modules/inventario-agulhas.js?v=13" defer></script>
     <script src="src/modules/calculadora-amostra.js" defer></script>
+    <script src="src/modules/gerador-esfera-circulo.js?v=1" defer></script>
     <script src="src/modules/banco-amostras.js?v=14" defer></script>
     <script src="src/modules/editor-graficos.js?v=10" defer></script>
+    <script src="src/modules/editor-simbolos-croche.js?v=1" defer></script>
     <script src="src/modules/tabelas-conversao.js?v=14" defer></script>
-    <script src="src/modules/configuracoes.js?v=12" defer></script>
+    <script src="src/modules/configuracoes.js?v=13" defer></script>
 
     <!-- Bootstrap principal -->
-    <script src="src/main.js?v=7" defer></script>
+    <script src="src/main.js?v=8" defer></script>
   </head>
   <body>
     <input type="checkbox" id="opcao-menu" />
@@ -698,6 +702,33 @@
                   />
                 </div>
               </div>
+
+              <!-- Contador Vinculado com Lembrete de Motivo (estilo KnitCompanion) -->
+              <div class="secao-motivo-vinculado">
+                <div class="motivo-cabecalho">
+                  <button type="button" class="btn-toggle-motivo" aria-expanded="false" title="Configurar lembrete periódico ou repetição de motivo">
+                    🔗 Motivo &amp; Lembrete ▾
+                  </button>
+                  <span class="badge-ciclo-motivo"></span>
+                </div>
+                <div class="alerta-motivo-card" role="status" aria-live="polite"></div>
+                <div class="motivo-config-corpo">
+                  <div class="motivo-grid-2">
+                    <div class="motivo-campo">
+                      <label for="motivo-cada-1">Avisar a cada (carr.)</label>
+                      <input type="text" inputmode="numeric" pattern="[0-9]*" id="motivo-cada-1" class="input-motivo-cada" placeholder="Ex: 4" />
+                    </div>
+                    <div class="motivo-campo">
+                      <label for="motivo-ciclo-1">Ciclo motivo (carr.)</label>
+                      <input type="text" inputmode="numeric" pattern="[0-9]*" id="motivo-ciclo-1" class="input-motivo-ciclo" placeholder="Ex: 8" />
+                    </div>
+                  </div>
+                  <div class="motivo-campo">
+                    <label for="motivo-texto-1">Lembrete exibido na carreira certa</label>
+                    <input type="text" id="motivo-texto-1" class="input-motivo-texto" placeholder="Ex: Fazer aumento! / Trocar cor" />
+                  </div>
+                </div>
+              </div>
             </article>
           </div>
 
@@ -735,6 +766,7 @@
               <span class="tela-toda-rotulo">CARREIRAS</span>
               <span id="tela-toda-numero" class="tela-toda-numero">0</span>
               <span id="tela-toda-pontos" class="tela-toda-pontos"></span>
+              <span id="tela-toda-motivo" class="tela-toda-motivo" role="status" aria-live="polite"></span>
               <span class="tela-toda-dica">Toque para +1 • Deslize para baixo para −1</span>
             </button>
 
@@ -802,12 +834,25 @@
             <div class="coluna-leitor-linhas">
               <div class="topo-card-receita">
                 <div>
-                  <h2 class="titulo-card-receita">Onde Parei (Marcador de Linha)</h2>
-                  <span class="sub-card-receita" id="info-linha-atual-global">Clique em qualquer linha para marcar seu progresso</span>
+                  <h2 class="titulo-card-receita">Leitor Interativo (Checklist + Pontos)</h2>
+                  <span class="sub-card-receita" id="info-linha-atual-global">Toque em ✓ para riscar a carreira ou clique em qualquer sigla (pb, mpa, aum...)</span>
                 </div>
                 <div class="controles-linha-receita">
+                  <button type="button" class="btn-receita-suave" id="btn-ribblr-reiniciar-checks" title="Desmarcar todas as carreiras concluídas">↺</button>
                   <button type="button" class="btn-receita-suave" id="btn-receita-linha-ant" title="Linha anterior">↑</button>
-                  <button type="button" class="btn-receita-primario" id="btn-receita-linha-prox" title="Avançar para a próxima linha">Próxima ↓</button>
+                  <button type="button" class="btn-receita-primario" id="btn-receita-linha-prox" title="Concluir carreira atual e avançar">Concluir ↓</button>
+                </div>
+              </div>
+              <div class="ribblr-barra-progresso">
+                <div class="ribblr-barra-topo">
+                  <strong id="ribblr-progresso-texto">0 / 0 concluídas (0%)</strong>
+                  <label class="ribblr-sync-label" title="Soma +1 automaticamente no Contador Principal ao riscar cada carreira">
+                    <input type="checkbox" id="chk-ribblr-sync-contador" checked />
+                    <span>+1 no Contador</span>
+                  </label>
+                </div>
+                <div class="ribblr-trilha" aria-hidden="true">
+                  <div class="ribblr-preenchimento" id="ribblr-progresso-fill"></div>
                 </div>
               </div>
               <div class="lista-linhas-interativas" id="lista-linhas-receita-global">
@@ -819,9 +864,22 @@
                       <circle cx="55" cy="33" r="2.2" fill="currentColor"></circle>
                     </svg>
                   </span>
-                  <span>Digite sua receita ao lado para ativar o marcador interativo de linha.</span>
+                  <span>Cole ou escreva sua receita ao lado: cada carreira vira um checklist interativo com siglas clicáveis.</span>
                 </div>
               </div>
+            </div>
+
+            <!-- Popover flutuante explicativo ao tocar em uma sigla de ponto -->
+            <div id="popover-ponto-receita" class="popover-ponto-receita" role="dialog" aria-label="Explicação do ponto" aria-hidden="true">
+              <div class="popover-ponto-topo">
+                <div>
+                  <div id="popover-ponto-titulo" class="popover-ponto-titulo">Ponto</div>
+                  <span id="popover-ponto-tecnica" class="popover-ponto-tecnica">Crochê</span>
+                </div>
+                <button type="button" id="btn-fechar-popover-ponto" class="btn-fechar-pro" aria-label="Fechar explicação">&times;</button>
+              </div>
+              <p id="popover-ponto-desc" class="popover-ponto-desc"></p>
+              <div id="popover-ponto-idiomas" class="popover-ponto-idiomas"></div>
             </div>
           </div>
 
@@ -2249,6 +2307,12 @@
                 <span class="badge-qtd-simulador" id="badge-qtd-simulador" style="display: none;">0</span>
               </button>
 
+              <!-- Botão Gerador de Listras & Planejador de Manta -->
+              <button type="button" class="btn-atalho-pro" id="btn-abrir-planejador-manta" title="Planejar manta de listras, degradê, padrão escocês ou manta da temperatura">
+                <span aria-hidden="true">🧣</span>
+                <span>Manta &amp; Listras</span>
+              </button>
+
               <!-- Menu Dropdown de Backup (.json) -->
               <div class="dropdown-backup-fios">
                 <button type="button" class="btn-backup-fios" id="btn-menu-backup-fios" title="Backup do inventário (JSON)" aria-haspopup="true">
@@ -3410,6 +3474,17 @@
               >
             </div>
             <div class="cabecalho-acoes-amostra">
+              <!-- Botão Gerador de Esfera (Amigurumi) & Círculo Plano Perfeito -->
+              <button
+                type="button"
+                class="btn-atalho-pro"
+                id="btn-abrir-esfera-circulo"
+                title="Gerar receita carreira por carreira de Esfera (Amigurumi) ou Círculo Plano Perfeito (Sousplat)"
+              >
+                <span aria-hidden="true">⚪</span>
+                <span>Esfera &amp; Círculo</span>
+              </button>
+
               <!-- Botão Calculadora Rápida de Aumentos & Diminuições Uniformes -->
               <button
                 type="button"
@@ -4529,10 +4604,13 @@
             <div class="cabecalho-acoes-graficos">
               <div class="switch-modo-graf" role="tablist" aria-label="Modo do Editor de Gráficos">
                 <button type="button" class="btn-modo-graf ativo" id="btn-graf-modo-edicao" data-graf-modo="edicao" role="tab" aria-selected="true">
-                  ✏️ Edição
+                  ✏️ Pixel Art
                 </button>
                 <button type="button" class="btn-modo-graf" id="btn-graf-modo-execucao" data-graf-modo="execucao" role="tab" aria-selected="false">
                   🧶 Execução
+                </button>
+                <button type="button" class="btn-modo-graf" id="btn-graf-modo-simbolos" data-graf-modo="simbolos" role="tab" aria-selected="false" title="Editor vetorial com símbolos internacionais de crochê (Fileiras & Circular)">
+                  ✿ Símbolos
                 </button>
               </div>
               <button type="button" class="btn-graf-topo" id="btn-graf-nova-grade" title="Configurar ou redimensionar grade">⊞ Grade</button>
@@ -4680,6 +4758,67 @@
                 </div>
               </div>
               <div class="graf-lista-paleta" id="graf-lista-paleta"></div>
+            </aside>
+          </div>
+
+          <!-- MODO COMPLEMENTAR: EDITOR DE GRÁFICO COM SÍMBOLOS DE CROCHÊ (FILEIRAS & CIRCULAR) -->
+          <div class="painel-simbolos-croche" id="painel-simbolos-croche" aria-label="Editor de gráfico com símbolos de crochê">
+            <!-- Esquerda: Paleta de 14 Símbolos Vetoriais CYC -->
+            <aside class="simb-painel">
+              <span class="simb-mini-titulo">Símbolos de Crochê (CYC)</span>
+              <div class="simb-grid-ferramentas" id="simb-grid-ferramentas"></div>
+              <span class="simb-mini-titulo">Modelos Prontos</span>
+              <div class="simb-templates-grid">
+                <button type="button" class="btn-pro-sec" data-simb-template="sousplat">🟣 Sousplat</button>
+                <button type="button" class="btn-pro-sec" data-simb-template="flor">✿ Flor 6 Pétalas</button>
+                <button type="button" class="btn-pro-sec" data-simb-template="barrado">〰️ Barrado</button>
+              </div>
+            </aside>
+
+            <!-- Centro: Barra de Geometria + Palco SVG Interativo -->
+            <section class="simb-palco-coluna">
+              <div class="simb-barra-topo">
+                <div class="simb-grupo-inline">
+                  <div class="pro-segmento" role="group" aria-label="Tipo de gráfico">
+                    <button type="button" class="btn-seg-pro ativo" data-simb-geom="circular">◎ Circular</button>
+                    <button type="button" class="btn-seg-pro" data-simb-geom="fileiras">▤ Fileiras</button>
+                  </div>
+                  <select id="simb-select-simetria" aria-label="Simetria de desenho" title="Simetria de repetição" style="padding:7px 10px;border-radius:7px;border:1px solid var(--creme-opacidade-25);background:var(--cor-fundo-profundo);color:var(--cor-texto-principal);font-size:0.82rem"></select>
+                  <label id="simb-chk-anel-magico-wrap" class="ribblr-sync-label" style="font-size:0.8rem">
+                    <input type="checkbox" id="simb-chk-anel-magico" checked />
+                    <span>Anel Mágico</span>
+                  </label>
+                </div>
+                <div class="simb-grupo-inline">
+                  <button type="button" class="btn-pro-sec" id="btn-simb-undo" title="Desfazer">↶</button>
+                  <button type="button" class="btn-pro-sec" id="btn-simb-redo" title="Refazer">↷</button>
+                  <button type="button" class="btn-pro-sec" id="btn-simb-limpar" title="Limpar pontos do gráfico">🧹 Limpar</button>
+                  <button type="button" class="btn-pro-sec" id="btn-simb-exportar-svg" title="Baixar gráfico vetorial SVG">📐 SVG</button>
+                  <button type="button" class="btn-pro-primario" id="btn-simb-exportar-png" title="Baixar imagem PNG de alta resolução">🖼️ PNG</button>
+                </div>
+              </div>
+
+              <div class="simb-canvas-box" id="simb-canvas-box" aria-label="Área de desenho de símbolos"></div>
+            </section>
+
+            <!-- Direita: Carreiras, Cores e Legenda Automática -->
+            <aside class="simb-painel">
+              <div class="pro-campo">
+                <label for="simb-input-titulo">Nome do Gráfico</label>
+                <input type="text" id="simb-input-titulo" value="Sousplat Clássico" placeholder="Ex: Mandala Solar..." />
+              </div>
+
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:6px">
+                <span class="simb-mini-titulo">Carreiras / Voltas</span>
+                <div style="display:flex;gap:5px">
+                  <button type="button" class="btn-pro-sec" id="btn-simb-rem-carreira" style="padding:4px 9px" title="Remover última carreira">−</button>
+                  <button type="button" class="btn-pro-primario" id="btn-simb-add-carreira" style="padding:4px 9px" title="Adicionar nova carreira">+ Carr.</button>
+                </div>
+              </div>
+              <div class="simb-lista-carreiras" id="simb-lista-carreiras"></div>
+
+              <span class="simb-mini-titulo">Legenda Automática</span>
+              <div class="simb-legenda-lista" id="simb-legenda-lista"></div>
             </aside>
           </div>
 
@@ -5335,18 +5474,52 @@
                   </div>
                 </div>
 
-                <div class="linha-config" data-busca="aranhas nanduobyete teia passeando atelie vivo discreto especies">
+                <div class="linha-config" data-busca="aranhas nanduobyete tarantula golias comedora passaros tecela argiope teia canto caca mosca mosquito barata lagartinho lagarta encontro atelie vivo discreto especies">
                   <div class="info-linha-config">
                     <strong>Aranhas do Ateliê (Ñanduobyeté)</strong>
-                    <span>5 espécies artesanais que às vezes passeiam pelas bordas, descem por fios ou espiam</span>
+                    <span>7 espécies com hábitos de caça reais (moscas, mosquitos, baratas e presas raras para a Tarântula Golias) e interações entre aranhas</span>
+                    <small id="cfg-desc-modo-aranhas" class="desc-modo-aranhas-cfg" aria-live="polite">Discreto (Padrão) — Ritmo calmo (a cada 38s–78s, máx. 1 na tela), passeios suaves com caçadas ocasionais (~8,4%) e Tarântula Golias lendária.</small>
                   </div>
                   <div class="controle-linha-config acoes-aranhas-cfg">
                     <div class="segmented-cfg" id="cfg-aranhas-atelie" role="group" aria-label="Frequência das aranhas do ateliê">
                       <button type="button" class="btn-seg-cfg" data-valor="desligado">Desligado</button>
+                      <button type="button" class="btn-seg-cfg" data-valor="raro">Raro</button>
                       <button type="button" class="btn-seg-cfg ativo" data-valor="discreto">Discreto</button>
                       <button type="button" class="btn-seg-cfg" data-valor="vivo">Ateliê Vivo</button>
                     </div>
-                    <button type="button" class="btn-cfg-suave" id="btn-cfg-chamar-aranha" title="Invocar uma aranha aleatória na tela agora">
+                    <select id="cfg-especie-aranha-teste" class="select-especie-aranha-cfg" aria-label="Escolher espécie ou cena de caça para invocar">
+                      <optgroup label="Espécies (7)">
+                        <option value="">Aleatória (7 espécies)</option>
+                        <option value="tarantula_golias">Tarântula Golias (Gigante)</option>
+                        <option value="tecela_canto">Aranha Tecelã (Teia de Canto)</option>
+                        <option value="nandu">Ñanduobyeté (Oficial)</option>
+                        <option value="papa_moscas">Papa-Moscas Curiosa</option>
+                        <option value="tecela_renda">Tecelã-de-Renda</option>
+                        <option value="caranguejo">Aranha-Caranguejo</option>
+                        <option value="filhote">Filhote Tecelão</option>
+                      </optgroup>
+                      <optgroup label="Cenas de Caça &amp; Encontros">
+                        <option value="cena:caca_papa_mosca">Caça: Papa-Moscas × Mosca</option>
+                        <option value="cena:caca_tecela_teia">Caça: Tecelã × Mosquito na Teia</option>
+                        <option value="cena:caca_caranguejo_mosca">Caça: Caranguejo × Mosca</option>
+                        <option value="cena:caca_renda_mosquito">Caça: Tecelã-de-Renda × Mosquito</option>
+                        <option value="cena:caca_golias_barata">Raro: Tarântula Golias × Barata</option>
+                        <option value="cena:caca_golias_lagartinho">Lendário: Golias × Lagartinho</option>
+                        <option value="cena:caca_golias_lagarta">Lendário: Golias × Lagarta Gigante</option>
+                        <option value="cena:encontro_aranhas">Encontro: 2 Aranhas (Cumprimento)</option>
+                        <option value="cena:encontro_golias">Encontro: Hierarquia com Golias</option>
+                      </optgroup>
+                      <optgroup label="Comportamentos Vivos &amp; Eventos">
+                        <option value="cena:beber_orvalho">Beber Gota de Orvalho</option>
+                        <option value="cena:nuvem_urticante">Golias: Nuvem de Pelos Urticantes</option>
+                        <option value="cena:camuflagem_galhinho">Camuflagem de "Galhinho"</option>
+                        <option value="cena:contorno_card">Contornar Borda de Card</option>
+                        <option value="cena:danca_cortejo">Raro: Dança de Cortejo (Papa-Moscas)</option>
+                        <option value="cena:ecdise_muda">Lendário: Troca de Exoesqueleto (Ecdise)</option>
+                        <option value="cena:mae_ooteca">Lendário: Mãe com Ooteca &amp; Filhotes</option>
+                      </optgroup>
+                    </select>
+                    <button type="button" class="btn-cfg-suave" id="btn-cfg-chamar-aranha" title="Invocar a espécie ou cena selecionada na tela agora">
                       <span>🕷️ Chamar agora</span>
                     </button>
                   </div>
@@ -5950,6 +6123,205 @@
         </button>
       </nav>
     </main>
+
+    <!-- MODAL: GERADOR DE ESFERA (AMIGURUMI) & CÍRCULO PLANO PERFEITO -->
+    <div id="modal-esfera-circulo" class="modal-overlay-atelie-pro" role="dialog" aria-modal="true" aria-labelledby="titulo-modal-esfera-circulo" aria-hidden="true">
+      <div class="modal-box-atelie-pro">
+        <div class="modal-pro-topo">
+          <div class="modal-pro-topo-titulo">
+            <h3 id="titulo-modal-esfera-circulo">⚪ Gerador de Esfera (Amigurumi) &amp; Círculo Plano Perfeito</h3>
+            <p>Gere receitas sem quinas hexagonais nem embabadamento e envie em 1 clique para Receitas ou Projeto</p>
+          </div>
+          <button type="button" id="btn-fechar-esfera-circulo" class="btn-fechar-pro" aria-label="Fechar">&times;</button>
+        </div>
+        <div class="modal-pro-corpo">
+          <div class="modal-pro-grid">
+            <!-- Coluna Esquerda: Configurações + Diagrama SVG -->
+            <div class="modal-pro-painel">
+              <div class="pro-segmento" role="group" aria-label="Formato da peça">
+                <button type="button" class="btn-seg-pro ativo" data-ec-forma="esfera">⚪ Esfera Amigurumi</button>
+                <button type="button" class="btn-seg-pro" data-ec-forma="circulo">🟣 Círculo / Sousplat</button>
+              </div>
+
+              <div class="pro-campo">
+                <label for="ec-select-ponto">Ponto Base</label>
+                <select id="ec-select-ponto">
+                  <option value="pb">Ponto Baixo (pb) — +6 pts/carr.</option>
+                  <option value="mpa">Meio Ponto Alto (mpa) — +8 pts/carr.</option>
+                  <option value="pa">Ponto Alto (pa) — +12 pts/carr. (Sousplat)</option>
+                </select>
+              </div>
+
+              <div class="pro-segmento" role="group" aria-label="Modo de dimensionamento">
+                <button type="button" class="btn-seg-pro ativo" data-ec-modo="carreiras">Por Nº de Carreiras</button>
+                <button type="button" class="btn-seg-pro" data-ec-modo="diametro">Por Diâmetro (cm)</button>
+              </div>
+
+              <div class="pro-campo" id="ec-grupo-carreiras">
+                <label for="ec-input-carreiras" id="ec-label-carreiras">Carreiras de aumento (raio)</label>
+                <input type="text" inputmode="numeric" id="ec-input-carreiras" value="6" />
+              </div>
+
+              <div class="pro-campo-linha-2" id="ec-grupo-diametro" style="display: none">
+                <div class="pro-campo">
+                  <label for="ec-input-diametro">Diâmetro desejado (cm)</label>
+                  <input type="text" inputmode="decimal" id="ec-input-diametro" value="8" />
+                </div>
+                <div class="pro-campo">
+                  <label for="ec-input-tensao">Tensão (pts / 10 cm)</label>
+                  <input type="text" inputmode="decimal" id="ec-input-tensao" value="22" />
+                </div>
+              </div>
+
+              <div class="pro-campo" id="ec-grupo-retas">
+                <label for="ec-input-retas">Carreiras retas no meio (corpo da esfera)</label>
+                <input type="text" inputmode="numeric" id="ec-input-retas" value="4" />
+              </div>
+
+              <label class="pro-check-card">
+                <input type="checkbox" id="ec-chk-escalonado" checked />
+                <span>
+                  <strong>Aumentos escalonados (Círculo Perfeito)</strong>
+                  <small>Alterna a posição dos aumentos nas carreiras pares para evitar quinas hexagonais</small>
+                </span>
+              </label>
+
+              <label class="pro-check-card" id="ec-grupo-acabamento" style="display: none">
+                <input type="checkbox" id="ec-chk-acabamento" />
+                <span>
+                  <strong>Carreira final de acabamento</strong>
+                  <small>Adiciona uma volta de pbx / ponto caranguejo para firmar a borda do sousplat</small>
+                </span>
+              </label>
+
+              <div class="pro-svg-preview" id="svg-preview-esfera-circulo"></div>
+            </div>
+
+            <!-- Coluna Direita: Métricas + Receita Gerada + Ações -->
+            <div class="modal-pro-painel">
+              <div class="pro-resumo-chips">
+                <div class="pro-chip-metrica">
+                  <span>Carreiras</span>
+                  <strong id="ec-metrica-carreiras">15</strong>
+                </div>
+                <div class="pro-chip-metrica">
+                  <span>Largura Máx.</span>
+                  <strong id="ec-metrica-maxpts">36 pts</strong>
+                </div>
+                <div class="pro-chip-metrica">
+                  <span>Diâmetro Est.</span>
+                  <strong id="ec-metrica-diametro">~5,2 cm</strong>
+                </div>
+              </div>
+
+              <div class="pro-lista-receita" id="ec-lista-receita"></div>
+
+              <div class="pro-acoes-barra">
+                <button type="button" class="btn-pro-primario" id="btn-ec-enviar-receitas">📝 Abrir em Receitas</button>
+                <button type="button" class="btn-pro-sec" id="btn-ec-enviar-projeto">📂 Anexar ao Projeto Ativo</button>
+                <button type="button" class="btn-pro-sec" id="btn-ec-copiar">📋 Copiar Texto</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL: GERADOR DE LISTRAS & PLANEJADOR DE MANTA -->
+    <div id="modal-planejador-manta" class="modal-overlay-atelie-pro" role="dialog" aria-modal="true" aria-labelledby="titulo-modal-planejador-manta" aria-hidden="true">
+      <div class="modal-box-atelie-pro largo">
+        <div class="modal-pro-topo">
+          <div class="modal-pro-topo-titulo">
+            <h3 id="titulo-modal-planejador-manta">🧣 Gerador de Listras &amp; Planejador de Manta</h3>
+            <p>Escolha de 2 a 6 cores do estoque, visualize listras harmônicas, degradê, padrão escocês ou manta da temperatura e estime o consumo</p>
+          </div>
+          <button type="button" id="btn-fechar-planejador-manta" class="btn-fechar-pro" aria-label="Fechar">&times;</button>
+        </div>
+        <div class="modal-pro-corpo">
+          <div class="modal-pro-grid">
+            <!-- Esquerda: Fios, Modelo e Estilo -->
+            <div class="modal-pro-painel">
+              <div class="pro-campo">
+                <label>Selecione de 2 a 6 fios / cores</label>
+                <small id="manta-qtd-cores-sel" style="opacity:0.75;font-size:0.76rem">4 de 6 cores selecionadas (mín. 2)</small>
+                <div class="manta-grid-cores" id="manta-lista-cores"></div>
+              </div>
+
+              <div class="manta-add-cor-wrap">
+                <input type="color" id="manta-picker-cor" value="#D98A6C" aria-label="Escolher cor personalizada" />
+                <input type="text" id="manta-nome-cor" placeholder="Adicionar cor extra..." style="flex:1;padding:7px 9px;border-radius:7px;border:1px solid var(--creme-opacidade-25);background:var(--cor-fundo-profundo);color:var(--cor-texto-principal);font-size:0.82rem" />
+                <button type="button" class="btn-pro-sec" id="btn-manta-add-cor">+ Cor</button>
+              </div>
+
+              <div class="pro-campo">
+                <label for="manta-select-modelo">Tamanho / Modelo da Peça</label>
+                <select id="manta-select-modelo">
+                  <option value="bebe">Manta de Bebê (80×100 cm)</option>
+                  <option value="sofa" selected>Manta de Sofá (130×170 cm)</option>
+                  <option value="cachecol">Cachecol (25×180 cm)</option>
+                  <option value="anual">Manta Anual da Temperatura (365 carr.)</option>
+                  <option value="personalizado">Personalizado</option>
+                </select>
+              </div>
+
+              <div class="pro-campo-linha-2">
+                <div class="pro-campo">
+                  <label for="manta-input-carreiras">Nº de Carreiras</label>
+                  <input type="text" inputmode="numeric" id="manta-input-carreiras" value="120" />
+                </div>
+                <div class="pro-campo">
+                  <label for="manta-input-gramas-carr">Consumo est. (g / carr.)</label>
+                  <input type="text" inputmode="decimal" id="manta-input-gramas-carr" value="6.5" />
+                </div>
+              </div>
+
+              <div class="pro-campo">
+                <label>Estilo das Listras</label>
+                <div class="pro-segmento quatro" role="group" aria-label="Estilo da manta">
+                  <button type="button" class="btn-seg-pro ativo" data-manta-estilo="harmonicas">🎲 Harmônicas</button>
+                  <button type="button" class="btn-seg-pro" data-manta-estilo="degrade">🌅 Degradê</button>
+                  <button type="button" class="btn-seg-pro" data-manta-estilo="escoces">🏴 Escocês</button>
+                  <button type="button" class="btn-seg-pro" data-manta-estilo="temperatura">🌡️ Temperatura</button>
+                </div>
+              </div>
+
+              <div id="manta-box-temperatura" style="display: none; flex-direction: column; gap: 8px">
+                <div class="pro-campo">
+                  <label for="manta-select-clima">Clima de Referência (Simulação Anual)</label>
+                  <select id="manta-select-clima">
+                    <option value="sudeste">Sul / Sudeste (13°C a 31°C)</option>
+                    <option value="sul">Inverno Frio / Serra (7°C a 28°C)</option>
+                    <option value="nordeste">Quente / Litoral (23°C a 33°C)</option>
+                  </select>
+                </div>
+                <div class="manta-temp-faixas" id="manta-faixas-temp-lista"></div>
+              </div>
+
+              <button type="button" class="btn-pro-sec" id="btn-manta-sortear">🎲 Sortear Listras</button>
+            </div>
+
+            <!-- Direita: Preview Visual + Consumo + Ordem das Carreiras -->
+            <div class="modal-pro-painel">
+              <div class="manta-canvas-wrap">
+                <canvas id="canvas-planejador-manta"></canvas>
+              </div>
+
+              <span class="simb-mini-titulo">Consumo Estimado por Cor</span>
+              <div class="manta-tabela-consumo" id="manta-tabela-consumo"></div>
+
+              <span class="simb-mini-titulo">Ordem Exata das Carreiras</span>
+              <div class="pro-lista-receita" id="manta-lista-sequencia" style="max-height: 210px"></div>
+
+              <div class="pro-acoes-barra">
+                <button type="button" class="btn-pro-primario" id="btn-manta-enviar-receitas">📝 Enviar para Receitas</button>
+                <button type="button" class="btn-pro-sec" id="btn-manta-exportar-png">🖼️ Exportar PNG</button>
+                <button type="button" class="btn-pro-sec" id="btn-manta-copiar">📋 Copiar Sequência</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- PALETA DE COMANDOS / BUSCA GLOBAL (CTRL + K) -->
     <div

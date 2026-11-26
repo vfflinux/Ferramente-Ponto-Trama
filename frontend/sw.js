@@ -6,7 +6,7 @@
 // imediatamente quando online/local e funcionar 100% offline sem rede.
 // ==========================================================================
 
-const CACHE_NOME = "ponto-e-trama-offline-v23";
+const CACHE_NOME = "ponto-e-trama-offline-v32";
 
 const RECURSOS_ESSENCIAIS = [
   "./",
@@ -32,6 +32,7 @@ const RECURSOS_ESSENCIAIS = [
   "./styles/modules/editor-graficos.css",
   "./styles/modules/tabelas-conversao.css",
   "./styles/modules/configuracoes.css",
+  "./styles/modules/ferramentas-atelie-pro.css",
   "./styles/base/mobile.css",
   "./styles/base/temas.css",
   "./src/core/database.js",
@@ -47,10 +48,13 @@ const RECURSOS_ESSENCIAIS = [
   "./src/modules/tradutor-receitas.js",
   "./src/modules/gerenciador-projetos.js",
   "./src/modules/inventario-fios.js",
+  "./src/modules/planejador-manta.js",
   "./src/modules/inventario-agulhas.js",
   "./src/modules/calculadora-amostra.js",
+  "./src/modules/gerador-esfera-circulo.js",
   "./src/modules/banco-amostras.js",
   "./src/modules/editor-graficos.js",
+  "./src/modules/editor-simbolos-croche.js",
   "./src/modules/tabelas-conversao.js",
   "./src/modules/configuracoes.js",
   "./src/main.js"

@@ -1,5 +1,7 @@
 // ==========================================================================
 // FERRAMENTA: CONTADOR DE CARREIRAS
+// Inclui Contadores Vinculados com Lembrete de Motivo (estilo KnitCompanion)
+// e integração direta com o Leitor Interativo de Receitas (+1 automático).
 // ==========================================================================
 
 const ContadorCarreiras = (() => {
@@ -26,7 +28,29 @@ const ContadorCarreiras = (() => {
     return { definida: false, meta: 0, atingida: false };
   }
 
-  // Atualiza cálculos de pontos e verifica disparo de alarme
+  // Avaliação do contador vinculado de motivo & lembrete periódico
+  function avaliarMotivoVinculado(carreiras, cada, ciclo, texto) {
+    const c = Math.max(0, parseInt(carreiras, 10) || 0);
+    const nCada = Math.max(0, parseInt(cada, 10) || 0);
+    const nCiclo = Math.max(0, parseInt(ciclo, 10) || 0);
+    const msg = String(texto || "").trim();
+
+    const cicloPos = nCiclo > 0 ? (c === 0 ? 0 : ((c - 1) % nCiclo) + 1) : 0;
+    const disparado = c > 0 && nCada > 0 && c % nCada === 0;
+    const textoAlerta = disparado
+      ? `✨ Carr. ${c}: ${msg || `Ação a cada ${nCada} carreiras!`}`
+      : "";
+
+    return {
+      nCada,
+      nCiclo,
+      cicloPos,
+      disparado,
+      textoAlerta
+    };
+  }
+
+  // Atualiza cálculos de pontos, lembrete de motivo e verifica disparo de alarme
   function atualizarContador(card) {
     if (!card) return;
     const inputCarreiras = card.querySelector(".input-carreiras");
@@ -77,7 +101,55 @@ const ContadorCarreiras = (() => {
       removerAlarmeCard(card);
     }
 
+    // 5# Contador Vinculado de Motivo & Lembrete (estilo KnitCompanion)
+    const inpCada = card.querySelector(".input-motivo-cada");
+    const inpCiclo = card.querySelector(".input-motivo-ciclo");
+    const inpTexto = card.querySelector(".input-motivo-texto");
+    const badgeCiclo = card.querySelector(".badge-ciclo-motivo");
+    const alertaMotivo = card.querySelector(".alerta-motivo-card");
+
+    const infoMotivo = avaliarMotivoVinculado(
+      carreiras,
+      inpCada?.value,
+      inpCiclo?.value,
+      inpTexto?.value
+    );
+
+    if (badgeCiclo) {
+      if (infoMotivo.nCiclo > 0) {
+        badgeCiclo.textContent = `Motivo ${infoMotivo.cicloPos}/${infoMotivo.nCiclo}`;
+        badgeCiclo.classList.add("visivel");
+      } else if (infoMotivo.nCada > 0) {
+        const faltam = carreiras === 0 ? infoMotivo.nCada : infoMotivo.nCada - (carreiras % infoMotivo.nCada);
+        badgeCiclo.textContent = infoMotivo.disparado ? `A cada ${infoMotivo.nCada} • Agora!` : `Próx. em ${faltam}`;
+        badgeCiclo.classList.add("visivel");
+      } else {
+        badgeCiclo.textContent = "";
+        badgeCiclo.classList.remove("visivel");
+      }
+    }
+
+    if (alertaMotivo) {
+      if (infoMotivo.disparado) {
+        alertaMotivo.textContent = infoMotivo.textoAlerta;
+        alertaMotivo.classList.add("ativo");
+        if (card.dataset.ultimaCarrMotivo !== String(carreiras)) {
+          card.dataset.ultimaCarrMotivo = String(carreiras);
+          if (typeof Configuracoes !== "undefined") {
+            Configuracoes.vibrar([24, 45, 24]);
+          }
+        }
+      } else {
+        alertaMotivo.textContent = "";
+        alertaMotivo.classList.remove("ativo");
+        card.dataset.ultimaCarrMotivo = "";
+      }
+    }
+
     salvarEstadoContadores();
+    if (cardTelaToda === card) {
+      atualizarTelaToda();
+    }
   }
 
   function incrementarCarreiras(card) {
@@ -233,6 +305,32 @@ const ContadorCarreiras = (() => {
           />
         </div>
       </div>
+
+      <div class="secao-motivo-vinculado">
+        <div class="motivo-cabecalho">
+          <button type="button" class="btn-toggle-motivo" aria-expanded="false" title="Configurar lembrete periódico ou repetição de motivo">
+            🔗 Motivo &amp; Lembrete ▾
+          </button>
+          <span class="badge-ciclo-motivo"></span>
+        </div>
+        <div class="alerta-motivo-card" role="status" aria-live="polite"></div>
+        <div class="motivo-config-corpo">
+          <div class="motivo-grid-2">
+            <div class="motivo-campo">
+              <label for="motivo-cada-${id}">Avisar a cada (carr.)</label>
+              <input type="text" inputmode="numeric" pattern="[0-9]*" id="motivo-cada-${id}" class="input-motivo-cada" placeholder="Ex: 4" />
+            </div>
+            <div class="motivo-campo">
+              <label for="motivo-ciclo-${id}">Ciclo motivo (carr.)</label>
+              <input type="text" inputmode="numeric" pattern="[0-9]*" id="motivo-ciclo-${id}" class="input-motivo-ciclo" placeholder="Ex: 8" />
+            </div>
+          </div>
+          <div class="motivo-campo">
+            <label for="motivo-texto-${id}">Lembrete exibido na carreira certa</label>
+            <input type="text" id="motivo-texto-${id}" class="input-motivo-texto" placeholder="Ex: Fazer aumento! / Trocar cor" />
+          </div>
+        </div>
+      </div>
     `;
 
     return card;
@@ -256,13 +354,19 @@ const ContadorCarreiras = (() => {
         const carreiras = parseInt(card.querySelector(".input-carreiras")?.value, 10) || 0;
         const pontosPorCarreira = parseInt(card.querySelector(".input-pontos-carreira")?.value, 10) || 0;
         const meta = parseInt(card.querySelector(".input-meta")?.value, 10) || 0;
+        const motivoCada = parseInt(card.querySelector(".input-motivo-cada")?.value, 10) || 0;
+        const motivoCiclo = parseInt(card.querySelector(".input-motivo-ciclo")?.value, 10) || 0;
+        const motivoTexto = (card.querySelector(".input-motivo-texto")?.value || "").trim();
 
         dados.push({
           id,
           nome,
           carreiras,
           pontosPorCarreira,
-          meta
+          meta,
+          motivoCada,
+          motivoCiclo,
+          motivoTexto
         });
       });
 
@@ -314,6 +418,15 @@ const ContadorCarreiras = (() => {
       const inputMeta = card.querySelector(".input-meta");
       if (inputMeta && item.meta > 0) inputMeta.value = item.meta;
 
+      const inputMotivoCada = card.querySelector(".input-motivo-cada");
+      if (inputMotivoCada && item.motivoCada > 0) inputMotivoCada.value = item.motivoCada;
+
+      const inputMotivoCiclo = card.querySelector(".input-motivo-ciclo");
+      if (inputMotivoCiclo && item.motivoCiclo > 0) inputMotivoCiclo.value = item.motivoCiclo;
+
+      const inputMotivoTexto = card.querySelector(".input-motivo-texto");
+      if (inputMotivoTexto && item.motivoTexto) inputMotivoTexto.value = item.motivoTexto;
+
       const btnRemover = card.querySelector(".btn-remover-contador");
       if (btnRemover && dados.length === 1) {
         btnRemover.style.display = "none";
@@ -356,7 +469,6 @@ const ContadorCarreiras = (() => {
     cards.forEach((c) => {
       let btn = c.querySelector(".btn-remover-contador");
       if (!btn && cards.length > 1) {
-        // Se não tiver botão de remover (ex: card inicial), adiciona
         const topo = c.querySelector(".card-topo");
         if (topo) {
           btn = document.createElement("button");
@@ -378,7 +490,6 @@ const ContadorCarreiras = (() => {
     const areaContadores = document.getElementById("area-contadores");
     if (!areaContadores) return;
 
-    // Busca todos os cards existentes para animar FLIP dinamicamente
     const cardsExistentes = areaContadores.querySelectorAll(".card-contador");
     const novoCard = criarElementoContador(contadorIdCounter);
 
@@ -397,10 +508,8 @@ const ContadorCarreiras = (() => {
     const areaContadores = document.getElementById("area-contadores");
     const todosCards = areaContadores ? areaContadores.querySelectorAll(".card-contador") : [];
 
-    // Não permite remover se for o único
     if (todosCards.length <= 1) return;
 
-    // Animação de desinflar
     card.classList.remove("animar-inflar");
     card.classList.add("animar-desinflar");
 
@@ -416,10 +525,6 @@ const ContadorCarreiras = (() => {
   }
 
   // ==========================================================================
-  // PARTE 3: EVENTOS E INICIALIZAÇÃO
-  // ==========================================================================
-
-  // ==========================================================================
   // MODO "TOQUE NA TELA TODA" COM CADEADO DE SEGURANÇA
   // ==========================================================================
   let cardTelaToda = null;
@@ -432,11 +537,15 @@ const ContadorCarreiras = (() => {
     const carreiras = parseInt(cardTelaToda.querySelector(".input-carreiras")?.value, 10) || 0;
     const ptsCarr = parseInt(cardTelaToda.querySelector(".input-pontos-carreira")?.value, 10) || 0;
     const meta = parseInt(cardTelaToda.querySelector(".input-meta")?.value, 10) || 0;
+    const motivoCada = parseInt(cardTelaToda.querySelector(".input-motivo-cada")?.value, 10) || 0;
+    const motivoCiclo = parseInt(cardTelaToda.querySelector(".input-motivo-ciclo")?.value, 10) || 0;
+    const motivoTexto = (cardTelaToda.querySelector(".input-motivo-texto")?.value || "").trim();
 
     const elNome = document.getElementById("tela-toda-nome");
     const elMeta = document.getElementById("tela-toda-meta");
     const elNum = document.getElementById("tela-toda-numero");
     const elPts = document.getElementById("tela-toda-pontos");
+    const elMotivo = document.getElementById("tela-toda-motivo");
     const ov = document.getElementById("overlay-contador-tela-toda");
 
     if (elNome) elNome.textContent = nome;
@@ -453,6 +562,27 @@ const ContadorCarreiras = (() => {
         elMeta.textContent = "Toque em qualquer lugar da tela para somar +1";
       }
     }
+
+    if (elMotivo) {
+      const infoM = avaliarMotivoVinculado(carreiras, motivoCada, motivoCiclo, motivoTexto);
+      if (infoM.disparado) {
+        elMotivo.textContent = infoM.textoAlerta;
+        elMotivo.classList.add("visivel", "disparado");
+      } else if (infoM.nCiclo > 0) {
+        elMotivo.textContent = `🔗 Motivo: carreira ${infoM.cicloPos} de ${infoM.nCiclo}`;
+        elMotivo.classList.add("visivel");
+        elMotivo.classList.remove("disparado");
+      } else if (infoM.nCada > 0) {
+        const faltam = carreiras === 0 ? infoM.nCada : infoM.nCada - (carreiras % infoM.nCada);
+        elMotivo.textContent = `🔗 Próximo lembrete em ${faltam} carr.`;
+        elMotivo.classList.add("visivel");
+        elMotivo.classList.remove("disparado");
+      } else {
+        elMotivo.textContent = "";
+        elMotivo.classList.remove("visivel", "disparado");
+      }
+    }
+
     if (ov) {
       ov.classList.toggle("meta-atingida", meta > 0 && carreiras >= meta);
     }
@@ -543,6 +673,13 @@ const ContadorCarreiras = (() => {
     const btnRemover = card.querySelector(".btn-remover-contador");
     const btnExpandir = card.querySelector(".btn-expandir-contador");
 
+    // Motivo vinculado
+    const btnToggleMotivo = card.querySelector(".btn-toggle-motivo");
+    const corpoMotivo = card.querySelector(".motivo-config-corpo");
+    const inputMotivoCada = card.querySelector(".input-motivo-cada");
+    const inputMotivoCiclo = card.querySelector(".input-motivo-ciclo");
+    const inputMotivoTexto = card.querySelector(".input-motivo-texto");
+
     if (inputNome) inputNome.addEventListener("input", salvarEstadoContadores);
     if (btnMais) {
       btnMais.addEventListener("click", () => incrementarCarreiras(card));
@@ -558,6 +695,17 @@ const ContadorCarreiras = (() => {
     if (inputMeta) inputMeta.addEventListener("input", () => atualizarContador(card));
     if (btnRemover) btnRemover.addEventListener("click", () => removerContador(card));
     if (btnExpandir) btnExpandir.addEventListener("click", () => abrirTelaToda(card));
+
+    if (btnToggleMotivo && corpoMotivo) {
+      btnToggleMotivo.addEventListener("click", () => {
+        const aberto = corpoMotivo.classList.toggle("aberto");
+        btnToggleMotivo.setAttribute("aria-expanded", aberto ? "true" : "false");
+        btnToggleMotivo.textContent = aberto ? "🔗 Motivo & Lembrete ▴" : "🔗 Motivo & Lembrete ▾";
+      });
+    }
+    if (inputMotivoCada) inputMotivoCada.addEventListener("input", () => atualizarContador(card));
+    if (inputMotivoCiclo) inputMotivoCiclo.addEventListener("input", () => atualizarContador(card));
+    if (inputMotivoTexto) inputMotivoTexto.addEventListener("input", () => atualizarContador(card));
 
     atualizarContador(card);
   }
@@ -609,7 +757,6 @@ const ContadorCarreiras = (() => {
         const dy = e.changedTouches[0].clientY - swipeTelaToda.y;
         swipeTelaToda = null;
 
-        // Deslizar para baixo ou para a esquerda (>= 55px) subtrai -1 carreira
         if (dy >= 55 || dx <= -55) {
           ignorarProximoClickTelaToda = true;
           decrementarCarreiras(cardTelaToda);
@@ -667,14 +814,12 @@ const ContadorCarreiras = (() => {
       }
     });
 
-    // Se houver um projeto ativo na bancada, carrega os contadores dele
     const projAtivo = typeof ProjetoContexto !== "undefined" ? ProjetoContexto.obterProjetoAtivo() : null;
     if (projAtivo) {
       carregarDoProjeto(projAtivo);
       return;
     }
 
-    // Tenta restaurar contadores salvos; caso não existam, inicializa o card estático do HTML
     const restaurado = carregarEstadoContadores();
     if (!restaurado) {
       const contadorInicial = document.getElementById("contador-1");
@@ -695,6 +840,7 @@ const ContadorCarreiras = (() => {
         if (Array.isArray(lista) && lista.length > 0) {
           lista[0].carreiras = n;
           localStorage.setItem(CHAVE_STORAGE, JSON.stringify(lista));
+          window.dispatchEvent(new CustomEvent("ponto-trama:contador-alterado", { detail: { carreiras: n, origem } }));
           if (typeof ProjetoContexto !== "undefined" && !ProjetoContexto.estaHidratando() && ProjetoContexto.obterProjetoAtivo()) {
             ProjetoContexto.atualizarSecaoAtiva("contadores", lista, { origem });
           }
@@ -711,6 +857,42 @@ const ContadorCarreiras = (() => {
     if (cardTelaToda === card) atualizarTelaToda();
   }
 
+  function incrementarPrincipal(origem = "receitas") {
+    const card = document.querySelector(".card-contador");
+    if (card) {
+      const inp = card.querySelector(".input-carreiras");
+      const atual = parseInt(inp?.value, 10) || 0;
+      definirCarreiraPrincipal(atual + 1, origem);
+      return;
+    }
+    try {
+      const bruto = localStorage.getItem(CHAVE_STORAGE);
+      const lista = bruto ? JSON.parse(bruto) : [{ id: "1", nome: "Contador Principal", carreiras: 0, pontosPorCarreira: 0, meta: 0 }];
+      const atual = Array.isArray(lista) && lista[0] ? parseInt(lista[0].carreiras, 10) || 0 : 0;
+      definirCarreiraPrincipal(atual + 1, origem);
+    } catch {
+      // ignora
+    }
+  }
+
+  function decrementarPrincipal(origem = "receitas") {
+    const card = document.querySelector(".card-contador");
+    if (card) {
+      const inp = card.querySelector(".input-carreiras");
+      const atual = parseInt(inp?.value, 10) || 0;
+      definirCarreiraPrincipal(Math.max(0, atual - 1), origem);
+      return;
+    }
+    try {
+      const bruto = localStorage.getItem(CHAVE_STORAGE);
+      const lista = bruto ? JSON.parse(bruto) : [{ id: "1", nome: "Contador Principal", carreiras: 0, pontosPorCarreira: 0, meta: 0 }];
+      const atual = Array.isArray(lista) && lista[0] ? parseInt(lista[0].carreiras, 10) || 0 : 0;
+      definirCarreiraPrincipal(Math.max(0, atual - 1), origem);
+    } catch {
+      // ignora
+    }
+  }
+
   return {
     init,
     carregarDoProjeto,
@@ -719,6 +901,8 @@ const ContadorCarreiras = (() => {
     decrementarCarreiras,
     zerarContador,
     definirCarreiraPrincipal,
+    incrementarPrincipal,
+    decrementarPrincipal,
     abrirTelaToda
   };
 })();

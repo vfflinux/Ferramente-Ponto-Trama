@@ -250,6 +250,42 @@ const BuscaGlobal = (() => {
         }, 120);
         break;
 
+      case "planejador-manta":
+        irParaFerramenta("fios");
+        setTimeout(() => {
+          if (typeof PlanejadorManta !== "undefined" && typeof PlanejadorManta.abrir === "function") {
+            PlanejadorManta.abrir();
+          }
+        }, 120);
+        break;
+
+      case "gerador-esfera":
+        irParaFerramenta("amostra");
+        setTimeout(() => {
+          if (typeof GeradorEsferaCirculo !== "undefined" && typeof GeradorEsferaCirculo.abrir === "function") {
+            GeradorEsferaCirculo.abrir("esfera");
+          }
+        }, 100);
+        break;
+
+      case "gerador-circulo":
+        irParaFerramenta("amostra");
+        setTimeout(() => {
+          if (typeof GeradorEsferaCirculo !== "undefined" && typeof GeradorEsferaCirculo.abrir === "function") {
+            GeradorEsferaCirculo.abrir("circulo");
+          }
+        }, 100);
+        break;
+
+      case "editor-simbolos-croche":
+        irParaFerramenta("editor-graficos");
+        setTimeout(() => {
+          if (typeof EditorSimbolosCroche !== "undefined" && typeof EditorSimbolosCroche.ativarModoSimbolos === "function") {
+            EditorSimbolosCroche.ativarModoSimbolos(true);
+          }
+        }, 100);
+        break;
+
       case "tradutor-receitas":
         irParaFerramenta("receitas");
         setTimeout(() => {
@@ -280,6 +316,34 @@ const BuscaGlobal = (() => {
       case "chamar-aranha":
         if (typeof AranhasAtelie !== "undefined" && typeof AranhasAtelie.invocarAgora === "function") {
           AranhasAtelie.invocarAgora();
+        }
+        break;
+
+      case "chamar-tarantula":
+        if (typeof AranhasAtelie !== "undefined" && typeof AranhasAtelie.invocarAgora === "function") {
+          AranhasAtelie.invocarAgora("tarantula_golias");
+        }
+        break;
+
+      case "chamar-tecela-canto":
+        if (typeof AranhasAtelie !== "undefined" && typeof AranhasAtelie.invocarAgora === "function") {
+          AranhasAtelie.invocarAgora("tecela_canto", "repouso_teia_canto");
+        }
+        break;
+
+      case "caca-golias-barata":
+      case "caca-golias-lagartinho":
+      case "caca-golias-lagarta":
+      case "caca-tecela-teia":
+      case "caca-papa-mosca":
+      case "encontro-aranhas":
+      case "beber-orvalho":
+      case "nuvem-urticante":
+      case "danca-cortejo":
+      case "ecdise-muda":
+      case "mae-ooteca":
+        if (typeof AranhasAtelie !== "undefined" && typeof AranhasAtelie.invocarCena === "function") {
+          AranhasAtelie.invocarCena(comando.replace(/-/g, "_"));
         }
         break;
     }
@@ -332,6 +396,46 @@ const BuscaGlobal = (() => {
         acaoMeta: { tipo: "comando", comando: "simulador-cores" }
       },
       {
+        chaveRecente: "cmd:gerador-esfera",
+        grupo: "acoes",
+        titulo: "Gerador de Esfera (Amigurumi)",
+        subtitulo: "Receita carreira por carreira com aumentos escalonados sem quinas",
+        icone: "⚪",
+        badge: "Ação",
+        palavras: "esfera amigurumi bola cabeca aumentos escalonados receita gerador",
+        acaoMeta: { tipo: "comando", comando: "gerador-esfera" }
+      },
+      {
+        chaveRecente: "cmd:gerador-circulo",
+        grupo: "acoes",
+        titulo: "Gerador de Círculo Plano Perfeito (Sousplat)",
+        subtitulo: "Círculo sem embabadar em pb, mpa ou pa com aumentos escalonados",
+        icone: "🟣",
+        badge: "Ação",
+        palavras: "circulo plano sousplat tapete base redonda escalonado gerador",
+        acaoMeta: { tipo: "comando", comando: "gerador-circulo" }
+      },
+      {
+        chaveRecente: "cmd:planejador-manta",
+        grupo: "acoes",
+        titulo: "Gerador de Listras & Planejador de Manta",
+        subtitulo: "Listras harmônicas, degradê, escocês ou manta da temperatura com consumo",
+        icone: "🧣",
+        badge: "Ação",
+        palavras: "manta listras stripe temperature blanket temperatura degrade escoces consumo novelos",
+        acaoMeta: { tipo: "comando", comando: "planejador-manta" }
+      },
+      {
+        chaveRecente: "cmd:editor-simbolos-croche",
+        grupo: "acoes",
+        titulo: "Editor de Gráfico com Símbolos de Crochê",
+        subtitulo: "Símbolos vetoriais CYC em modo Circular (mandala/sousplat) ou Fileiras (barrado)",
+        icone: "✿",
+        badge: "Ação",
+        palavras: "simbolos croche grafico circular mandala sousplat flor barrado diagrama svg cyc",
+        acaoMeta: { tipo: "comando", comando: "editor-simbolos-croche" }
+      },
+      {
         chaveRecente: "cmd:tradutor-receitas",
         grupo: "acoes",
         titulo: "Abrir Tradutor de Receitas (US / UK / ES → PT)",
@@ -364,12 +468,122 @@ const BuscaGlobal = (() => {
       {
         chaveRecente: "cmd:chamar-aranha",
         grupo: "acoes",
-        titulo: "Chamar Aranha Tecelã Agora",
-        subtitulo: "Invoca uma das 5 espécies Ñanduobyeté para passear pela tela",
+        titulo: "Chamar Aranha do Ateliê Agora",
+        subtitulo: "Invoca uma das 7 espécies Ñanduobyeté para passear ou vigiar as teias",
         icone: "🕷️",
         badge: "Ateliê",
-        palavras: "aranha nanduobyete teia papa moscas caranguejo tecela filhote chamar invocar animacao",
+        palavras: "aranha nanduobyete teia papa moscas caranguejo tecela filhote tarantula golias chamar invocar animacao",
         acaoMeta: { tipo: "comando", comando: "chamar-aranha" }
+      },
+      {
+        chaveRecente: "cmd:chamar-tarantula",
+        grupo: "acoes",
+        titulo: "Chamar Tarântula Golias (Comedora-de-Pássaros)",
+        subtitulo: "A maior aranha do mundo com cerdas detalhadas e postura de defesa",
+        icone: "🕷️",
+        badge: "Ateliê",
+        palavras: "tarantula golias comedora passaros caranguejeira maior aranha cerdas peluda theraphosa chamar",
+        acaoMeta: { tipo: "comando", comando: "chamar-tarantula" }
+      },
+      {
+        chaveRecente: "cmd:chamar-tecela-canto",
+        grupo: "acoes",
+        titulo: "Chamar Aranha Tecelã (na Teia de Canto)",
+        subtitulo: "Aparece sobre uma das teias nos cantos em postura em X com estabilimento",
+        icone: "🕸️",
+        badge: "Ateliê",
+        palavras: "tecela argiope teia canto orbital estabilimento aranha chamar",
+        acaoMeta: { tipo: "comando", comando: "chamar-tecela-canto" }
+      },
+      {
+        chaveRecente: "cmd:caca-golias-barata",
+        grupo: "acoes",
+        titulo: "Cena Rara: Tarântula Golias caçando Barata",
+        subtitulo: "Espreita pesada, abertura das quelíceras e bote terrestre",
+        icone: "🪳",
+        badge: "Caça",
+        palavras: "caca tarantula golias barata presa raro aranha",
+        acaoMeta: { tipo: "comando", comando: "caca-golias-barata" }
+      },
+      {
+        chaveRecente: "cmd:caca-golias-lagartinho",
+        grupo: "acoes",
+        titulo: "Cena Lendária: Tarântula Golias caçando Lagartinho",
+        subtitulo: "Lagartinho articulado com cauda sinuosa e língua bífida × Golias gigante",
+        icone: "🦎",
+        badge: "Lendário",
+        palavras: "caca tarantula golias lagartinho lagartixa lagarto lendario raro",
+        acaoMeta: { tipo: "comando", comando: "caca-golias-lagartinho" }
+      },
+      {
+        chaveRecente: "cmd:caca-golias-lagarta",
+        grupo: "acoes",
+        titulo: "Cena Lendária: Tarântula Golias caçando Lagarta Gigante",
+        subtitulo: "Lagarta com locomoção peristáltica em 7 segmentos × Golias gigante",
+        icone: "🐛",
+        badge: "Lendário",
+        palavras: "caca tarantula golias lagarta mandarova lendario raro",
+        acaoMeta: { tipo: "comando", comando: "caca-golias-lagarta" }
+      },
+      {
+        chaveRecente: "cmd:caca-tecela-teia",
+        grupo: "acoes",
+        titulo: "Caça na Teia: Aranha Tecelã × Mosquito",
+        subtitulo: "Mosquito preso na teia de canto e enrolamento em casulo de seda",
+        icone: "🕸️",
+        badge: "Caça",
+        palavras: "caca tecela mosquito mosca casulo seda teia canto",
+        acaoMeta: { tipo: "comando", comando: "caca-tecela-teia" }
+      },
+      {
+        chaveRecente: "cmd:encontro-aranhas",
+        grupo: "acoes",
+        titulo: "Encontro entre 2 Aranhas (Cumprimento Tátil)",
+        subtitulo: "Duas aranhas se encontram, tamborilam as patas dianteiras e seguem caminho",
+        icone: "🕷️",
+        badge: "Ateliê",
+        palavras: "encontro interacao duas aranhas cumprimento territorio",
+        acaoMeta: { tipo: "comando", comando: "encontro-aranhas" }
+      },
+      {
+        chaveRecente: "cmd:beber-orvalho",
+        grupo: "acoes",
+        titulo: "Aranha Bebendo Gota de Orvalho",
+        subtitulo: "Aproximação calma e hidratação por capilaridade enquanto a gota encolhe",
+        icone: "💧",
+        badge: "Ateliê",
+        palavras: "beber agua gota orvalho hidratar aranha tarantula",
+        acaoMeta: { tipo: "comando", comando: "beber-orvalho" }
+      },
+      {
+        chaveRecente: "cmd:danca-cortejo",
+        grupo: "acoes",
+        titulo: "Raro: Dança de Cortejo da Papa-Moscas",
+        subtitulo: "Passinhos laterais em arco com 3º par erguido e balanço abdominal",
+        icone: "💃",
+        badge: "Raro",
+        palavras: "danca cortejo papa moscas salticidae maratus aranha",
+        acaoMeta: { tipo: "comando", comando: "danca-cortejo" }
+      },
+      {
+        chaveRecente: "cmd:ecdise-muda",
+        grupo: "acoes",
+        titulo: "Lendário: Troca de Exoesqueleto (Ecdise)",
+        subtitulo: "Aranha sai da casca deixando a exúvia translúcida para trás",
+        icone: "✨",
+        badge: "Lendário",
+        palavras: "ecdise muda exoesqueleto exuvia casca aranha lendario",
+        acaoMeta: { tipo: "comando", comando: "ecdise-muda" }
+      },
+      {
+        chaveRecente: "cmd:mae-ooteca",
+        grupo: "acoes",
+        titulo: "Lendário: Ñanduobyeté Mãe com Ooteca & Filhotes",
+        subtitulo: "Carrega ooteca prateada de onde 3 filhotinhos saem flutuando (ballooning)",
+        icone: "🕸️",
+        badge: "Lendário",
+        palavras: "mae ooteca ovos filhotes ballooning nanduobyete lendario",
+        acaoMeta: { tipo: "comando", comando: "mae-ooteca" }
       }
     ];
 
