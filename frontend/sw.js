@@ -6,7 +6,7 @@
 // imediatamente quando online/local e funcionar 100% offline sem rede.
 // ==========================================================================
 
-const CACHE_NOME = "ponto-e-trama-offline-v10";
+const CACHE_NOME = "ponto-e-trama-offline-v11";
 
 const RECURSOS_ESSENCIAIS = [
   "./",
