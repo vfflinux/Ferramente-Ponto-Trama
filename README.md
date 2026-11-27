@@ -1,6 +1,6 @@
 # Ferramente-Ponto-Trama — Ponto & Trama
 
-Aplicação multiplataforma **100% offline e local** para organização de artesanato em **crochê e tricô**, construída sobre uma única base compartilhada e distribuída em três versões sincronizadas: **Web (PWA)**, **App Desktop para Ubuntu (Linux)** e **App Mobile para Android**.
+Aplicação multiplataforma **100% offline e local** para organização profissional de artesanato em **crochê e tricô**, construída sobre uma única base compartilhada e distribuída em três versões sincronizadas: **Web (PWA)**, **App Desktop para Ubuntu (Linux)** e **App Mobile para Android**.
 
 > **Início limpo em todas as plataformas:** ao baixar e abrir pela primeira vez (Web, Ubuntu ou Android), o **Inventário de Fios**, **Agulhas e Acessórios**, **Banco de Amostras** e **Gerenciador de Projetos** iniciam **completamente vazios (0 itens pré-cadastrados)**, prontos para você cadastrar seus próprios materiais e projetos.
 
@@ -10,10 +10,23 @@ Aplicação multiplataforma **100% offline e local** para organização de artes
 
 | Plataforma | Arquivo | Tamanho | Onde baixar | Como instalar / abrir |
 | :--- | :--- | :---: | :--- | :--- |
-| **Android (Celular)** | `ponto-e-trama.apk` (`v1.0.1`) | `779 KB` | [Baixar APK (`mobile/ponto-e-trama.apk`)](https://github.com/vfflinux/Ferramente-Ponto-Trama/raw/main/mobile/ponto-e-trama.apk) | Copie o `.apk` para o celular (Android 7.0 a 15+), toque no arquivo e autorize a instalação. Roda **100% local**, sem permissão de internet. |
-| **Linux / Ubuntu (Instalador `.deb`)** | `ponto-e-trama_1.0.0_all.deb` | `308 KB` | [Baixar `.deb` (`dist/ponto-e-trama_1.0.0_all.deb`)](https://github.com/vfflinux/Ferramente-Ponto-Trama/raw/main/dist/ponto-e-trama_1.0.0_all.deb) | Clique duas vezes no `.deb` (abre na Central de Aplicativos do Ubuntu) ou instale via `sudo apt install ./dist/ponto-e-trama_1.0.0_all.deb`. |
+| **Android (Celular)** | `ponto-e-trama.apk` (`v1.0.1`) | `811 KB` | [Baixar APK (`mobile/ponto-e-trama.apk`)](https://github.com/vfflinux/Ferramente-Ponto-Trama/raw/main/mobile/ponto-e-trama.apk) | Copie o `.apk` para o celular (Android 7.0 a 15+), toque no arquivo e autorize a instalação. Roda **100% local**, sem permissão de internet. |
+| **Linux / Ubuntu (Instalador `.deb`)** | `ponto-e-trama_1.0.0_all.deb` | `329 KB` | [Baixar `.deb` (`dist/ponto-e-trama_1.0.0_all.deb`)](https://github.com/vfflinux/Ferramente-Ponto-Trama/raw/main/dist/ponto-e-trama_1.0.0_all.deb) | Clique duas vezes no `.deb` (abre na Central de Aplicativos do Ubuntu) ou instale via `sudo apt install ./dist/ponto-e-trama_1.0.0_all.deb`. |
 | **Linux / Ubuntu (Atalho gráfico)** | `Ponto & Trama.desktop` / `Instalar Ponto & Trama.desktop` | — | Pasta [`dist/`](dist/) | Clique com o botão direito → *Permitir iniciar* e dê duplo clique para abrir o app (`PontoETrama`) ou o instalador gráfico GTK (`desktop/instalador-gui.py`). |
 | **Web (Navegador / PWA)** | `frontend/index.html` | — | [`frontend/index.html`](frontend/index.html) | Abra no navegador ou sirva `frontend/` (salva tudo localmente via IndexedDB + Service Worker offline-first). |
+
+---
+
+## Facilitadores Profissionais do Ateliê
+
+- **Desfazer / Refazer Global (`Ctrl + Z` / `Ctrl + Y`) + Toast Interativo (`frontend/src/core/historico-acoes.js`):** qualquer contador zerado ou projeto removido exibe um toast flutuante com botão **`↩ Desfazer (Ctrl+Z)`** para reversão imediata.
+- **Snapshots Automáticos Locais (Backup Rotativo — 5 Pontos de Restauração):** salva automaticamente os últimos 5 pontos de restauração locais antes de exclusões ou baixas de estoque (acessível via `Ctrl + K` → *Snapshots Automáticos* para criar pontos manuais ou restaurar em 1 clique).
+- **Drag & Drop Universal na Janela:** arraste e solte qualquer arquivo diretamente sobre o aplicativo:
+  - **Receitas (`.txt` / `.md`):** abrem automaticamente no **Leitor Interativo estilo Ribblr**.
+  - **Fotos ou PDFs (`.png`, `.jpg`, `.webp`, `.pdf`):** abrem diretamente no **Visualizador com Régua "Onde parei"**.
+  - **Backup (`.json`):** cria um snapshot de segurança e restaura os dados imediatamente.
+- **Exportador de Ficha Técnica & Orçamento em PDF Limpo (`📄 Ficha PDF`):** disponível na **Home**, no **Workspace do Projeto** e na **Calculadora de Precificação**, gerando uma folha editorial pronta para imprimir ou salvar em PDF e enviar no WhatsApp para clientes.
+- **Mini-Janela "Sempre no Topo" (`📌 Mini-Topo` / Atalho `F10`):** no App Desktop Ubuntu (`desktop/app.py` + `/api/desktop/mini-topo`), ativa `window.set_keep_above(True)` no GTK3 e redimensiona para um **Mini-Contador flutuante (`420×580`)**, ideal para tecer assistindo videoaulas ao lado.
 
 ---
 
@@ -21,109 +34,85 @@ Aplicação multiplataforma **100% offline e local** para organização de artes
 
 > **Barra lateral enxuta, personalizável e arrastável:** em **Configurações → Aparência e Leitura**, você escolhe exatamente quais ferramentas ficam visíveis na barra lateral. As demais ficam na aba **Ferramentas**, que infla um popup conectado exibindo somente os ícones — e, com o popup aberto, basta **arrastar e soltar** ferramentas entre a barra lateral e o popup (ou reordená-las) para ativar/desativar em tempo real nas Configurações.
 
-> **Busca Global / Paleta de Comandos (`Ctrl + K`):** disponível em todas as 12 telas (pelo atalho `Ctrl + K` / `Cmd + K` / `/` ou pelo ícone de lupa no cabeçalho). Digite `4.5`, `Amigurumi`, `Touca bebê`, `sc2tog` ou o nome de um projeto/fio e salte direto para o item, dicionário, tabela de conversão ou comando rápido com 1 clique.
+> **Busca Global / Paleta de Comandos (`Ctrl + K`):** disponível em todas as 12 telas (pelo atalho `Ctrl + K` / `Cmd + K` / `/` ou pelo ícone de lupa no cabeçalho). Digite `4.5`, `Amigurumi`, `Touca bebê`, `sc2tog`, `Snapshots`, `Mini-Janela` ou o nome de um projeto/fio e salte direto para o item, dicionário, tabela de conversão ou comando rápido com 1 clique.
 
-### 1. Início — "Bancada do Ateliê"
-- **Saudação contextual** por horário (*Bom dia / Boa tarde / Boa noite*) com o nome configurado do ateliê e data formatada em `pt-BR`.
-- **Hero Card "Continue de Onde Parou":** exibe automaticamente o projeto na bancada (ou o mais recente *Em andamento*), capa/ícone, tags, anel circular SVG de progresso, contador de carreiras, tempo tecido e ações diretas (**`▶ Retomar Workspace`**, **`+1 Carreira`** com sincronização imediata e **`⛶ Tela Toda`**) — ou um cartão de Boas-Vindas limpo quando o ateliê inicia vazio.
+### 1. Início — "Bancada Aberta do Ateliê"
+- **Saudação contextual** por horário (*Bom dia / Boa tarde / Boa noite*) com tipografia editorial, etiqueta de tecido costurada (*woven label*) e data formatada em `pt-BR`.
+- **Hero Card "Continue de Onde Parou":** exibe automaticamente o projeto na bancada (ou o mais recente *Em andamento*), capa/ícone, tags, anel circular SVG de progresso, contador de carreiras, tempo tecido, **previsão inteligente de término (`⏳ Faltam ~...`)**, **preview clicável da linha atual da Receita (`📜 Onde parei`)** e ações diretas (**`▶ Retomar Workspace`**, **`+1 Carreira`** com sincronização imediata, **`⛶ Tela Toda`** e **`📄 Ficha PDF`**) — ou um cartão de Boas-Vindas limpo quando o ateliê inicia vazio.
 - **Métricas reais, alertas discretos e atalhos:** 3 cards clicáveis (*Em andamento*, *Novelos no estoque*, *Tempo tecido*), faixa condicional de prazos próximos/fios zerados, 5 atalhos de 1 toque e mini-cards dos projetos recentes.
 
 ### 2. Gerenciador de Projetos (Pastas / Fichários + Workspace)
-- **Pastas / Fichários no Dashboard:** cards em formato de fichário com aba superior, capa ou ilustração, status colorido (*Na Fila*, *Em Andamento*, *Pausado*, *Concluído*), menu `⋯` (*Workspace*, *Retirar*, *Editar*, *Duplicar*, *Arquivar*, *Excluir*) e barra de progresso.
+- **Pastas / Fichários no Dashboard:** cards em formato de fichário com aba superior, capa ou ilustração, status colorido (*Na Fila*, *Em Andamento*, *Pausado*, *Concluído*), menu `⋯` (*Workspace*, *Retirar*, *Editar*, *Duplicar*, *Arquivar*, *Excluir* com suporte a `Ctrl + Z`) e barra de progresso.
 - **Abertura Animada + Botão `Retirar`:**
   - Ao abrir uma pasta, as **7 fichas** (*Contadores*, *Receita & Notas*, *Fios & Agulha*, *Etapas*, *Amostra*, *Tempo & Preço* e *Gráfico Visual*) deslizam para formar o dossiê completo.
-  - **`Retirar`** distribui o projeto para **todas as ferramentas** e exibe a barra global **"📂 Na bancada"** no topo — qualquer alteração feita em qualquer aba (contadores, receita, amostra, precificação ou gráfico) é salva automaticamente na pasta ativa.
+  - **`Retirar`** distribui o projeto para **todas as ferramentas** e exibe a barra global **"📂 Na bancada"** no topo — qualquer alteração feita em qualquer aba é salva automaticamente na pasta ativa.
 - **Workspace do Projeto (2 Colunas no Desktop / 3 Abas fixas no Mobile):**
-  - **Execução:** múltiplos contadores integrados (`+1` / `-1`, atalhos `Espaço`, `↑`, `↓`, vibração e alarme sonoro ao atingir a meta), cronômetro de trabalho (**Play / Pause** + envio direto das horas para a Precificação) e leitor/editor de receitas.
+  - **Execução:** múltiplos contadores integrados (`+1` / `-1`, atalhos `Espaço`, `↑`, `↓`, vibração e alarme sonoro ao atingir a meta), cronômetro de trabalho (**Play / Pause** + envio direto das horas para a Precificação), leitor/editor de receitas e botão **`📄 Ficha PDF`** no topo.
   - **Metadados:** checklist de etapas com progresso automático ou manual (`0–100%`), celebração discreta (*confetes* + badge **`🎉 Peça Finalizada!`**), ficha técnica vinculada aos inventários de fios/agulhas e galeria de progresso com lightbox.
-- **Formulário de Criação/Edição em Drawer:** acordeões **1. Informações Básicas** e **2. Materiais, Etapas e Prazos** com rolagem interna independente para fácil preenchimento no desktop e celular.
-- **Baixa Automática no Estoque ao Concluir Projeto:** ao finalizar o projeto (`100%` ou status *Concluído*), exibe confirmação em 1 clique para descontar automaticamente do estoque os novelos/gramas de fios e aviamentos utilizados.
+- **Baixa Automática no Estoque ao Concluir Projeto:** ao finalizar o projeto (`100%` ou status *Concluído*), grava um snapshot automático de segurança e exibe confirmação em 1 clique para descontar do estoque os novelos/gramas de fios e aviamentos utilizados.
 
-### 3. Receitas e Anotações (Leitor Interativo estilo Ribblr + Dicionário & Tradutor)
-- **Leitor Interativo estilo *Ribblr* (Checklist + Popover de Ponto):** ao colar ou digitar uma receita, cada carreira vira uma linha interativa com **checkbox para riscar** (somando **`+1` automaticamente no Contador Principal**), barra de progresso (`%`), destaque automático do total de pontos esperados (`[24]`, `(18)`) e **siglas clicáveis (`pb`, `mpa`, `pa`, `aum`, `dim`, `sc2tog`, `k2tog`...)** que abrem um mini-balão explicativo na hora sem sair da receita.
-- **Modo PDF / Foto:** carregamento de PDFs ou imagens de gráficos com **régua móvel "Onde parei"**.
-- **Dicionário de Abreviações (`frontend/data/dicionario-pontos.json`):** catálogo multilíngue minimalista entre **PT-BR**, **Inglês (US)**, **Inglês (UK)** e **Espanhol (ES)** com busca instantânea, filtros por idioma/técnica/categoria e cópia rápida.
-- **Tradutor Automático de Receitas (100% Offline / Client-Side):** cola trechos ou receitas inteiras, traduz siglas preservando números/repetições (`*2 sc, inc* x6 → *2 pb, aum* x6`), destaca termos traduzidos com tooltip, exibe alerta de ambiguidade **US vs. UK** e envia direto para o leitor ou para o projeto ativo.
+### 3. Receitas e Anotações (Leitor Interativo estilo Ribblr + Conferência de Estoque + Tradutor)
+- **Leitor Interativo estilo *Ribblr* (Checklist + Popover de Ponto):** ao colar, digitar ou arrastar um arquivo `.txt`/`.md`, cada carreira vira uma linha interativa com **checkbox para riscar** (somando **`+1` automaticamente no Contador Principal**), barra de progresso (`%`), destaque automático do total de pontos esperados (`[24]`, `(18)`) e **siglas clicáveis (`pb`, `mpa`, `pa`, `aum`, `dim`, `sc2tog`, `k2tog`...)** que abrem um mini-balão explicativo na hora sem sair da receita.
+- **Conferência Automática de Estoque (`🧶 Conferir Estoque`):** analisa o texto da receita em busca de gramas, metragem, TEX e nomes/cores de fios e compara instantaneamente com os novelos disponíveis no seu **Inventário de Fios**.
+- **Modo PDF / Foto:** carregamento ou drag-and-drop de PDFs/imagens de gráficos com **régua móvel "Onde parei"** e zoom por pinça/duplo toque.
+- **Dicionário de Abreviações (`frontend/data/dicionario-pontos.json`) & Tradutor Automático (100% Offline):** catálogo multilíngue (**PT-BR**, **US**, **UK**, **ES**) e tradutor que preserva números/repetições (`*2 sc, inc* x6 → *2 pb, aum* x6`), destaca termos traduzidos e alerta sobre ambiguidades **US vs. UK**.
 
-### 4. Contador de Carreiras + Contadores Vinculados & "Tela Toda"
-- Múltiplos contadores simultâneos com cálculo automático do total de pontos, meta de carreiras com alarme visual e sonoro offline (Web Audio API), vibração tátil no celular e sincronização bidirecional com o projeto na bancada, o **Leitor Interativo de Receitas** e o **Editor de Gráficos**.
-- **Contadores Vinculados com Lembrete de Motivo (*estilo KnitCompanion*):** em cada card, configure regras como *"Avisar a cada `4` carreiras: `Fazer aumento!`"* e/ou *"Ciclo de motivo de `8` carreiras"* — exibindo o progresso do ciclo (`Motivo 3/8`) e acendendo um alerta discreto exatamente na carreira certa (inclusive no modo *Tela Toda*).
-- **Modo "Toque na Tela Toda":** botão para expandir o contador em tela cheia onde qualquer toque na tela soma `+1` (com vibração suave) e cadeado de segurança para evitar zerar sem querer enquanto tece.
+### 4. Contador de Carreiras + Modo Mãos-Livres, Ritmo/ETA & "Tela Toda"
+- Múltiplos contadores simultâneos com números tabulares (`tabular-nums`), cálculo automático do total de pontos, meta de carreiras com alarme visual e sonoro offline (Web Audio API), vibração tátil no celular, reversão via **`Ctrl + Z`** ao zerar e sincronização bidirecional com o projeto na bancada, o **Leitor Interativo de Receitas** e o **Editor de Gráficos**.
+- **Modo Mãos-Livres + Previsão Inteligente de Tempo (Ritmo & ETA):**
+  - Pressione **`Espaço`** ou **`Seta ↑`** (ou pedal USB/Bluetooth) para somar `+1 carreira` e **`Seta ↓`** para diminuir `-1` sem tirar as mãos da agulha.
+  - Calcula automaticamente o ritmo médio da sessão e a previsão de término (`⏱️ Ritmo: 45s/carr • Previsão: ~22 min`).
+  - Botão **`📌 Mini-Topo (F10)`** para destacar o contador em janela compacta sempre no topo no Ubuntu Desktop.
+- **Contadores Vinculados com Lembrete de Motivo (*estilo KnitCompanion*):** configure regras como *"Avisar a cada `4` carreiras: `Fazer aumento!`"* e/ou *"Ciclo de motivo de `8` carreiras"* (`Motivo 3/8`).
+- **Modo "Toque na Tela Toda":** qualquer toque na tela soma `+1` (deslizar para baixo/esquerda subtrai `−1`) com cadeado de segurança contra toque acidental no botão zerar.
 
-### 5. Calculadora de Precificação
+### 5. Calculadora de Precificação + Exportação em PDF
 - Cálculo em tempo real de linhas (em **unidades/novelos** ou **gramas**), mão de obra (com importação das horas do cronômetro do projeto), acessórios/extras e margem de lucro com controle deslizante.
-- **Integração com Estoque:** botão **Estoque** (autocomplete, cálculo de sobras e gaveta lateral de fios) e botão **`🎀 Aviamentos`** (puxa custos de *Agulhas e Acessórios*).
-- Reativa às Configurações: moeda (`R$` / `$` / `€`), valor/hora padrão, margem padrão, nome do ateliê e assinatura personalizada ao copiar o orçamento.
+- **Integração com Estoque & Orçamento PDF:** botão **Estoque** (autocomplete, cálculo de sobras e gaveta lateral de fios), botão **`🎀 Aviamentos`** e botão **`📄 Gerar PDF`** para exportar a ficha de orçamento pronta para clientes.
 
-### 6. Inventário de Fios — Prateleira de Cores / Pantone *(inicia vazio)*
-- **Visualização em Amostras de Cor (Swatches Pantone & Etiqueta de Novelo):** cards com faixa ampla da cor real (`cor_hex`, com inferência automática pelo nome da cor ou extração automática da foto carregada), contraste automático WCAG, moldura estilo etiqueta quando há foto, alternador **`🎨 Prateleira`** / **`▦ Compacto`** e indicador visual de quanto resta do novelo (*Cheio*, *Médio*, *Acabando*, *Zerado*).
-- **Filtro por Paleta Cromática:** bolinhas clicáveis por família de cor no topo (*Branco & Cru*, *Bege & Terrosos*, *Amarelo*, *Rosa*, *Vermelho*, *Roxo*, *Azul*, *Verde*, *Escuros*) com contadores em tempo real.
-- **Simulador de Combinação de Cores (2 a 5 fios):** seleção via cards + dock flutuante para testar harmonias ao vivo em **Listras**, **Granny Square (SVG concêntrico)** ou **Colunas Pantone**, com sugestão automática **`✨ Harmonia`**, aviso de diferença de TEX, cópia da lista e exportação em **PNG** (inclusive nativa no Android).
-- **Gerador de Listras & Planejador de Manta (`🧣 Manta & Listras`):** selecione 2 a 6 fios do estoque (ou cores livres), escolha nº de carreiras e estilo (**Listras Harmônicas**, **Degradê**, **Padrão Escocês** ou **Manta da Temperatura** com faixas editáveis em `°C`), visualize a manta em Canvas, confira consumo estimado em gramas/novelos (com alerta de estoque), exporte em **PNG** e envie a ordem exata das carreiras direto para **Receitas**.
-- Cadastro completo (marca, cor, código, lote, TEX, composição, peso, metragem, agulha, localização, preço e foto), controle rápido `- / +`, tela de detalhes, duplicação e backup `.json`.
+### 6. Inventário de Fios — Prateleira de Cores / Pantone & Planejador de Manta *(inicia vazio)*
+- **Visualização em Amostras de Cor (Swatches Pantone & Cinta de Meada):** cards com faixa ampla da cor real (`cor_hex`, inferida pelo nome ou extraída da foto), acabamento estilo **cinta de meada (*yarn band*)**, alternador **`🎨 Prateleira`** / **`▦ Compacto`** e indicador visual de saldo (*Cheio*, *Médio*, *Acabando*, *Zerado*).
+- **Simulador de Combinação de Cores (2 a 5 fios):** teste harmonias ao vivo em **Listras**, **Granny Square (SVG concêntrico)** ou **Colunas Pantone**, com sugestão **`✨ Harmonia`**, aviso de TEX e exportação em **PNG**.
+- **Gerador de Listras & Planejador de Manta (`🧣 Manta & Listras`):** escolha 2 a 6 fios, nº de carreiras e estilo (**Listras Harmônicas**, **Degradê**, **Padrão Escocês** ou **Manta da Temperatura** em `°C`), visualize em Canvas, confira o consumo estimado em gramas/novelos e envie a sequência de carreiras direto para **Receitas**.
 
 ### 7. Agulhas e Acessórios *(inicia vazio)*
-- Organização em **3 zonas** (abas *Todas*, *Agulhas*, *Ferramentas* e *Aviamentos* + subfiltros *Crochê*, *Tricô Reto*, *Tricô Circular*, *Tapeçaria*; busca + alternador Grade/Lista; listagem responsiva).
-- Drawer lateral com campos dinâmicos por categoria, calculadora de custo unitário a partir do pacote, toggle **`Em Uso / Livre`** sincronizado com o projeto ativo e ajuste `- / +` para aviamentos.
+- Organização em **3 zonas** (*Todas*, *Agulhas*, *Ferramentas* e *Aviamentos* + subfiltros *Crochê*, *Tricô Reto*, *Tricô Circular*, *Tapeçaria*), calculadora de custo unitário a partir do pacote e toggle **`Em Uso / Livre`** sincronizado com o projeto ativo.
 
 ### 8. Calculadora de Amostra + Esfera & Círculo Perfeito + Aumentos/Dim.
-- Dois modos via seletor deslizante (*Por Medida Desejada* e *Adaptar Receita*), conversão **`cm ↔ pol`**, steppers, visualização proporcional da trama, fita métrica elástica e salvamento direto no Banco de Amostras.
-- **Modo Avançado (`⚡ On/Off`):** integra Fio, Agulha, pontos-base (**Ponto Baixo** para Crochê e **Ponto Malha** para Tricô), lista personalizável de pontos e modelos do Banco de Amostras, com estimativa de consumo em gramas, metros e novelos.
-- **Gerador de Esfera (Amigurumi) & Círculo Plano Perfeito (`⚪ Esfera & Círculo`):** calcula a receita carreira por carreira por nº de carreiras ou diâmetro em `cm` (puxando a tensão da amostra), com **aumentos escalonados** para eliminar quinas hexagonais no amigurumi e embabadamento em sousplats, diagrama SVG ao vivo e envio em 1 clique para **Receitas** ou **Projeto Ativo**.
-- **Calculadora de Aumentos & Diminuições Uniformes:** acessível direto por um botão no cabeçalho da ferramenta; calcula a sequência pronta da carreira (ex.: `*5 pb, 1 aum* x4; *6 pb, 1 aum* x9`) para crochê ou tricô, circular ou plano, com envio direto para Receitas/Projeto.
+- Modos *Por Medida Desejada* e *Adaptar Receita*, conversão **`cm ↔ pol`**, visualização proporcional da trama, fita métrica elástica, **Modo Avançado (`⚡ On/Off`)** e salvamento no Banco de Amostras.
+- **Gerador de Esfera (Amigurumi) & Círculo Plano Perfeito (`⚪ Esfera & Círculo`):** gera a receita carreira por carreira por nº de carreiras ou diâmetro em `cm` com **aumentos escalonados** (sem quinas hexagonais no amigurumi e sem embabadar no sousplat), diagrama SVG ao vivo e envio em 1 clique para **Receitas** ou **Projeto Ativo**.
+- **Calculadora de Aumentos & Diminuições Uniformes:** calcula a sequência exata da carreira para crochê ou tricô, circular ou plano.
 
 ### 9. Banco de Amostras *(inicia vazio)*
 - Galeria de pontos com busca instantânea, filtros por categoria e favoritos, visualização detalhada, duplicação e botão **`Usar na Calculadora`**.
 
 ### 10. Editor de Gráficos (Pixel Art / Tapestry / C2C + Símbolos de Crochê)
-- **Editor de Grade Manual em HTML5 Canvas (60 fps):** largura/altura e proporção customizáveis (1:1 ou retangular pela amostra), pincel, borracha, balde de tinta (flood fill), conta-gotas, linha, retângulo e elipse, seleção (copiar/colar/mover), espelhamento, desenho simétrico em tempo real, Undo/Redo, zoom/pan, redimensionamento sem perda e guias numeradas com destaque a cada 5/10 pontos.
-- **Editor de Gráfico com Símbolos de Crochê (`✿ Símbolos` — Fileiras & Circular):** modo vetorial SVG complementar com **14 símbolos padrão CYC** (anel mágico, correntinha, pbx, pb, mpa, pa, pad, aumento, diminuição, leque 3pa, pipoca, picô, relevo frente/trás), simetria radial (`1×/4×/6×/8×/12×`), cores e contagem por carreira, 3 modelos prontos (*Sousplat*, *Flor 6 Pétalas* e *Barrado*), legenda automática, Desfazer/Refazer e exportação **SVG** e **PNG**.
-- **Importação de Imagens e Pixel Art Quadriculada:** recorte (Crop), calibração de grade virtual com detecção automática de linhas e offset/escala, amostragem central de cor (ignora linhas da grade e ruído JPG), agrupamento de cores (Color Merging) e sugestão de fios do Inventário.
-- **Modo de Execução & Exportação:** destaca a carreira atual de baixo para cima com direção ida/volta, leitura por blocos de cor, modo alto contraste, sincronização bidirecional com o Contador de Carreiras e o Projeto ativo, autosave local e exportação em **PNG** e **PDF**.
+- **Editor de Grade Manual em HTML5 Canvas (60 fps):** pincel, borracha, balde de tinta, conta-gotas, linha, retângulo, elipse, seleção, espelhamento, simetria em tempo real, Undo/Redo, zoom/pan, importação de imagens com calibração de grade e modo execução sincronizado com o Contador.
+- **Editor de Gráfico com Símbolos de Crochê (`✿ Símbolos` — Fileiras & Circular):** modo vetorial SVG com **14 símbolos padrão CYC** (anel mágico, correntinha, pbx, pb, mpa, pa, pad, aumento, diminuição, leque 3pa, pipoca, picô, relevo frente/trás), simetria radial (`1×/4×/6×/8×/12×`), 3 modelos prontos (*Sousplat*, *Flor 6 Pétalas* e *Barrado*), legenda automática e exportação **SVG** e **PNG**.
 
 ### 11. Tabelas de Conversão e Medidas (`frontend/data/tabelas-conversao.json`)
-- **3 Abas com Indicador Deslizante:** *Agulhas* (`mm`, `US`, `UK`, `Letra` e uso comum), *Espessura de Fios* (`CYC 0–7`, `TEX`, agulha sugerida e exemplos brasileiros) e *Medidas Padrão* (8 subcategorias: *Toucas/Gorros*, *Meias*, *Blusas/Camisas*, *Calças*, *Vestidos*, *Cachecóis*, *Mantas* e *Bolsas*, cada uma com dica técnica prática).
-- **Conversor Rápido & Toggle `cm | pol`:** cartão instantâneo de equivalências (com badge indicando se você já tem aquela agulha/fio no estoque) e alternância global `cm ↔ pol` ($1\text{ pol} = 2,54\text{ cm}$) persistida em `localStorage`.
-- **Produtividade e Responsividade:** busca instantânea (incluindo busca cruzada entre peças/abas), botão **Copiar** em cada linha com confirmação visual, clique na linha para **Modo Leitura** (destaque fixo) e cartões empilhados abaixo de `600 px`.
+- **3 Abas com Indicador Deslizante:** *Agulhas* (`mm`, `US`, `UK`, `Letra`), *Espessura de Fios* (`CYC 0–7`, `TEX`, exemplos brasileiros) e *Medidas Padrão* (8 subcategorias de peças com dicas técnicas), conversor rápido com badge de estoque e toggle global `cm ↔ pol`.
 
-### 12. Configurações, Temas Harmonizados e Sincronização Wi-Fi
-- **Ateliê e Perfil:** nome do ateliê, assinatura para orçamentos e **Técnica Principal** (`Crochê`, `Tricô` ou `Ambos`) refletida em projetos, amostras, agulhas e placeholders.
-- **Aparência, Micro-identidade Artesanal e 8 Temas (`frontend/styles/base/temas.css`):**
-  - **8 temas visuais harmonizados** com contraste WCAG AA/AAA (mantendo o *Azul Marinho Clássico* como padrão): **Azul Marinho Clássico**, **Noite Profunda**, **Ateliê Claro**, **Linho & Terracota** (textura sutil de linho + terracota e verde-oliva), **Sálvia & Algodão** (conforto ocular para leitura prolongada), **Ameixa & Veludo**, **Mel & Cacau** e **Floresta & Âmbar**.
-  - **Identidade Ñanduobyeté & Costura:** alinhavos pontilhados finos (`dashed`), anéis de progresso com pontas arredondadas, estados vazios ilustrados com SVGs artesanais detalhados, teias de renda discretas e o **Ecossistema Vivo de Aranhas do Ateliê** (7 espécies vetoriais — incluindo a **Tarântula Golias gigante lendária** com cerdas em 2 camadas e quelíceras articuladas e a **Aranha Tecelã de Canto** em postura "X" — com 5 presas animadas em **escala de raridade progressiva** [moscas, mosquitos, baratas e raramente lagartinho/lagarta gigante], 7 hábitos de caça específicos por espécie e interações entre aranhas, tudo configurável em *Desligado / Raro / Discreto / Ateliê Vivo*, com seletor de cenas para teste e atalhos no `Ctrl + K`).
-  - 3 tamanhos de fonte (*Compacto*, *Padrão*, *Grande*), *Reduzir Animações*, estado inicial da barra lateral e **seletor de ferramentas da barra lateral** (as desmarcadas vão para o popup conectado da aba **Ferramentas**).
-- **Padrões das Ferramentas:** alerta sonoro offline (com teste de som), alerta visual, vibração, *Manter tela acesa* (Wake Lock + nativo Android), atalhos de teclado, valor/hora, margem padrão, moeda global (`BRL` / `USD` / `EUR`), unidade padrão (`cm`/`pol`), vínculo automático de projetos, marcação automática de agulha em uso e confetes.
-- **Sincronização Local via Wi-Fi (`backend/sync_wifi.py`):** servidor HTTP temporário no Ubuntu com **QR Code SVG 100% offline** e link manual, token temporário de uso único (5 min), seleção de direção (**PC → Celular**, **Celular → PC** ou **Mesclar** comparando `updatedAt`), página mobile embarcada sem instalação extra, validação de schema, backup automático de rollback (`backup_pre_sync.json`), encerramento limpo e diagnóstico de firewall/UFW.
-- **Dados, Backup Unificado e Zona de Perigo:** diagnóstico em tempo real (SQLite vs. IndexedDB), **Exportar/Importar Backup Completo (`.json`)** (*Mesclar* ou *Substituir Tudo*), restauração de padrões e limpeza seletiva com confirmação dupla (`LIMPAR`).
+### 12. Configurações, 8 Temas e Ecossistema Biomecânico de Aranhas (`<canvas>` 2D IK)
+- **8 temas visuais harmonizados** com contraste WCAG AA/AAA: **Azul Marinho Clássico**, **Noite Profunda**, **Ateliê Claro**, **Linho & Terracota**, **Sálvia & Algodão**, **Ameixa & Veludo**, **Mel & Cacau** e **Floresta & Âmbar**.
+- **Ecossistema Vivo de Aranhas do Ateliê (`frontend/src/core/aranhas-atelie.js` + `aranhas-cinematica-ik.js`):**
+  - **Motor Biomecânico Híbrido `<canvas>` 2D HiDPI + Cinemática Inversa (IK) de 2 Juntas:** cada uma das 8 patas realiza *foot-planting* tetrapodal real no pixel exato da tela (fêmur + tíbia/tarso articulados), com **sombra de contato física 3D** que desloca e encolhe conforme a altura real `z`, micro-física de inércia (*follow-through* elástico no abdômen), *head-tracking* em micro-trancos (*saccades*) na Papa-Moscas e oclusão de fresta nas bordas dos cards.
+  - **7 Espécies & 5 Presas com Locomoção Biológica Real:** *Ñanduobyeté*, *Papa-Moscas*, *Tecelã-de-Renda*, *Aranha-Caranguejo*, *Filhote Tecelão*, *Aranha Tecelã de Canto* e a lendária *Tarântula Golias (146 px)*; moscas com *saccades* de voo e caminhada após o pouso, mosquitos com voo senoidal duplo e *hovering*, baratas com rajadas curvas, lagartinhos com corrida *stop-and-go* e lagartas com ondas peristálticas.
+  - **Comportamentos Etológicos Reais:** ritual completo de cortejo *Salticidae* em 5 fases e 3 desfechos reais; **disputa agonística por presa em 5 estágios** (*Modelo de Avaliação Sequencial*: convergência, avaliação em círculo, esgrima de patas dianteiras, clímax por bote de intimidação ou engalfinhamento giratório, vigilância da vencedora e fuga específica da espécie — exceto Golias); encontros interespecíficos reais (fugas distintas por espécie diante da Golias e intimidação/avaliação entre as demais); e **Tarântula Golias devorando lagarta e lagartinho pedaço por pedaço** com mastigação das quelíceras e descarte do *bolus*.
+- **Sincronização Local via Wi-Fi (`backend/sync_wifi.py`):** QR Code SVG 100% offline, token temporário, direções **PC → Celular**, **Celular → PC** ou **Mesclar** e rollback automático.
 
 ---
 
-## App Android 100% Local e Front Mobile Dedicado
-
-- **Execução 100% local (`mobile/android/`):**
-  - **Zero permissão de internet** (`INTERNET` removida do `AndroidManifest.xml`), sem servidor HTTP local e sem abrir navegador externo.
-  - Assets servidos diretamente da memória interna do APK via `WebViewClient.shouldInterceptRequest` (`appassets.androidplatform.net`), garantindo **IndexedDB** e **localStorage** persistentes.
-  - **Compatibilidade com Android 15 Edge-to-Edge (`WindowInsets`):** aplica automaticamente os recuos de barra de status, barra de navegação, notch/câmera e teclado virtual.
-  - **Ponte nativa Android (`PontoETramaAndroid`):** sincroniza cor das barras com o tema, ativa `FLAG_KEEP_SCREEN_ON`, vibração háptica e exportação nativa de arquivos (`ACTION_CREATE_DOCUMENT`).
-  - **Ícone adaptativo com fundo escuro:** todas as densidades (`mdpi`–`xxxhdpi` + `mipmap-anydpi-v26`), preservando a logo transparente original no Web e no App Ubuntu.
-- **Front mobile dedicado (`frontend/styles/base/mobile.css`) e Gestos Touch Nativos:**
-  - **Barra de navegação inferior nativa** (telas ≤ 768 px) com acesso rápido a *Início*, *Projetos*, *Contador*, *Preço* e *Mais*, além de **gesto de borda esquerda** (deslizar da borda para abrir e para a esquerda para fechar a gaveta lateral).
-  - **Editor de Gráficos (Touch):** canvas posicionado logo no topo da tela no celular, **pinça para zoom (`0.18×–4.5×`) + pan com 2 dedos** (sem deixar pontos acidentais), **toque com 2 dedos = Desfazer**, **toque com 3 dedos = Refazer**, **pressionar e segurar = Conta-gotas instantâneo**, **toque duplo** para enquadrar no Modo Execução e **deslizar na barra de execução** para trocar de carreira.
-  - **Receitas (Foto/PDF):** **pinça para zoom + toque duplo (`1× ↔ 2.2×`)** na imagem da receita e **régua "⇅ Onde parei" arrastável diretamente com o dedo**.
-  - **Contador de Carreiras:** no modo *Toque na Tela Toda*, toque soma `+1` e **deslizar para baixo ou esquerda** subtrai `−1`; nos botões `+` e `−`, **pressão longa** avança ou recua carreiras continuamente.
-  - **Galeria de Progresso (Lightbox):** **pinça para zoom**, **toque duplo**, **deslizar esquerda/direita** para trocar de foto e **deslizar para baixo** para fechar.
-  - Top App Bar flexível, tabelas em cartões empilhados abaixo de `600 px` e modais/drawers em largura total.
-
----
-
-## Arquitetura, Banco de Dados e Otimizações
+## Arquitetura, Performance e Verificação Automatizada
 
 - **Persistência dual com auto-reparo (`frontend/src/core/database.js`):**
-  - **App Desktop Ubuntu (`./PontoETrama` / `.deb`):** banco relacional **SQLite** local (`backend/database/ponto_e_trama.db`, esquema em [`backend/database/schema.sql`](backend/database/schema.sql)) servido pelo backend Python puro [`backend/server.py`](backend/server.py) (zero dependências externas, conexão persistente por thread, cache em RAM, `ETag / 304` e compressão `gzip`).
-  - **Versão Web (PWA) e App Android:** **IndexedDB (`v4`)** com auto-upgrade, fallback em `localStorage` e Service Worker offline-first ([`frontend/sw.js`](frontend/sw.js), [`frontend/manifest.json`](frontend/manifest.json)).
-- **Otimização de build e performance:**
-  - Minificação automática de HTML/CSS/JS na geração dos pacotes via [`scripts/otimizar-build.py`](scripts/otimizar-build.py) (`-23%` nos assets empacotados), mantendo o código-fonte legível no repositório.
-  - Compressão `xz -z9` no `.deb` (`266 KB`), assinatura completa no `.apk` (`719 KB`) e inicialização sob demanda (*lazy init* + *lazy sync*).
+  - **App Desktop Ubuntu (`./PontoETrama` / `.deb`):** banco **SQLite** local servido por [`backend/server.py`](backend/server.py) + interface nativa GTK3/WebKit2GTK ([`desktop/app.py`](desktop/app.py)) com `CacheModel.WEB_BROWSER`, aceleração 2D/WebGL e suporte a Mini-Janela Sempre no Topo (`F10`).
+  - **Versão Web (PWA) e App Android:** **IndexedDB (`v4`)** + Service Worker offline-first ([`frontend/sw.js`](frontend/sw.js)) + `MainActivity.java` com cache de assets em memória (`ConcurrentHashMap`), `LAYER_TYPE_HARDWARE`, `RENDERER_PRIORITY_IMPORTANT` e gerenciamento de ciclo de vida `onPause`/`onResume`.
+- **Otimização de Renderização (60+ FPS):**
+  - Promoção de camada GPU restrita aos containers principais (`will-change: transform` + `contain: layout style`), `content-visibility: auto` nas grades/listas de cards, dirty-checking nas escritas DOM/SVG, FLIP em lote sem layout thrashing ([`frontend/src/core/animations.js`](frontend/src/core/animations.js)) e pausa real do `requestAnimationFrame` quando a aba está oculta.
+- **Verificação e Build Automatizados:**
+  - [`scripts/verificar-integridade.py`](scripts/verificar-integridade.py): valida compilação Python, referências de assets do `index.html` / `sw.js` e integridade dos módulos JS/CSS antes do empacotamento.
+  - [`scripts/otimizar-build.py`](scripts/otimizar-build.py): minifica automaticamente HTML/CSS/JS (`-23%`) durante a geração do `.deb` e do `.apk`.
 
 ---
 
@@ -135,55 +124,59 @@ Ponto&Trama/
 ├── AGENTS.md                                # Diretriz de sincronização Web <-> Ubuntu <-> Android
 ├── README.md
 ├── scripts/
+│   ├── verificar-integridade.py             # Auditoria automatizada pré-build (Python, HTML, SW, JS/CSS)
 │   └── otimizar-build.py                    # Minificador de HTML/CSS/JS usado nos builds .deb e .apk
 ├── backend/
-│   ├── server.py                            # Servidor HTTP local (gzip/ETag) + API REST SQLite
+│   ├── server.py                            # Servidor HTTP local (gzip/ETag) + API REST SQLite + hook Mini-Topo
 │   ├── sync_wifi.py                         # Sincronização Wi-Fi local (QR SVG offline, merge e rollback)
 │   └── database/
 │       └── schema.sql                       # Esquema SQL (fios, itens_biblioteca, banco_amostras, projetos)
 ├── desktop/
-│   ├── app.py                               # App nativo Ubuntu (GTK 3 + WebKit2GTK + SQLite + Ctrl+K + FileChooser)
+│   ├── app.py                               # App nativo Ubuntu (GTK 3 + WebKit2GTK + SQLite + Mini-Topo F10)
 │   ├── instalador-gui.py                    # Instalador gráfico GTK para Ubuntu
 │   └── build-deb.sh                         # Gera dist/ponto-e-trama_1.0.0_all.deb e lançadores .desktop
 ├── dist/
-│   ├── ponto-e-trama_1.0.0_all.deb          # Instalador oficial Ubuntu (.deb — 266 KB)
+│   ├── ponto-e-trama_1.0.0_all.deb          # Instalador oficial Ubuntu (.deb — 329 KB)
 │   ├── Ponto & Trama.desktop                # Lançador clicável do app
 │   └── Instalar Ponto & Trama.desktop       # Lançador clicável do instalador gráfico
 ├── mobile/
-│   ├── ponto-e-trama.apk                    # Aplicativo Android 100% local (.apk — 719 KB)
+│   ├── ponto-e-trama.apk                    # Aplicativo Android 100% local (.apk — 811 KB)
 │   ├── build-apk.sh                         # Compila (aapt2/javac/d8), alinha e assina o APK
 │   ├── README.md
 │   └── android/
 │       ├── AndroidManifest.xml              # Zero permissão INTERNET (100% offline)
 │       ├── java/com/pontoetrama/app/
-│       │   └── MainActivity.java            # Assets em memória, WindowInsets Android 15 e ponte nativa
+│       │   └── MainActivity.java            # Cache RAM de assets, Hardware Layer, WindowInsets Android 15
 │       └── res/                             # Ícones adaptativos escuros (mdpi-xxxhdpi + anydpi-v26)
 └── frontend/
     ├── index.html                           # SPA compartilhada entre Web, Ubuntu e Android
     ├── manifest.json                        # Manifesto PWA instalável offline
-    ├── sw.js                                # Service Worker offline-first (network-first + fallback cache)
+    ├── sw.js                                # Service Worker offline-first (cache v42)
     ├── assets/images/logo.png               # Logo oficial otimizada (15 KB)
     ├── data/
     │   ├── dicionario-pontos.json           # Catálogo multilíngue de pontos (PT-BR, US, UK, ES)
     │   └── tabelas-conversao.json           # Banco de agulhas, fios (CYC/TEX) e medidas padrão
     ├── styles/
-    │   ├── base/                            # global.css, mobile.css (front celular), temas.css (8 temas)
+    │   ├── base/                            # global.css (tabular-nums/content-visibility), mobile.css, temas.css
     │   ├── layout/                          # barra-lateral.css, busca-global.css, identidade-artesanal.css, aranhas-atelie.css
-    │   └── modules/                         # CSS modularizado das 12 ferramentas
+    │   └── modules/                         # CSS modularizado das 12 ferramentas + ferramentas-atelie-pro.css
     └── src/
         ├── main.js                          # Bootstrap com lazy init por ferramenta + registro SW
-        ├── core/                            # database.js, projeto-contexto.js, sidebar.js, busca-global.js, aranhas-atelie.js, animations.js
-        └── modules/                         # JS modularizado das 12 ferramentas + tradutor-receitas.js
+        ├── core/                            # database.js, projeto-contexto.js, historico-acoes.js, sidebar.js, busca-global.js, aranhas-cinematica-ik.js, aranhas-atelie.js, animations.js
+        └── modules/                         # JS modularizado das 12 ferramentas + gerador-esfera-circulo.js, planejador-manta.js, editor-simbolos-croche.js, tradutor-receitas.js
 ```
 
 ---
 
-## Como Recompilar os Instaladores após Alterações
+## Como Verificar e Recompilar os Instaladores após Alterações
 
 ```bash
-# Regerar o instalador Ubuntu (.deb) e lançadores em dist/
+# 1. Executar auditoria automatizada de integridade
+python3 scripts/verificar-integridade.py
+
+# 2. Regerar o instalador Ubuntu (.deb) e lançadores em dist/
 ./desktop/build-deb.sh
 
-# Regerar o APK Android em mobile/ponto-e-trama.apk
+# 3. Regerar o APK Android em mobile/ponto-e-trama.apk
 ./mobile/build-apk.sh
 ```
