@@ -304,6 +304,24 @@ const BuscaGlobal = (() => {
         }, 60);
         break;
 
+      case "snapshots-backup":
+        if (typeof HistoricoAcoes !== "undefined" && typeof HistoricoAcoes.abrirModalSnapshots === "function") {
+          HistoricoAcoes.abrirModalSnapshots();
+        }
+        break;
+
+      case "mini-janela-topo":
+        if (typeof HistoricoAcoes !== "undefined" && typeof HistoricoAcoes.alternarMiniJanelaTopo === "function") {
+          HistoricoAcoes.alternarMiniJanelaTopo();
+        }
+        break;
+
+      case "desfazer-acao":
+        if (typeof HistoricoAcoes !== "undefined" && typeof HistoricoAcoes.desfazer === "function") {
+          HistoricoAcoes.desfazer();
+        }
+        break;
+
       case "alternar-tema":
         if (typeof Configuracoes !== "undefined" && typeof Configuracoes.obter === "function" && typeof Configuracoes.atualizar === "function") {
           const temas = ["classico", "noite", "claro", "linho", "salvia", "ameixa", "mel", "floresta"];
@@ -337,6 +355,7 @@ const BuscaGlobal = (() => {
       case "caca-tecela-teia":
       case "caca-papa-mosca":
       case "encontro-aranhas":
+      case "disputa-presa":
       case "beber-orvalho":
       case "nuvem-urticante":
       case "danca-cortejo":
@@ -378,12 +397,42 @@ const BuscaGlobal = (() => {
       {
         chaveRecente: "cmd:tela-toda",
         grupo: "acoes",
-        titulo: "Abrir Contador em Tela Toda",
-        subtitulo: "Modo foco para contar carreiras com 1 toque",
+        titulo: "Abrir Contador em Tela Toda (Mãos-Livres)",
+        subtitulo: "Toque em qualquer área da tela ou pressione Espaço para somar +1 carreira",
         icone: "⛶",
         badge: "Ação",
-        palavras: "tela toda contador fullscreen carreiras modo foco",
+        palavras: "tela toda contador fullscreen carreiras modo foco maos livres espaco",
         acaoMeta: { tipo: "comando", comando: "tela-toda" }
+      },
+      {
+        chaveRecente: "cmd:mini-janela-topo",
+        grupo: "acoes",
+        titulo: "Mini-Janela Sempre no Topo (F10)",
+        subtitulo: "Modo compacto flutuante para tecer assistindo aulas no computador",
+        icone: "📌",
+        badge: "Atalho",
+        palavras: "mini janela sempre no topo flutuante f10 contador compacto ubuntu",
+        acaoMeta: { tipo: "comando", comando: "mini-janela-topo" }
+      },
+      {
+        chaveRecente: "cmd:snapshots-backup",
+        grupo: "acoes",
+        titulo: "Snapshots Automáticos (Pontos de Restauração)",
+        subtitulo: "Ver ou restaurar os últimos 5 backups locais automáticos do ateliê",
+        icone: "📸",
+        badge: "Backup",
+        palavras: "snapshots pontos restauracao backup automatico recuperar historico",
+        acaoMeta: { tipo: "comando", comando: "snapshots-backup" }
+      },
+      {
+        chaveRecente: "cmd:desfazer-acao",
+        grupo: "acoes",
+        titulo: "Desfazer Última Ação (Ctrl+Z)",
+        subtitulo: "Reverter último contador zerado ou item removido",
+        icone: "↩",
+        badge: "Atalho",
+        palavras: "desfazer ctrl z reverter voltar acao",
+        acaoMeta: { tipo: "comando", comando: "desfazer-acao" }
       },
       {
         chaveRecente: "cmd:simulador-cores",
@@ -544,6 +593,16 @@ const BuscaGlobal = (() => {
         badge: "Ateliê",
         palavras: "encontro interacao duas aranhas cumprimento territorio",
         acaoMeta: { tipo: "comando", comando: "encontro-aranhas" }
+      },
+      {
+        chaveRecente: "cmd:disputa-presa",
+        grupo: "acoes",
+        titulo: "Disputa: 2 Aranhas Brigando por Presa",
+        subtitulo: "Duas aranhas disputam o mesmo inseto — a vencedora leva a presa e a perdedora foge",
+        icone: "⚔️",
+        badge: "Caça",
+        palavras: "disputa briga luta combate presa inseto mosca duas aranhas vencedora foge",
+        acaoMeta: { tipo: "comando", comando: "disputa-presa" }
       },
       {
         chaveRecente: "cmd:beber-orvalho",

@@ -326,12 +326,36 @@ const Home = (() => {
       : `<div class="home-hero-capa-placeholder" aria-hidden="true"><span>${catIco}</span></div>`;
 
     const seloTopo = estaNaBancada
-      ? `<span class="home-eyebrow bancada">📂 NA BANCADA AGORA</span>`
-      : `<span class="home-eyebrow">CONTINUE DE ONDE PAROU</span>`;
+      ? `<span class="home-eyebrow bancada etiqueta-tecido-atelie">📂 NA BANCADA AGORA</span>`
+      : `<span class="home-eyebrow etiqueta-tecido-atelie">CONTINUE DE ONDE PAROU</span>`;
 
     const badgePrazo = prazoInfo
       ? `<span class="home-chip-prazo ${prazoInfo.classe}">${escapeHtml(prazoInfo.texto)}</span>`
       : "";
+
+    // Previsão inteligente de término baseada no ritmo real do projeto
+    let etaProjetoHtml = "";
+    if (projeto.tempo_gasto_seg > 60 && carreirasAtual > 0 && metaCarreiras > carreirasAtual) {
+      const segPorCarr = projeto.tempo_gasto_seg / carreirasAtual;
+      const faltaSeg = Math.round((metaCarreiras - carreirasAtual) * segPorCarr);
+      etaProjetoHtml = `<span class="home-stat-pill">⏳ Faltam ~${escapeHtml(formatarTempo(faltaSeg))}</span>`;
+    }
+
+    // Última linha da Receita onde parou na Bancada Aberta
+    let resumoReceitaHtml = "";
+    if (projeto.receita && typeof projeto.receita.texto === "string" && projeto.receita.texto.trim()) {
+      const linhasRec = projeto.receita.texto.split("\n").map((l) => l.trim()).filter(Boolean);
+      if (linhasRec.length > 0) {
+        const idxRec = Math.max(0, Math.min(Number(projeto.receita.linha_atual) || 0, linhasRec.length - 1));
+        const trecho = linhasRec[idxRec].slice(0, 72) + (linhasRec[idxRec].length > 72 ? "…" : "");
+        resumoReceitaHtml = `
+          <div class="home-bancada-receita-preview" id="btn-home-ir-receita-direto" title="Clique para abrir direto no Leitor Interativo de Receitas">
+            <span class="home-rec-tag">📜 Onde parei (${idxRec + 1}/${linhasRec.length}):</span>
+            <span class="home-rec-trecho">${escapeHtml(trecho)}</span>
+          </div>
+        `;
+      }
+    }
 
     slot.innerHTML = `
       <article class="home-hero-card">
@@ -374,8 +398,11 @@ const Home = (() => {
               <strong>Carreira ${carreirasAtual}</strong>${metaCarreiras ? ` / ${metaCarreiras}` : ""}
             </span>
             <span class="home-stat-pill">⏱️ ${escapeHtml(tempoFmt)}</span>
+            ${etaProjetoHtml}
             ${projeto.cliente ? `<span class="home-stat-pill">👤 ${escapeHtml(projeto.cliente)}</span>` : ""}
           </div>
+
+          ${resumoReceitaHtml}
 
           <div class="home-hero-acoes">
             <button type="button" class="btn-home-hero-primario" id="btn-home-retomar-ws">
@@ -386,6 +413,9 @@ const Home = (() => {
             </button>
             <button type="button" class="btn-home-hero-sec" id="btn-home-hero-tela-toda" title="Abrir contador em Tela Toda para este projeto">
               <span>⛶ Tela Toda</span>
+            </button>
+            <button type="button" class="btn-home-hero-sec" id="btn-home-hero-ficha-pdf" title="Gerar Ficha Técnica e Orçamento em PDF para este projeto">
+              <span>📄 Ficha PDF</span>
             </button>
           </div>
         </div>
@@ -398,6 +428,33 @@ const Home = (() => {
     document.getElementById("btn-home-mais-carreira")?.addEventListener("click", incrementarCarreiraDestaque);
     document.getElementById("btn-home-hero-tela-toda")?.addEventListener("click", () => {
       abrirContadorTelaToda(projeto);
+    });
+    document.getElementById("btn-home-ir-receita-direto")?.addEventListener("click", () => {
+      if (typeof ProjetoContexto !== "undefined" && ProjetoContexto.retirarProjeto) {
+        ProjetoContexto.retirarProjeto(projeto, { origem: "home" });
+      }
+      irParaFerramenta("receitas");
+    });
+    document.getElementById("btn-home-hero-ficha-pdf")?.addEventListener("click", () => {
+      if (typeof HistoricoAcoes !== "undefined" && HistoricoAcoes.gerarFichaOrcamentoPDF) {
+        const fiosNomes = (projeto.materiais?.fios || []).map((f) => `${f.nome || "Fio"} (${f.quantidade || 1} un)`);
+        const valorHora = (typeof Configuracoes !== "undefined" && Number(Configuracoes.obter("valorHora"))) || 25;
+        const horas = (Number(projeto.tempo_gasto_seg) || 0) / 3600;
+        const maoObra = Math.max(25, horas * valorHora);
+        HistoricoAcoes.gerarFichaOrcamentoPDF({
+          nomePeca: projeto.nome,
+          cliente: projeto.cliente || "Sob encomenda",
+          categoria: `${tecnicaTxt} • ${catTxt}`,
+          prazo: prazoInfo ? prazoInfo.texto : projeto.prazo_estimado || "A combinar",
+          tempoFmt,
+          fios: fiosNomes,
+          agulha: projeto.materiais?.agulha_mm || projeto.materiais?.agulha_nome || "—",
+          custoMaoObra: maoObra,
+          precoFinal: Number(projeto.precificacao?.preco_final) || maoObra * 1.35,
+          observacoes: projeto.observacoes || "Peça artesanal exclusiva tecida no ateliê.",
+          fotoCapa: projeto.foto_capa || ""
+        });
+      }
     });
   }
 

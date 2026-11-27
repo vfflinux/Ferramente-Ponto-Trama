@@ -740,6 +740,41 @@ const GerenciadorProjetos = (() => {
     document.getElementById("ws-datas-resumo").textContent = datas.join(" • ");
 
     atualizarBotaoRetirarWorkspace(projeto);
+
+    // Injeta botão "📄 Ficha / Orçamento PDF" no cabeçalho do Workspace
+    const btnRet = document.getElementById("btn-ws-retirar");
+    if (btnRet && !document.getElementById("btn-ws-ficha-pdf")) {
+      const btnPdf = document.createElement("button");
+      btnPdf.type = "button";
+      btnPdf.id = "btn-ws-ficha-pdf";
+      btnPdf.className = "btn-ws-acao-sec";
+      btnPdf.title = "Gerar Ficha Técnica e Orçamento em PDF pronto para imprimir ou enviar no WhatsApp";
+      btnPdf.innerHTML = "📄 Ficha PDF";
+      btnPdf.addEventListener("click", () => {
+        const p = obterProjetoPorId(projetoWorkspaceId);
+        if (!p || typeof HistoricoAcoes === "undefined") return;
+        const metaC = ctx()?.METADADOS_CATEGORIA[p.categoria] || { rotulo: "Artesanato" };
+        const fiosLista = (p.materiais?.fios || []).map((f) => `${f.nome || "Fio"} ${f.cor_nome ? `— ${f.cor_nome}` : ""} (${f.quantidade || 1} un)`);
+        const valorHora = (typeof Configuracoes !== "undefined" && Number(Configuracoes.obter("valorHora"))) || 25;
+        const horas = (Number(p.tempo_gasto_seg) || 0) / 3600;
+        const maoObra = Math.max(25, horas * valorHora);
+        HistoricoAcoes.gerarFichaOrcamentoPDF({
+          nomePeca: p.nome,
+          cliente: p.cliente || "Sob encomenda",
+          categoria: `${p.tecnica === "trico" ? "Tricô" : "Crochê"} • ${metaC.rotulo}`,
+          prazo: p.prazo_estimado ? formatarDataBr(p.prazo_estimado) : "A combinar",
+          tempoFmt: formatarTempo(p.tempo_gasto_seg || 0),
+          fios: fiosLista,
+          agulha: p.materiais?.agulha_mm || p.materiais?.agulha_nome || "—",
+          custoMaoObra: maoObra,
+          precoFinal: Number(p.precificacao?.preco_final) || maoObra * 1.35,
+          observacoes: p.observacoes || "Peça 100% artesanal produzida sob medida.",
+          fotoCapa: p.foto_capa || ""
+        });
+      });
+      btnRet.parentNode.insertBefore(btnPdf, btnRet);
+    }
+
     atualizarProgressoWorkspace(projeto, false);
     renderizarContadoresWorkspace(projeto);
     atualizarVisorCronometro(projeto);
@@ -1642,6 +1677,10 @@ const GerenciadorProjetos = (() => {
   async function confirmarExclusao() {
     if (projetoParaExcluirId === null) return;
     const id = projetoParaExcluirId;
+    const copiaRemovida = obterProjetoPorId(id) ? JSON.parse(JSON.stringify(obterProjetoPorId(id))) : null;
+    if (typeof HistoricoAcoes !== "undefined") {
+      await HistoricoAcoes.salvarSnapshotAutomatico(`Antes de remover projeto "${copiaRemovida?.nome || id}"`, false);
+    }
     if (typeof BancoDadosPT !== "undefined") {
       await BancoDadosPT.excluir(STORE_PROJETOS, id);
     }
@@ -1655,7 +1694,20 @@ const GerenciadorProjetos = (() => {
     atualizarFiltroFiosDisponiveis();
     atualizarContadoresChips();
     aplicarFiltros(false);
-    mostrarToast("Pasta removida.");
+    if (copiaRemovida && typeof HistoricoAcoes !== "undefined") {
+      HistoricoAcoes.registrar({
+        titulo: `Projeto "${copiaRemovida.nome}" removido`,
+        desfazer: async () => {
+          const restaurado = await BancoDadosPT.salvar(STORE_PROJETOS, copiaRemovida);
+          projetosCache.unshift(normalizar(restaurado || copiaRemovida));
+          atualizarFiltroFiosDisponiveis();
+          atualizarContadoresChips();
+          aplicarFiltros(false);
+        }
+      });
+    } else {
+      mostrarToast("Pasta removida.");
+    }
   }
 
   // ==========================================================================
@@ -1823,6 +1875,10 @@ const GerenciadorProjetos = (() => {
     if (!marcados.length) {
       fecharModalBaixaEstoque();
       return;
+    }
+
+    if (typeof HistoricoAcoes !== "undefined") {
+      await HistoricoAcoes.salvarSnapshotAutomatico(`Antes da baixa de estoque (${projetoPendenteBaixa?.nome || "Projeto"})`, true);
     }
 
     let totalFios = 0;

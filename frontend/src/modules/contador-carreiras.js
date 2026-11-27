@@ -6,6 +6,47 @@
 
 const ContadorCarreiras = (() => {
   let contadorIdCounter = 1;
+  // Histórico de timestamps por card para cálculo de ritmo médio e previsão de término (ETA)
+  const historicoRitmoPorCard = new Map();
+
+  function registrarToqueRitmo(cardId) {
+    const id = String(cardId || "1");
+    const agora = Date.now();
+    const lista = historicoRitmoPorCard.get(id) || [];
+    if (lista.length > 0 && agora - lista[lista.length - 1] > 15 * 60 * 1000) {
+      lista.length = 0; // Reinicia janela se ficou mais de 15 min parado
+    }
+    lista.push(agora);
+    while (lista.length > 12) lista.shift();
+    historicoRitmoPorCard.set(id, lista);
+  }
+
+  function calcularTextoRitmoETA(cardId, carreiras, meta) {
+    const lista = historicoRitmoPorCard.get(String(cardId || "1")) || [];
+    if (lista.length < 2) return "";
+    const intervalos = [];
+    for (let i = 1; i < lista.length; i++) {
+      const dtSeg = (lista[i] - lista[i - 1]) / 1000;
+      if (dtSeg >= 1.5 && dtSeg <= 600) intervalos.push(dtSeg);
+    }
+    if (intervalos.length === 0) return "";
+    const mediaSeg = intervalos.reduce((a, b) => a + b, 0) / intervalos.length;
+    const ritmoFmt = mediaSeg < 60
+      ? `${Math.round(mediaSeg)}s/carr`
+      : `${Math.floor(mediaSeg / 60)}m${String(Math.round(mediaSeg % 60)).padStart(2, "0")}s/carr`;
+    const m = parseInt(meta, 10) || 0;
+    const c = parseInt(carreiras, 10) || 0;
+    if (m > c) {
+      const restSeg = Math.round((m - c) * mediaSeg);
+      const etaFmt = restSeg < 60
+        ? `~${restSeg}s`
+        : restSeg < 3600
+          ? `~${Math.ceil(restSeg / 60)} min`
+          : `~${Math.floor(restSeg / 3600)}h ${Math.round((restSeg % 3600) / 60)}m`;
+      return `⏱️ Ritmo: ${ritmoFmt} • Previsão: ${etaFmt}`;
+    }
+    return `⏱️ Ritmo: ${ritmoFmt}`;
+  }
 
   // ==========================================================================
   // PARTE 1: OPERAÇÕES E LÓGICA (Cálculos, Estado e Dados)
@@ -147,6 +188,23 @@ const ContadorCarreiras = (() => {
     }
 
     salvarEstadoContadores();
+
+    // 6# Previsão Inteligente de Tempo (Ritmo & ETA)
+    let badgeEta = card.querySelector(".badge-ritmo-eta");
+    const txtEta = calcularTextoRitmoETA(card.dataset.id || "1", carreiras, inputMeta?.value);
+    if (txtEta) {
+      if (!badgeEta) {
+        badgeEta = document.createElement("div");
+        badgeEta.className = "badge-ritmo-eta";
+        const secCarr = card.querySelector(".secao-carreiras");
+        if (secCarr) secCarr.appendChild(badgeEta);
+      }
+      badgeEta.textContent = txtEta;
+      badgeEta.style.display = "block";
+    } else if (badgeEta) {
+      badgeEta.style.display = "none";
+    }
+
     if (cardTelaToda === card) {
       atualizarTelaToda();
     }
@@ -156,6 +214,7 @@ const ContadorCarreiras = (() => {
     const inputCarreiras = card.querySelector(".input-carreiras");
     let val = parseInt(inputCarreiras.value, 10) || 0;
     inputCarreiras.value = val + 1;
+    registrarToqueRitmo(card.dataset.id || "1");
     if (typeof Configuracoes !== "undefined") Configuracoes.vibrar(18);
     atualizarContador(card);
   }
@@ -172,8 +231,23 @@ const ContadorCarreiras = (() => {
 
   function zerarContador(card) {
     const inputCarreiras = card.querySelector(".input-carreiras");
+    const valorAnterior = parseInt(inputCarreiras.value, 10) || 0;
+    const nome = (card.querySelector(".nome-contador")?.value || "Contador").trim();
     inputCarreiras.value = 0;
     atualizarContador(card);
+    if (valorAnterior > 0 && typeof HistoricoAcoes !== "undefined") {
+      HistoricoAcoes.registrar({
+        titulo: `${nome} zerado (estava em ${valorAnterior})`,
+        desfazer: () => {
+          inputCarreiras.value = valorAnterior;
+          atualizarContador(card);
+        },
+        refazer: () => {
+          inputCarreiras.value = 0;
+          atualizarContador(card);
+        }
+      });
+    }
   }
 
   // ==========================================================================
@@ -811,8 +885,54 @@ const ContadorCarreiras = (() => {
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape" && cardTelaToda) {
         fecharTelaToda();
+        return;
+      }
+      // Modo Mãos-Livres: Barra de Espaço, Enter ou Pedal USB/Bluetooth soma +1 carreira!
+      const tag = (e.target?.tagName || "").toUpperCase();
+      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || tag === "BUTTON" || e.target?.isContentEditable) return;
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+
+      const secCont = document.getElementById("secao-contador-carreiras");
+      const contVisivel = Boolean(cardTelaToda || (secCont && secCont.style.display !== "none" && secCont.offsetParent !== null));
+      if (!contVisivel) return;
+
+      if (e.key === " " || e.code === "Space" || e.key === "ArrowUp") {
+        const alvo = cardTelaToda || document.querySelector(".card-contador");
+        if (alvo) {
+          e.preventDefault();
+          incrementarCarreiras(alvo);
+          if (cardTelaToda) {
+            atualizarTelaToda();
+            pulsarNumeroTelaToda();
+          }
+        }
+      } else if (e.key === "ArrowDown") {
+        const alvo = cardTelaToda || document.querySelector(".card-contador");
+        if (alvo) {
+          e.preventDefault();
+          decrementarCarreiras(alvo);
+          if (cardTelaToda) {
+            atualizarTelaToda();
+            pulsarNumeroTelaToda();
+          }
+        }
       }
     });
+
+    // Injeta botão "📌 Mini-Topo (F10)" ao lado do botão Tela Toda no cabeçalho do Contador
+    const btnTelaTodaTopo = document.getElementById("btn-contador-tela-toda-topo");
+    if (btnTelaTodaTopo && !document.getElementById("btn-contador-mini-topo")) {
+      const btnMini = document.createElement("button");
+      btnMini.type = "button";
+      btnMini.id = "btn-contador-mini-topo";
+      btnMini.className = "btn-mini-janela-topo";
+      btnMini.title = "Alternar Mini-Contador Flutuante Sempre no Topo (Atalho: F10)";
+      btnMini.innerHTML = "<span>📌 Mini-Topo (F10)</span>";
+      btnMini.addEventListener("click", () => {
+        if (typeof HistoricoAcoes !== "undefined") HistoricoAcoes.alternarMiniJanelaTopo();
+      });
+      btnTelaTodaTopo.parentNode.insertBefore(btnMini, btnTelaTodaTopo);
+    }
 
     const projAtivo = typeof ProjetoContexto !== "undefined" ? ProjetoContexto.obterProjetoAtivo() : null;
     if (projAtivo) {

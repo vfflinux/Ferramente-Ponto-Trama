@@ -15,6 +15,10 @@
 // ==========================================================================
 
 const AranhasAtelie = (() => {
+  // Cache de dimensões da viewport atualizado apenas no resize (evita leituras repetidas em 60 FPS)
+  let vpW = (typeof window !== "undefined" && window.innerWidth) || 1200;
+  let vpH = (typeof window !== "undefined" && window.innerHeight) || 800;
+
   const MAX_INSTANCIAS = {
     desligado: 0,
     raro: 1,
@@ -979,8 +983,8 @@ const AranhasAtelie = (() => {
   }
 
   function bordaMaisProxima(x, y, margem) {
-    const W = window.innerWidth || 1200;
-    const H = window.innerHeight || 800;
+    const W = vpW;
+    const H = vpH;
     const m = Math.max(60, margem || 80);
     const cx = Math.max(24, Math.min(W - 24, x));
     const cy = Math.max(24, Math.min(H - 24, y));
@@ -993,8 +997,8 @@ const AranhasAtelie = (() => {
   }
 
   function estaForaDaTela(x, y, tamPx) {
-    const W = window.innerWidth || 1200;
-    const H = window.innerHeight || 800;
+    const W = vpW;
+    const H = vpH;
     const margem = Math.max(28, (tamPx || 50) * 0.68);
     return x < -margem || x > W + margem || y < -margem || y > H + margem;
   }
@@ -1013,10 +1017,12 @@ const AranhasAtelie = (() => {
       inst.fioPath = null;
       inst.estabPath = null;
     }
-    const saida = bordaMaisProxima(st.x, st.y, Math.max(72, inst.tamPx * 1.45));
+    const saida = bordaMaisProxima(st.x, st.y, Math.max(92, inst.tamPx * 1.65));
     const dist = Math.max(40, Math.hypot(saida.x - st.x, saida.y - st.y));
     const mult = Math.max(0.7, velMult || 1.0);
 
+    inst.fugindo = false;
+    inst.fugaAlvo = null;
     st.tipo = "travessia_curva";
     st.temFio = false;
     st.temTeiaCanto = false;
@@ -1259,8 +1265,8 @@ const AranhasAtelie = (() => {
       return {
         vx,
         vy,
-        px: Math.max(24, Math.min(W - 24, vx - offsetX)),
-        py: Math.max(24, Math.min(H - 24, vy + offsetY)),
+        px: Math.max(46, Math.min(W - 46, vx - offsetX)),
+        py: Math.max(46, Math.min(H - 46, vy + offsetY)),
         anguloRepouso: 225,
         raioTeia: Math.max(54, Math.min(130, rect.width * 0.72))
       };
@@ -1270,8 +1276,8 @@ const AranhasAtelie = (() => {
     return {
       vx,
       vy,
-      px: Math.max(24, Math.min(W - 24, vx + offsetX)),
-      py: Math.max(24, Math.min(H - 24, vy + offsetY)),
+      px: Math.max(46, Math.min(W - 46, vx + offsetX)),
+      py: Math.max(46, Math.min(H - 46, vy + offsetY)),
       anguloRepouso: 135,
       raioTeia: Math.max(54, Math.min(130, rect.width * 0.72))
     };
@@ -1422,24 +1428,25 @@ const AranhasAtelie = (() => {
     if (tipo === "espiadinha") {
       const lados = ["direita", "esquerda", "topo"];
       const lado = lados[Math.floor(Math.random() * lados.length)];
+      const margemFora = Math.max(82, Math.round(especie.tamanho * 1.45));
       let xFora, yFora, xEspia, yEspia, angulo;
       if (lado === "direita") {
         const y = rand(H * 0.18, H * 0.78);
-        xFora = W + margem * 0.55;
-        xEspia = W - especie.tamanho * 0.24;
+        xFora = W + margemFora;
+        xEspia = W - especie.tamanho * 0.42;
         yFora = yEspia = y;
         angulo = -90;
       } else if (lado === "esquerda") {
         const y = rand(H * 0.18, H * 0.78);
-        xFora = -margem * 0.55;
-        xEspia = especie.tamanho * 0.24;
+        xFora = -margemFora;
+        xEspia = especie.tamanho * 0.42;
         yFora = yEspia = y;
         angulo = 90;
       } else {
         const x = rand(W * 0.2, W * 0.85);
         xFora = xEspia = x;
-        yFora = -margem * 0.55;
-        yEspia = especie.tamanho * 0.26;
+        yFora = -margemFora;
+        yEspia = especie.tamanho * 0.42;
         angulo = 180;
       }
       return {
@@ -1447,11 +1454,13 @@ const AranhasAtelie = (() => {
         fase: "entrando",
         t: 0,
         tempoPausa: 0,
-        duracaoPausa: rand(2.6, 4.2),
+        duracaoPausa: rand(1.6, 2.5),
         xFora,
         yFora,
         xEspia,
         yEspia,
+        origemSaidaX: xEspia,
+        origemSaidaY: yEspia,
         x: xFora,
         y: yFora,
         angulo,
@@ -1625,7 +1634,8 @@ const AranhasAtelie = (() => {
       }
     }
 
-    let mov = movForcado && esp.movimentos.includes(movForcado) ? movForcado : null;
+    // Respeita sempre movForcado quando especificado por cenas (ex.: travessia_curva para encontros/disputas/caças)
+    let mov = movForcado || null;
     if (!mov) {
       if (esp.id === "tecela_canto" && (especieForcada || Math.random() < 0.78)) {
         mov = "repouso_teia_canto";
@@ -1673,6 +1683,9 @@ const AranhasAtelie = (() => {
     wrap.style.width = `${tamPx}px`;
     wrap.style.height = `${tamPx}px`;
     wrap.innerHTML = especie.gerarSvg();
+    // Posiciona fora/na origem imediatamente para nunca piscar em (0, 0) no canto superior esquerdo!
+    const meiaIni = tamPx / 2;
+    wrap.style.transform = `translate3d(${(estado.x - meiaIni).toFixed(2)}px, ${(estado.y - meiaIni).toFixed(2)}px, 0) rotate(${(estado.angulo || 0).toFixed(2)}deg)`;
 
     let fioSvg = null;
     let fioPath = null;
@@ -1746,7 +1759,8 @@ const AranhasAtelie = (() => {
       tempoUltimoRastro: 0,
       caca: null,
       interacao: null,
-      cooldownInteracao: 0
+      cooldownInteracao: 0,
+      tempoImovelBorda: 0
     };
 
     ativas.push(instancia);
@@ -1779,9 +1793,10 @@ const AranhasAtelie = (() => {
     wrap.style.width = `${tamPx}px`;
     wrap.style.height = `${tamPx}px`;
     wrap.innerHTML = def.gerarSvg();
-    camadaEl.appendChild(wrap);
-
     const ang0 = (Math.atan2(alvoY - y0, alvoX - x0) * 180) / Math.PI + 90;
+    const meiaPresaIni = tamPx / 2;
+    wrap.style.transform = `translate3d(${(x0 - meiaPresaIni).toFixed(2)}px, ${(y0 - meiaPresaIni).toFixed(2)}px, 0) rotate(${ang0.toFixed(2)}deg)`;
+    camadaEl.appendChild(wrap);
 
     const presa = {
       uid: ++contadorInstancia,
@@ -1807,6 +1822,7 @@ const AranhasAtelie = (() => {
       segsLagarta: Array.from(wrap.querySelectorAll(".lagarta-seg")),
       cabecaLagarta: wrap.querySelector(".lagarta-cabeca"),
       casuloEl: wrap.querySelector(".presa-casulo-seda"),
+      pedacosEls: Array.from(wrap.querySelectorAll(".pedaco-presa")),
       tempoVida: 0,
       faseMarcha: 0,
       modo: opcoes.modoInicial || "livre", // livre | pousada | alerta | defesa_presa | evadindo | presa_na_teia | capturada | escapando
@@ -1845,11 +1861,20 @@ const AranhasAtelie = (() => {
       origemEvadeY: y0,
       escalaExtraX: 1,
       escalaExtraY: 1,
-      // Comportamento de "barata tonta": mudanças constantes de direção + paradas súbitas!
+      // Comportamento de "barata tonta" + locomoção biológica real para todas as 5 presas
       barataDirAng: Math.atan2(alvoY - y0, alvoX - x0),
+      barataDirAlvo: Math.atan2(alvoY - y0, alvoX - x0),
       barataTrocaDirTimer: rand(0.32, 0.72),
       barataPausaTimer: 0,
-      barataTempoErrando: 0
+      barataTempoErrando: 0,
+      // Estado de locomoção orgânica (mosca, mosquito, lagartinho, lagarta)
+      rumoAng: Math.atan2(alvoY - y0, alvoX - x0),
+      curvaturaAng: rand(-1.1, 1.1),
+      timerManobra: rand(0.38, 0.95),
+      timerHover: 0,
+      pousosRestantes: def.id === "mosca" ? (opcoes.teiaAncora ? 0 : 2) : def.id === "mosquito" ? (opcoes.teiaAncora ? 0 : 1) : 0,
+      tempoLivreTotal: 0,
+      caminhandoPousada: 0
     };
 
     presasAtivas.push(presa);
@@ -1874,6 +1899,10 @@ const AranhasAtelie = (() => {
   function removerPresa(presa) {
     if (!presa) return;
     if (presa.wrap && presa.wrap.parentNode) presa.wrap.parentNode.removeChild(presa.wrap);
+    if (presa.disputaRef) {
+      presa.disputaRef.presaRemovida = true;
+      presa.disputaRef = null;
+    }
     if (presa.cacador && presa.cacador.caca && presa.cacador.caca.presa === presa) {
       const cac = presa.cacador;
       limparFioCaca(cac);
@@ -1889,6 +1918,22 @@ const AranhasAtelie = (() => {
   function limparAcaoEspecial(inst) {
     if (!inst || !inst.acaoEspecial) return;
     const ac = inst.acaoEspecial;
+    if (ac.tipo === "disputa_presa" && ac.disputa) {
+      // Se esta aranha fugiu/saiu antes da resolução, a rival vence automaticamente por W.O.!
+      const d = ac.disputa;
+      if (!d.resolvida && ac.rival && ativas.includes(ac.rival)) {
+        d.vencedora = ac.rival;
+        d.perdedora = inst;
+        d.fase = "resolucao";
+        d.tempoFase = 0;
+        d.resolvida = true;
+        d.desistiu = inst;
+      }
+      if (d.presa && d.presa.disputaRef === d && (!ac.rival || !ativas.includes(ac.rival))) {
+        d.presa.emDisputa = false;
+        d.presa.disputaRef = null;
+      }
+    }
     if (ac.gotaEl && ac.gotaEl.parentNode) ac.gotaEl.parentNode.removeChild(ac.gotaEl);
     if (ac.ootecaEl && ac.ootecaEl.parentNode) ac.ootecaEl.parentNode.removeChild(ac.ootecaEl);
     inst.acaoEspecial = null;
@@ -2087,8 +2132,11 @@ const AranhasAtelie = (() => {
     const yEnc = rand(H * 0.34, H * 0.68);
     const xCentro = rand(W * 0.42, W * 0.58);
 
-    const esp1Id = comGolias ? "tarantula_golias" : ["nandu", "papa_moscas", "caranguejo"][Math.floor(Math.random() * 3)];
-    const esp2Pool = ["nandu", "papa_moscas", "tecela_renda", "caranguejo"].filter((id) => id !== esp1Id);
+    const todasMenosGolias = ["nandu", "papa_moscas", "tecela_renda", "caranguejo", "tecela_canto", "filhote"];
+    const esp1Id = comGolias
+      ? "tarantula_golias"
+      : todasMenosGolias[Math.floor(Math.random() * todasMenosGolias.length)];
+    const esp2Pool = todasMenosGolias.filter((id) => id !== esp1Id);
     const esp2Id = esp2Pool[Math.floor(Math.random() * esp2Pool.length)];
 
     const a1 = gerarAranha(esp1Id, "travessia_curva", true, {
@@ -2215,6 +2263,169 @@ const AranhasAtelie = (() => {
     return ritual;
   }
 
+  // ==========================================================================
+  // EVENTO: DISPUTA POR PRESA (2 Aranhas brigam pelo mesmo inseto — EXCETO Golias!)
+  // ==========================================================================
+  function montarDisputaPresa(aranhaA, aranhaB, presa) {
+    if (!aranhaA || !aranhaB || !presa || aranhaA === aranhaB) return null;
+    // Regra estrita: Tarântula Golias NUNCA participa de brigas por presa com outras aranhas
+    if (aranhaA.especie.id === "tarantula_golias" || aranhaB.especie.id === "tarantula_golias") return null;
+    if (presa.modo === "capturada" || presa.emDisputa) return null;
+
+    // Limpa caça prévia ou fio solto caso uma delas estivesse espreitando este inseto ou em teia
+    [aranhaA, aranhaB].forEach((ar) => {
+      if (ar.caca) {
+        limparFioCaca(ar);
+        ar.caca = null;
+      }
+      if (ar.fioSvg && ar.fioSvg.parentNode) {
+        ar.fioSvg.parentNode.removeChild(ar.fioSvg);
+        ar.fioSvg = null;
+        ar.fioPath = null;
+        ar.estabPath = null;
+      }
+      ar.estado.temFio = false;
+      ar.estado.temTeiaCanto = false;
+      ar.estado.temFioVento = false;
+      ar.interacao = null;
+      ar.cooldownInteracao = 14;
+      ar.estado.pausaRestante = 0;
+    });
+
+    presa.cacador = null;
+    presa.emDisputa = true;
+    presa.modo = "pousada";
+    presa.vibrandoPresa = true;
+    presa.lutaIntensidade = 0.55;
+    presa.tempoPausa = 12;
+
+    // Sorteia vencedora com leve peso biológico de porte (sempre deixando margem real para zebra!)
+    const pesoA = aranhaA.especie.id === "filhote" ? 0.48 : aranhaA.tamPx / 50;
+    const pesoB = aranhaB.especie.id === "filhote" ? 0.48 : aranhaB.tamPx / 50;
+    const probA = Math.max(0.24, Math.min(0.76, pesoA / (pesoA + pesoB)));
+    const vencedora = Math.random() < probA ? aranhaA : aranhaB;
+    const perdedora = vencedora === aranhaA ? aranhaB : aranhaA;
+
+    // Define centro seguro da arena e espaçamentos dinâmicos proporcionais ao tamanho (zero sobreposição!)
+    const W = window.innerWidth || 1200;
+    const H = window.innerHeight || 800;
+    const centroX = Math.max(105, Math.min(W - 105, presa.x));
+    const centroY = Math.max(105, Math.min(H - 105, presa.y));
+    const somaTam = (aranhaA.tamPx || 48) + (aranhaB.tamPx || 48);
+    const raioOrbita = Math.max(48, somaTam * 0.56);
+    const raioEsgrima = Math.max(31, somaTam * 0.41);
+    const raioEngalf = Math.max(22, somaTam * 0.31);
+
+    // Rivais de porte semelhante escalam mais para engalfinhamento; disparidade favorece bote de intimidação
+    const razaoPorte = Math.max(pesoA, pesoB) / Math.max(0.2, Math.min(pesoA, pesoB));
+    const probEngalf = razaoPorte < 1.25 ? 0.55 : 0.32;
+    const tipoClimax = Math.random() < probEngalf ? "engalfinhamento" : "bote_intimidacao";
+
+    // Define eixo espacial entre as duas rivais ao redor da presa
+    let angEixo = Math.atan2(aranhaB.estado.y - aranhaA.estado.y, aranhaB.estado.x - aranhaA.estado.x);
+    if (!isFinite(angEixo)) angEixo = 0;
+
+    const disputa = {
+      presa,
+      a: aranhaA,
+      b: aranhaB,
+      vencedora,
+      perdedora,
+      fase: "convergindo", // convergindo -> avaliacao_ameaca -> esgrima_patas -> climax_embate -> resolucao
+      tempoFase: 0,
+      centroX,
+      centroY,
+      eixoRad: angEixo,
+      sentidoOrbita: Math.random() < 0.5 ? 1 : -1,
+      raioOrbita,
+      raioEsgrima,
+      raioEngalf,
+      tipoClimax,
+      ultimoPulsoAmeaca: -1,
+      ultimoImpacto: -1,
+      climaxOndaEmitida: false,
+      sedaPerdedoraMarcada: false,
+      resolvida: false,
+      presaRemovida: false,
+      capturaIniciada: false,
+      desistiu: null,
+      perdedoraFugiu: false
+    };
+
+    presa.disputaRef = disputa;
+    aranhaA.acaoEspecial = { tipo: "disputa_presa", lado: -1, rival: aranhaB, disputa, tempo: 0 };
+    aranhaB.acaoEspecial = { tipo: "disputa_presa", lado: 1, rival: aranhaA, disputa, tempo: 0 };
+    return disputa;
+  }
+
+  function iniciarCenaDisputaPresa(ignorarFoco = false) {
+    if (!ignorarFoco && (modoAtual === "desligado" || animacoesReduzidasAtivas() || emZonaDeFocoProtegida())) return null;
+    const W = window.innerWidth || 1200;
+    const H = window.innerHeight || 800;
+    const cx = rand(W * 0.34, W * 0.66);
+    const cy = rand(H * 0.34, H * 0.66);
+
+    // Todas as espécies elegíveis (EXCETO Tarântula Golias!)
+    const pool = ["nandu", "papa_moscas", "tecela_renda", "caranguejo", "tecela_canto", "filhote"];
+    const esp1 = pool[Math.floor(Math.random() * pool.length)];
+    const pool2 = pool.filter((id) => id !== esp1);
+    const esp2 = pool2[Math.floor(Math.random() * pool2.length)];
+    const insetoId = Math.random() < 0.6 ? "mosca" : "mosquito";
+
+    const presa = gerarPresa(insetoId, { x: cx, y: cy, alvoX: cx, alvoY: cy, modoInicial: "pousada", esquivasRestantes: 0 });
+    if (!presa) return null;
+
+    // Ângulos orgânicos de entrada (evita que toda cena seja sempre perfeitamente horizontal)
+    const angA = rand(-0.65, 0.65) + (Math.random() < 0.5 ? Math.PI : 0);
+    const angB = angA + Math.PI + rand(-0.42, 0.42);
+    const distA = rand(140, 172);
+    const distB = rand(140, 172);
+    const x1 = Math.max(42, Math.min(W - 42, cx + Math.cos(angA) * distA));
+    const y1 = Math.max(42, Math.min(H - 42, cy + Math.sin(angA) * distA));
+    const x2 = Math.max(42, Math.min(W - 42, cx + Math.cos(angB) * distB));
+    const y2 = Math.max(42, Math.min(H - 42, cy + Math.sin(angB) * distB));
+
+    const a1 = gerarAranha(esp1, "travessia_curva", true, {
+      p0: { x: x1, y: y1 },
+      p1: { x: (x1 + cx) * 0.5, y: (y1 + cy) * 0.5 },
+      p2: { x: cx, y: cy },
+      p3: { x: W + 90, y: cy }
+    });
+    const a2 = gerarAranha(esp2, "travessia_curva", true, {
+      p0: { x: x2, y: y2 },
+      p1: { x: (x2 + cx) * 0.5, y: (y2 + cy) * 0.5 },
+      p2: { x: cx, y: cy },
+      p3: { x: -90, y: cy }
+    });
+    if (!a1 || !a2) {
+      removerPresa(presa);
+      if (a1) removerInstancia(a1);
+      if (a2) removerInstancia(a2);
+      return null;
+    }
+
+    a1.estado.x = x1;
+    a1.estado.y = y1;
+    a1.estado.angulo = (Math.atan2(cy - y1, cx - x1) * 180) / Math.PI + 90;
+    a1.estado.anguloAlvo = a1.estado.angulo;
+    a2.estado.x = x2;
+    a2.estado.y = y2;
+    a2.estado.angulo = (Math.atan2(cy - y2, cx - x2) * 180) / Math.PI + 90;
+    a2.estado.anguloAlvo = a2.estado.angulo;
+
+    const disputa = montarDisputaPresa(a1, a2, presa);
+    if (!disputa) {
+      removerPresa(presa);
+      return null;
+    }
+    return {
+      aranha1: a1,
+      aranha2: a2,
+      presa,
+      titulo: `Disputa por ${presa.def.nome}: ${a1.especie.nome} × ${a2.especie.nome}`
+    };
+  }
+
   // 10. Cena Rara: Ritual Completo de Cortejo da Papa-Moscas (Salticidae — 5 fases + 3 desfechos reais)
   function iniciarCenaDancaCortejo(ignorarFoco = false) {
     if (!ignorarFoco && (modoAtual === "desligado" || animacoesReduzidasAtivas() || emZonaDeFocoProtegida())) return null;
@@ -2326,9 +2537,11 @@ const AranhasAtelie = (() => {
       return;
     }
 
-    // Nível 3 — Raro (2,8% a 7,3%): Barata, Encontro, ou Dança de Cortejo da Papa-Moscas
+    // Nível 3 — Raro (2,8% a 7,3%): Barata, Encontro, Disputa por Presa ou Dança de Cortejo da Papa-Moscas
     if (r >= limRaro && presasAtivas.length === 0) {
-      if (modoAtual === "vivo" && ativas.length === 0 && Math.random() < 0.32) {
+      if (modoAtual === "vivo" && ativas.length === 0 && Math.random() < 0.24) {
+        iniciarCenaDisputaPresa(false);
+      } else if (modoAtual === "vivo" && ativas.length === 0 && Math.random() < 0.36) {
         iniciarCenaDancaCortejo(false);
       } else if (modoAtual === "vivo" && ativas.length === 0 && Math.random() < 0.5) {
         iniciarEncontroAranhas(Math.random() < 0.16, false);
@@ -2570,6 +2783,37 @@ const AranhasAtelie = (() => {
 
     if (presa.modo === "capturada") {
       animarAnatomiaPresa(presa, dt, false);
+    } else if (presa.emDisputa) {
+      // Encurralada no anel da disputa: tenta se esgueirar nervosamente para a lateral sem conseguir escapar do cerco!
+      const disp = presa.disputaRef;
+      let andandoNervosa = false;
+      if (disp && isFinite(disp.centroX) && isFinite(disp.centroY)) {
+        const perpX = -Math.sin(disp.eixoRad);
+        const perpY = Math.cos(disp.eixoRad);
+        // Desloca-se para o lado livre perpendicular ao eixo de confronto (até ~22 px do centro)
+        const ladoFuga = disp.sentidoOrbita * -1;
+        const pulso = 0.55 + Math.sin(presa.tempoVida * 3.4) * 0.45;
+        const offsetLat = disp.fase === "convergindo" ? 5 : 15 + pulso * 9;
+        const microX = Math.cos(presa.tempoVida * 7.2) * 4;
+        const microY = Math.sin(presa.tempoVida * 6.5) * 4;
+        const destX = disp.centroX + perpX * ladoFuga * offsetLat + microX;
+        const destY = disp.centroY + perpY * ladoFuga * offsetLat + microY;
+        const dxN = destX - presa.x;
+        const dyN = destY - presa.y;
+        const distN = Math.hypot(dxN, dyN);
+        if (distN > 1.2) {
+          const passo = Math.min(distN, 42 * dt);
+          presa.x += (dxN / distN) * passo;
+          presa.y += (dyN / distN) * passo;
+          presa.anguloAlvo = (Math.atan2(dyN, dxN) * 180) / Math.PI + 90 + Math.sin(presa.tempoVida * 18) * 14;
+          andandoNervosa = true;
+        } else {
+          presa.anguloAlvo = presa.angulo + Math.sin(presa.tempoVida * 15) * 16;
+        }
+      } else {
+        presa.anguloAlvo = presa.angulo + Math.sin(presa.tempoVida * 16) * 10;
+      }
+      animarAnatomiaPresa(presa, dt, andandoNervosa);
     } else if (presa.modo === "presa_na_teia") {
       // Luta em ciclos alternados na teia de canto + emite ondas de vibração radiais!
       const emRajada = (presa.tempoVida % 0.85) < 0.56;
@@ -2681,91 +2925,153 @@ const AranhasAtelie = (() => {
       presa.tempoPausa += dt;
       // Barata não fica parada por muito tempo: logo volta a errar como "barata tonta"!
       if (presa.def.id === "barata") {
-        if (presa.tempoPausa >= rand(0.45, 0.85)) {
+        if (presa.tempoPausa >= rand(0.42, 0.82)) {
           presa.modo = "livre";
           presa.barataPausaTimer = 0;
-          presa.barataDirAng += (Math.random() < 0.5 ? 1 : -1) * rand(0.7, 1.9);
+          presa.barataDirAlvo = (presa.barataDirAng || 0) + (Math.random() < 0.5 ? 1 : -1) * rand(0.7, 1.9);
         }
       } else if (presa.def.id === "mosca") {
+        // Mosca pousada alterna esfregar patinhas, micro-giros nervosos e passinhos curtos a pé!
         presa.microGiroTimer -= dt;
         if (presa.microGiroTimer <= 0) {
-          presa.microGiroTimer = rand(1.1, 2.3);
-          presa.anguloAlvo += (Math.random() < 0.5 ? 1 : -1) * rand(28, 62);
+          presa.microGiroTimer = rand(0.65, 1.45);
+          presa.anguloAlvo += (Math.random() < 0.5 ? 1 : -1) * rand(26, 74);
+          if (Math.random() < 0.45 && !presa.emDisputa) {
+            presa.caminhandoPousada = rand(0.22, 0.44);
+          }
+        }
+        if (presa.caminhandoPousada > 0) {
+          presa.caminhandoPousada -= dt;
+          const radM = ((presa.angulo - 90) * Math.PI) / 180;
+          presa.x += Math.cos(radM) * 34 * dt;
+          presa.y += Math.sin(radM) * 34 * dt;
+          movendo = true;
+        }
+        // Após pouso curto, decola em voo errático para outro ponto da tela se ainda tiver pousos!
+        if (presa.pousosRestantes > 0 && presa.tempoPausa >= rand(1.9, 3.1) && (!pred || !pred.caca || pred.caca.fase === "detectando")) {
+          const W = window.innerWidth || 1200;
+          const H = window.innerHeight || 800;
+          presa.pousosRestantes -= 1;
+          presa.alvoX = rand(W * 0.22, W * 0.78);
+          presa.alvoY = rand(H * 0.22, H * 0.76);
+          presa.rumoAng = Math.atan2(presa.alvoY - presa.y, presa.alvoX - presa.x) + (Math.random() < 0.5 ? 1 : -1) * rand(0.65, 1.35);
+          presa.timerManobra = rand(0.25, 0.52);
+          presa.modo = "livre";
+          presa.tempoPausa = 0;
+        }
+      } else if (presa.def.id === "mosquito") {
+        presa.microGiroTimer -= dt;
+        if (presa.microGiroTimer <= 0) {
+          presa.microGiroTimer = rand(0.9, 1.8);
+          presa.anguloAlvo += (Math.random() < 0.5 ? 1 : -1) * rand(18, 42);
+        }
+        if (presa.pousosRestantes > 0 && presa.tempoPausa >= rand(2.1, 3.3) && (!pred || !pred.caca || pred.caca.fase === "detectando")) {
+          const W = window.innerWidth || 1200;
+          const H = window.innerHeight || 800;
+          presa.pousosRestantes -= 1;
+          presa.alvoX = rand(W * 0.24, W * 0.76);
+          presa.alvoY = rand(H * 0.22, H * 0.76);
+          presa.rumoAng = Math.atan2(presa.alvoY - presa.y, presa.alvoX - presa.x) + rand(-0.9, 0.9);
+          presa.modo = "livre";
+          presa.tempoPausa = 0;
+        }
+      } else if (presa.def.id === "lagartinho" || presa.def.id === "lagarta") {
+        // Lagartinho e Lagarta nunca ficam congelados eternamente após evadir — logo retomam sua marcha natural!
+        if (presa.tempoPausa >= (presa.def.id === "lagartinho" ? 1.05 : 1.25)) {
+          presa.modo = "livre";
+          presa.tempoPausa = 0;
+          presa.rumoAng += (Math.random() < 0.5 ? 1 : -1) * rand(0.45, 1.15);
         }
       }
       if (presa.tempoPausa >= presa.duracaoPouso && (!pred || pred.fugindo)) {
         presa.modo = "escapando";
       }
-      animarAnatomiaPresa(presa, dt, false);
+      animarAnatomiaPresa(presa, dt, movendo);
     } else if (presa.modo === "escapando") {
       movendo = true;
       const dx = presa.xSaida - presa.x;
       const dy = presa.ySaida - presa.y;
       const dist = Math.hypot(dx, dy);
-      const multEsc = presa.def.voadora ? 1.9 : 1.85;
+      const multEsc = presa.def.id === "lagarta" ? 1.25 : presa.def.voadora ? 1.85 : 1.75;
       const vel = presa.def.velocidadeBase * multEsc;
-      if (dist <= vel * dt + 10) {
+      if (estaForaDaTela(presa.x, presa.y, presa.tamPx)) {
         terminado = true;
+      } else if (dist <= vel * dt + 12) {
+        const novaSaida = bordaMaisProxima(presa.x, presa.y, Math.max(80, presa.tamPx * 1.5));
+        presa.xSaida = novaSaida.x;
+        presa.ySaida = novaSaida.y;
       } else {
-        const zig = presa.def.voadora ? Math.sin(presa.tempoVida * 11) * 45 : Math.sin(presa.tempoVida * 10) * 20;
-        presa.x += ((dx / dist) * vel - (dy / dist) * zig) * dt;
-        presa.y += ((dy / dist) * vel + (dx / dist) * zig) * dt;
-        presa.anguloAlvo = (Math.atan2(presa.y - prevY, presa.x - prevX) * 180) / Math.PI + 90;
+        const angSaida = Math.atan2(dy, dx);
+        const zig =
+          presa.def.id === "mosca"
+            ? Math.sin(presa.tempoVida * 13) * 0.62 + Math.cos(presa.tempoVida * 7.5) * 0.28
+            : presa.def.id === "mosquito"
+              ? Math.sin(presa.tempoVida * 6.5) * 0.55 + Math.sin(presa.tempoVida * 11.2) * 0.22
+              : presa.def.id === "lagartinho"
+                ? Math.sin(presa.tempoVida * 8.5) * 0.34
+                : Math.sin(presa.tempoVida * 4.5) * 0.22;
+        const angMove = angSaida + zig;
+        presa.x += Math.cos(angMove) * vel * dt;
+        presa.y += Math.sin(angMove) * vel * dt;
+        presa.anguloAlvo = (angMove * 180) / Math.PI + 90;
+        if (presa.def.voadora) {
+          presa.escalaExtraX = 1.12;
+          presa.escalaExtraY = 1.12;
+        }
       }
       animarAnatomiaPresa(presa, dt, movendo);
     } else if (presa.def.id === "barata") {
-      // Comportamento autêntico de "barata tonta": muda de direção toda hora + paradas súbitas!
+      // Comportamento autêntico de "barata tonta": rajadas curtas + guinadas orgânicas + paradas súbitas!
       const W = window.innerWidth || 1200;
       const H = window.innerHeight || 800;
       const margem = 68;
       presa.barataTempoErrando += dt;
 
       if (presa.barataPausaTimer > 0) {
-        // Parada súbita com antenas varrendo o ambiente!
         presa.barataPausaTimer -= dt;
         if (presa.barataPausaTimer <= 0) {
-          // Escolhe nova direção brusca ao retomar a corrida
-          presa.barataDirAng += (Math.random() < 0.5 ? 1 : -1) * rand(0.65, 2.05);
-          presa.barataTrocaDirTimer = rand(0.32, 0.78);
+          presa.barataDirAlvo = presa.barataDirAng + (Math.random() < 0.5 ? 1 : -1) * rand(0.68, 2.05);
+          presa.barataTrocaDirTimer = rand(0.32, 0.74);
         }
       } else {
         movendo = true;
         presa.barataTrocaDirTimer -= dt;
         if (presa.barataTrocaDirTimer <= 0) {
           if (Math.random() < 0.38) {
-            // Parada súbita aleatória
-            presa.barataPausaTimer = rand(0.28, 0.72);
+            presa.barataPausaTimer = rand(0.26, 0.68);
           } else {
-            // Guinada repentina de "barata tonta"!
-            presa.barataDirAng += (Math.random() < 0.5 ? 1 : -1) * rand(0.62, 1.95);
-            // Se há uma Tarântula Golias esperando nos fios de alarme, atrai suavemente após alguns segundos
-            if (pred && pred.caca && pred.caca.fase === "esperando_fios" && presa.barataTempoErrando > 2.6) {
+            presa.barataDirAlvo = presa.barataDirAng + (Math.random() < 0.5 ? 1 : -1) * rand(0.65, 1.95);
+            if (pred && pred.caca && pred.caca.fase === "esperando_fios" && presa.barataTempoErrando > 2.4) {
               const angAlvoFios = Math.atan2(pred.estado.y - presa.y, pred.estado.x - presa.x);
               const diff = Math.atan2(Math.sin(angAlvoFios - presa.barataDirAng), Math.cos(angAlvoFios - presa.barataDirAng));
-              presa.barataDirAng += diff * rand(0.45, 0.8);
+              presa.barataDirAlvo = presa.barataDirAng + diff * rand(0.5, 0.82);
             }
           }
-          presa.barataTrocaDirTimer = rand(0.3, 0.75);
+          presa.barataTrocaDirTimer = rand(0.3, 0.72);
         }
 
-        // Mantém a barata tonta dentro da tela rebatendo suavemente nas margens
-        if (presa.x < margem && Math.cos(presa.barataDirAng) < 0) {
-          presa.barataDirAng = rand(-0.9, 0.9);
-        } else if (presa.x > W - margem && Math.cos(presa.barataDirAng) > 0) {
-          presa.barataDirAng = Math.PI + rand(-0.9, 0.9);
+        // Rebote orgânico nas margens mantendo dentro da tela
+        if (presa.x < margem && Math.cos(presa.barataDirAlvo) < 0) {
+          presa.barataDirAlvo = rand(-0.95, 0.95);
+        } else if (presa.x > W - margem && Math.cos(presa.barataDirAlvo) > 0) {
+          presa.barataDirAlvo = Math.PI + rand(-0.95, 0.95);
         }
-        if (presa.y < margem && Math.sin(presa.barataDirAng) < 0) {
-          presa.barataDirAng = Math.PI * 0.5 + rand(-0.9, 0.9);
-        } else if (presa.y > H - margem && Math.sin(presa.barataDirAng) > 0) {
-          presa.barataDirAng = -Math.PI * 0.5 + rand(-0.9, 0.9);
+        if (presa.y < margem && Math.sin(presa.barataDirAlvo) < 0) {
+          presa.barataDirAlvo = Math.PI * 0.5 + rand(-0.95, 0.95);
+        } else if (presa.y > H - margem && Math.sin(presa.barataDirAlvo) > 0) {
+          presa.barataDirAlvo = -Math.PI * 0.5 + rand(-0.95, 0.95);
         }
 
-        const velBarata = presa.def.velocidadeBase * rand(1.05, 1.32);
+        // Giro fluido porém rápido (sem salto brusco artificial de 1 frame)
+        const diffBar = Math.atan2(Math.sin(presa.barataDirAlvo - presa.barataDirAng), Math.cos(presa.barataDirAlvo - presa.barataDirAng));
+        presa.barataDirAng += diffBar * Math.min(1, dt * 13);
+
+        const rajada = 0.92 + Math.abs(Math.sin(presa.tempoVida * 5.2)) * 0.45;
+        const velBarata = presa.def.velocidadeBase * rajada;
         presa.x += Math.cos(presa.barataDirAng) * velBarata * dt;
         presa.y += Math.sin(presa.barataDirAng) * velBarata * dt;
         presa.anguloAlvo = (presa.barataDirAng * 180) / Math.PI + 90;
 
-        // Emite vibrações no chão percebidas pelos tricobótrios da Tarântula Golias
         presa.ultimoPulsoVib += dt;
         if (presa.ultimoPulsoVib >= 0.62) {
           presa.ultimoPulsoVib = 0;
@@ -2777,44 +3083,205 @@ const AranhasAtelie = (() => {
         presa.modo = "escapando";
       }
       animarAnatomiaPresa(presa, dt, movendo);
-    } else {
+    } else if (presa.def.id === "mosca") {
+      // MOSCA DOMÉSTICA: voo em guinadas bruscas ("saccades") + loops rápidos até pousar!
+      presa.tempoLivreTotal += dt;
       const dx = presa.alvoX - presa.x;
       const dy = presa.alvoY - presa.y;
       const dist = Math.hypot(dx, dy);
 
-      if (dist > 14) {
-        movendo = true;
-        let vel = presa.def.velocidadeBase;
-        if (presa.def.id === "lagarta") {
-          vel *= 0.65 + Math.max(0, Math.sin(presa.faseMarcha)) * 0.85;
-        }
-        const ond = presa.def.voadora
-          ? Math.sin(presa.tempoVida * (presa.def.id === "mosquito" ? 6.5 : 9)) * 38
-          : presa.def.id === "lagartinho"
-            ? Math.sin(presa.tempoVida * 4.5) * 14
-            : 0;
-        presa.x += ((dx / dist) * vel - (dy / dist) * ond) * dt;
-        presa.y += ((dy / dist) * vel + (dx / dist) * ond) * dt;
-        presa.anguloAlvo = (Math.atan2(presa.y - prevY, presa.x - prevX) * 180) / Math.PI + 90;
-
-        if (!presa.def.voadora && pred && pred.especie.id === "tarantula_golias") {
-          presa.ultimoPulsoVib += dt;
-          if (presa.ultimoPulsoVib >= 0.78) {
-            presa.ultimoPulsoVib = 0;
-            criarOndaVibracao(presa.x, presa.y, "solo");
-          }
-        }
-      } else {
+      if (dist <= (presa.teiaAncora ? 28 : 22) && (presa.tempoLivreTotal > 1.2 || presa.teiaAncora)) {
         if (presa.teiaAncora) {
           presa.modo = "presa_na_teia";
           criarOndaVibracao(presa.alvoX, presa.alvoY, "teia");
-        } else if (presa.def.voadora || !presa.jaPousou) {
+        } else {
           presa.jaPousou = true;
           presa.modo = "pousada";
           presa.tempoPausa = 0;
-        } else {
-          presa.modo = "escapando";
         }
+      } else {
+        movendo = true;
+        presa.timerManobra -= dt;
+        const angAlvo = Math.atan2(dy, dx);
+        if (presa.timerManobra <= 0) {
+          // Guinada brusca de 45°–110° em zigue-zague/arco ao redor da direção geral!
+          const pesoGuia = presa.teiaAncora ? 0.82 : dist < 110 ? 0.72 : 0.42;
+          const desvioSaccade = (Math.random() < 0.5 ? 1 : -1) * rand(0.65, 1.55) * (1 - pesoGuia * 0.55);
+          const diff = Math.atan2(Math.sin(angAlvo - presa.rumoAng), Math.cos(angAlvo - presa.rumoAng));
+          presa.rumoAng += diff * pesoGuia + desvioSaccade;
+          presa.curvaturaAng = (Math.random() < 0.5 ? 1 : -1) * rand(1.1, 2.8);
+          presa.timerManobra = rand(0.24, 0.56);
+        }
+        // Curva contínua + leve atração suave ao ponto de pouso/teia
+        const diffGuia = Math.atan2(Math.sin(angAlvo - presa.rumoAng), Math.cos(angAlvo - presa.rumoAng));
+        const forcaGuiaM = presa.teiaAncora ? 4.8 : dist < 130 ? 3.8 : 1.7;
+        presa.rumoAng += (presa.curvaturaAng * (presa.teiaAncora ? 0.4 : 1) + diffGuia * forcaGuiaM) * dt;
+
+        const vel = presa.def.velocidadeBase * (0.95 + Math.abs(Math.sin(presa.tempoVida * 6.5)) * 0.35);
+        presa.x += Math.cos(presa.rumoAng) * vel * dt;
+        presa.y += Math.sin(presa.rumoAng) * vel * dt;
+        presa.anguloAlvo = (presa.rumoAng * 180) / Math.PI + 90;
+        // Elevação visual de voo (diminui suavemente ao aproximar do pouso)
+        const fatorAlt = Math.min(1, dist / 90);
+        const escVoo = 1 + fatorAlt * (0.14 + Math.sin(presa.tempoVida * 12) * 0.04);
+        presa.escalaExtraX = escVoo;
+        presa.escalaExtraY = escVoo;
+      }
+      animarAnatomiaPresa(presa, dt, movendo);
+    } else if (presa.def.id === "mosquito") {
+      // MOSQUITO: voo flutuante sinuoso (ondas duplas) + pairadas curtas ("hovering") no ar!
+      presa.tempoLivreTotal += dt;
+      const dx = presa.alvoX - presa.x;
+      const dy = presa.alvoY - presa.y;
+      const dist = Math.hypot(dx, dy);
+
+      if (dist <= (presa.teiaAncora ? 28 : 22) && (presa.tempoLivreTotal > 1.5 || presa.teiaAncora)) {
+        if (presa.teiaAncora) {
+          presa.modo = "presa_na_teia";
+          criarOndaVibracao(presa.alvoX, presa.alvoY, "teia");
+        } else {
+          presa.jaPousou = true;
+          presa.modo = "pousada";
+          presa.tempoPausa = 0;
+        }
+      } else {
+        movendo = true;
+        presa.timerManobra -= dt;
+        if (presa.timerHover > 0 && !presa.teiaAncora) {
+          // Pairando no ar (hovering) subindo e descendo suavemente!
+          presa.timerHover -= dt;
+          presa.x += Math.sin(presa.tempoVida * 5.2) * 16 * dt;
+          presa.y += Math.cos(presa.tempoVida * 6.8) * 18 * dt;
+          presa.anguloAlvo += Math.sin(presa.tempoVida * 4.4) * 35 * dt;
+        } else {
+          if (presa.timerManobra <= 0) {
+            if (!presa.teiaAncora && Math.random() < 0.32 && dist > 65) {
+              presa.timerHover = rand(0.32, 0.62);
+            } else {
+              presa.curvaturaAng = (Math.random() < 0.5 ? 1 : -1) * rand(0.9, 2.1);
+            }
+            presa.timerManobra = rand(0.48, 1.05);
+          }
+          const angAlvo = Math.atan2(dy, dx);
+          const diffGuia = Math.atan2(Math.sin(angAlvo - presa.rumoAng), Math.cos(angAlvo - presa.rumoAng));
+          const bob = Math.sin(presa.tempoVida * 4.3) * 1.45 + Math.sin(presa.tempoVida * 9.1) * 0.65;
+          const forcaGuia = presa.teiaAncora ? 4.6 : dist < 140 ? 3.2 : 1.5;
+          presa.rumoAng += ((presa.curvaturaAng * 0.7 + bob) * (presa.teiaAncora ? 0.45 : 1) + diffGuia * forcaGuia) * dt;
+
+          const vel = presa.def.velocidadeBase * (0.72 + Math.sin(presa.tempoVida * 3.8) * 0.25);
+          presa.x += Math.cos(presa.rumoAng) * vel * dt;
+          presa.y += Math.sin(presa.rumoAng) * vel * dt;
+          presa.anguloAlvo = (presa.rumoAng * 180) / Math.PI + 90;
+        }
+        const escMosq = 1.04 + Math.sin(presa.tempoVida * 6.2) * 0.07;
+        presa.escalaExtraX = escMosq;
+        presa.escalaExtraY = escMosq;
+      }
+      animarAnatomiaPresa(presa, dt, movendo);
+    } else if (presa.def.id === "lagartinho") {
+      // LAGARTINHO: locomoção reptiliana Stop-and-Go (corridinhas curtas em arco + congelamentos com língua bífida!)
+      const W = window.innerWidth || 1200;
+      const H = window.innerHeight || 800;
+      const margem = 92;
+      presa.tempoLivreTotal += dt;
+
+      if (presa.pausaSprint > 0) {
+        // Congelado em vigilância — só a cabeça e a língua bífida se movem!
+        presa.pausaSprint -= dt;
+        if (presa.pausaSprint <= 0) {
+          presa.sprintRestante = rand(0.58, 1.15);
+          presa.curvaturaAng = (Math.random() < 0.5 ? 1 : -1) * rand(0.45, 1.25);
+          // Vira para nova direção natural (ou em direção ao palco/fios da Golias após explorar)
+          if (pred && pred.caca && pred.caca.fase === "esperando_fios" && presa.tempoLivreTotal > 2.2) {
+            const angFios = Math.atan2(pred.estado.y - presa.y, pred.estado.x - presa.x);
+            presa.rumoAng = angFios + rand(-0.45, 0.45);
+          } else {
+            presa.rumoAng += (Math.random() < 0.5 ? 1 : -1) * rand(0.55, 1.38);
+          }
+        }
+      } else {
+        movendo = true;
+        presa.sprintRestante -= dt;
+        if (presa.sprintRestante <= 0) {
+          presa.pausaSprint = rand(0.72, 1.38);
+        } else {
+          // Mantém dentro da tela com desvio suave nas bordas
+          if (presa.x < margem && Math.cos(presa.rumoAng) < 0) presa.rumoAng = rand(-0.75, 0.75);
+          else if (presa.x > W - margem && Math.cos(presa.rumoAng) > 0) presa.rumoAng = Math.PI + rand(-0.75, 0.75);
+          if (presa.y < margem && Math.sin(presa.rumoAng) < 0) presa.rumoAng = Math.PI * 0.5 + rand(-0.75, 0.75);
+          else if (presa.y > H - margem && Math.sin(presa.rumoAng) > 0) presa.rumoAng = -Math.PI * 0.5 + rand(-0.75, 0.75);
+
+          presa.rumoAng += presa.curvaturaAng * dt;
+          const velLag = presa.def.velocidadeBase * 1.48;
+          presa.x += Math.cos(presa.rumoAng) * velLag * dt;
+          presa.y += Math.sin(presa.rumoAng) * velLag * dt;
+          presa.anguloAlvo = (presa.rumoAng * 180) / Math.PI + 90;
+
+          if (pred && pred.especie.id === "tarantula_golias") {
+            presa.ultimoPulsoVib += dt;
+            if (presa.ultimoPulsoVib >= 0.65) {
+              presa.ultimoPulsoVib = 0;
+              criarOndaVibracao(presa.x, presa.y, "solo");
+            }
+          }
+        }
+      }
+
+      if (!pred && presa.tempoLivreTotal > 11.5) {
+        presa.modo = "escapando";
+      }
+      animarAnatomiaPresa(presa, dt, movendo);
+    } else {
+      // LAGARTA GIGANTE: rastejo peristáltico em curvas orgânicas + pausas tateando com a cabeça!
+      const W = window.innerWidth || 1200;
+      const H = window.innerHeight || 800;
+      const margem = 92;
+      presa.tempoLivreTotal += dt;
+
+      if (presa.pausaSprint > 0) {
+        // Pausa de exploração: cabeça balança de um lado para o outro escolhendo nova curva!
+        presa.pausaSprint -= dt;
+        if (presa.pausaSprint <= 0) {
+          presa.sprintRestante = rand(1.6, 2.8);
+          presa.curvaturaAng = (Math.random() < 0.5 ? 1 : -1) * rand(0.28, 0.68);
+          if (pred && pred.caca && pred.caca.fase === "esperando_fios" && presa.tempoLivreTotal > 2.2) {
+            const angFios = Math.atan2(pred.estado.y - presa.y, pred.estado.x - presa.x);
+            presa.rumoAng = angFios + rand(-0.35, 0.35);
+          } else {
+            presa.rumoAng += (Math.random() < 0.5 ? 1 : -1) * rand(0.45, 1.05);
+          }
+        }
+      } else {
+        movendo = true;
+        presa.sprintRestante -= dt;
+        if (presa.sprintRestante <= 0) {
+          presa.pausaSprint = rand(0.68, 1.18);
+        } else {
+          if (presa.x < margem && Math.cos(presa.rumoAng) < 0) presa.rumoAng = rand(-0.65, 0.65);
+          else if (presa.x > W - margem && Math.cos(presa.rumoAng) > 0) presa.rumoAng = Math.PI + rand(-0.65, 0.65);
+          if (presa.y < margem && Math.sin(presa.rumoAng) < 0) presa.rumoAng = Math.PI * 0.5 + rand(-0.65, 0.65);
+          else if (presa.y > H - margem && Math.sin(presa.rumoAng) > 0) presa.rumoAng = -Math.PI * 0.5 + rand(-0.65, 0.65);
+
+          presa.rumoAng += presa.curvaturaAng * dt;
+          // Pulso peristáltico real: avança mais quando a onda muscular empurra o tórax!
+          const pulsoPerist = 0.45 + Math.max(0, Math.sin(presa.faseMarcha)) * 1.15;
+          const velLagarta = presa.def.velocidadeBase * pulsoPerist;
+          presa.x += Math.cos(presa.rumoAng) * velLagarta * dt;
+          presa.y += Math.sin(presa.rumoAng) * velLagarta * dt;
+          presa.anguloAlvo = (presa.rumoAng * 180) / Math.PI + 90;
+
+          if (pred && pred.especie.id === "tarantula_golias") {
+            presa.ultimoPulsoVib += dt;
+            if (presa.ultimoPulsoVib >= 0.85) {
+              presa.ultimoPulsoVib = 0;
+              criarOndaVibracao(presa.x, presa.y, "solo");
+            }
+          }
+        }
+      }
+
+      if (!pred && presa.tempoLivreTotal > 13.5) {
+        presa.modo = "escapando";
       }
       animarAnatomiaPresa(presa, dt, movendo);
     }
@@ -2830,7 +3297,11 @@ const AranhasAtelie = (() => {
 
     presa.angulo = lerpAngulo(presa.angulo, presa.anguloAlvo, dt * 11);
     const meia = presa.tamPx / 2;
-    presa.wrap.style.transform = `translate3d(${(presa.x - meia).toFixed(2)}px, ${(presa.y - meia).toFixed(2)}px, 0) rotate(${presa.angulo.toFixed(2)}deg) scale(${presa.escalaExtraX.toFixed(3)}, ${presa.escalaExtraY.toFixed(3)})`;
+    const txP = `translate3d(${(presa.x - meia).toFixed(1)}px, ${(presa.y - meia).toFixed(1)}px, 0) rotate(${presa.angulo.toFixed(1)}deg) scale(${presa.escalaExtraX.toFixed(3)}, ${presa.escalaExtraY.toFixed(3)})`;
+    if (txP !== presa._lastWrapTx) {
+      presa._lastWrapTx = txP;
+      presa.wrap.style.transform = txP;
+    }
   }
 
   // ==========================================================================
@@ -2875,6 +3346,12 @@ const AranhasAtelie = (() => {
           c.fase = "beliscando_alvo";
           c.tempoFase = 0;
           st.vibracaoRestante = 0.55;
+        } else if (c.tempoFase >= 14) {
+          // Evita ficar congelada no canto caso a presa não alcance a teia
+          p.cacador = null;
+          p.modo = "escapando";
+          inst.caca = null;
+          return false;
         }
       } else if (c.fase === "beliscando_alvo") {
         // Duplo belisco diagnóstico nos fios radiais para medir o tamanho da presa!
@@ -2969,7 +3446,7 @@ const AranhasAtelie = (() => {
         flags.andando = false;
         flags.emboscadaBracos = true;
         st.anguloAlvo = angParaPresa;
-        if (p.modo === "pousada" || dist < 96) {
+        if (p.modo === "pousada" || dist < 96 || c.tempoFase >= 4.2) {
           c.fase = "espreitando";
           c.tempoFase = 0;
         }
@@ -3256,26 +3733,31 @@ const AranhasAtelie = (() => {
           p.escalaExtraY = 1;
           if (p.wrap) p.wrap.style.opacity = "0.96";
 
-          // Consome os pedaços anatômicos (data-pedaco="0..N") um por um!
-          if (p.wrap) {
-            const pedacosEls = p.wrap.querySelectorAll(".pedaco-presa");
-            pedacosEls.forEach((el) => {
+          // Consome os pedaços anatômicos (data-pedaco="0..N") um por um (cacheado no spawn, zero querySelectorAll por frame!)
+          if (p.pedacosEls && p.pedacosEls.length > 0) {
+            for (let pi = 0; pi < p.pedacosEls.length; pi++) {
+              const el = p.pedacosEls[pi];
               const num = parseInt(el.dataset.pedaco, 10);
-              if (isNaN(num)) return;
+              if (isNaN(num)) continue;
               if (num < idxPedaco) {
-                el.style.opacity = "0";
-                el.style.transform = "scale(0.08)";
+                if (el._estadoPedaco !== "comido") {
+                  el._estadoPedaco = "comido";
+                  el.style.opacity = "0";
+                  el.style.transform = "scale(0.08)";
+                }
               } else if (num === idxPedaco) {
                 // Mastigando e dissolvendo o pedaço atual com leve tremor!
+                el._estadoPedaco = "ativo";
                 const esc = Math.max(0.12, 1 - progPedaco * 0.88);
                 const tremor = Math.sin(progPedaco * 32) * 2.4;
                 el.style.opacity = Math.max(0, 1 - progPedaco * 0.95).toFixed(2);
                 el.style.transform = `translate(${tremor.toFixed(1)}px, 0px) scale(${esc.toFixed(2)})`;
-              } else {
+              } else if (el._estadoPedaco !== "inteiro") {
+                el._estadoPedaco = "inteiro";
                 el.style.opacity = "1";
                 el.style.transform = "";
               }
-            });
+            }
           }
 
           // Micro-gotículas enzimáticas / farelos sutis ao arrancar cada pedaço!
@@ -3576,8 +4058,11 @@ const AranhasAtelie = (() => {
       // Peso real: carregar Lagartinho ou Lagarta Gigante deixa a Tarântula Golias mais lenta e cadenciada!
       const pesoPresa = p.def.porte === "gigante" ? 0.68 : p.def.porte === "medio" ? 0.86 : 0.96;
       const vel = inst.especie.velocidadeBase * pesoPresa;
-      if (dF <= vel * dt + 10) {
+      if (estaForaDaTela(st.x, st.y, inst.tamPx)) {
         flags.terminado = true;
+      } else if (dF <= vel * dt + 10) {
+        // Caso o alvo antigo tenha ficado dentro da tela (ex.: resize), empurra a saída para bem fora da borda!
+        c.alvoFuga = bordaMaisProxima(st.x, st.y, Math.max(100, inst.tamPx * 1.75));
       } else {
         st.x += (fx / dF) * vel * dt;
         st.y += (fy / dF) * vel * dt;
@@ -3593,66 +4078,310 @@ const AranhasAtelie = (() => {
     return true;
   }
 
+  // Helper: desvia a rota suavemente em arco para longe de outra aranha (sempre até fora da borda!)
+  function desviarRotaAposEncontro(inst, outro, sinalPerp = 1, velMult = 1.15) {
+    if (!inst || !inst.estado) return;
+    const st = inst.estado;
+    let dx = outro && outro.estado ? st.x - outro.estado.x : Math.cos(((st.angulo - 90) * Math.PI) / 180);
+    let dy = outro && outro.estado ? st.y - outro.estado.y : Math.sin(((st.angulo - 90) * Math.PI) / 180);
+    const d = Math.max(1, Math.hypot(dx, dy));
+    dx /= d;
+    dy /= d;
+    // Combina afastamento + componente lateral para formar desvio em "V" ou arco largo
+    const perpX = -dy * sinalPerp;
+    const perpY = dx * sinalPerp;
+    const dirX = dx * 0.72 + perpX * 0.68;
+    const dirY = dy * 0.72 + perpY * 0.68;
+    const alvoRefX = st.x + dirX * 260;
+    const alvoRefY = st.y + dirY * 260;
+
+    if (inst.fioSvg && inst.fioSvg.parentNode) {
+      inst.fioSvg.parentNode.removeChild(inst.fioSvg);
+      inst.fioSvg = null;
+      inst.fioPath = null;
+      inst.estabPath = null;
+    }
+    const saida = bordaMaisProxima(alvoRefX, alvoRefY, Math.max(72, inst.tamPx * 1.45));
+    const midX = lerp(st.x, saida.x, 0.4) + perpX * 54;
+    const midY = lerp(st.y, saida.y, 0.4) + perpY * 54;
+    const dist = Math.max(50, Math.hypot(saida.x - st.x, saida.y - st.y));
+
+    st.tipo = "travessia_curva";
+    st.temFio = false;
+    st.temTeiaCanto = false;
+    st.temFioVento = false;
+    st.elAlvo = null;
+    st.p0 = { x: st.x, y: st.y };
+    st.p1 = { x: midX, y: midY };
+    st.p2 = { x: lerp(midX, saida.x, 0.6), y: lerp(midY, saida.y, 0.6) };
+    st.p3 = { x: saida.x, y: saida.y };
+    st.t = 0;
+    st.velEscalar = Math.max(0.7, velMult);
+    st.pausaFeita = true;
+    st.pausaRestante = 0;
+    st.faseSalto = "andando";
+    st.duracao = Math.max(1.8, dist / (inst.especie.velocidadeBase * Math.max(0.8, velMult)));
+  }
+
+  // Helper: converte um filhote em fuga aérea por ballooning (dispersão real pelo vento!)
+  function acionarFugaBallooning(inst, outro) {
+    if (!inst || !inst.estado) return;
+    const st = inst.estado;
+    const W = window.innerWidth || 1200;
+    if (inst.fioSvg && inst.fioSvg.parentNode) {
+      inst.fioSvg.parentNode.removeChild(inst.fioSvg);
+      inst.fioSvg = null;
+      inst.fioPath = null;
+      inst.estabPath = null;
+    }
+    const fio = criarSvgFio();
+    inst.fioSvg = fio.svg;
+    inst.fioPath = fio.path;
+    const dirX = outro && outro.estado && st.x < outro.estado.x ? -1 : 1;
+    st.tipo = "ballooning";
+    st.temFioVento = true;
+    st.temFio = false;
+    st.temTeiaCanto = false;
+    st.elAlvo = null;
+    st.x0 = st.x;
+    st.y0 = st.y;
+    st.x1 = st.x + dirX * rand(220, Math.max(320, W * 0.42));
+    st.y1 = -Math.max(70, inst.tamPx * 1.8);
+    st.t = 0;
+    st.duracao = rand(4.2, 6.0);
+    st.ampOnda = rand(18, 32);
+    st.freqOnda = rand(2.2, 3.2);
+    inst.fugindo = false;
+    inst.fugaAlvo = null;
+    criarRastroPonto(st.x, st.y, true);
+  }
+
+  function obterRaioDeteccaoGolias(especieId) {
+    switch (especieId) {
+      case "papa_moscas": return 340; // Visão telescópica Salticidae: avista de muito longe!
+      case "filhote": return 275;     // Ultra-sensível às vibrações pesadas da Golias
+      case "nandu": return 235;
+      case "tecela_canto": return 225;
+      case "caranguejo": return 215;
+      case "tecela_renda": return 210;
+      default: return 230;
+    }
+  }
+
   let ultimoCheckEncontrosTs = 0;
   function verificarEncontrosEntreAranhas() {
     if (ativas.length < 2) return;
     const agora = performance.now();
-    if (agora - ultimoCheckEncontrosTs < 140) return;
+    if (agora - ultimoCheckEncontrosTs < 120) return;
     ultimoCheckEncontrosTs = agora;
 
     for (let i = 0; i < ativas.length; i++) {
       const a = ativas[i];
-      if (a.fugindo || a.caca || a.interacao || a.cooldownInteracao > 0 || a.defesaRestante > 0) continue;
+      if (a.fugindo || a.caca || a.interacao || a.acaoEspecial || a.cooldownInteracao > 0 || a.defesaRestante > 0) continue;
       if (a.estado.tipo === "ballooning" || a.estado.tipo === "rapel_fio") continue;
 
       for (let j = i + 1; j < ativas.length; j++) {
         const b = ativas[j];
-        if (b.fugindo || b.caca || b.interacao || b.cooldownInteracao > 0 || b.defesaRestante > 0) continue;
+        if (b.fugindo || b.caca || b.interacao || b.acaoEspecial || b.cooldownInteracao > 0 || b.defesaRestante > 0) continue;
         if (b.estado.tipo === "ballooning" || b.estado.tipo === "rapel_fio") continue;
 
         const dist = Math.hypot(a.estado.x - b.estado.x, a.estado.y - b.estado.y);
-        const raioEncontro = (a.tamPx + b.tamPx) * 0.78 + 45;
-        if (dist < raioEncontro) {
-          const aGolias = a.especie.id === "tarantula_golias";
-          const bGolias = b.especie.id === "tarantula_golias";
+        const aGolias = a.especie.id === "tarantula_golias";
+        const bGolias = b.especie.id === "tarantula_golias";
 
-          if (a.especie.id === "papa_moscas" && b.especie.id === "papa_moscas" && !a.acaoEspecial && !b.acaoEspecial) {
-            // 10. Encontro entre duas Papa-Moscas dispara automaticamente o Ritual Completo de Cortejo Salticidae!
-            const cx = (a.estado.x + b.estado.x) * 0.5;
-            const cy = (a.estado.y + b.estado.y) * 0.5;
-            montarRitualCortejoSalticidae(a, b, cx, cy, false);
-          } else if (aGolias !== bGolias) {
-            const gigante = aGolias ? a : b;
-            const menor = aGolias ? b : a;
-            gigante.interacao = { tipo: "aviso_territorial", tempo: 0, duracao: 0.95, outro: menor };
-            menor.interacao = { tipo: "recuo_hierarquia", tempo: 0, duracao: 0.65, outro: gigante };
-          } else {
-            a.interacao = { tipo: "cumprimento", tempo: 0, duracao: 1.35, outro: b };
-            b.interacao = { tipo: "cumprimento", tempo: 0, duracao: 1.35, outro: a };
+        // 1. ENCONTRO COM A TARÂNTULA GOLIAS — Cada espécie reage conforme seus sentidos e biologia real!
+        if (aGolias !== bGolias) {
+          const gigante = aGolias ? a : b;
+          const menor = aGolias ? b : a;
+          const raioGolias = obterRaioDeteccaoGolias(menor.especie.id);
+          if (dist >= raioGolias) continue;
+
+          const idMenor = menor.especie.id;
+          // Golias só se incomoda em virar se a menor chegou realmente perto (< 185 px)
+          if (dist < 185) {
+            gigante.interacao = { tipo: "presenca_golias", tempo: 0, duracao: 0.65, outro: menor };
+            gigante.cooldownInteracao = 6;
           }
-          a.cooldownInteracao = 7;
-          b.cooldownInteracao = 7;
+
+          if (idMenor === "papa_moscas") {
+            // Visão excelente: detecta de longe, foca por 0.26s e salta imediatamente para longe!
+            menor.interacao = {
+              tipo: "fuga_visual_salto",
+              tempo: 0,
+              duracao: 0.7,
+              outro: gigante,
+              origX: menor.estado.x,
+              origY: menor.estado.y,
+              saltoIniciado: false
+            };
+          } else if (idMenor === "filhote") {
+            // Pânico de dispersão: sobressalto breve e fuga aérea em ballooning!
+            menor.interacao = { tipo: "fuga_ballooning_panico", tempo: 0, duracao: 0.28, outro: gigante };
+          } else if (idMenor === "caranguejo") {
+            // Achatada/camuflada por instantes, depois corre de lado em marcha caranguejo mantendo frente em guarda!
+            menor.interacao = {
+              tipo: "camuflagem_depois_caranguejo",
+              tempo: 0,
+              duracao: 1.35,
+              outro: gigante,
+              ladoLateral: Math.random() < 0.5 ? 1 : -1
+            };
+          } else if (idMenor === "tecela_renda") {
+            // Postura críptica de "galhinho" esticada tentando não ser vista, depois dispara em fuga!
+            menor.interacao = { tipo: "galhinho_depois_fuga", tempo: 0, duracao: 0.92, outro: gigante };
+          } else if (idMenor === "tecela_canto") {
+            // Vibração defensiva rápida (web-bouncing) e fuga veloz!
+            menor.interacao = { tipo: "balanco_fuga_tecela", tempo: 0, duracao: 0.52, outro: gigante };
+          } else {
+            // Ñanduobyeté: recuo curto em guarda tátil + contorno largo para longe das quelíceras!
+            menor.interacao = {
+              tipo: "guarda_e_contorno_largo",
+              tempo: 0,
+              duracao: 0.58,
+              outro: gigante,
+              ladoContorno: Math.random() < 0.5 ? 1 : -1
+            };
+          }
+          menor.cooldownInteracao = 10;
           break;
         }
+
+        // 2. ENCONTROS ENTRE OUTRAS ESPÉCIES (NÃO-GOLIAS)
+        const raioEncontro =
+          a.especie.id === "papa_moscas" || b.especie.id === "papa_moscas"
+            ? (a.tamPx + b.tamPx) * 0.85 + 68
+            : (a.tamPx + b.tamPx) * 0.78 + 46;
+        if (dist >= raioEncontro) continue;
+
+        // 2A. Duas Papa-Moscas: Ritual Completo de Cortejo Salticidae!
+        if (a.especie.id === "papa_moscas" && b.especie.id === "papa_moscas" && !a.acaoEspecial && !b.acaoEspecial) {
+          const cx = (a.estado.x + b.estado.x) * 0.5;
+          const cy = (a.estado.y + b.estado.y) * 0.5;
+          montarRitualCortejoSalticidae(a, b, cx, cy, false);
+          a.cooldownInteracao = 12;
+          b.cooldownInteracao = 12;
+          break;
+        }
+
+        // 2B. Diferença relevante de porte (>= 1.28x): Intimidação / Predação Intraguilda!
+        const razaoPorte = Math.max(a.tamPx, b.tamPx) / Math.max(1, Math.min(a.tamPx, b.tamPx));
+        if (razaoPorte >= 1.28 && a.especie.id !== b.especie.id) {
+          const maior = a.tamPx >= b.tamPx ? a : b;
+          const menor = maior === a ? b : a;
+          maior.interacao = { tipo: "intimidacao_porte", tempo: 0, duracao: 0.85, outro: menor };
+          if (menor.especie.id === "filhote") {
+            menor.interacao = { tipo: "fuga_ballooning_panico", tempo: 0, duracao: 0.3, outro: maior };
+          } else if (menor.especie.id === "papa_moscas") {
+            menor.interacao = {
+              tipo: "fuga_visual_salto",
+              tempo: 0,
+              duracao: 0.66,
+              outro: maior,
+              origX: menor.estado.x,
+              origY: menor.estado.y,
+              saltoIniciado: false
+            };
+          } else {
+            menor.interacao = { tipo: "guarda_e_contorno_largo", tempo: 0, duracao: 0.55, outro: maior, ladoContorno: Math.random() < 0.5 ? 1 : -1 };
+          }
+          a.cooldownInteracao = 9;
+          b.cooldownInteracao = 9;
+          break;
+        }
+
+        // 2C. Papa-Moscas × Outra espécie (porte próximo): Avaliação visual por paralaxe + desvio cauteloso!
+        if ((a.especie.id === "papa_moscas" || b.especie.id === "papa_moscas") && a.especie.id !== b.especie.id) {
+          const papa = a.especie.id === "papa_moscas" ? a : b;
+          const outra = papa === a ? b : a;
+          papa.interacao = { tipo: "avaliacao_visual", tempo: 0, duracao: 0.95, outro: outra, ladoDesvio: Math.random() < 0.5 ? 1 : -1 };
+          outra.interacao = { tipo: "guarda_cautela", tempo: 0, duracao: 0.85, outro: papa, ladoDesvio: -1 };
+          a.cooldownInteracao = 9;
+          b.cooldownInteracao = 9;
+          break;
+        }
+
+        // 2D. Espécie críptica (Tecelã-de-Renda ou Caranguejo) congela imóvel para a outra passar direto
+        const aCriptica = a.especie.id === "tecela_renda" || a.especie.id === "caranguejo";
+        const bCriptica = b.especie.id === "tecela_renda" || b.especie.id === "caranguejo";
+        if ((aCriptica !== bCriptica) && Math.random() < 0.48) {
+          const criptica = aCriptica ? a : b;
+          const passante = criptica === a ? b : a;
+          criptica.interacao = {
+            tipo: criptica.especie.id === "tecela_renda" ? "camuflagem_galhinho_passagem" : "camuflagem_achatada_passagem",
+            tempo: 0,
+            duracao: 1.4,
+            outro: passante
+          };
+          passante.interacao = { tipo: "inspecao_breve", tempo: 0, duracao: 0.48, outro: criptica, ladoDesvio: Math.random() < 0.5 ? 1 : -1 };
+          a.cooldownInteracao = 9;
+          b.cooldownInteracao = 9;
+          break;
+        }
+
+        // 2E. Porte semelhante (demais encontros): Advertência Territorial Mútua (leg-fencing) + Desvio divergente em "V"!
+        const ladoV = Math.random() < 0.5 ? 1 : -1;
+        a.interacao = { tipo: "advertencia_mutua", tempo: 0, duracao: 1.05, outro: b, ladoDesvio: ladoV };
+        b.interacao = { tipo: "advertencia_mutua", tempo: 0, duracao: 1.05, outro: a, ladoDesvio: -ladoV };
+        a.cooldownInteracao = 9;
+        b.cooldownInteracao = 9;
+        break;
       }
     }
   }
 
-  // Se uma presa solta passa perto de uma aranha compatível já na tela, a aranha decide caçar!
+  // Se uma presa solta passa perto de aranhas compatíveis já na tela:
+  // - Se 2 aranhas (EXCETO Golias) avistam o mesmo inseto (ou 1 intercepta a espreita da outra) -> DISPUTA PELA PRESA!
+  // - Se apenas 1 aranha avista -> caça normal.
   function verificarOportunidadesDeCaca() {
     if (ativas.length === 0 || presasAtivas.length === 0) return;
     for (let i = 0; i < presasAtivas.length; i++) {
       const p = presasAtivas[i];
-      if (p.cacador || p.modo === "capturada" || p.modo === "escapando") continue;
+      if (p.emDisputa || p.modo === "capturada" || p.modo === "escapando") continue;
+
+      // Caso 1: Presa já está sendo espreitada por uma aranha (NÃO-Golias) e outra aranha (NÃO-Golias) chega perto -> BRIGA PELA PRESA!
+      if (p.cacador) {
+        const atual = p.cacador;
+        const faseInicial = atual.caca && (atual.caca.fase === "detectando" || atual.caca.fase === "espreitando");
+        if (faseInicial && atual.especie.id !== "tarantula_golias" && !atual.fugindo && !atual.acaoEspecial) {
+          for (let j = 0; j < ativas.length; j++) {
+            const rival = ativas[j];
+            if (rival === atual || rival.especie.id === "tarantula_golias") continue;
+            if (rival.caca || rival.fugindo || rival.interacao || rival.acaoEspecial || rival.cooldownInteracao > 0 || rival.defesaRestante > 0) continue;
+            if (rival.estado.tipo === "ballooning" || rival.estado.tipo === "rapel_fio") continue;
+            if (!rival.especie.presasAlvo || !rival.especie.presasAlvo.includes(p.def.id)) continue;
+            const dR = Math.hypot(rival.estado.x - p.x, rival.estado.y - p.y);
+            if (dR < 320) {
+              montarDisputaPresa(atual, rival, p);
+              break;
+            }
+          }
+        }
+        continue;
+      }
+
+      // Caso 2: Presa livre -> coleta todas as candidatas no raio de visão!
+      const candidatas = [];
       for (let j = 0; j < ativas.length; j++) {
         const a = ativas[j];
-        if (a.caca || a.fugindo || a.interacao || a.defesaRestante > 0) continue;
+        if (a.caca || a.fugindo || a.interacao || a.acaoEspecial || a.defesaRestante > 0) continue;
+        if (a.estado.tipo === "ballooning" || a.estado.tipo === "rapel_fio") continue;
         if (!a.especie.presasAlvo || !a.especie.presasAlvo.includes(p.def.id)) continue;
         const d = Math.hypot(a.estado.x - p.x, a.estado.y - p.y);
-        if (d < 340) {
-          vincularCaca(a, p, Math.random() < 0.22);
-          break;
+        if (d < 350) {
+          candidatas.push({ aranha: a, dist: d });
         }
+      }
+      if (candidatas.length === 0) continue;
+      candidatas.sort((x, y) => x.dist - y.dist);
+
+      // Se 2+ aranhas elegíveis (NENHUMA sendo Golias) avistaram o mesmo inseto -> brigam pela presa!
+      const elegiveisDisputa = candidatas.filter(
+        (c) => c.aranha.especie.id !== "tarantula_golias" && c.aranha.cooldownInteracao <= 0
+      );
+      if (elegiveisDisputa.length >= 2) {
+        montarDisputaPresa(elegiveisDisputa[0].aranha, elegiveisDisputa[1].aranha, p);
+      } else {
+        vincularCaca(candidatas[0].aranha, p, Math.random() < 0.22);
       }
     }
   }
@@ -3709,6 +4438,9 @@ const AranhasAtelie = (() => {
     }
     if (st.tipo === "espiadinha") {
       st.fase = "saindo";
+      st.t = 0;
+      st.origemSaidaX = st.x;
+      st.origemSaidaY = st.y;
       return;
     }
     if (st.tipo === "repouso_teia_canto") {
@@ -3728,6 +4460,9 @@ const AranhasAtelie = (() => {
   }
 
   function animarPatasEComportamentos(inst, dt, andando, desloc, noAr, agachando, extras = {}) {
+    if (typeof AranhasCinematicaIK !== "undefined") {
+      AranhasCinematicaIK.atualizarBiomecanicaAranha(inst, dt, extras, cursorAtual, presasAtivas);
+    }
     const t = inst.tempoVida;
     const amp = inst.especie.ampPata || 10;
     const emDefesa = Boolean(extras.emDefesa);
@@ -3757,6 +4492,9 @@ const AranhasAtelie = (() => {
     const femeaAceitando = Boolean(extras.femeaAceitando);
     const mordendoPedaco = Boolean(extras.mordendoPedaco);
     const pulsoMordida = Number(extras.pulsoMordida) || 0;
+    const disputaAmeaca = Boolean(extras.disputaAmeaca);
+    const disputaEsgrima = Boolean(extras.disputaEsgrima);
+    const disputaCombate = Boolean(extras.disputaCombate);
     const ecdiseContraindo = Boolean(extras.ecdiseContraindo);
     const tateandoCursor = Boolean(extras.tateandoCursor);
     const espreguicando = Boolean(extras.espreguicando);
@@ -3782,8 +4520,12 @@ const AranhasAtelie = (() => {
       } else if (contendoPresa) {
         angQ = 7;
       }
-      inst.queliceraEsq.style.transform = `rotate(${(-angQ).toFixed(1)}deg) scaleY(${syQ.toFixed(2)})`;
-      inst.queliceraDir.style.transform = `rotate(${angQ.toFixed(1)}deg) scaleY(${syQ.toFixed(2)})`;
+      const txQE = `rotate(${(-angQ).toFixed(1)}deg) scaleY(${syQ.toFixed(2)})`;
+      if (txQE !== inst._lastQTx) {
+        inst._lastQTx = txQE;
+        inst.queliceraEsq.style.transform = txQE;
+        inst.queliceraDir.style.transform = `rotate(${angQ.toFixed(1)}deg) scaleY(${syQ.toFixed(2)})`;
+      }
     }
 
     // 1. Respiração sutil contínua no abdômen (ou balanço na Dança da Seda / exibição Maratus / sucção!)
@@ -3830,6 +4572,11 @@ const AranhasAtelie = (() => {
         escX = 0.9;
         escY = 1.06;
         rotAbd = 0;
+      } else if (disputaCombate || disputaEsgrima || disputaAmeaca) {
+        // Abdômen contraído e alerta durante exibição agonística, esgrima ou engalfinhamento
+        escX = disputaCombate ? 1.06 : 1.035;
+        escY = disputaCombate ? 0.92 : 0.95;
+        rotAbd = Math.sin(t * (disputaCombate ? 28 : disputaEsgrima ? 17 : 10)) * (disputaCombate ? 5.2 : 2.6);
       } else if (emDefesa || armandoBoteGolias || acumulandoPressao) {
         escX = 1.045;
         escY = 0.945;
@@ -3845,7 +4592,13 @@ const AranhasAtelie = (() => {
       } else if (!andando && inst.comportamentoAtual === "escovar_cerdas") {
         rotAbd = Math.sin(inst.tempoComportamento * 5.2) * 3.5;
       }
-      inst.abdomen.style.transform = `rotate(${rotAbd.toFixed(2)}deg) scale(${escX.toFixed(3)}, ${escY.toFixed(3)})`;
+      // Soma micro-física de inércia (Follow-Through elástico nas curvas/arrancadas)
+      rotAbd += inst._inerciaAbd || 0;
+      const txAbd = `rotate(${rotAbd.toFixed(1)}deg) scale(${escX.toFixed(3)}, ${escY.toFixed(3)})`;
+      if (txAbd !== inst._lastAbdTx) {
+        inst._lastAbdTx = txAbd;
+        inst.abdomen.style.transform = txAbd;
+      }
     }
 
     // 2. Micro-inclinação do cefalotórax & pedipalpos
@@ -3884,6 +4637,17 @@ const AranhasAtelie = (() => {
       rotCefalo = Math.sin(t * 7.5) * 7.5;
       rotPalpos = Math.sin(t * 16) * 13;
       tyPalpos = Math.sin(t * 16) * 2.8;
+    } else if (disputaCombate) {
+      rotCefalo = Math.sin(t * 26) * 9.5;
+      rotPalpos = Math.sin(t * 36) * 18;
+      tyPalpos = Math.sin(t * 36) * 2.2;
+    } else if (disputaEsgrima) {
+      rotCefalo = Math.sin(t * 18) * 6.5;
+      rotPalpos = Math.sin(t * 28) * 15;
+      tyPalpos = Math.sin(t * 28) * 1.8;
+    } else if (disputaAmeaca) {
+      rotCefalo = Math.sin(t * 9.5) * 4.5;
+      rotPalpos = Math.sin(t * 18) * 12;
     } else if (mordendoPedaco) {
       rotCefalo = Math.sin(t * 9.5) * 3.2;
       rotPalpos = pulsoMordida * 15;
@@ -3923,11 +4687,23 @@ const AranhasAtelie = (() => {
       inst.ancoraMarcada = false;
     }
 
-    if (inst.cefalo) inst.cefalo.style.transform = `rotate(${rotCefalo.toFixed(2)}deg)`;
+    if (inst.cefalo) {
+      // Soma saccades visuais discretas na Papa-Moscas (head-tracking Salticidae)
+      const rotCefFinal = rotCefalo + (inst.especie.id === "papa_moscas" ? (inst._headSaccadeAng || 0) : 0);
+      const txCef = `rotate(${rotCefFinal.toFixed(1)}deg)`;
+      if (txCef !== inst._lastCefTx) {
+        inst._lastCefTx = txCef;
+        inst.cefalo.style.transform = txCef;
+      }
+    }
     if (inst.palpos) {
-      inst.palpos.style.transform = tyPalpos
-        ? `translateY(${tyPalpos.toFixed(2)}px) rotate(${rotPalpos.toFixed(2)}deg)`
-        : `rotate(${rotPalpos.toFixed(2)}deg)`;
+      const txPalp = tyPalpos
+        ? `translateY(${tyPalpos.toFixed(1)}px) rotate(${rotPalpos.toFixed(1)}deg)`
+        : `rotate(${rotPalpos.toFixed(1)}deg)`;
+      if (txPalp !== inst._lastPalpTx) {
+        inst._lastPalpTx = txPalp;
+        inst.palpos.style.transform = txPalp;
+      }
     }
 
     // 3. Cinemática Individual das 8 Patas
@@ -3993,6 +4769,27 @@ const AranhasAtelie = (() => {
         if (p.par === 0) alvoAng = p.lado * -16;
         else if (p.par >= 2) alvoAng = p.lado * -8;
         else alvoAng = p.lado * -5;
+      } else if (disputaCombate) {
+        // Engalfinhamento curto: pares I e II travam e empurram com energia; pares traseiros fazem força real!
+        if (p.par === 0) alvoAng = p.lado * (-31 + Math.sin(t * 30 + (p.lado === 1 ? 0 : Math.PI)) * 17);
+        else if (p.par === 1) alvoAng = p.lado * (-20 + Math.cos(t * 26 + (p.lado === 1 ? Math.PI : 0)) * 13);
+        else alvoAng = andando && desloc > 0.02
+          ? Math.sin(inst.fasePassada + p.faseBase) * amp * 0.9 + p.lado * 6
+          : p.lado * 9 + Math.sin(t * 22 + p.faseBase) * 4;
+      } else if (disputaEsgrima) {
+        // Esgrima de patas dianteiras (Leg-Fencing): toques alternados ágeis no par I, guarda no par II, passos reais atrás!
+        if (p.par === 0) alvoAng = p.lado * (-30 + Math.sin(t * 24 + (p.lado === 1 ? 0 : Math.PI * 0.85)) * 18);
+        else if (p.par === 1) alvoAng = p.lado * (-17 + Math.sin(t * 16 + p.lado) * 7);
+        else alvoAng = andando && desloc > 0.02
+          ? Math.sin(inst.fasePassada + p.faseBase) * amp * 0.88
+          : p.lado * 6;
+      } else if (disputaAmeaca) {
+        // Postura de avaliação/ameaça em círculo: 1º par erguido amplo enquanto patas traseiras caminham de verdade!
+        if (p.par === 0) alvoAng = p.lado * (-28 + Math.sin(t * 13 + p.lado * 0.6) * 6);
+        else if (p.par === 1) alvoAng = p.lado * (-16 + Math.sin(t * 11) * 4);
+        else alvoAng = andando && desloc > 0.02
+          ? Math.sin(inst.fasePassada + p.faseBase) * amp * 0.95
+          : p.lado * 5;
       } else if (mordendoPedaco) {
         // Puxando e segurando pedaço por pedaço da Lagarta / Lagartinho com os pares I e II!
         if (p.par === 0) alvoAng = p.lado * (-22 + pulsoMordida * 7.5);
@@ -4044,7 +4841,8 @@ const AranhasAtelie = (() => {
         alvoAng = p.par <= 1 ? p.lado * -16 : p.lado * 12;
       } else if (andando && desloc > 0.02) {
         const fatorPar = p.par === 0 || p.par === 3 ? 1.1 : 0.92;
-        alvoAng = Math.sin(inst.fasePassada + p.faseBase) * amp * fatorPar;
+        const deltaIK = inst.ikPatas && inst.ikPatas[i] ? inst.ikPatas[i].deltaAngGraus * 0.55 : 0;
+        alvoAng = Math.sin(inst.fasePassada + p.faseBase) * amp * fatorPar + deltaIK;
       } else if (inst.estado.tipo === "ballooning") {
         alvoAng = Math.sin(t * 2.2 + p.faseBase) * 5;
       } else {
@@ -4090,7 +4888,10 @@ const AranhasAtelie = (() => {
       }
 
       p.angAtual = lerp(p.angAtual, alvoAng, Math.min(1, dt * 15));
-      p.el.style.transform = `rotate(${p.angAtual.toFixed(2)}deg)`;
+      if (p._angEscrito == null || Math.abs(p.angAtual - p._angEscrito) >= 0.25) {
+        p._angEscrito = p.angAtual;
+        p.el.style.transform = `rotate(${p.angAtual.toFixed(1)}deg)`;
+      }
     }
   }
 
@@ -4120,24 +4921,29 @@ const AranhasAtelie = (() => {
         dTeia += ` M ${(st.vx + sgn * rr).toFixed(1)} ${(st.vy + 2).toFixed(1)} Q ${(st.vx + sgn * rr * 0.68 + nx * vib * 0.5).toFixed(1)} ${(st.vy + rr * 0.68 + ny * vib * 0.5).toFixed(1)} ${(st.vx + sgn * 2).toFixed(1)} ${(st.vy + rr).toFixed(1)}`;
       }
     }
-    inst.fioPath.setAttribute("d", dTeia);
+    if (dTeia !== inst._lastTeiaD) {
+      inst._lastTeiaD = dTeia;
+      inst.fioPath.setAttribute("d", dTeia);
+    }
 
     if (inst.estabPath) {
       const passos = Math.floor(opSeda * 7);
+      let dZ = "";
       if (passos >= 2) {
         const ampZ = 4.6;
         const compZ = 34;
         const xIni = st.px - ux * (compZ * 0.5);
         const yIni = st.py - uy * (compZ * 0.5);
-        let dZ = `M ${xIni.toFixed(1)} ${yIni.toFixed(1)}`;
+        dZ = `M ${xIni.toFixed(1)} ${yIni.toFixed(1)}`;
         for (let k = 1; k <= passos; k++) {
           const frac = k / 7;
           const lado = k % 2 === 0 ? -1 : 1;
           dZ += ` L ${(xIni + ux * (compZ * frac) + nx * (lado * ampZ + vib * 0.6)).toFixed(1)} ${(yIni + uy * (compZ * frac) + ny * (lado * ampZ + vib * 0.6)).toFixed(1)}`;
         }
+      }
+      if (dZ !== inst._lastEstabD) {
+        inst._lastEstabD = dZ;
         inst.estabPath.setAttribute("d", dZ);
-      } else {
-        inst.estabPath.setAttribute("d", "");
       }
     }
   }
@@ -4262,6 +5068,437 @@ const AranhasAtelie = (() => {
           inst.acaoEspecial = null;
           encaminharParaSaidaBorda(inst, 1.0);
           return false;
+        }
+      }
+      return true;
+    }
+
+    // 9.5 EVENTO: DISPUTA AGONÍSTICA REALISTA POR PRESA (Avaliação Sequencial em 5 Estágios — EXCETO GOLIAS)
+    if (ac.tipo === "disputa_presa") {
+      const disp = ac.disputa;
+      const p = disp && disp.presa && presasAtivas.includes(disp.presa) ? disp.presa : null;
+      const rival = ac.rival && ativas.includes(ac.rival) ? ac.rival : null;
+
+      // Proteção contra anomalias: se a presa sumiu antes da captura, libera suavemente para a borda!
+      if (!disp || !p || disp.presaRemovida) {
+        inst.wrap.classList.remove("em-disputa-presa");
+        inst.acaoEspecial = null;
+        encaminharParaSaidaBorda(inst, 1.0);
+        return false;
+      }
+
+      // Apenas a aranha "a" (ou a sobrevivente, se "a" saiu) avança o relógio compartilhado da disputa
+      const controlaRelogio = inst === disp.a || !ativas.includes(disp.a);
+      if (controlaRelogio) {
+        disp.tempoFase += dt;
+      }
+
+      // Mantém a presa encurralada dentro da arena enquanto ninguém capturou
+      if (disp.fase !== "resolucao") {
+        p.modo = "pousada";
+        p.tempoPausa = 4;
+        p.vibrandoPresa = true;
+        p.lutaIntensidade = 0.65;
+      }
+
+      const cx = isFinite(disp.centroX) ? disp.centroX : p.x;
+      const cy = isFinite(disp.centroY) ? disp.centroY : p.y;
+      const raioOrb = disp.raioOrbita || 54;
+      const raioEsg = disp.raioEsgrima || 38;
+      const raioEng = disp.raioEngalf || 28;
+
+      const angParaPresa = (Math.atan2(p.y - st.y, p.x - st.x) * 180) / Math.PI + 90;
+      const angParaRival = rival ? (Math.atan2(rival.estado.y - st.y, rival.estado.x - st.x) * 180) / Math.PI + 90 : angParaPresa;
+
+      // Se a rival fugiu/sumiu antes de resolver, esta aranha vence automaticamente por W.O.!
+      if (!rival && !disp.resolvida) {
+        disp.vencedora = inst;
+        disp.perdedora = ac.rival;
+        disp.fase = "resolucao";
+        disp.tempoFase = 0;
+        disp.resolvida = true;
+      }
+
+      if (disp.fase === "convergindo") {
+        // ESTÁGIO 1: Aproximação natural e travada brusca fora do alcance de bote ao avistar a rival
+        const cosE = Math.cos(disp.eixoRad);
+        const sinE = Math.sin(disp.eixoRad);
+        const raioIni = raioOrb + 12;
+        const alvoX = cx + cosE * (ac.lado * raioIni);
+        const alvoY = cy + sinE * (ac.lado * raioIni);
+        const dx = alvoX - st.x;
+        const dy = alvoY - st.y;
+        const dist = Math.hypot(dx, dy);
+        const vel = Math.max(92, inst.especie.velocidadeBase * 1.48);
+        if (dist > 7) {
+          st.x += (dx / dist) * Math.min(dist, vel * dt);
+          st.y += (dy / dist) * Math.min(dist, vel * dt);
+          st.anguloAlvo = (Math.atan2(dy, dx) * 180) / Math.PI + 90;
+          flags.andando = true;
+        } else {
+          // Trava brusca encarando a rival com o 1º par em alerta!
+          flags.andando = false;
+          flags.disputaAmeaca = true;
+          st.anguloAlvo = angParaRival;
+          st.angulo = lerpAngulo(st.angulo, st.anguloAlvo, Math.min(1, dt * 16));
+        }
+
+        const rivalChegou =
+          !rival ||
+          Math.hypot(cx + cosE * (-ac.lado * raioIni) - rival.estado.x, cy + sinE * (-ac.lado * raioIni) - rival.estado.y) <= 15;
+        if (controlaRelogio && ((dist <= 13 && rivalChegou) || disp.tempoFase >= 1.45)) {
+          disp.fase = "avaliacao_ameaca";
+          disp.tempoFase = 0;
+          disp.ultimoPulsoAmeaca = -1;
+          criarOndaVibracao(cx, cy, "solo");
+        }
+      } else if (disp.fase === "avaliacao_ameaca") {
+        // ESTÁGIO 2: Avaliação Visual em Círculo (Circling) + Postura de Ameaça elevada + sinais sísmicos no solo!
+        inst.wrap.classList.add("em-disputa-presa");
+        if (controlaRelogio) {
+          // Orbita suavemente ~55° ao redor da presa avaliando o porte da rival
+          disp.eixoRad += disp.sentidoOrbita * 0.68 * dt;
+          const pulsoIdx = disp.tempoFase >= 0.92 ? 1 : disp.tempoFase >= 0.34 ? 0 : -1;
+          if (pulsoIdx > disp.ultimoPulsoAmeaca) {
+            disp.ultimoPulsoAmeaca = pulsoIdx;
+            const emissor = pulsoIdx === 0 ? disp.a : disp.b;
+            if (emissor && emissor.estado) criarOndaVibracao(emissor.estado.x, emissor.estado.y, "solo");
+          }
+        }
+        const cosE = Math.cos(disp.eixoRad);
+        const sinE = Math.sin(disp.eixoRad);
+        const respiroRad = Math.sin(disp.tempoFase * 5.2 + ac.lado) * 4;
+        const raioAtual = raioOrb + respiroRad;
+        const alvoX = cx + cosE * (ac.lado * raioAtual);
+        const alvoY = cy + sinE * (ac.lado * raioAtual);
+        st.x = lerp(st.x, alvoX, Math.min(1, dt * 8.5));
+        st.y = lerp(st.y, alvoY, Math.min(1, dt * 8.5));
+        st.anguloAlvo = angParaRival;
+        st.angulo = lerpAngulo(st.angulo, st.anguloAlvo, Math.min(1, dt * 15));
+        // Patas traseiras dão passos reais durante o movimento circular; 1º par fica erguido em ameaça!
+        flags.andando = true;
+        flags.disputaAmeaca = true;
+        flags.escalaX = inst.especie.id === "caranguejo" ? 1.09 : 1.05;
+        flags.escalaY = 1.07;
+        flags.sombraExtra = 4.2;
+
+        if (controlaRelogio && disp.tempoFase >= 1.4) {
+          disp.fase = "esgrima_patas";
+          disp.tempoFase = 0;
+          disp.ultimoImpacto = -1;
+        }
+      } else if (disp.fase === "esgrima_patas") {
+        // ESTÁGIO 3: Esgrima de Patas Dianteiras (Leg-Fencing) — 3 assaltos rítmicos na distância exata de alcance!
+        inst.wrap.classList.add("em-disputa-presa");
+        if (controlaRelogio) {
+          disp.eixoRad += disp.sentidoOrbita * 0.24 * dt;
+        }
+        const cosE = Math.cos(disp.eixoRad);
+        const sinE = Math.sin(disp.eixoRad);
+        const perpX = -sinE;
+        const perpY = cosE;
+
+        // 3 ciclos nítidos de 0.48s: avanço rápido (0..0.18s) para tocar patas + recuo elástico (0.18..0.48s)
+        const cicloDur = 0.48;
+        const faseCiclo = (disp.tempoFase % cicloDur) / cicloDur;
+        const pulsoAvanco = faseCiclo < 0.36
+          ? Math.sin((faseCiclo / 0.36) * Math.PI)
+          : -0.22 * Math.sin(((faseCiclo - 0.36) / 0.64) * Math.PI);
+
+        // Vencedora começa a ganhar leve vantagem de terreno ao longo dos 3 assaltos
+        const prog = Math.min(1, disp.tempoFase / 1.45);
+        const empurraoDominio = (inst === disp.vencedora ? -1 : 1) * prog * 6.5 * ac.lado;
+        const distAlvo = raioEsg - pulsoAvanco * 7.5;
+        const desvioLat = Math.sin(disp.tempoFase * 6.5) * 4.5 * ac.lado;
+
+        const alvoX = cx + cosE * (ac.lado * distAlvo + empurraoDominio) + perpX * desvioLat;
+        const alvoY = cy + sinE * (ac.lado * distAlvo + empurraoDominio) + perpY * desvioLat;
+        st.x = lerp(st.x, alvoX, Math.min(1, dt * 15));
+        st.y = lerp(st.y, alvoY, Math.min(1, dt * 15));
+        st.anguloAlvo = angParaRival;
+        st.angulo = lerpAngulo(st.angulo, st.anguloAlvo, Math.min(1, dt * 17));
+        flags.andando = true;
+        flags.disputaEsgrima = true;
+        flags.escalaX = 1.05;
+        flags.escalaY = 1.07 + Math.max(0, pulsoAvanco) * 0.03;
+        flags.sombraExtra = 3.8 + Math.max(0, pulsoAvanco) * 1.4;
+
+        // Onda sutil exatamente no ponto médio de toque das patas dianteiras em cada assalto!
+        const assaltoIdx = Math.floor((disp.tempoFase + 0.38) / cicloDur);
+        if (controlaRelogio && assaltoIdx > disp.ultimoImpacto && faseCiclo >= 0.14 && faseCiclo <= 0.34) {
+          disp.ultimoImpacto = assaltoIdx;
+          const mx = rival ? (st.x + rival.estado.x) * 0.5 : cx;
+          const my = rival ? (st.y + rival.estado.y) * 0.5 : cy;
+          criarOndaVibracao(mx, my, "impacto");
+        }
+
+        if (controlaRelogio && disp.tempoFase >= 1.45) {
+          disp.fase = "climax_embate";
+          disp.tempoFase = 0;
+          disp.ultimoImpacto = -1;
+          disp.climaxOndaEmitida = false;
+        }
+      } else if (disp.fase === "climax_embate") {
+        // ESTÁGIO 4: Clímax Decisivo — Bote de Intimidação Explosivo OU Engalfinhamento Giratório Curto!
+        inst.wrap.classList.add("em-disputa-presa");
+        const souVencedora = inst === disp.vencedora;
+
+        if (disp.tipoClimax === "bote_intimidacao") {
+          const cosE = Math.cos(disp.eixoRad);
+          const sinE = Math.sin(disp.eixoRad);
+          const tC = disp.tempoFase;
+
+          if (tC < 0.24) {
+            // 4A.1: Vencedora se agacha comprimindo como mola; perdedora tenta sustentar a guarda
+            const distAlvo = souVencedora ? raioEsg + 7 : raioEsg + 2;
+            const alvoX = cx + cosE * (ac.lado * distAlvo);
+            const alvoY = cy + sinE * (ac.lado * distAlvo);
+            st.x = lerp(st.x, alvoX, Math.min(1, dt * 12));
+            st.y = lerp(st.y, alvoY, Math.min(1, dt * 12));
+            st.anguloAlvo = angParaRival;
+            if (souVencedora) {
+              flags.andando = false;
+              flags.agachando = true;
+              flags.acumulandoPressao = true;
+              flags.escalaX = 1.09;
+              flags.escalaY = 0.87;
+              flags.sombraExtra = 1.5;
+            } else {
+              flags.andando = false;
+              flags.disputaAmeaca = true;
+              flags.escalaX = 1.04;
+              flags.escalaY = 1.05;
+            }
+          } else if (tC < 0.66) {
+            // 4A.2: Vencedora dispara bote explosivo para frente; perdedora leva susto e salta para trás!
+            const pBote = Math.min(1, (tC - 0.24) / 0.42);
+            const arcoSalto = Math.sin(pBote * Math.PI);
+            if (controlaRelogio && !disp.climaxOndaEmitida) {
+              disp.climaxOndaEmitida = true;
+              criarOndaVibracao(disp.vencedora.estado.x, disp.vencedora.estado.y, "impacto");
+            }
+            if (souVencedora) {
+              const distV = lerp(raioEsg + 7, Math.max(12, raioEsg - 24), Math.min(1, pBote * 1.35));
+              const alvoX = cx + cosE * (ac.lado * distV);
+              const alvoY = cy + sinE * (ac.lado * distV);
+              st.x = lerp(st.x, alvoX, Math.min(1, dt * 22));
+              st.y = lerp(st.y, alvoY, Math.min(1, dt * 22));
+              st.anguloAlvo = angParaRival;
+              flags.andando = false;
+              flags.noAr = arcoSalto > 0.22;
+              flags.boteHidraulico = true;
+              flags.escalaX = 1.06;
+              flags.escalaY = 1.14;
+              flags.sombraExtra = 3 + arcoSalto * 5.5;
+            } else {
+              // Perdedora recua bruscamente ao ver o bote!
+              const distP = lerp(raioEsg + 2, raioOrb + 36, Math.min(1, pBote * 1.25));
+              const alvoX = cx + cosE * (ac.lado * distP);
+              const alvoY = cy + sinE * (ac.lado * distP);
+              st.x = lerp(st.x, alvoX, Math.min(1, dt * 16));
+              st.y = lerp(st.y, alvoY, Math.min(1, dt * 16));
+              st.anguloAlvo = angParaRival;
+              flags.andando = false;
+              flags.noAr = arcoSalto > 0.25;
+              flags.escalaX = 0.94;
+              flags.escalaY = 1.05;
+              flags.sombraExtra = 2 + arcoSalto * 3.5;
+            }
+          } else {
+            // 4A.3: Vencedora aterrissa dominante; perdedora já desequilibrada pronta para fugir
+            st.anguloAlvo = angParaRival;
+            if (souVencedora) {
+              flags.andando = false;
+              flags.disputaAmeaca = true;
+              flags.escalaX = 1.07;
+              flags.escalaY = 1.07;
+              flags.sombraExtra = 3.2;
+            } else {
+              flags.andando = true;
+              flags.escalaX = 0.96;
+              flags.escalaY = 1.02;
+            }
+          }
+        } else {
+          // 4B: Engalfinhamento Giratório Curto (trava de patas girando ~80° + empurrão decisivo)
+          const tC = disp.tempoFase;
+          if (tC < 0.56) {
+            if (controlaRelogio) {
+              disp.eixoRad += disp.sentidoOrbita * 2.55 * dt;
+              const ondaIdx = tC >= 0.32 ? 1 : tC >= 0.08 ? 0 : -1;
+              if (ondaIdx > disp.ultimoImpacto) {
+                disp.ultimoImpacto = ondaIdx;
+                const mx = rival ? (st.x + rival.estado.x) * 0.5 : cx;
+                const my = rival ? (st.y + rival.estado.y) * 0.5 : cy;
+                criarOndaVibracao(mx, my, "impacto");
+              }
+            }
+            const cosE = Math.cos(disp.eixoRad);
+            const sinE = Math.sin(disp.eixoRad);
+            const pulsoTrava = Math.sin(tC * 28) * 2.5;
+            const alvoX = cx + cosE * (ac.lado * (raioEng + pulsoTrava));
+            const alvoY = cy + sinE * (ac.lado * (raioEng + pulsoTrava));
+            st.x = lerp(st.x, alvoX, Math.min(1, dt * 18));
+            st.y = lerp(st.y, alvoY, Math.min(1, dt * 18));
+            st.anguloAlvo = angParaRival;
+            st.angulo = lerpAngulo(st.angulo, st.anguloAlvo, Math.min(1, dt * 20));
+            flags.andando = true;
+            flags.disputaCombate = true;
+            flags.escalaX = 1.06;
+            flags.escalaY = 1.08;
+            flags.sombraExtra = 4.6;
+          } else {
+            // Empurrão final separando a perdedora para trás!
+            const cosE = Math.cos(disp.eixoRad);
+            const sinE = Math.sin(disp.eixoRad);
+            const pEmp = Math.min(1, (tC - 0.56) / 0.39);
+            if (controlaRelogio && !disp.climaxOndaEmitida) {
+              disp.climaxOndaEmitida = true;
+              const mx = rival ? (st.x + rival.estado.x) * 0.5 : cx;
+              const my = rival ? (st.y + rival.estado.y) * 0.5 : cy;
+              criarOndaVibracao(mx, my, "impacto");
+            }
+            if (souVencedora) {
+              const distV = lerp(raioEng, raioEng + 8, pEmp);
+              st.x = lerp(st.x, cx + cosE * (ac.lado * distV), Math.min(1, dt * 14));
+              st.y = lerp(st.y, cy + sinE * (ac.lado * distV), Math.min(1, dt * 14));
+              st.anguloAlvo = angParaRival;
+              flags.andando = false;
+              flags.disputaAmeaca = true;
+              flags.escalaX = 1.07;
+              flags.escalaY = 1.08;
+              flags.sombraExtra = 3.5;
+            } else {
+              const distP = lerp(raioEng, raioOrb + 40, pEmp);
+              st.x = lerp(st.x, cx + cosE * (ac.lado * distP), Math.min(1, dt * 16));
+              st.y = lerp(st.y, cy + sinE * (ac.lado * distP), Math.min(1, dt * 16));
+              st.anguloAlvo = angParaRival;
+              flags.andando = false;
+              flags.noAr = pEmp < 0.65;
+              flags.escalaX = 0.93;
+              flags.escalaY = 1.06;
+              flags.sombraExtra = 2.5;
+            }
+          }
+        }
+
+        if (controlaRelogio && disp.tempoFase >= 0.95) {
+          disp.fase = "resolucao";
+          disp.tempoFase = 0;
+          disp.resolvida = true;
+        }
+      } else {
+        // ESTÁGIO 5: RESOLUÇÃO — Fuga fiel à espécie na perdedora + Checagem de vigilância e captura na vencedora!
+        inst.wrap.classList.remove("em-disputa-presa");
+        const cosE = Math.cos(disp.eixoRad);
+        const sinE = Math.sin(disp.eixoRad);
+        const perpX = -sinE;
+        const perpY = cosE;
+
+        if (inst === disp.perdedora) {
+          if (disp.tempoFase < 0.30) {
+            // Recuo elástico breve ainda olhando a vencedora + fio de segurança
+            flags.andando = disp.tempoFase >= 0.14;
+            flags.noAr = disp.tempoFase < 0.14;
+            const recuoVel = 128 * (1 - disp.tempoFase * 1.4);
+            st.x += cosE * ac.lado * Math.max(35, recuoVel) * dt;
+            st.y += sinE * ac.lado * Math.max(35, recuoVel) * dt;
+            st.anguloAlvo = angParaRival;
+            flags.escalaX = 0.95;
+            flags.escalaY = 1.04;
+          } else if (inst.especie.id === "caranguejo" && disp.tempoFase < 0.60) {
+            // Aranha-Caranguejo foge primeiro em arrancada lateral típica (Thomisidae) antes de disparar!
+            if (!disp.sedaPerdedoraMarcada) {
+              disp.sedaPerdedoraMarcada = true;
+              criarRastroPonto(st.x, st.y, true);
+            }
+            const dirLatX = perpX * disp.sentidoOrbita * 0.8 + cosE * ac.lado * 0.6;
+            const dirLatY = perpY * disp.sentidoOrbita * 0.8 + sinE * ac.lado * 0.6;
+            const normL = Math.hypot(dirLatX, dirLatY) || 1;
+            const velCar = 165;
+            st.x += (dirLatX / normL) * velCar * dt;
+            st.y += (dirLatY / normL) * velCar * dt;
+            const angMov = (Math.atan2(dirLatY, dirLatX) * 180) / Math.PI + 90;
+            st.anguloAlvo = angMov + 80 * disp.sentidoOrbita;
+            flags.andando = true;
+          } else {
+            if (!disp.sedaPerdedoraMarcada) {
+              disp.sedaPerdedoraMarcada = true;
+              criarRastroPonto(st.x, st.y, true);
+            }
+            inst.acaoEspecial = null;
+            disp.perdedoraFugiu = true;
+
+            if (inst.especie.id === "filhote") {
+              // Filhote escapa flutuando em fio de seda ao vento (ballooning real!)
+              acionarFugaBallooning(inst, disp.vencedora);
+              return false;
+            }
+
+            // Demais espécies fogem em alta velocidade para a borda oposta à vencedora
+            inst.fugindo = true;
+            const fuga = bordaMaisProxima(
+              st.x + cosE * ac.lado * 210,
+              st.y + sinE * ac.lado * 210,
+              Math.max(76, inst.tamPx * 1.45)
+            );
+            inst.fugaAlvo = { x: fuga.x, y: fuga.y };
+            if (inst.especie.id === "papa_moscas") {
+              st.faseSalto = "no_ar";
+              st.saltoT = 0;
+            }
+            return false;
+          }
+        } else {
+          // VENCEDORA: checagem breve de vigilância acompanhando a fuga da rival -> bote decisivo na presa!
+          const tempoVig = disp.desistiu ? 0.18 : 0.42;
+          if (disp.tempoFase < tempoVig) {
+            flags.andando = false;
+            flags.paralaxe = true;
+            flags.disputaAmeaca = disp.tempoFase < tempoVig * 0.55;
+            st.anguloAlvo = rival ? angParaRival : angParaPresa;
+            st.angulo = lerpAngulo(st.angulo, st.anguloAlvo, Math.min(1, dt * 14));
+          } else {
+            const dxP = p.x - st.x;
+            const dyP = p.y - st.y;
+            const dP = Math.hypot(dxP, dyP);
+            st.anguloAlvo = angParaPresa;
+            st.angulo = lerpAngulo(st.angulo, st.anguloAlvo, Math.min(1, dt * 18));
+            if (dP <= 20 || disp.tempoFase >= tempoVig + 0.85) {
+              p.emDisputa = false;
+              p.disputaRef = null;
+              p.cacador = inst;
+              p.modo = "capturada";
+              p.vibrandoPresa = true;
+              p.lutaIntensidade = 0.85;
+              inst.acaoEspecial = null;
+              inst.caca = {
+                presa: p,
+                estilo: inst.especie.estiloCaca || "nandu_laco",
+                fase: "contendo",
+                tempoFase: 0,
+                podeEscapar: false,
+                fioSvg: null,
+                fioPath: null,
+                tapeteEl: null,
+                alvoFuga: bordaMaisProxima(st.x, st.y, Math.max(78, inst.tamPx * 1.45))
+              };
+              criarRastroPonto(p.x, p.y, true);
+              criarOndaVibracao(p.x, p.y, "impacto");
+              return false;
+            } else {
+              const velBote = Math.max(145, inst.especie.velocidadeBase * 2.25);
+              st.x += (dxP / dP) * Math.min(dP, velBote * dt);
+              st.y += (dyP / dP) * Math.min(dP, velBote * dt);
+              const saltoBote = inst.especie.id === "papa_moscas" && dP > 18 && dP < 82;
+              flags.andando = !saltoBote;
+              flags.noAr = saltoBote;
+              if (saltoBote) {
+                flags.boteHidraulico = true;
+                flags.sombraExtra = 5;
+              }
+            }
+          }
         }
       }
       return true;
@@ -4682,33 +5919,176 @@ const AranhasAtelie = (() => {
     } else if (inst.acaoEspecial && atualizarAcaoEspecial(inst, dt, flags)) {
       // Ação especial (orvalho, urticante, tatear cursor, cortejo, ecdise, mãe com ooteca) assumiu este frame
     } else if (inst.interacao) {
-      // 0.5 Interação social / territorial Aranha ↔ Aranha
+      // 0.5 Interações Etológicas Reais Aranha ↔ Aranha (por espécie & porte)
       const inter = inst.interacao;
       inter.tempo += dt;
-      const outro = inter.outro;
-      if (outro && ativas.includes(outro)) {
-        st.anguloAlvo = (Math.atan2(outro.estado.y - st.y, outro.estado.x - st.x) * 180) / Math.PI + 90;
-      }
-      if (inter.tipo === "cumprimento") {
+      const outro = inter.outro && ativas.includes(inter.outro) ? inter.outro : null;
+      const angParaOutro = outro
+        ? (Math.atan2(outro.estado.y - st.y, outro.estado.x - st.x) * 180) / Math.PI + 90
+        : st.anguloAlvo;
+      const dxAfasta = outro ? st.x - outro.estado.x : Math.cos(((st.angulo - 90) * Math.PI) / 180);
+      const dyAfasta = outro ? st.y - outro.estado.y : Math.sin(((st.angulo - 90) * Math.PI) / 180);
+      const dAfasta = Math.max(1, Math.hypot(dxAfasta, dyAfasta));
+      const ux = dxAfasta / dAfasta;
+      const uy = dyAfasta / dAfasta;
+
+      if (inter.tipo === "presenca_golias") {
+        // Golias apenas vira pesadamente o cefalotórax com presença imponente
         flags.andando = false;
-        flags.cumprimentando = true;
-      } else if (inter.tipo === "aviso_territorial") {
+        flags.acumulandoPressao = true;
+        st.anguloAlvo = angParaOutro;
+      } else if (inter.tipo === "fuga_visual_salto") {
+        // Papa-Moscas: foco instantâneo de longe (0.26s) + salto explosivo para trás/lado + fuga!
+        st.anguloAlvo = angParaOutro;
+        if (inter.tempo < 0.26) {
+          flags.andando = false;
+          flags.paralaxe = true;
+          st.angulo = lerpAngulo(st.angulo, st.anguloAlvo, Math.min(1, dt * 18));
+        } else {
+          if (!inter.saltoIniciado) {
+            inter.saltoIniciado = true;
+            inter.origX = st.x;
+            inter.origY = st.y;
+            criarRastroPonto(st.x, st.y, true);
+          }
+          const sT = Math.min(1, (inter.tempo - 0.26) / 0.44);
+          const arco = Math.sin(sT * Math.PI);
+          flags.andando = false;
+          flags.noAr = true;
+          flags.escalaX = 1 + arco * 0.2;
+          flags.escalaY = 1 + arco * 0.24;
+          flags.sombraExtra = 10 * arco;
+          st.x = inter.origX + ux * (135 * sT);
+          st.y = inter.origY + uy * (135 * sT);
+        }
+      } else if (inter.tipo === "fuga_ballooning_panico") {
+        // Filhote: leve sobressalto antes de decolar pelo vento em ballooning!
         flags.andando = false;
-        flags.emDefesa = true;
-      } else if (inter.tipo === "recuo_hierarquia") {
-        // Recua de costas com respeito diante da Tarântula Golias!
-        if (outro && ativas.includes(outro)) {
-          const rx = st.x - outro.estado.x;
-          const ry = st.y - outro.estado.y;
-          const rd = Math.max(1, Math.hypot(rx, ry));
-          st.x += (rx / rd) * inst.especie.velocidadeBase * 1.1 * dt;
-          st.y += (ry / rd) * inst.especie.velocidadeBase * 1.1 * dt;
+        flags.agachando = true;
+        st.anguloAlvo = angParaOutro;
+      } else if (inter.tipo === "camuflagem_depois_caranguejo") {
+        // Aranha-Caranguejo: congela achatada (0.55s), depois corre de lado mantendo garras voltadas à gigante!
+        st.anguloAlvo = angParaOutro;
+        if (inter.tempo < 0.55) {
+          flags.andando = false;
+          flags.encolhida = true;
+          flags.escalaX = 1.04;
+          flags.escalaY = 0.88;
+        } else {
+          flags.andando = true;
+          flags.emboscadaBracos = true;
+          const perpX = -uy * (inter.ladoLateral || 1);
+          const perpY = ux * (inter.ladoLateral || 1);
+          const velLat = inst.especie.velocidadeBase * 1.95;
+          st.x += (perpX * 0.78 + ux * 0.62) * velLat * dt;
+          st.y += (perpY * 0.78 + uy * 0.62) * velLat * dt;
+        }
+      } else if (inter.tipo === "galhinho_depois_fuga") {
+        // Tecelã-de-Renda: postura críptica de galhinho imóvel tentando não ser notada
+        flags.andando = false;
+        flags.camuflagemGalhinho = true;
+        flags.escalaX = 0.9;
+        flags.escalaY = 1.08;
+      } else if (inter.tipo === "balanco_fuga_tecela") {
+        // Aranha Tecelã: balanço defensivo rápido (web-bouncing) antes de fugir
+        flags.andando = false;
+        flags.vibrandoTeia = true;
+        st.anguloAlvo = angParaOutro;
+        const vib = Math.sin(inter.tempo * 38) * 3.5;
+        st.x += -uy * vib * dt * 10;
+        st.y += ux * vib * dt * 10;
+      } else if (inter.tipo === "guarda_e_contorno_largo") {
+        // Ñanduobyeté: recua de frente com patas dianteiras em guarda tátil!
+        flags.andando = true;
+        flags.disputaAmeaca = true;
+        st.anguloAlvo = angParaOutro;
+        st.x += ux * inst.especie.velocidadeBase * 0.95 * dt;
+        st.y += uy * inst.especie.velocidadeBase * 0.95 * dt;
+      } else if (inter.tipo === "intimidacao_porte") {
+        // Aranha maior intimida a menor (predação intraguilda): foco + 1 passo tenso à frente!
+        st.anguloAlvo = angParaOutro;
+        if (inter.tempo < 0.42) {
+          flags.andando = false;
+          flags.acumulandoPressao = true;
+        } else {
+          flags.andando = true;
+          flags.disputaAmeaca = true;
+          st.x -= ux * inst.especie.velocidadeBase * 0.58 * dt;
+          st.y -= uy * inst.especie.velocidadeBase * 0.58 * dt;
+        }
+      } else if (inter.tipo === "avaliacao_visual") {
+        // Papa-Moscas avaliando outra espécie: paralaxe lateral + 2 passinhos cautelosos para trás
+        st.anguloAlvo = angParaOutro;
+        if (inter.tempo < 0.62) {
+          flags.andando = false;
+          flags.paralaxe = true;
+        } else {
+          flags.andando = true;
+          flags.paralaxe = true;
+          st.x += ux * inst.especie.velocidadeBase * 0.55 * dt;
+          st.y += uy * inst.especie.velocidadeBase * 0.55 * dt;
+        }
+      } else if (inter.tipo === "guarda_cautela") {
+        // Outra espécie fica imóvel em guarda com 1º par erguido enquanto a Papa-Moscas avalia e desvia
+        flags.andando = false;
+        flags.disputaAmeaca = true;
+        st.anguloAlvo = angParaOutro;
+      } else if (inter.tipo === "camuflagem_galhinho_passagem") {
+        flags.andando = false;
+        flags.camuflagemGalhinho = true;
+        flags.escalaX = 0.9;
+        flags.escalaY = 1.07;
+      } else if (inter.tipo === "camuflagem_achatada_passagem") {
+        flags.andando = false;
+        flags.encolhida = true;
+        flags.escalaX = 1.05;
+        flags.escalaY = 0.88;
+      } else if (inter.tipo === "inspecao_breve") {
+        flags.andando = false;
+        inst.comportamentoAtual = "probing";
+        st.anguloAlvo = angParaOutro;
+      } else if (inter.tipo === "advertencia_mutua") {
+        // Encontro interespecífico de porte semelhante: advertência mútua + leve toque cauteloso + recuo
+        st.anguloAlvo = angParaOutro;
+        if (inter.tempo < 0.55) {
+          flags.andando = false;
+          flags.disputaAmeaca = true;
+        } else if (inter.tempo < 0.82) {
+          flags.andando = false;
+          flags.cumprimentando = true;
+        } else {
+          flags.andando = true;
+          flags.disputaAmeaca = true;
+          st.x += ux * inst.especie.velocidadeBase * 0.7 * dt;
+          st.y += uy * inst.especie.velocidadeBase * 0.7 * dt;
         }
       }
+
       if (inter.tempo >= inter.duracao) {
-        const eraRecuo = inter.tipo === "recuo_hierarquia";
+        const tipoFim = inter.tipo;
+        const ladoFim = inter.ladoDesvio || inter.ladoContorno || inter.ladoLateral || (Math.random() < 0.5 ? 1 : -1);
         inst.interacao = null;
-        if (eraRecuo) acionarFuga(inst);
+
+        if (tipoFim === "fuga_ballooning_panico") {
+          acionarFugaBallooning(inst, outro);
+        } else if (
+          tipoFim === "fuga_visual_salto" ||
+          tipoFim === "camuflagem_depois_caranguejo" ||
+          tipoFim === "galhinho_depois_fuga" ||
+          tipoFim === "balanco_fuga_tecela"
+        ) {
+          inst.fugindo = true;
+          const fuga = bordaMaisProxima(st.x + ux * 200, st.y + uy * 200, Math.max(76, inst.tamPx * 1.45));
+          inst.fugaAlvo = { x: fuga.x, y: fuga.y };
+        } else if (
+          tipoFim === "guarda_e_contorno_largo" ||
+          tipoFim === "avaliacao_visual" ||
+          tipoFim === "advertencia_mutua" ||
+          tipoFim === "guarda_cautela" ||
+          tipoFim === "inspecao_breve"
+        ) {
+          desviarRotaAposEncontro(inst, outro, ladoFim, tipoFim === "guarda_e_contorno_largo" ? 1.55 : 1.05);
+        }
       }
     } else if (inst.fugindo && inst.fugaAlvo) {
       const dx = inst.fugaAlvo.x - st.x;
@@ -4717,8 +6097,12 @@ const AranhasAtelie = (() => {
       const multFuga = inst.especie.posturaDefensiva ? 1.85 : 2.75;
       st.velEscalar = lerp(st.velEscalar || 1, multFuga, dt * 8);
       const velFuga = inst.especie.velocidadeBase * st.velEscalar;
-      if (dist <= velFuga * dt + 8) {
+      if (estaForaDaTela(st.x, st.y, inst.tamPx)) {
         flags.terminado = true;
+      } else if (dist <= velFuga * dt + 8) {
+        // Evita travamento se a janela redimensionou: recalcula fuga bem para fora da borda
+        const novaFuga = bordaMaisProxima(st.x, st.y, Math.max(96, inst.tamPx * 1.7));
+        inst.fugaAlvo = { x: novaFuga.x, y: novaFuga.y };
       } else {
         st.x += (dx / dist) * velFuga * dt;
         st.y += (dy / dist) * velFuga * dt;
@@ -4772,19 +6156,24 @@ const AranhasAtelie = (() => {
       }
     } else if (st.tipo === "repouso_teia_canto") {
       if (st.elAlvo) {
-        const viva = calcularAncoraElemento(st.elAlvo, st.canto, st.offsetX, st.offsetY);
-        if (!viva) {
-          if (st.fase !== "partindo") {
-            st.fase = "partindo";
-            st.t = 0;
-            st.origemPartidaX = st.x;
-            st.origemPartidaY = st.y;
+        // Revalida âncora DOM apenas a cada 0.38s (evita getBoundingClientRect + getComputedStyle a 60 FPS!)
+        st.tempoRevalidaAncora = (st.tempoRevalidaAncora || 0) - dt;
+        if (st.tempoRevalidaAncora <= 0) {
+          st.tempoRevalidaAncora = 0.38;
+          const viva = calcularAncoraElemento(st.elAlvo, st.canto, st.offsetX, st.offsetY);
+          if (!viva) {
+            if (st.fase !== "partindo") {
+              st.fase = "partindo";
+              st.t = 0;
+              st.origemPartidaX = st.x;
+              st.origemPartidaY = st.y;
+            }
+          } else {
+            st.vx = viva.vx;
+            st.vy = viva.vy;
+            st.px = viva.px;
+            st.py = viva.py;
           }
-        } else {
-          st.vx = viva.vx;
-          st.vy = viva.vy;
-          st.px = viva.px;
-          st.py = viva.py;
         }
       }
 
@@ -4861,13 +6250,13 @@ const AranhasAtelie = (() => {
         const ease = st.t * st.t;
         const ox = st.origemPartidaX != null ? st.origemPartidaX : st.px;
         const oy = st.origemPartidaY != null ? st.origemPartidaY : st.py;
-        const destinoX = st.canto === "top-right" ? st.vx + inst.tamPx * 0.7 : st.vx - inst.tamPx * 0.7;
-        const destinoY = st.vy - inst.tamPx * 0.7;
+        const destinoX = st.canto === "top-right" ? st.vx + inst.tamPx * 1.55 : st.vx - inst.tamPx * 1.55;
+        const destinoY = st.vy - inst.tamPx * 1.55;
         st.x = lerp(ox, destinoX, ease);
         st.y = lerp(oy, destinoY, ease);
         st.progressoSeda = Math.max(0, 1 - ease * 1.15);
         st.anguloAlvo = (Math.atan2(destinoY - oy, destinoX - ox) * 180) / Math.PI + 90;
-        if (st.t >= 1) {
+        if (st.t >= 1 || estaForaDaTela(st.x, st.y, inst.tamPx)) {
           if (estaForaDaTela(st.x, st.y, inst.tamPx)) {
             flags.terminado = true;
           } else {
@@ -4925,14 +6314,18 @@ const AranhasAtelie = (() => {
         if (st.tempoPausa >= st.duracaoPausa) {
           st.fase = "saindo";
           st.t = 0;
+          st.origemSaidaX = st.x;
+          st.origemSaidaY = st.y;
         }
       } else {
         const mult = inst.fugindo ? 2.5 : 0.95;
         st.t = Math.min(1, st.t + dt * mult);
         const ease = st.t * st.t;
-        st.x = lerp(st.xEspia, st.xFora, ease);
-        st.y = lerp(st.yEspia, st.yFora, ease);
-        if (st.t >= 1) {
+        const oxS = st.origemSaidaX != null ? st.origemSaidaX : st.xEspia;
+        const oyS = st.origemSaidaY != null ? st.origemSaidaY : st.yEspia;
+        st.x = lerp(oxS, st.xFora, ease);
+        st.y = lerp(oyS, st.yFora, ease);
+        if (st.t >= 1 || estaForaDaTela(st.x, st.y, inst.tamPx)) {
           if (estaForaDaTela(st.x, st.y, inst.tamPx)) {
             flags.terminado = true;
           } else {
@@ -5056,10 +6449,22 @@ const AranhasAtelie = (() => {
 
     if (flags.terminado) {
       if (!estaForaDaTela(st.x, st.y, inst.tamPx)) {
-        // Garantia absoluta: nenhuma aranha pode desaparecer no meio da tela!
-        inst.fugindo = false;
-        inst.fugaAlvo = null;
-        encaminharParaSaidaBorda(inst, 1.15);
+        // Garantia absoluta: nenhuma aranha pode desaparecer no meio da tela NEM ficar presa em loop na borda!
+        if (inst.caca && inst.caca.fase === "levando") {
+          inst.caca.alvoFuga = bordaMaisProxima(st.x, st.y, Math.max(100, inst.tamPx * 1.75));
+        } else {
+          if (inst.caca) {
+            if (inst.caca.presa && inst.caca.presa.modo !== "capturada") {
+              inst.caca.presa.cacador = null;
+              inst.caca.presa.modo = "escapando";
+            }
+            limparFioCaca(inst);
+            inst.caca = null;
+          }
+          limparAcaoEspecial(inst);
+          inst.interacao = null;
+          encaminharParaSaidaBorda(inst, 1.2);
+        }
         flags.terminado = false;
       } else {
         removerInstancia(inst);
@@ -5069,6 +6474,51 @@ const AranhasAtelie = (() => {
 
     st.angulo = lerpAngulo(st.angulo, st.anguloAlvo, dt * (inst.fugindo ? 16 : 8));
     const desloc = Math.hypot(st.x - prevX, st.y - prevY);
+
+    // Watchdog anti-travamento nas bordas/cantos: nenhuma aranha pode ficar parada pela metade sem se mexer!
+    if (!isFinite(st.x) || !isFinite(st.y)) {
+      removerInstancia(inst);
+      return;
+    }
+    const WAtual = vpW;
+    const HAtual = vpH;
+    const faixaBorda = Math.max(38, inst.tamPx * 0.72);
+    const pertoDaBorda =
+      st.x < faixaBorda || st.x > WAtual - faixaBorda || st.y < faixaBorda || st.y > HAtual - faixaBorda;
+    const pausaIntencionalBorda =
+      (st.tipo === "repouso_teia_canto" && st.fase === "aguardando_em_x" && st.tempoFase < st.duracaoVigilia) ||
+      (st.tipo === "espiadinha" && st.fase === "espiando" && st.tempoPausa < st.duracaoPausa) ||
+      (inst.caca && inst.caca.fase === "aguardando_teia" && inst.caca.tempoFase < 14);
+    if (pertoDaBorda && desloc < 0.14 && !pausaIntencionalBorda) {
+      inst.tempoImovelBorda = (inst.tempoImovelBorda || 0) + dt;
+      if (inst.tempoImovelBorda >= 2.1) {
+        inst.tempoImovelBorda = 0;
+        if (estaForaDaTela(st.x, st.y, inst.tamPx)) {
+          removerInstancia(inst);
+          return;
+        }
+        if (inst.caca && inst.caca.fase === "levando") {
+          inst.caca.alvoFuga = bordaMaisProxima(st.x, st.y, Math.max(105, inst.tamPx * 1.8));
+        } else {
+          if (inst.caca) {
+            if (inst.caca.presa && inst.caca.presa.modo !== "capturada") {
+              inst.caca.presa.cacador = null;
+              inst.caca.presa.modo = "escapando";
+            }
+            limparFioCaca(inst);
+            inst.caca = null;
+          }
+          limparAcaoEspecial(inst);
+          inst.interacao = null;
+          inst.camuflagemRestante = 0;
+          inst.defesaRestante = 0;
+          encaminharParaSaidaBorda(inst, 1.35);
+        }
+      }
+    } else {
+      inst.tempoImovelBorda = 0;
+    }
+
     animarPatasEComportamentos(inst, dt, flags.andando, desloc, flags.noAr, flags.agachando, flags);
 
     if (inst.especie.rastroSeda && flags.andando && desloc > 0.18 && st.tipo !== "repouso_teia_canto") {
@@ -5109,17 +6559,25 @@ const AranhasAtelie = (() => {
       flags.escalaY *= 1 - fS * 0.06;
     }
     const meia = inst.tamPx / 2;
-    inst.wrap.style.transform = `translate3d(${(st.x - meia + offsetScrollX).toFixed(2)}px, ${(st.y - meia + bobCorpo).toFixed(2)}px, 0) rotate(${(st.angulo + offsetScrollX * 0.45).toFixed(2)}deg) scale(${flags.escalaX.toFixed(3)}, ${flags.escalaY.toFixed(3)})`;
+    const txWrap = `translate3d(${(st.x - meia + offsetScrollX).toFixed(1)}px, ${(st.y - meia + bobCorpo).toFixed(1)}px, 0) rotate(${(st.angulo + offsetScrollX * 0.45).toFixed(1)}deg) scale(${flags.escalaX.toFixed(3)}, ${flags.escalaY.toFixed(3)})`;
+    if (txWrap !== inst._lastWrapTx) {
+      inst._lastWrapTx = txWrap;
+      inst.wrap.style.transform = txWrap;
+    }
 
-    if (flags.sombraExtra > 0.1) {
-      inst.wrap.style.filter = `drop-shadow(0 ${(4 + flags.sombraExtra).toFixed(1)}px ${(5 + flags.sombraExtra * 0.75).toFixed(1)}px var(--aranha-sombra))`;
-    } else if (inst.wrap.style.filter) {
-      inst.wrap.style.filter = "";
+    // Classe CSS estática em vez de reescrever filter:drop-shadow() a cada frame (evita blur por software a 60 FPS!)
+    const elevada = flags.sombraExtra > 2.2;
+    if (elevada !== inst._elevadaAtiva) {
+      inst._elevadaAtiva = elevada;
+      inst.wrap.classList.toggle("aranha-elevada", elevada);
     }
   }
 
   function loopFrame(ts) {
     if (ativas.length === 0 && presasAtivas.length === 0) {
+      if (typeof AranhasCinematicaIK !== "undefined") {
+        AranhasCinematicaIK.renderizarFrame(camadaEl, ativas, presasAtivas, ts);
+      }
       rafId = null;
       return;
     }
@@ -5159,11 +6617,17 @@ const AranhasAtelie = (() => {
       for (let i = presasAtivas.length - 1; i >= 0; i--) {
         atualizarPresa(presasAtivas[i], dt);
       }
+      if (typeof AranhasCinematicaIK !== "undefined") {
+        AranhasCinematicaIK.renderizarFrame(camadaEl, ativas, presasAtivas, ts);
+      }
     }
 
     if (ativas.length > 0 || presasAtivas.length > 0) {
       rafId = requestAnimationFrame(loopFrame);
     } else {
+      if (typeof AranhasCinematicaIK !== "undefined") {
+        AranhasCinematicaIK.renderizarFrame(camadaEl, ativas, presasAtivas, ts);
+      }
       rafId = null;
     }
   }
@@ -5250,6 +6714,8 @@ const AranhasAtelie = (() => {
         return iniciarEncontroAranhas(false, true);
       case "encontro_golias":
         return iniciarEncontroAranhas(true, true);
+      case "disputa_presa":
+        return iniciarCenaDisputaPresa(true);
       case "beber_orvalho":
         return iniciarCenaBeberOrvalho(null, true);
       case "nuvem_urticante":
@@ -5355,11 +6821,27 @@ const AranhasAtelie = (() => {
       }
     }, { passive: true, capture: true });
 
+    // Atualiza cache de dimensões da viewport apenas no resize
+    window.addEventListener("resize", () => {
+      vpW = window.innerWidth || 1200;
+      vpH = window.innerHeight || 800;
+      if (typeof AranhasCinematicaIK !== "undefined") {
+        AranhasCinematicaIK.redimensionar(vpW, vpH);
+      }
+    }, { passive: true });
+
     document.addEventListener("visibilitychange", () => {
       if (document.hidden) {
         cancelarAgendamento();
+        if (rafId) {
+          cancelAnimationFrame(rafId);
+          rafId = null;
+        }
       } else {
         ultimoFrameTs = 0;
+        if (ativas.length > 0 || presasAtivas.length > 0) {
+          iniciarLoop();
+        }
         agendarProxima(false);
       }
     });

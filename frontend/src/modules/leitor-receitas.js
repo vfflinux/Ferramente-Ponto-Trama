@@ -302,7 +302,21 @@ const LeitorReceitas = (() => {
     if (ta && ta.value !== estado.texto) ta.value = estado.texto;
 
     const chkSync = document.getElementById("chk-ribblr-sync-contador");
-    if (chkSync) chkSync.checked = estado.sync_contador !== false;
+    if (chkSync) {
+      chkSync.checked = estado.sync_contador !== false;
+      // Injeta botão "🧶 Conferir Estoque" ao lado do controle do Leitor Ribblr
+      const barraSync = chkSync.closest("label")?.parentElement;
+      if (barraSync && !document.getElementById("btn-conferir-estoque-receita")) {
+        const btnEst = document.createElement("button");
+        btnEst.type = "button";
+        btnEst.id = "btn-conferir-estoque-receita";
+        btnEst.className = "btn-conferir-estoque-receita";
+        btnEst.title = "Comparar fios pedidos na receita com seu Estoque de Fios";
+        btnEst.innerHTML = "🧶 Conferir Estoque";
+        btnEst.addEventListener("click", abrirModalConferenciaEstoque);
+        barraSync.appendChild(btnEst);
+      }
+    }
 
     const lista = document.getElementById("lista-linhas-receita-global");
     const info = document.getElementById("info-linha-atual-global");
@@ -682,6 +696,82 @@ const LeitorReceitas = (() => {
     garantirDicionarioSiglas();
     renderizar();
     persistir();
+  }
+
+  async function abrirModalConferenciaEstoque() {
+    const fios = typeof BancoDadosPT !== "undefined" ? await BancoDadosPT.obterTodos("fios") : [];
+    const txt = (estado.texto || "").toLowerCase();
+    // Extrai menções a gramas, metros, tex ou nomes de cores/fios na receita
+    const matchGramas = txt.match(/(\d+)\s*g\b/);
+    const matchMetros = txt.match(/(\d+)\s*m(?:etros)?\b/);
+    const matchTex = txt.match(/tex\s*(\d+)/i);
+    const gramasPedidas = matchGramas ? Number(matchGramas[1]) : 0;
+    const metrosPedidos = matchMetros ? Number(matchMetros[1]) : 0;
+    const texPedido = matchTex ? Number(matchTex[1]) : 0;
+
+    const disponiveis = (fios || []).filter((f) => (Number(f.quantidade) || 0) > 0);
+    const compativeis = disponiveis.filter((f) => {
+      const nomeMatch = f.nome && txt.includes(String(f.nome).toLowerCase());
+      const corMatch = f.cor_nome && txt.includes(String(f.cor_nome).toLowerCase());
+      const texMatch = texPedido > 0 && f.tex && Math.abs(Number(f.tex) - texPedido) <= 120;
+      return nomeMatch || corMatch || texMatch;
+    });
+    const exibir = compativeis.length > 0 ? compativeis : disponiveis.slice(0, 8);
+
+    let modal = document.getElementById("modal-conferir-estoque-rec");
+    if (!modal) {
+      modal = document.createElement("div");
+      modal.id = "modal-conferir-estoque-rec";
+      modal.className = "modal-overlay-atelie-pro";
+      document.body.appendChild(modal);
+    }
+
+    const resumoRequisitos = [
+      gramasPedidas ? `~${gramasPedidas}g detectados` : null,
+      metrosPedidos ? `~${metrosPedidos}m detectados` : null,
+      texPedido ? `TEX ~${texPedido}` : null
+    ].filter(Boolean).join(" • ") || "Comparação rápida com os fios disponíveis na sua prateleira";
+
+    modal.innerHTML = `
+      <div class="modal-box-atelie-pro" style="max-width:560px" role="dialog" aria-modal="true">
+        <div class="modal-topo-atelie-pro">
+          <div>
+            <span class="etiqueta-tecido-atelie">CONFERÊNCIA DE MATERIAIS</span>
+            <h3>🧶 Fios do Estoque para esta Receita</h3>
+          </div>
+          <button type="button" class="btn-fechar-atelie-pro" id="btn-fechar-conf-estoque">✕</button>
+        </div>
+        <div class="modal-corpo-atelie-pro" style="display:flex;flex-direction:column;gap:10px">
+          <p style="font-size:12.5px;opacity:0.86">${escapeHtml(resumoRequisitos)}</p>
+          ${
+            exibir.length === 0
+              ? `<div class="snapshot-vazio">Seu estoque de fios está vazio no momento. Cadastre seus novelos na aba Fios!</div>`
+              : exibir
+                  .map((f) => {
+                    const gTotal = Math.round((Number(f.quantidade) || 0) * (Number(f.peso_novelo_g) || 100));
+                    const suficiente = !gramasPedidas || gTotal >= gramasPedidas;
+                    return `
+                      <div class="snapshot-item-linha">
+                        <div class="snapshot-item-info">
+                          <strong>${escapeHtml(f.nome || "Fio")} — ${escapeHtml(f.cor_nome || "")} (${escapeHtml(f.marca || "")})</strong>
+                          <span>Estoque: ${Number(f.quantidade) || 0} un (~${gTotal}g) ${f.tex ? `• TEX ${escapeHtml(f.tex)}` : ""}</span>
+                        </div>
+                        <span class="etiqueta-tecido-atelie" style="opacity:${suficiente ? 1 : 0.7}">${suficiente ? "✓ Suficiente" : "⚠ Pouco saldo"}</span>
+                      </div>
+                    `;
+                  })
+                  .join("")
+          }
+        </div>
+      </div>
+    `;
+    modal.style.display = "flex";
+    document.getElementById("btn-fechar-conf-estoque")?.addEventListener("click", () => {
+      modal.style.display = "none";
+    });
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) modal.style.display = "none";
+    });
   }
 
   function alternarModo(novoModo) {

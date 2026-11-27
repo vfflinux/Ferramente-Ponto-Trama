@@ -64,6 +64,9 @@ document.addEventListener("DOMContentLoaded", () => {
   if (typeof AranhasAtelie !== "undefined" && typeof AranhasAtelie.init === "function") {
     AranhasAtelie.init();
   }
+  if (typeof HistoricoAcoes !== "undefined" && typeof HistoricoAcoes.init === "function") {
+    HistoricoAcoes.init();
+  }
 
   // 2. Inicializa imediatamente apenas a tela inicial visível (Home)
   PontoTramaApp.garantirModulo("home");

@@ -22,23 +22,37 @@ const Animacoes = {
 
     const posicoesAntes = elementos.map((el) => ({
       el,
-      rect: el.getBoundingClientRect()
+      left: el.getBoundingClientRect().left
     }));
 
     if (typeof callbackMudanca === "function") callbackMudanca();
 
-    posicoesAntes.forEach(({ el, rect: rectAntes }) => {
-      const rectDepois = el.getBoundingClientRect();
-      const deltaX = rectAntes.left - rectDepois.left;
-
+    // Agrupa todas as leituras de layout antes das escritas (elimina N reflows forçados!)
+    const deltas = [];
+    for (let i = 0; i < posicoesAntes.length; i++) {
+      const item = posicoesAntes[i];
+      const deltaX = item.left - item.el.getBoundingClientRect().left;
       if (deltaX !== 0) {
-        el.style.transition = "none";
-        el.style.transform = `translateX(${deltaX}px)`;
-        // Força reflow no navegador
-        void el.offsetHeight;
-        el.style.transition = "transform 0.45s cubic-bezier(0.4, 0, 0.2, 1)";
-        el.style.transform = "";
+        deltas.push({ el: item.el, deltaX });
       }
+    }
+
+    if (deltas.length === 0) return;
+
+    for (let i = 0; i < deltas.length; i++) {
+      const { el, deltaX } = deltas[i];
+      el.style.transition = "none";
+      el.style.transform = `translate3d(${deltaX}px, 0, 0)`;
+    }
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        for (let i = 0; i < deltas.length; i++) {
+          const { el } = deltas[i];
+          el.style.transition = "transform 0.38s cubic-bezier(0.22, 1, 0.36, 1)";
+          el.style.transform = "";
+        }
+      });
     });
   },
 

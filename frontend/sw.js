@@ -6,7 +6,7 @@
 // imediatamente quando online/local e funcionar 100% offline sem rede.
 // ==========================================================================
 
-const CACHE_NOME = "ponto-e-trama-offline-v35";
+const CACHE_NOME = "ponto-e-trama-offline-v42";
 
 const RECURSOS_ESSENCIAIS = [
   "./",
@@ -38,8 +38,10 @@ const RECURSOS_ESSENCIAIS = [
   "./src/core/database.js",
   "./src/core/projeto-contexto.js",
   "./src/core/animations.js",
+  "./src/core/historico-acoes.js",
   "./src/core/sidebar.js",
   "./src/core/busca-global.js",
+  "./src/core/aranhas-cinematica-ik.js",
   "./src/core/aranhas-atelie.js",
   "./src/modules/home.js",
   "./src/modules/contador-carreiras.js",

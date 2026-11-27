@@ -79,37 +79,49 @@
   contain: strict;
 }
 
+.canvas-ik-aranhas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
 .aranha-viva-ator {
   position: absolute;
   top: 0;
   left: 0;
+  z-index: 1;
   pointer-events: none;
   color: var(--aranha-tinta);
-  opacity: 0.86;
+  opacity: 0.9;
   will-change: transform;
-  filter: drop-shadow(0 3px 4px var(--aranha-sombra));
+  contain: layout style;
+}
+
+.aranha-viva-ator.aranha-elevada {
+  opacity: 0.96;
 }
 
 .aranha-viva-ator.especie-filhote {
-  opacity: 0.78;
+  opacity: 0.8;
 }
 
-/* Tarântula Golias (Comedora-de-Pássaros — 146 px): presença imponente e sombra aterrada */
+/* Tarântula Golias (Comedora-de-Pássaros — 146 px): presença imponente e sombra 3D via Canvas */
 .aranha-viva-ator.especie-tarantula_golias {
-  opacity: 0.94;
+  opacity: 0.95;
   z-index: 2;
-  filter: drop-shadow(0 7px 9px var(--aranha-sombra));
 }
 
 .golias-quelicera-esq,
 .golias-quelicera-dir {
   transition: transform 0.14s cubic-bezier(0.22, 1, 0.36, 1);
-  will-change: transform;
 }
 
 /* Aranha Tecelã de Canto (Argiope): contraste nítido sobre as teias dos cantos */
 .aranha-viva-ator.especie-tecela_canto {
-  opacity: 0.9;
+  opacity: 0.92;
 }
 
 /* Presas vivas (Mosca, Mosquito, Barata, Lagartinho, Lagarta Gigante) */
@@ -120,15 +132,14 @@
   z-index: 1;
   pointer-events: none;
   color: var(--aranha-tinta);
-  opacity: 0.9;
+  opacity: 0.92;
   will-change: transform;
-  filter: drop-shadow(0 3px 4px var(--aranha-sombra));
+  contain: layout style;
 }
 
 .presa-viva-ator.presa-lagartinho,
 .presa-viva-ator.presa-lagarta {
-  opacity: 0.93;
-  filter: drop-shadow(0 6px 7px var(--aranha-sombra));
+  opacity: 0.95;
 }
 
 .presa-svg {
@@ -201,6 +212,11 @@
 
 .aranha-viva-ator.exibindo-cortejo .palpo-mancha {
   opacity: 1 !important;
+}
+
+/* Destaque sutil durante disputa territorial/alimentar entre 2 aranhas */
+.aranha-viva-ator.em-disputa-presa {
+  filter: drop-shadow(0 3px 6px var(--aranha-sombra));
 }
 
 /* Pedaços anatômicos consumíveis da Lagarta e do Lagartinho (Golias comendo pedaço por pedaço) */
@@ -400,29 +416,22 @@
   overflow: visible;
 }
 
-/* Pivôs anatômicos individuais de patas, abdômen e cefalotórax */
-.aranha-svg .pata-art {
-  will-change: transform;
-}
-
+/* Pivôs anatômicos individuais de patas, abdômen e cefalotórax
+   (sem will-change em cada filho SVG para evitar explosão de camadas GPU) */
 .aranha-svg .aranha-abdomen {
   transform-origin: 60px 62px;
-  will-change: transform;
 }
 
 .aranha-svg .aranha-cefalotorax {
   transform-origin: 60px 52px;
-  will-change: transform;
 }
 
 .aranha-svg .aranha-palpos {
   transform-origin: 60px 36px;
-  will-change: transform;
 }
 
 .aranha-svg .aranha-olhos-vivos {
   transform-origin: 60px 38px;
-  animation: piscarOlhinhosAranha 5.2s cubic-bezier(0.45, 0, 0.55, 1) infinite;
 }
 
 /* Fio dinâmico de rapel ou ballooning */

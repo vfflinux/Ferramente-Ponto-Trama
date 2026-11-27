@@ -7,42 +7,44 @@
     <link rel="manifest" href="manifest.json" />
     <title>Ponto & Trama</title>
     <!-- Carregamento paralelo de estilos (sem cascata @import) -->
-    <link rel="stylesheet" href="styles/base/global.css?v=15" />
+    <link rel="stylesheet" href="styles/base/global.css?v=17" />
     <link rel="stylesheet" href="styles/layout/barra-lateral.css?v=9" />
-    <link rel="stylesheet" href="styles/layout/busca-global.css?v=1" />
-    <link rel="stylesheet" href="styles/layout/identidade-artesanal.css?v=5" />
-    <link rel="stylesheet" href="styles/layout/aranhas-atelie.css?v=11" />
+    <link rel="stylesheet" href="styles/layout/busca-global.css?v=2" />
+    <link rel="stylesheet" href="styles/layout/identidade-artesanal.css?v=6" />
+    <link rel="stylesheet" href="styles/layout/aranhas-atelie.css?v=14" />
     <link rel="stylesheet" href="styles/modules/home.css?v=14" />
     <link rel="stylesheet" href="styles/modules/contador-carreiras.css?v=12" />
     <link rel="stylesheet" href="styles/modules/leitor-receitas.css?v=11" />
     <link rel="stylesheet" href="styles/modules/calculadora-precificacao.css" />
     <link rel="stylesheet" href="styles/modules/gerenciador-projetos.css?v=12" />
-    <link rel="stylesheet" href="styles/modules/inventario-fios.css?v=16" />
+    <link rel="stylesheet" href="styles/modules/inventario-fios.css?v=17" />
     <link rel="stylesheet" href="styles/modules/inventario-agulhas.css" />
     <link rel="stylesheet" href="styles/modules/calculadora-amostra.css?v=2" />
     <link rel="stylesheet" href="styles/modules/banco-amostras.css" />
     <link rel="stylesheet" href="styles/modules/editor-graficos.css" />
     <link rel="stylesheet" href="styles/modules/tabelas-conversao.css?v=11" />
     <link rel="stylesheet" href="styles/modules/configuracoes.css?v=9" />
-    <link rel="stylesheet" href="styles/modules/ferramentas-atelie-pro.css?v=2" />
+    <link rel="stylesheet" href="styles/modules/ferramentas-atelie-pro.css?v=4" />
     <link rel="stylesheet" href="styles/base/mobile.css?v=16" />
     <link rel="stylesheet" href="styles/base/temas.css?v=19" />
 
     <!-- Core da aplicação -->
     <script src="src/core/database.js?v=13" defer></script>
     <script src="src/core/projeto-contexto.js?v=4" defer></script>
-    <script src="src/core/animations.js" defer></script>
+    <script src="src/core/animations.js?v=2" defer></script>
+    <script src="src/core/historico-acoes.js?v=1" defer></script>
     <script src="src/core/sidebar.js?v=10" defer></script>
-    <script src="src/core/busca-global.js?v=10" defer></script>
-    <script src="src/core/aranhas-atelie.js?v=11" defer></script>
+    <script src="src/core/busca-global.js?v=12" defer></script>
+    <script src="src/core/aranhas-cinematica-ik.js?v=1" defer></script>
+    <script src="src/core/aranhas-atelie.js?v=18" defer></script>
 
     <!-- Módulos de ferramentas -->
-    <script src="src/modules/home.js?v=17" defer></script>
-    <script src="src/modules/contador-carreiras.js?v=12" defer></script>
-    <script src="src/modules/calculadora-precificacao.js?v=4" defer></script>
+    <script src="src/modules/home.js?v=18" defer></script>
+    <script src="src/modules/contador-carreiras.js?v=13" defer></script>
+    <script src="src/modules/calculadora-precificacao.js?v=5" defer></script>
     <script src="src/modules/tradutor-receitas.js?v=5" defer></script>
-    <script src="src/modules/leitor-receitas.js?v=14" defer></script>
-    <script src="src/modules/gerenciador-projetos.js?v=13" defer></script>
+    <script src="src/modules/leitor-receitas.js?v=15" defer></script>
+    <script src="src/modules/gerenciador-projetos.js?v=14" defer></script>
     <script src="src/modules/inventario-fios.js?v=17" defer></script>
     <script src="src/modules/planejador-manta.js?v=1" defer></script>
     <script src="src/modules/inventario-agulhas.js?v=13" defer></script>
@@ -55,7 +57,7 @@
     <script src="src/modules/configuracoes.js?v=13" defer></script>
 
     <!-- Bootstrap principal -->
-    <script src="src/main.js?v=8" defer></script>
+    <script src="src/main.js?v=9" defer></script>
   </head>
   <body>
     <input type="checkbox" id="opcao-menu" />
@@ -5506,8 +5508,9 @@
                         <option value="cena:caca_golias_barata">Raro: Tarântula Golias × Barata</option>
                         <option value="cena:caca_golias_lagartinho">Lendário: Golias × Lagartinho</option>
                         <option value="cena:caca_golias_lagarta">Lendário: Golias × Lagarta Gigante</option>
-                        <option value="cena:encontro_aranhas">Encontro: 2 Aranhas (Cumprimento)</option>
-                        <option value="cena:encontro_golias">Encontro: Hierarquia com Golias</option>
+                        <option value="cena:encontro_aranhas">Encontro: 2 Espécies (Etologia Real)</option>
+                        <option value="cena:encontro_golias">Encontro: Reação Real à Tarântula Golias</option>
+                        <option value="cena:disputa_presa">Disputa: 2 Aranhas Brigando por Presa</option>
                       </optgroup>
                       <optgroup label="Comportamentos Vivos &amp; Eventos">
                         <option value="cena:beber_orvalho">Beber Gota de Orvalho</option>

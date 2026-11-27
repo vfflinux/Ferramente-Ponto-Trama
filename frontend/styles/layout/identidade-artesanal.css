@@ -195,7 +195,7 @@
   opacity: 0.13;
   z-index: 0;
   transform-origin: top right;
-  animation: teiaRespirar 9s ease-in-out infinite;
+  contain: layout style;
 }
 
 .aranha-fio-pendente {
@@ -209,35 +209,33 @@
   opacity: 0.56;
   z-index: 1;
   transform-origin: top center;
+  contain: layout style;
   animation:
     descerFioAranha 1.05s cubic-bezier(0.22, 1, 0.36, 1) both,
     balancoAranhaFio 8.2s cubic-bezier(0.37, 0, 0.63, 1) 1.05s infinite;
-  transition: opacity 0.25s ease, filter 0.25s ease;
+  transition: opacity 0.25s ease;
 }
 
 .home-hero-card:hover .aranha-fio-pendente,
 .home-boas-vindas:hover .aranha-fio-pendente {
-  opacity: 0.8;
-  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.22));
+  opacity: 0.82;
 }
 
+/* Fio estático sem animação CPU de stroke-dashoffset (elimina repaint contínuo 60 FPS) */
 .aranha-fio-linha {
-  animation: fioSedaCorrer 3.2s linear infinite;
+  opacity: 0.85;
 }
 
 .aranha-patas-esq {
   transform-origin: 32px 76px;
-  animation: mexerPatasEsq 4.2s cubic-bezier(0.37, 0, 0.63, 1) infinite;
 }
 
 .aranha-patas-dir {
   transform-origin: 32px 76px;
-  animation: mexerPatasDir 4.2s cubic-bezier(0.37, 0, 0.63, 1) infinite;
 }
 
 .aranha-olhos {
   transform-origin: center;
-  animation: piscarOlhinhosAranha 5.5s ease-in-out infinite;
 }
 
 .home-hero-card > *:not(.teia-hero-decor):not(.aranha-fio-pendente),
@@ -256,7 +254,6 @@
   color: var(--cor-texto-principal, #fcf1d0);
   opacity: 0.09;
   z-index: 0;
-  animation: teiaRespirar 10s ease-in-out infinite;
 }
 
 .teia-tela-toda.esq {
@@ -298,7 +295,6 @@
   height: 18px;
   flex-shrink: 0;
   transform-origin: top center;
-  animation: acenoMiniAranha 5s ease-in-out infinite;
 }
 
 /* ==========================================================================
@@ -417,7 +413,6 @@ svg circle[stroke-dasharray],
   display: block;
   position: relative;
   z-index: 1;
-  animation: flutuarSuaveVazio 5.2s ease-in-out infinite;
 }
 
 .svg-vazio-artesanal.compacto {
@@ -445,7 +440,6 @@ svg circle[stroke-dasharray],
 .home-bv-ilustra svg {
   width: 82px;
   height: 82px;
-  animation: flutuarSuaveVazio 5.2s ease-in-out infinite;
 }
 
 .vazio-bloco-ilustrado {

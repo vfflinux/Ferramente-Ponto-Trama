@@ -66,6 +66,7 @@ HOST = os.environ.get("PONTO_TRAMA_HOST", "127.0.0.1")
 PORT = int(os.environ.get("PONTO_TRAMA_PORT", "8080"))
 
 COLECOES_PERMITIDAS = {"fios", "itens_biblioteca", "banco_amostras", "projetos"}
+DESKTOP_MINI_TOPO_HOOK = None
 
 
 def agora_iso() -> str:
@@ -539,6 +540,14 @@ class PontoTramaHandler(BaseHTTPRequestHandler):
         path_limpo = urlparse(self.path).path.rstrip("/")
         try:
             corpo = self.ler_json_corpo()
+
+            # Endpoint Desktop Ubuntu: Mini-Janela Sempre no Topo (GTK3 keep_above + resize)
+            if path_limpo == "/api/desktop/mini-topo":
+                ativo = bool(corpo.get("ativo")) if isinstance(corpo, dict) else False
+                if callable(DESKTOP_MINI_TOPO_HOOK):
+                    DESKTOP_MINI_TOPO_HOOK(ativo)
+                self.enviar_json({"ok": True, "ativo": ativo})
+                return
 
             # Endpoints de Sincronização Wi-Fi Local (RF01-RF06, RNF01-RNF05)
             if path_limpo == "/api/sync/iniciar":

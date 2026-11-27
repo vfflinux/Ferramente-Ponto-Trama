@@ -26,6 +26,7 @@ import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -33,6 +34,7 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Ponto & Trama — Aplicativo Android 100% Local e Offline.
@@ -55,6 +57,7 @@ public class MainActivity extends Activity {
     private ValueCallback<Uri[]> filePathCallback;
     private String conteudoPendenteSalvar;
     private byte[] bytesPendentesSalvar;
+    private final Map<String, byte[]> cacheAssets = new ConcurrentHashMap<>();
 
     @SuppressLint("SetJavaScriptEnabled")
     @SuppressWarnings("deprecation")
@@ -75,9 +78,13 @@ public class MainActivity extends Activity {
 
         webView = new WebView(this);
         webView.setBackgroundColor(Color.parseColor("#0d1c42"));
+        webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
         webView.setOverScrollMode(View.OVER_SCROLL_NEVER);
         webView.setVerticalScrollBarEnabled(false);
         webView.setHorizontalScrollBarEnabled(false);
+        if (Build.VERSION.SDK_INT >= 26) {
+            webView.setRendererPriorityPolicy(WebView.RENDERER_PRIORITY_IMPORTANT, false);
+        }
         rootContainer.addView(webView, new FrameLayout.LayoutParams(
             FrameLayout.LayoutParams.MATCH_PARENT,
             FrameLayout.LayoutParams.MATCH_PARENT
@@ -122,6 +129,7 @@ public class MainActivity extends Activity {
         settings.setBuiltInZoomControls(false);
         settings.setDisplayZoomControls(false);
         settings.setMediaPlaybackRequiresUserGesture(false);
+        settings.setCacheMode(WebSettings.LOAD_DEFAULT);
 
         webView.addJavascriptInterface(new PonteAndroidNativa(), "PontoETramaAndroid");
 
@@ -156,12 +164,18 @@ public class MainActivity extends Activity {
                 }
 
                 try {
-                    InputStream is = assets.open("frontend/" + rel);
                     String mime = detectarMime(rel);
                     String encoding = isTexto(mime) ? "UTF-8" : null;
                     Map<String, String> headers = new HashMap<>();
-                    headers.put("Cache-Control", "no-cache");
-                    return new WebResourceResponse(mime, encoding, 200, "OK", headers, is);
+                    headers.put("Cache-Control", "public, max-age=86400");
+                    byte[] dados = cacheAssets.get(rel);
+                    if (dados == null) {
+                        dados = lerAssetEmMemoria(assets, "frontend/" + rel);
+                        if (dados.length <= 512 * 1024) {
+                            cacheAssets.put(rel, dados);
+                        }
+                    }
+                    return new WebResourceResponse(mime, encoding, 200, "OK", headers, new ByteArrayInputStream(dados));
                 } catch (IOException e) {
                     return respostaVazia(404, "Not Found");
                 }
@@ -352,11 +366,41 @@ public class MainActivity extends Activity {
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        if (webView != null) {
+            webView.onPause();
+            webView.pauseTimers();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (webView != null) {
+            webView.resumeTimers();
+            webView.onResume();
+        }
+    }
+
+    @Override
     protected void onDestroy() {
+        cacheAssets.clear();
         if (webView != null) {
             webView.destroy();
         }
         super.onDestroy();
+    }
+
+    private static byte[] lerAssetEmMemoria(AssetManager assets, String caminho) throws IOException {
+        try (InputStream is = assets.open(caminho); ByteArrayOutputStream bos = new ByteArrayOutputStream(8192)) {
+            byte[] buf = new byte[8192];
+            int lidos;
+            while ((lidos = is.read(buf)) != -1) {
+                bos.write(buf, 0, lidos);
+            }
+            return bos.toByteArray();
+        }
     }
 
     private static WebResourceResponse respostaVazia(int status, String reason) {

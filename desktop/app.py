@@ -71,6 +71,7 @@ class PontoTramaDesktopApp:
         server.inicializar_banco()
         porta = escolher_porta_local()
         self.http_server = ThreadingHTTPServer((HOST, porta), server.PontoTramaHandler)
+        self.http_server.daemon_threads = True
         self.porta_ativa = self.http_server.server_address[1]
         self.server_thread = threading.Thread(target=self.http_server.serve_forever, daemon=True)
         self.server_thread.start()
@@ -93,6 +94,11 @@ class PontoTramaDesktopApp:
             base_cache_directory=str(APP_DATA_DIR / "cache"),
         )
         web_context = WebKit2.WebContext.new_with_website_data_manager(data_manager)
+        try:
+            # Ativa cache de recursos decodificados em memória (navegação instantânea)
+            web_context.set_cache_model(WebKit2.CacheModel.WEB_BROWSER)
+        except Exception:
+            pass
         web_context.connect("download-started", self._ao_iniciar_download)
 
         # Sinaliza explicitamente ao frontend que está rodando no App Desktop (ativa banco SQLite)
@@ -120,6 +126,8 @@ class PontoTramaDesktopApp:
         self.window.connect("key-press-event", self._ao_pressionar_tecla)
 
         self.fullscreen_ativo = False
+        self.mini_topo_ativo = False
+        server.DESKTOP_MINI_TOPO_HOOK = self._alternar_mini_topo_remoto
 
         # Carrega a aplicação local (mesma base do Web, com SQLite ativado para o App)
         self.url_inicial = f"http://{HOST}:{self.porta_ativa}/?ambiente=desktop"
@@ -160,7 +168,20 @@ class PontoTramaDesktopApp:
         settings.set_enable_html5_database(True)
         settings.set_javascript_can_access_clipboard(True)
         settings.set_enable_smooth_scrolling(True)
-        settings.set_enable_developer_extras(True)
+        # DevTools desativado em uso normal para evitar overhead de instrumentação (ative com PONTO_TRAMA_DEVTOOLS=1)
+        settings.set_enable_developer_extras(os.environ.get("PONTO_TRAMA_DEVTOOLS") == "1")
+        for attr, val in (
+            ("set_hardware_acceleration_policy", WebKit2.HardwareAccelerationPolicy.ON_DEMAND),
+            ("set_enable_accelerated_2d_canvas", True),
+            ("set_enable_webgl", True),
+            ("set_enable_page_cache", True),
+        ):
+            try:
+                fn = getattr(settings, attr, None)
+                if callable(fn):
+                    fn(val)
+            except Exception:
+                pass
 
     def _ao_iniciar_download(self, _context, download: WebKit2.Download) -> None:
         def decidir_destino(dl: WebKit2.Download, nome_sugerido: str) -> bool:
@@ -249,6 +270,9 @@ class PontoTramaDesktopApp:
         if event.keyval == Gdk.KEY_F5 or (ctrl and event.keyval in (Gdk.KEY_r, Gdk.KEY_R)):
             self.webview.reload_bypass_cache()
             return True
+        if event.keyval == Gdk.KEY_F10:
+            self._aplicar_mini_topo(not self.mini_topo_ativo)
+            return True
         if event.keyval == Gdk.KEY_F11:
             if self.fullscreen_ativo:
                 self.window.unfullscreen()
@@ -256,6 +280,27 @@ class PontoTramaDesktopApp:
                 self.window.fullscreen()
             self.fullscreen_ativo = not self.fullscreen_ativo
             return True
+        return False
+
+    def _alternar_mini_topo_remoto(self, ativo: bool) -> None:
+        GLib.idle_add(self._aplicar_mini_topo, bool(ativo))
+
+    def _aplicar_mini_topo(self, ativo: bool) -> bool:
+        self.mini_topo_ativo = bool(ativo)
+        try:
+            self.window.set_keep_above(self.mini_topo_ativo)
+            if self.mini_topo_ativo:
+                if self.fullscreen_ativo:
+                    self.window.unfullscreen()
+                    self.fullscreen_ativo = False
+                self.window.unmaximize()
+                self.window.resize(420, 580)
+                self.window.set_title(f"📌 {APP_TITLE} (Sempre no Topo)")
+            else:
+                self.window.resize(1320, 840)
+                self.window.set_title(APP_TITLE)
+        except Exception as exc:
+            print(f"[App] Aviso ao alternar Mini-Topo: {exc}", file=sys.stderr)
         return False
 
     def _ao_fechar(self, *_args) -> None:

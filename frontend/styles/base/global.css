@@ -53,9 +53,10 @@
   --azul-profundo-opacidade-50: rgba(1, 7, 54, 0.5);
   --azul-profundo-opacidade-40: rgba(1, 7, 54, 0.4);
 
-  /* --- TIPOGRAFIA --- */
+  /* --- TIPOGRAFIA EDITORIAL & TABULAR (100% OFFLINE) --- */
   --fonte-padrao: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  --fonte-logo: "Times New Roman", Times, serif;
+  --fonte-logo: "Georgia", "Bitstream Charter", "URW Bookman", "Palatino Linotype", "Times New Roman", serif;
+  --fonte-editorial: "Georgia", "Bitstream Charter", "URW Bookman", "Palatino Linotype", "Book Antiqua", serif;
 
   /* --- DIMENSÕES E LAYOUT --- */
   --largura-barra-lateral: 270px;
@@ -232,4 +233,48 @@ input[type="number"] {
   -moz-appearance: textfield !important;
   -webkit-appearance: none !important;
   appearance: textfield !important;
+}
+
+/* ==========================================================================
+   OTIMIZAÇÃO DE RENDERIZAÇÃO E ROLAGEM (ISOLAMENTO DE LAYOUT & PAINT)
+   ========================================================================== */
+.secao-ferramenta {
+  contain: layout style;
+}
+
+.card-fio,
+.card-projeto,
+.card-amostra,
+.card-item-bib,
+.card-contador,
+.linha-receita-item {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 240px;
+}
+
+/* Números tabulares para contadores, cronômetros, tabelas e preços (zero trepidação lateral ao contar!) */
+.input-carreiras,
+#tela-toda-numero,
+.valor-total-pontos,
+.home-anel-texto,
+.home-stat-pill,
+.ws-crono-visor,
+.tabela-conversao td,
+.valor-resultado-prec,
+.badge-ritmo-eta {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Textura tátil sutil de linho/papel artesanal no fundo da bancada (zero custo de GPU) */
+body {
+  background-image: radial-gradient(rgba(252, 241, 208, 0.025) 1px, transparent 0);
+  background-size: 20px 20px;
+}
+
+/* Tipografia Editorial característica nos títulos de destaque */
+.home-bv-titulo,
+.home-hero-nome,
+#home-saudacao-titulo {
+  font-family: var(--fonte-editorial);
+  letter-spacing: -0.01em;
 }

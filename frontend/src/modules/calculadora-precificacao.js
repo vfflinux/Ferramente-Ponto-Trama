@@ -1327,6 +1327,38 @@ const CalculadoraPrecificacao = (() => {
   async function init() {
     vincularEventos();
 
+    // Injeta botão "📄 Ficha / Orçamento PDF" ao lado de Copiar Orçamento
+    const btnCopiar = document.getElementById("btn-copiar-orcamento");
+    if (btnCopiar && !document.getElementById("btn-gerar-pdf-orcamento")) {
+      const btnPdf = document.createElement("button");
+      btnPdf.type = "button";
+      btnPdf.id = "btn-gerar-pdf-orcamento";
+      btnPdf.className = "btn-acao-secundaria-prec";
+      btnPdf.style.marginLeft = "8px";
+      btnPdf.title = "Gerar Ficha Técnica e Orçamento em PDF pronto para imprimir ou enviar no WhatsApp";
+      btnPdf.innerHTML = "📄 Gerar PDF";
+      btnPdf.addEventListener("click", () => {
+        if (typeof HistoricoAcoes === "undefined") return;
+        const nomePeca = document.getElementById("input-nome-peca")?.value?.trim() || "Peça Artesanal Sob Encomenda";
+        const horas = document.getElementById("input-horas-trabalhadas")?.value || "0";
+        const infoLinhas = calcularSubtotalLinhas();
+        const fiosDesc = (infoLinhas.listaDiscriminada || []).map((l) => `${l.nome}: ${formatarMoeda(l.custo)}`);
+        const parseMoedaTxt = (id) => {
+          const t = document.getElementById(id)?.textContent || "0";
+          return Number(t.replace(/[^\d,-]/g, "").replace(",", ".")) || 0;
+        };
+        HistoricoAcoes.gerarFichaOrcamentoPDF({
+          nomePeca,
+          tempoFmt: `${horas}h dedicadas`,
+          fios: fiosDesc,
+          custoMateriais: parseMoedaTxt("valor-custo-materiais"),
+          custoMaoObra: parseMoedaTxt("valor-mao-de-obra"),
+          precoFinal: parseMoedaTxt("valor-preco-final")
+        });
+      });
+      btnCopiar.parentNode.insertBefore(btnPdf, btnCopiar.nextSibling);
+    }
+
     // Carrega o estoque de fios e aviamentos em background
     await obterFiosDoInventario();
     await obterAviamentosDoInventario();
