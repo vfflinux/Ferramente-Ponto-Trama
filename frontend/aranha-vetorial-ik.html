@@ -1,0 +1,1367 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Aranha Vetorial — 5 Espécies, Locomoção Procedural &amp; IK</title>
+    <style>
+        :root {
+            --bg-deep: #010736;
+            --bg-panel: #0D1C42;
+            --border-navy: #22396F;
+            --accent-cream: #FCF1D0;
+        }
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            background-color: var(--bg-deep);
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            color: var(--accent-cream);
+            touch-action: none;
+        }
+        #simulation-canvas {
+            display: block;
+            width: 100vw;
+            height: 100vh;
+            cursor: crosshair;
+        }
+        .control-panel {
+            position: fixed;
+            top: 14px;
+            left: 14px;
+            z-index: 20;
+            width: calc(100vw - 28px);
+            max-width: 325px;
+            border-radius: 16px;
+            padding: 15px;
+            font-size: 13px;
+            background: rgba(13, 28, 66, 0.9);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid #22396F;
+            box-shadow: 0 12px 32px rgba(1, 5, 28, 0.65);
+        }
+        .panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+        .panel-title-wrap {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #FCF1D0;
+            box-shadow: 0 0 8px #FCF1D0;
+        }
+        .panel-body {
+            margin-top: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .panel-body.hidden {
+            display: none;
+        }
+        .label-upper {
+            display: block;
+            font-size: 10.5px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: rgba(252, 241, 208, 0.68);
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+        select.species-select {
+            width: 100%;
+            padding: 7px 10px;
+            border-radius: 9px;
+            background: rgba(1, 7, 54, 0.78);
+            border: 1px solid #22396F;
+            color: #FCF1D0;
+            font-size: 12.5px;
+            font-weight: 500;
+            outline: none;
+            cursor: pointer;
+        }
+        .mode-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+        }
+        .mode-btn {
+            background: rgba(1, 7, 54, 0.6);
+            border: 1px solid #22396F;
+            color: rgba(252, 241, 208, 0.72);
+            transition: all 0.2s ease;
+            padding: 6px 8px;
+            border-radius: 8px;
+            font-size: 11px;
+            cursor: pointer;
+            text-align: center;
+        }
+        .mode-btn:hover {
+            border-color: #4668B8;
+            color: #FCF1D0;
+        }
+        .mode-btn.active {
+            background: #FCF1D0;
+            border-color: #FCF1D0;
+            color: #010736;
+            font-weight: 600;
+            box-shadow: 0 0 12px rgba(252, 241, 208, 0.25);
+        }
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 6px;
+            background: #071130;
+            border: 1px solid #22396F;
+            border-radius: 9999px;
+            outline: none;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #FCF1D0;
+            border: 2px solid #0D1C42;
+            box-shadow: 0 0 8px rgba(252, 241, 208, 0.45);
+            cursor: pointer;
+        }
+        .slider-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+            font-size: 12px;
+        }
+        .val-badge {
+            font-size: 11px;
+            font-family: monospace;
+            background: rgba(1, 7, 54, 0.75);
+            padding: 2px 6px;
+            border-radius: 5px;
+            border: 1px solid #22396F;
+        }
+        .debug-legend {
+            margin-top: 8px;
+            padding: 8px;
+            border-radius: 10px;
+            background: rgba(1, 7, 54, 0.65);
+            border: 1px solid rgba(34, 57, 111, 0.85);
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 6px;
+            font-size: 10.5px;
+        }
+        .debug-legend.hidden {
+            display: none;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="simulation-canvas"></canvas>
+
+    <aside id="ui-panel" class="control-panel">
+        <div class="panel-header">
+            <div class="panel-title-wrap">
+                <div class="status-dot"></div>
+                <div>
+                    <h1 style="margin:0;font-size:14px;font-weight:600;color:#FCF1D0">Aranha Vetorial — 5 Espécies</h1>
+                    <p style="margin:0;font-size:11px;opacity:0.65">Vec2 + Steering + Cinemática Inversa</p>
+                </div>
+            </div>
+            <button id="toggle-collapse" type="button" aria-label="Recolher painel"
+                style="padding:5px 8px;border-radius:8px;border:1px solid #22396F;background:transparent;color:#FCF1D0;cursor:pointer">
+                ▾
+            </button>
+        </div>
+
+        <div id="panel-body" class="panel-body">
+            <div>
+                <label for="species-select" class="label-upper">Espécie (Anatomia &amp; Biomecânica)</label>
+                <select id="species-select" class="species-select">
+                    <option value="tarantula_golias">1. Tarântula Golias (Theraphosa blondi)</option>
+                    <option value="papa_moscas">2. Papa-moscas (Salticidae)</option>
+                    <option value="tecela">3. Aranha Tecelã (Araneidae / Nephila)</option>
+                    <option value="tecela_renda">4. Tecelã-de-renda (Amaurobiidae)</option>
+                    <option value="caranguejo">5. Aranha-caranguejo (Thomisidae)</option>
+                </select>
+                <p id="species-desc" style="margin:5px 0 0;font-size:11px;opacity:0.75;line-height:1.35">
+                    Corpo massivo com cerdas, pedipalpos longos e caminhar pesado e cadenciado.
+                </p>
+            </div>
+
+            <div>
+                <span class="label-upper">Comportamento</span>
+                <div class="mode-grid" role="group" aria-label="Modo de comportamento">
+                    <button type="button" data-mode="autonomous" class="mode-btn active">Autônomo</button>
+                    <button type="button" data-mode="seek" class="mode-btn">Seguir Mouse</button>
+                    <button type="button" data-mode="flee" class="mode-btn">Fugir Mouse</button>
+                </div>
+            </div>
+
+            <div>
+                <div class="slider-row">
+                    <label for="speed-slider">Velocidade</label>
+                    <span id="speed-value" class="val-badge">1.0x</span>
+                </div>
+                <input id="speed-slider" type="range" min="0.4" max="2.4" step="0.1" value="1.0">
+            </div>
+
+            <div>
+                <div class="slider-row">
+                    <label for="reach-slider">Alcance das Patas</label>
+                    <span id="reach-value" class="val-badge">1.00x</span>
+                </div>
+                <input id="reach-slider" type="range" min="0.75" max="1.45" step="0.05" value="1.0">
+            </div>
+
+            <div style="padding-top:8px;border-top:1px solid rgba(34,57,111,0.7)">
+                <label style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;font-size:12px;font-weight:500">
+                    <span>Mostrar Vetores &amp; IK (Debug)</span>
+                    <input id="debug-toggle" type="checkbox">
+                </label>
+
+                <div id="debug-legend" class="debug-legend hidden">
+                    <div class="legend-item"><span style="width:10px;height:2px;background:#38BDF8;display:inline-block"></span>Velocidade</div>
+                    <div class="legend-item"><span style="width:10px;height:2px;background:#FB923C;display:inline-block"></span>Steering</div>
+                    <div class="legend-item"><span style="width:8px;height:8px;border-radius:50%;border:1px solid #FCF1D0;display:inline-block"></span>Raio Passo</div>
+                    <div class="legend-item"><span style="width:8px;height:8px;border-radius:50%;background:#F472B6;display:inline-block"></span>Joelho (IK)</div>
+                </div>
+            </div>
+
+            <p id="mode-hint" style="margin:0;font-size:11px;opacity:0.65;line-height:1.3">
+                Clique ou toque na tela para criar um ponto de interesse.
+            </p>
+        </div>
+    </aside>
+
+    <script>
+        /**
+         * =====================================================================
+         * 1. CLASSE VEC2 — BIBLIOTECA COMPLETA DE VETORES 2D
+         * =====================================================================
+         */
+        class Vec2 {
+            constructor(x = 0, y = 0) {
+                this.x = x;
+                this.y = y;
+            }
+            copy() { return new Vec2(this.x, this.y); }
+            set(x, y) { this.x = x; this.y = y; return this; }
+            add(v) { this.x += v.x; this.y += v.y; return this; }
+            sub(v) { this.x -= v.x; this.y -= v.y; return this; }
+            mult(s) { this.x *= s; this.y *= s; return this; }
+            div(s) { if (s !== 0) { this.x /= s; this.y /= s; } return this; }
+            mag() { return Math.hypot(this.x, this.y); }
+            magSq() { return this.x * this.x + this.y * this.y; }
+            normalize() {
+                const m = this.mag();
+                if (Number.isFinite(m) && m > 1e-8) this.div(m);
+                else this.set(0, 0);
+                return this;
+            }
+            setMag(len) { return this.normalize().mult(len); }
+            limit(max) {
+                const mSq = this.magSq();
+                if (!Number.isFinite(mSq)) this.set(0, 0);
+                else if (mSq > max * max) this.div(Math.sqrt(mSq)).mult(max);
+                return this;
+            }
+            rotate(rad) {
+                const cos = Math.cos(rad);
+                const sin = Math.sin(rad);
+                const nx = this.x * cos - this.y * sin;
+                const ny = this.x * sin + this.y * cos;
+                this.x = nx;
+                this.y = ny;
+                return this;
+            }
+            angle() { return Math.atan2(this.y, this.x); }
+            dist(v) { return Math.hypot(this.x - v.x, this.y - v.y); }
+            dot(v) { return this.x * v.x + this.y * v.y; }
+            lerp(v, t) {
+                this.x += (v.x - this.x) * t;
+                this.y += (v.y - this.y) * t;
+                return this;
+            }
+            perp() { return new Vec2(-this.y, this.x); }
+
+            static add(a, b) { return new Vec2(a.x + b.x, a.y + b.y); }
+            static sub(a, b) { return new Vec2(a.x - b.x, a.y - b.y); }
+            static mult(v, s) { return new Vec2(v.x * s, v.y * s); }
+            static dist(a, b) { return Math.hypot(a.x - b.x, a.y - b.y); }
+            static dot(a, b) { return a.x * b.x + a.y * b.y; }
+            static lerp(a, b, t) { return new Vec2(a.x + (b.x - a.x) * t, a.y + (b.y - a.y) * t); }
+            static fromAngle(rad, mag = 1) { return new Vec2(Math.cos(rad) * mag, Math.sin(rad) * mag); }
+        }
+
+        function wrapAngle(a) {
+            while (a > Math.PI) a -= Math.PI * 2;
+            while (a < -Math.PI) a += Math.PI * 2;
+            return a;
+        }
+        function lerpAngle(current, target, t) {
+            return current + wrapAngle(target - current) * t;
+        }
+        function smoothstep(t) {
+            const c = Math.max(0, Math.min(1, t));
+            return c * c * (3 - 2 * c);
+        }
+
+        /**
+         * =====================================================================
+         * 2. SPECIES_CONFIG — 5 ESPÉCIES COM ANATOMIA E BIOMECÂNICA REAIS
+         * =====================================================================
+         */
+        const SPECIES_CONFIG = {
+            tarantula_golias: {
+                id: 'tarantula_golias',
+                name: 'Tarântula Golias (Theraphosa blondi)',
+                desc: 'Corpo massivo com cerdas, patas muito robustas, pedipalpos longos como 5º par e caminhar pesado.',
+                baseMaxSpeed: 92,
+                baseMaxForce: 195,
+                turnRate: 3.4,
+                abdomenFollow: 2.8,
+                stepThreshold: 27,
+                emergencyThreshold: 54,
+                stepDurMin: 0.17,
+                stepDurMax: 0.26,
+                liftScale: 0.65,
+                topDownKneeRatio: 0.14,
+                femurRadius: 8.6,
+                kneeRadius: 5.8,
+                tipRadius: 2.5,
+                hasBristles: true,
+                palpLen1: 23,
+                palpLen2: 19,
+                cephRx: 25, cephRy: 20,
+                abdDist: 39, abdRx: 32, abdRy: 26,
+                colors: {
+                    femur0: '#3B2316', femur1: '#593622', femur2: '#2B180E',
+                    tibia0: '#4A2C1B', tibia1: '#2A170D', tip: '#D99B66',
+                    joint: '#7A492B', body0: '#5C3722', body1: '#361E12', body2: '#1C0E08',
+                    accent: 'rgba(229, 169, 109, 0.58)'
+                },
+                pairs: [
+                    { ax: 19, ay: 13, ix: 82, iy: 54, f: 52, t: 62, bendFront: true },
+                    { ax: 7,  ay: 18, ix: 28, iy: 92, f: 48, t: 58, bendFront: true },
+                    { ax: -7, ay: 18, ix: -28, iy: 90, f: 48, t: 58, bendFront: false },
+                    { ax: -19, ay: 13, ix: -84, iy: 56, f: 56, t: 68, bendFront: false }
+                ]
+            },
+            papa_moscas: {
+                id: 'papa_moscas',
+                name: 'Papa-moscas (Salticidae)',
+                desc: 'Cefalotórax quadrangular com 2 olhos AME gigantes, preparação agachada de mola e salto balístico longo e veloz.',
+                baseMaxSpeed: 185,
+                baseMaxForce: 520,
+                turnRate: 12.0,
+                abdomenFollow: 7.5,
+                stepThreshold: 21,
+                emergencyThreshold: 42,
+                stepDurMin: 0.065,
+                stepDurMax: 0.12,
+                liftScale: 1.2,
+                topDownKneeRatio: 0.15,
+                femurRadius: 4.8,
+                kneeRadius: 3.2,
+                tipRadius: 1.35,
+                startStop: true,
+                canJump: true,
+                palpLen1: 12,
+                palpLen2: 10,
+                cephRx: 17.5, cephRy: 15.5,
+                abdDist: 23, abdRx: 17.5, abdRy: 13.5,
+                colors: {
+                    femur0: '#1D356B', femur1: '#2E509E', femur2: '#152752',
+                    tibia0: '#264487', tibia1: '#162957', tip: '#FCF1D0',
+                    joint: '#4770C7', body0: '#3B62B8', body1: '#1B3166', body2: '#0B1636',
+                    accent: 'rgba(252, 241, 208, 0.65)'
+                },
+                pairs: [
+                    { ax: 14, ay: 10, ix: 54, iy: 36, f: 34, t: 40, bendFront: true },
+                    { ax: 5,  ay: 13, ix: 18, iy: 60, f: 31, t: 37, bendFront: true },
+                    { ax: -5, ay: 13, ix: -20, iy: 60, f: 35, t: 42, bendFront: false },
+                    { ax: -13, ay: 10, ix: -56, iy: 38, f: 38, t: 48, bendFront: false }
+                ]
+            },
+            tecela: {
+                id: 'tecela',
+                name: 'Aranha Tecelã (Araneidae / Nephila)',
+                desc: 'Abdômen alongado com padrões geométricos, patas longas e elegantes e andar pendular.',
+                baseMaxSpeed: 128,
+                baseMaxForce: 260,
+                turnRate: 5.5,
+                abdomenFollow: 3.4,
+                stepThreshold: 34,
+                emergencyThreshold: 68,
+                stepDurMin: 0.13,
+                stepDurMax: 0.22,
+                liftScale: 1.15,
+                topDownKneeRatio: 0.15,
+                femurRadius: 3.7,
+                kneeRadius: 2.5,
+                tipRadius: 1.0,
+                palpLen1: 12,
+                palpLen2: 10,
+                cephRx: 14.5, cephRy: 11.5,
+                abdDist: 31, abdRx: 26, abdRy: 14.5,
+                colors: {
+                    femur0: '#1B2F63', femur1: '#3557A8', femur2: '#14234D',
+                    tibia0: '#29458A', tibia1: '#15254D', tip: '#FCF1D0',
+                    joint: '#E6C36A', body0: '#3658A6', body1: '#182A59', body2: '#091230',
+                    accent: 'rgba(252, 241, 208, 0.72)'
+                },
+                pairs: [
+                    { ax: 14, ay: 9,  ix: 86, iy: 54, f: 54, t: 68, bendFront: true },
+                    { ax: 5,  ay: 12, ix: 30, iy: 92, f: 48, t: 62, bendFront: true },
+                    { ax: -5, ay: 12, ix: -26, iy: 76, f: 38, t: 48, bendFront: false },
+                    { ax: -13, ay: 9, ix: -84, iy: 54, f: 52, t: 66, bendFront: false }
+                ]
+            },
+            tecela_renda: {
+                id: 'tecela_renda',
+                name: 'Tecelã-de-renda (Amaurobiidae)',
+                desc: 'Corpo compacto e aveludado com chevrons claros, patas intermediárias e andar ágil e raso.',
+                baseMaxSpeed: 142,
+                baseMaxForce: 340,
+                turnRate: 7.2,
+                abdomenFollow: 5.0,
+                stepThreshold: 26,
+                emergencyThreshold: 52,
+                stepDurMin: 0.09,
+                stepDurMax: 0.16,
+                liftScale: 0.75,
+                topDownKneeRatio: 0.14,
+                femurRadius: 4.3,
+                kneeRadius: 2.8,
+                tipRadius: 1.15,
+                palpLen1: 11,
+                palpLen2: 9,
+                cephRx: 15.5, cephRy: 12,
+                abdDist: 26, abdRx: 21.5, abdRy: 16,
+                colors: {
+                    femur0: '#14224A', femur1: '#1F346E', femur2: '#0E1938',
+                    tibia0: '#1A2C5E', tibia1: '#0F1B3D', tip: '#D6E4FF',
+                    joint: '#2E4B94', body0: '#233A78', body1: '#121F45', body2: '#070E26',
+                    accent: 'rgba(214, 228, 255, 0.48)'
+                },
+                pairs: [
+                    { ax: 13, ay: 10, ix: 60, iy: 42, f: 38, t: 48, bendFront: true },
+                    { ax: 4,  ay: 12, ix: 20, iy: 70, f: 35, t: 45, bendFront: true },
+                    { ax: -4, ay: 12, ix: -20, iy: 68, f: 35, t: 45, bendFront: false },
+                    { ax: -12, ay: 10, ix: -60, iy: 42, f: 39, t: 50, bendFront: false }
+                ]
+            },
+            caranguejo: {
+                id: 'caranguejo',
+                name: 'Aranha-caranguejo (Thomisidae)',
+                desc: 'Abdômen trapezoidal em escudo, pares dianteiros I e II longos em arco e caminhar lateral.',
+                baseMaxSpeed: 132,
+                baseMaxForce: 310,
+                turnRate: 6.2,
+                abdomenFollow: 6.2,
+                stepThreshold: 25,
+                emergencyThreshold: 50,
+                stepDurMin: 0.10,
+                stepDurMax: 0.17,
+                liftScale: 0.85,
+                topDownKneeRatio: 0.16,
+                femurRadius: 5.4,
+                kneeRadius: 3.5,
+                tipRadius: 1.25,
+                crabWalk: true,
+                palpLen1: 11,
+                palpLen2: 9,
+                cephRx: 16.5, cephRy: 15,
+                abdDist: 24, abdRx: 21.5, abdRy: 20.5,
+                colors: {
+                    femur0: '#243E7D', femur1: '#385CB0', femur2: '#182B59',
+                    tibia0: '#2D4C96', tibia1: '#172954', tip: '#FCF1D0',
+                    joint: '#527AD6', body0: '#3D64BD', body1: '#1D336B', body2: '#0B1638',
+                    accent: 'rgba(252, 241, 208, 0.58)'
+                },
+                pairs: [
+                    { ax: 14, ay: 11, ix: 74, iy: 58, f: 52, t: 62, bendFront: true },
+                    { ax: 5,  ay: 14, ix: 32, iy: 90, f: 48, t: 58, bendFront: true },
+                    { ax: -5, ay: 12, ix: -20, iy: 54, f: 28, t: 34, bendFront: false },
+                    { ax: -12, ay: 10, ix: -46, iy: 36, f: 29, t: 35, bendFront: false }
+                ]
+            }
+        };
+
+        /**
+         * =====================================================================
+         * 3. CLASSE SPIDERLEG — PATA COM CINEMÁTICA INVERSA E PASSO PARABÓLICO
+         * =====================================================================
+         */
+        class SpiderLeg {
+            constructor(index, side, pairIndex, anchorOffset, idealOffset, femurLen, tibiaLen, bendDir) {
+                this.index = index;
+                this.side = side;
+                this.pairIndex = pairIndex;
+                this.anchorOffset = anchorOffset;
+                this.idealOffset = idealOffset;
+                this.baseFemurLen = femurLen;
+                this.baseTibiaLen = tibiaLen;
+                this.bendDir = bendDir;
+
+                this.anchorWorld = new Vec2();
+                this.idealWorld = new Vec2();
+                this.footPos = new Vec2();
+                this.kneePos = new Vec2();
+
+                this.isStepping = false;
+                this.stepProgress = 1;
+                this.stepDuration = 0.14;
+                this.stepStart = new Vec2();
+                this.stepTarget = new Vec2();
+                this.liftHeight = 0;
+            }
+
+            updateTargets(bodyPos, bodyAngle, reachScale) {
+                const rotatedAnchor = this.anchorOffset.copy().rotate(bodyAngle);
+                this.anchorWorld = Vec2.add(bodyPos, rotatedAnchor);
+
+                const rotatedIdeal = this.idealOffset.copy().mult(reachScale).rotate(bodyAngle);
+                this.idealWorld = Vec2.add(bodyPos, rotatedIdeal);
+            }
+
+            startStep(bodyVel, speedScale, spCfg) {
+                this.isStepping = true;
+                this.stepProgress = 0;
+                this.stepStart = this.footPos.copy();
+
+                const leadTime = 0.14 + 0.04 * (1 / Math.max(0.5, speedScale));
+                const velocityProjection = Vec2.mult(bodyVel, leadTime);
+                const jitter = Vec2.fromAngle(Math.random() * Math.PI * 2, 2.2);
+                this.stepTarget = Vec2.add(this.idealWorld, velocityProjection).add(jitter);
+
+                const speedMag = bodyVel.mag();
+                this.stepDuration = Math.max(
+                    spCfg.stepDurMin,
+                    Math.min(spCfg.stepDurMax, spCfg.stepDurMax - speedMag * 0.00028)
+                );
+            }
+
+            updateStep(dt, reachScale, bodyAngle, spCfg) {
+                if (this.isStepping) {
+                    this.stepProgress += dt / this.stepDuration;
+                    if (this.stepProgress >= 1) {
+                        this.stepProgress = 1;
+                        this.isStepping = false;
+                        this.footPos = this.stepTarget.copy();
+                        this.liftHeight = 0;
+                    } else {
+                        const eased = smoothstep(this.stepProgress);
+                        this.footPos = Vec2.lerp(this.stepStart, this.stepTarget, eased);
+                        this.liftHeight = 4 * this.stepProgress * (1 - this.stepProgress) * (spCfg.liftScale || 1);
+                    }
+                } else {
+                    this.liftHeight = 0;
+                }
+                this.solveIK(reachScale, bodyAngle);
+            }
+
+            solveIK(reachScale, bodyAngle) {
+                const L1 = this.baseFemurLen * (0.72 + 0.28 * reachScale);
+                const L2 = this.baseTibiaLen * (0.72 + 0.28 * reachScale);
+
+                const toFoot = Vec2.sub(this.footPos, this.anchorWorld);
+                let dist = toFoot.mag();
+
+                const minDist = Math.abs(L1 - L2) + 1.5;
+                const maxDist = (L1 + L2) * 0.97;
+                if (dist < minDist) dist = minDist;
+                if (dist > maxDist) dist = maxDist;
+
+                const dir = toFoot.copy().normalize();
+                if (toFoot.magSq() < 1e-6) {
+                    dir.set(Math.cos(bodyAngle), Math.sin(bodyAngle));
+                }
+
+                const a = (L1 * L1 - L2 * L2 + dist * dist) / (2 * dist);
+                const hRaw = Math.sqrt(Math.max(4, L1 * L1 - a * a));
+                const h = Math.max(dist * 0.11, Math.min(dist * 0.16, hRaw * 0.42));
+
+                const perp = dir.perp().mult(this.bendDir);
+                const liftOffset = perp.copy().mult(this.liftHeight * 3.8);
+
+                this.kneePos = this.anchorWorld.copy()
+                    .add(Vec2.mult(dir, a))
+                    .add(Vec2.mult(perp, h))
+                    .add(liftOffset);
+            }
+        }
+
+        /**
+         * =====================================================================
+         * 4. CLASSE SPIDER — CORPO, STEERING E LOCOMOÇÃO POR ESPÉCIE
+         * =====================================================================
+         */
+        class Spider {
+            constructor(x, y, speciesId = 'tarantula_golias') {
+                this.pos = new Vec2(x, y);
+                this.vel = Vec2.fromAngle(Math.random() * Math.PI * 2, 50);
+                this.acc = new Vec2(0, 0);
+                this.lastSteering = new Vec2(0, 0);
+
+                this.angle = this.vel.angle();
+                this.abdomenAngle = this.angle;
+                this.headScanOffset = 0;
+                this.swayPhase = 0;
+
+                this.wanderAngle = 0;
+                this.wanderCircleCenter = new Vec2();
+                this.wanderTargetPoint = new Vec2();
+
+                this.mode = 'autonomous';
+                this.speedScale = 1.0;
+                this.reachScale = 1.0;
+                this.poi = null;
+
+                // Estados específicos por espécie
+                this.burstTimer = 0.5;
+                this.pauseTimer = 0;
+                this.jumpState = null; // { t, duration, start, target }
+                this.crabSide = 1;
+
+                this.legs = [];
+                this.setSpecies(speciesId);
+            }
+
+            setSpecies(speciesId) {
+                this.species = SPECIES_CONFIG[speciesId] || SPECIES_CONFIG.tarantula_golias;
+                this.legs = [];
+                let idx = 0;
+                for (let p = 0; p < 4; p++) {
+                    const cfg = this.species.pairs[p];
+                    for (const side of [-1, 1]) {
+                        const anchor = new Vec2(cfg.ax, cfg.ay * side);
+                        const ideal = new Vec2(cfg.ix, cfg.iy * side);
+                        const bendDir = cfg.bendFront ? -side : side;
+                        const leg = new SpiderLeg(idx++, side, p, anchor, ideal, cfg.f, cfg.t, bendDir);
+                        leg.updateTargets(this.pos, this.angle, this.reachScale);
+                        leg.footPos = leg.idealWorld.copy();
+                        leg.solveIK(this.reachScale, this.angle);
+                        this.legs.push(leg);
+                    }
+                }
+            }
+
+            setPointOfInterest(x, y) {
+                this.poi = { pos: new Vec2(x, y), life: 0, maxLife: 8.5, arrivedTime: 0 };
+                // Papa-moscas prepara o bote agachando e salta balisticamente longo e veloz!
+                if (this.species.canJump && !this.jumpState) {
+                    const d = Vec2.dist(this.pos, this.poi.pos);
+                    if (d >= 70 && d <= 285) {
+                        this.jumpState = {
+                            phase: 'crouch',
+                            crouchT: 0,
+                            crouchDur: 0.44,
+                            t: 0,
+                            duration: 0.21,
+                            origin: this.pos.copy(),
+                            start: this.pos.copy(),
+                            target: this.poi.pos.copy()
+                        };
+                        this.angle = Vec2.sub(this.poi.pos, this.pos).angle();
+                    }
+                }
+            }
+
+            computeWander(dt, maxSpeed, maxForce) {
+                const circleDist = 75;
+                const circleRadius = 42;
+                this.wanderAngle += (Math.random() - 0.5) * 4.2 * dt;
+                const forward = this.vel.magSq() > 1 ? this.vel.copy().normalize() : Vec2.fromAngle(this.angle);
+                this.wanderCircleCenter = Vec2.add(this.pos, Vec2.mult(forward, circleDist));
+                const displacement = Vec2.fromAngle(this.angle + this.wanderAngle, circleRadius);
+                this.wanderTargetPoint = Vec2.add(this.wanderCircleCenter, displacement);
+                const desired = Vec2.sub(this.wanderTargetPoint, this.pos).setMag(maxSpeed * 0.78);
+                return Vec2.sub(desired, this.vel).limit(maxForce * 0.75);
+            }
+
+            computeArrive(target, maxSpeed, maxForce, slowRadius = 110) {
+                const desired = Vec2.sub(target, this.pos);
+                const d = desired.mag();
+                if (d < 4) return Vec2.mult(this.vel, -2.5).limit(maxForce);
+                let speed = maxSpeed;
+                if (d < slowRadius) speed = maxSpeed * (d / slowRadius);
+                desired.setMag(speed);
+                return Vec2.sub(desired, this.vel).limit(maxForce);
+            }
+
+            computeFlee(threatPos, maxSpeed, maxForce, panicRadius = 260) {
+                const away = Vec2.sub(this.pos, threatPos);
+                const d = away.mag();
+                if (d > panicRadius || d < 0.001) return new Vec2(0, 0);
+                const urgency = 1 - d / panicRadius;
+                const desired = away.setMag(maxSpeed * (0.95 + urgency * 0.6));
+                return Vec2.sub(desired, this.vel).limit(maxForce * (1.25 + urgency * 0.9));
+            }
+
+            computeWallAvoidance(width, height, maxSpeed, maxForce) {
+                const margin = Math.max(1, Math.min(130, Math.min(width, height) * 0.22));
+                const desired = new Vec2(0, 0);
+                let nearWall = false;
+                if (this.pos.x < margin) { desired.x = maxSpeed * (1 - this.pos.x / margin); nearWall = true; }
+                else if (this.pos.x > width - margin) { desired.x = -maxSpeed * (1 - (width - this.pos.x) / margin); nearWall = true; }
+                if (this.pos.y < margin) { desired.y = maxSpeed * (1 - this.pos.y / margin); nearWall = true; }
+                else if (this.pos.y > height - margin) { desired.y = -maxSpeed * (1 - (height - this.pos.y) / margin); nearWall = true; }
+                if (!nearWall || desired.magSq() < 1e-8) return new Vec2(0, 0);
+                desired.setMag(maxSpeed);
+                return Vec2.sub(desired, this.vel).limit(maxForce * 1.9);
+            }
+
+            canLegStep(leg) {
+                for (const other of this.legs) {
+                    if (other.index === leg.index || !other.isStepping) continue;
+                    if (other.pairIndex === leg.pairIndex && other.side !== leg.side) return false;
+                    if (other.side === leg.side && Math.abs(other.pairIndex - leg.pairIndex) === 1) return false;
+                }
+                return true;
+            }
+
+            update(dt, width, height, pointer) {
+                const sp = this.species;
+                const maxSpeed = sp.baseMaxSpeed * this.speedScale;
+                const maxForce = sp.baseMaxForce * this.speedScale;
+
+                // Preparação de Bote ("crouch") + Salto Balístico Longo e Rápido da Papa-moscas (Salticidae)
+                if (this.jumpState) {
+                    if (this.jumpState.phase === 'crouch') {
+                        this.jumpState.crouchT += dt / this.jumpState.crouchDur;
+                        const p = Math.min(1, this.jumpState.crouchT);
+                        const dirJump = Vec2.sub(this.jumpState.target, this.jumpState.origin).normalize();
+                        // Recua 7px carregando a mola traseira
+                        const recoil = Math.sin(p * Math.PI * 0.85) * 7.5;
+                        this.pos = Vec2.sub(this.jumpState.origin, Vec2.mult(dirJump, recoil));
+                        this.angle = dirJump.angle() + Math.sin(p * 26) * 0.04;
+                        this.abdomenAngle = this.angle + Math.sin(p * 32) * 0.08;
+                        this.swayPhase += dt * 28;
+                        for (const leg of this.legs) {
+                            leg.updateTargets(this.pos, this.angle, this.reachScale);
+                            if (leg.pairIndex === 0) {
+                                // 1º par erguido mirando o alvo
+                                leg.footPos = Vec2.add(leg.idealWorld, Vec2.mult(dirJump, 10));
+                                leg.liftHeight = 0.75;
+                            } else if (leg.pairIndex >= 2) {
+                                // Pares III e IV recolhidos junto ao corpo carregando a catapulta
+                                leg.footPos = Vec2.add(leg.idealWorld, Vec2.mult(dirJump, 14 * p));
+                                leg.liftHeight = 0.35;
+                            }
+                            leg.solveIK(this.reachScale, this.angle);
+                        }
+                        if (this.jumpState.crouchT >= 1) {
+                            this.jumpState.phase = 'flight';
+                            this.jumpState.start = this.pos.copy();
+                        }
+                        return;
+                    }
+                    this.jumpState.t += dt / this.jumpState.duration;
+                    if (this.jumpState.t >= 1) {
+                        this.pos = this.jumpState.target.copy();
+                        this.vel.set(0, 0);
+                        this.jumpState = null;
+                    } else {
+                        const e = 1 - Math.pow(1 - this.jumpState.t, 1.7);
+                        this.pos = Vec2.lerp(this.jumpState.start, this.jumpState.target, e);
+                        const arc = 4 * this.jumpState.t * (1 - this.jumpState.t);
+                        for (const leg of this.legs) {
+                            leg.updateTargets(this.pos, this.angle, this.reachScale * 0.84);
+                            leg.footPos = leg.idealWorld.copy();
+                            leg.liftHeight = arc * 1.65;
+                            leg.solveIK(this.reachScale, this.angle);
+                        }
+                        return;
+                    }
+                }
+
+                this.acc.set(0, 0);
+                let steering = new Vec2(0, 0);
+
+                if (this.mode === 'autonomous') {
+                    if (this.poi) {
+                        this.poi.life += dt;
+                        const distToPoi = Vec2.dist(this.pos, this.poi.pos);
+                        if (distToPoi < 38) {
+                            this.poi.arrivedTime += dt;
+                            steering.add(this.computeArrive(this.poi.pos, maxSpeed * 0.7, maxForce, 90));
+                            if (this.poi.arrivedTime > 1.4) this.poi = null;
+                        } else {
+                            steering.add(this.computeArrive(this.poi.pos, maxSpeed * 1.05, maxForce * 1.1, 105));
+                        }
+                        if (this.poi && this.poi.life > this.poi.maxLife) this.poi = null;
+                    } else {
+                        steering.add(this.computeWander(dt, maxSpeed, maxForce));
+                    }
+                } else if (this.mode === 'seek') {
+                    if (pointer.active) steering.add(this.computeArrive(pointer.pos, maxSpeed * 1.15, maxForce * 1.25, 115));
+                    else steering.add(this.computeWander(dt, maxSpeed * 0.7, maxForce));
+                } else if (this.mode === 'flee') {
+                    const fleeForce = pointer.active ? this.computeFlee(pointer.pos, maxSpeed * 1.3, maxForce * 1.5, 270) : new Vec2(0, 0);
+                    if (fleeForce.magSq() > 1) steering.add(fleeForce);
+                    else steering.add(this.computeWander(dt, maxSpeed * 0.65, maxForce * 0.8));
+                }
+
+                // Locomoção start-stop da Papa-moscas com escaneamento rápido do cefalotórax
+                if (sp.startStop && this.mode === 'autonomous' && !this.poi) {
+                    if (this.pauseTimer > 0) {
+                        this.pauseTimer -= dt;
+                        steering.set(0, 0);
+                        this.vel.mult(Math.pow(0.02, dt));
+                        if (Math.random() < dt * 7) {
+                            this.headScanOffset = (Math.random() - 0.5) * 0.55;
+                        }
+                    } else {
+                        this.headScanOffset *= Math.pow(0.05, dt);
+                        this.burstTimer -= dt;
+                        if (this.burstTimer <= 0) {
+                            this.pauseTimer = 0.38 + Math.random() * 0.52;
+                            this.burstTimer = 0.35 + Math.random() * 0.45;
+                        }
+                    }
+                } else {
+                    this.headScanOffset = 0;
+                }
+
+                steering.add(this.computeWallAvoidance(width, height, maxSpeed, maxForce));
+                this.lastSteering = steering.copy();
+                this.acc.add(steering);
+
+                this.vel.add(Vec2.mult(this.acc, dt)).limit(maxSpeed * 1.35);
+                if (this.acc.magSq() < 25) this.vel.mult(Math.pow(0.25, dt));
+                this.pos.add(Vec2.mult(this.vel, dt));
+
+                const pad = 28;
+                this.pos.x = Math.max(pad, Math.min(width - pad, this.pos.x));
+                this.pos.y = Math.max(pad, Math.min(height - pad, this.pos.y));
+
+                const speed = this.vel.mag();
+                if (speed > 6) {
+                    let targetAngle = this.vel.angle();
+                    // Aranha-caranguejo (Thomisidae): caminhar lateral mantendo frente em postura de emboscada
+                    if (sp.crabWalk && this.mode !== 'seek') {
+                        targetAngle += this.crabSide * Math.PI * 0.44;
+                    }
+                    const turnRate = Math.min(1, dt * sp.turnRate * this.speedScale);
+                    this.angle = lerpAngle(this.angle, targetAngle + this.headScanOffset, turnRate);
+                    this.swayPhase += dt * (4 + speed * 0.045);
+                } else {
+                    this.angle = lerpAngle(this.angle, this.angle + this.headScanOffset * 0.3, Math.min(1, dt * 8));
+                    this.swayPhase += dt * 1.6;
+                }
+
+                const swayOffset = Math.sin(this.swayPhase) * (speed > 6 ? 0.05 : 0.018);
+                this.abdomenAngle = lerpAngle(this.abdomenAngle, this.angle + swayOffset, Math.min(1, dt * sp.abdomenFollow));
+
+                const stepThreshold = sp.stepThreshold * this.reachScale;
+                const emergencyThreshold = sp.emergencyThreshold * this.reachScale;
+
+                for (const leg of this.legs) {
+                    leg.updateTargets(this.pos, this.angle, this.reachScale);
+                }
+
+                const candidates = this.legs
+                    .filter(l => !l.isStepping)
+                    .map(l => ({ leg: l, dist: Vec2.dist(l.footPos, l.idealWorld) }))
+                    .sort((a, b) => b.dist - a.dist);
+
+                for (const item of candidates) {
+                    if (item.dist > emergencyThreshold) {
+                        item.leg.startStep(this.vel, this.speedScale, sp);
+                    } else if (item.dist > stepThreshold && this.canLegStep(item.leg)) {
+                        item.leg.startStep(this.vel, this.speedScale, sp);
+                    }
+                }
+
+                for (const leg of this.legs) {
+                    leg.updateStep(dt, this.reachScale, this.angle, sp);
+                }
+            }
+
+            draw(ctx, showDebug) {
+                this.drawShadow(ctx);
+                for (const leg of this.legs) this.drawLeg(ctx, leg);
+                this.drawBody(ctx);
+                if (showDebug) this.drawDebug(ctx);
+            }
+
+            drawShadow(ctx) {
+                const sp = this.species;
+                ctx.save();
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+
+                for (const leg of this.legs) {
+                    const liftShadow = leg.liftHeight * 10;
+                    ctx.strokeStyle = 'rgba(0, 3, 20, 0.36)';
+                    ctx.lineWidth = sp.femurRadius * 1.3;
+                    ctx.beginPath();
+                    ctx.moveTo(leg.anchorWorld.x + 5, leg.anchorWorld.y + 8);
+                    ctx.lineTo(leg.kneePos.x + 7 + liftShadow * 0.4, leg.kneePos.y + 11 + liftShadow * 0.5);
+                    ctx.lineTo(leg.footPos.x + 3 + liftShadow * 0.7, leg.footPos.y + 5 + liftShadow);
+                    ctx.stroke();
+                }
+
+                const abdCenter = Vec2.add(this.pos, Vec2.fromAngle(this.abdomenAngle + Math.PI, sp.abdDist));
+                ctx.save();
+                ctx.translate(abdCenter.x + 7, abdCenter.y + 11);
+                ctx.rotate(this.abdomenAngle);
+                ctx.fillStyle = 'rgba(0, 3, 22, 0.48)';
+                ctx.beginPath();
+                ctx.ellipse(0, 0, sp.abdRx, sp.abdRy, 0, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+
+                ctx.save();
+                ctx.translate(this.pos.x + 6, this.pos.y + 9);
+                ctx.rotate(this.angle);
+                ctx.fillStyle = 'rgba(0, 3, 22, 0.45)';
+                ctx.beginPath();
+                ctx.ellipse(3, 0, sp.cephRx, sp.cephRy, 0, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+                ctx.restore();
+            }
+
+            drawLeg(ctx, leg) {
+                const sp = this.species;
+                const c = sp.colors;
+                const a = leg.anchorWorld;
+                const k = leg.kneePos;
+                const f = leg.footPos;
+                if (!Number.isFinite(a.x) || !Number.isFinite(k.x) || !Number.isFinite(f.x)) return;
+
+                const isRaptorial = sp.crabWalk && leg.pairIndex <= 1;
+                const rFemur = sp.femurRadius * (isRaptorial ? 1.25 : sp.crabWalk ? 0.75 : 1);
+                const rKnee = sp.kneeRadius * (isRaptorial ? 1.2 : sp.crabWalk ? 0.78 : 1);
+
+                const drawTaperedSegment = (p1, p2, r1, r2, fillStyle, strokeStyle) => {
+                    const seg = Vec2.sub(p2, p1);
+                    const len = seg.mag();
+                    if (len < 0.5) return;
+                    const perp = seg.perp().normalize();
+                    ctx.beginPath();
+                    ctx.moveTo(p1.x + perp.x * r1, p1.y + perp.y * r1);
+                    ctx.lineTo(p2.x + perp.x * r2, p2.y + perp.y * r2);
+                    ctx.lineTo(p2.x - perp.x * r2, p2.y - perp.y * r2);
+                    ctx.lineTo(p1.x - perp.x * r1, p1.y - perp.y * r1);
+                    ctx.closePath();
+                    ctx.fillStyle = fillStyle;
+                    ctx.fill();
+                    if (strokeStyle) {
+                        ctx.strokeStyle = strokeStyle;
+                        ctx.lineWidth = 0.85;
+                        ctx.stroke();
+                    }
+                };
+
+                const femurGrad = ctx.createLinearGradient(a.x, a.y, k.x, k.y);
+                femurGrad.addColorStop(0, c.femur0);
+                femurGrad.addColorStop(0.6, c.femur1);
+                femurGrad.addColorStop(1, c.femur2);
+                drawTaperedSegment(a, k, rFemur, rKnee, femurGrad, c.accent);
+
+                const tibiaGrad = ctx.createLinearGradient(k.x, k.y, f.x, f.y);
+                tibiaGrad.addColorStop(0, c.tibia0);
+                tibiaGrad.addColorStop(0.75, c.tibia1);
+                tibiaGrad.addColorStop(1, c.tip);
+                drawTaperedSegment(k, f, rKnee * 0.95, sp.tipRadius, tibiaGrad, c.accent);
+
+                // Cerdas vetoriais na Tarântula Golias
+                if (sp.hasBristles) {
+                    ctx.save();
+                    ctx.strokeStyle = 'rgba(229, 169, 109, 0.35)';
+                    ctx.lineWidth = 0.9;
+                    for (const [p1, p2] of [[a, k], [k, f]]) {
+                        const seg = Vec2.sub(p2, p1);
+                        const len = seg.mag();
+                        if (len < 4) continue;
+                        const dir = seg.copy().normalize();
+                        const perp = dir.perp();
+                        for (let i = 1; i <= 6; i++) {
+                            const t = i / 7;
+                            const pt = Vec2.lerp(p1, p2, t);
+                            for (const s of [-1, 1]) {
+                                const tip = pt.copy().add(Vec2.mult(perp, s * 5.2)).add(Vec2.mult(dir, 3.2));
+                                ctx.beginPath();
+                                ctx.moveTo(pt.x, pt.y);
+                                ctx.lineTo(tip.x, tip.y);
+                                ctx.stroke();
+                            }
+                        }
+                    }
+                    ctx.restore();
+                }
+
+                ctx.beginPath();
+                ctx.arc(k.x, k.y, rKnee * 1.08, 0, Math.PI * 2);
+                ctx.fillStyle = c.joint;
+                ctx.fill();
+                ctx.strokeStyle = c.accent;
+                ctx.lineWidth = 0.8;
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.arc(f.x, f.y, leg.isStepping ? 2.1 : 1.6, 0, Math.PI * 2);
+                ctx.fillStyle = leg.isStepping ? '#FCF1D0' : c.tip;
+                ctx.fill();
+            }
+
+            drawBody(ctx) {
+                const sp = this.species;
+                const c = sp.colors;
+                const speedRatio = Math.min(1, this.vel.mag() / (sp.baseMaxSpeed * 1.2));
+                const palpTwitch = Math.sin(this.swayPhase * 1.8) * (0.12 + speedRatio * 0.15);
+
+                // 1. Abdômen articulado
+                ctx.save();
+                ctx.translate(this.pos.x, this.pos.y);
+                ctx.rotate(this.abdomenAngle);
+
+                ctx.fillStyle = '#0D1C42';
+                ctx.beginPath();
+                ctx.ellipse(-10, 0, 6, 4, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                const abdGrad = ctx.createRadialGradient(-sp.abdDist + 3, -5, 3, -sp.abdDist, 0, sp.abdRx * 1.15);
+                abdGrad.addColorStop(0, c.body0);
+                abdGrad.addColorStop(0.58, c.body1);
+                abdGrad.addColorStop(1, c.body2);
+
+                ctx.beginPath();
+                if (sp.crabWalk) {
+                    // Abdômen trapezoidal/losango em escudo (Thomisidae)
+                    ctx.moveTo(-10, 0);
+                    ctx.lineTo(-sp.abdDist * 0.85, -sp.abdRy);
+                    ctx.lineTo(-sp.abdDist - sp.abdRx * 0.85, 0);
+                    ctx.lineTo(-sp.abdDist * 0.85, sp.abdRy);
+                    ctx.closePath();
+                } else {
+                    ctx.ellipse(-sp.abdDist, 0, sp.abdRx, sp.abdRy, 0, 0, Math.PI * 2);
+                }
+                ctx.fillStyle = abdGrad;
+                ctx.fill();
+                ctx.strokeStyle = c.accent;
+                ctx.lineWidth = 1.2;
+                ctx.stroke();
+
+                // Padrões dorsais no abdômen
+                ctx.strokeStyle = c.accent;
+                ctx.lineWidth = 1.3;
+                for (let i = 0; i < 3; i++) {
+                    const x = -sp.abdDist + 8 - i * (sp.abdRx * 0.34);
+                    const w = sp.abdRy * (0.48 - i * 0.1);
+                    ctx.beginPath();
+                    ctx.moveTo(x + 3, -w);
+                    ctx.quadraticCurveTo(x - 3, 0, x + 3, w);
+                    ctx.stroke();
+                }
+                ctx.restore();
+
+                // 2. Cefalotórax, Pedipalpos, Quelíceras e Olhos
+                ctx.save();
+                ctx.translate(this.pos.x, this.pos.y);
+                ctx.rotate(this.angle);
+
+                for (const side of [-1, 1]) {
+                    const pAngle = side * (0.38 + palpTwitch * side);
+                    const p1 = new Vec2(sp.cephRx * 0.9, side * 6);
+                    const p2 = Vec2.add(p1, Vec2.fromAngle(pAngle, sp.palpLen1));
+                    const p3 = Vec2.add(p2, Vec2.fromAngle(pAngle - side * 0.45, sp.palpLen2));
+
+                    ctx.strokeStyle = c.femur1;
+                    ctx.lineWidth = sp.hasBristles ? 4.2 : 2.6;
+                    ctx.lineCap = 'round';
+                    ctx.lineJoin = 'round';
+                    ctx.beginPath();
+                    ctx.moveTo(p1.x, p1.y);
+                    ctx.lineTo(p2.x, p2.y);
+                    ctx.lineTo(p3.x, p3.y);
+                    ctx.stroke();
+                }
+
+                const cephGrad = ctx.createRadialGradient(5, -3, 2, 3, 0, sp.cephRx * 1.1);
+                cephGrad.addColorStop(0, c.body0);
+                cephGrad.addColorStop(0.6, c.body1);
+                cephGrad.addColorStop(1, c.body2);
+
+                ctx.beginPath();
+                if (sp.id === 'papa_moscas') {
+                    ctx.roundRect(-sp.cephRx + 3, -sp.cephRy, sp.cephRx * 2, sp.cephRy * 2, 7);
+                } else {
+                    ctx.ellipse(3, 0, sp.cephRx, sp.cephRy, 0, 0, Math.PI * 2);
+                }
+                ctx.fillStyle = cephGrad;
+                ctx.fill();
+                ctx.strokeStyle = c.accent;
+                ctx.lineWidth = 1.15;
+                ctx.stroke();
+
+                // Olhos específicos por espécie (AME gigantes na Papa-moscas)
+                const mainEyeR = sp.id === 'papa_moscas' ? 3.5 : 2.0;
+                const ex = sp.cephRx - 1.5;
+                const eyes = [
+                    { x: ex, y: -3.4, r: mainEyeR, glow: true },
+                    { x: ex, y:  3.4, r: mainEyeR, glow: true },
+                    { x: ex - 2, y: -6.8, r: 1.4, glow: false },
+                    { x: ex - 2, y:  6.8, r: 1.4, glow: false }
+                ];
+                for (const eye of eyes) {
+                    if (eye.glow) {
+                        ctx.fillStyle = 'rgba(252, 241, 208, 0.28)';
+                        ctx.beginPath();
+                        ctx.arc(eye.x, eye.y, eye.r * 1.8, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                    ctx.fillStyle = '#FCF1D0';
+                    ctx.beginPath();
+                    ctx.arc(eye.x, eye.y, eye.r, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                ctx.restore();
+            }
+
+            drawDebug(ctx) {
+                ctx.save();
+                const stepThreshold = this.species.stepThreshold * this.reachScale;
+
+                if (this.mode === 'autonomous' && !this.poi) {
+                    ctx.strokeStyle = 'rgba(252, 241, 208, 0.22)';
+                    ctx.setLineDash([4, 4]);
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.arc(this.wanderCircleCenter.x, this.wanderCircleCenter.y, 42, 0, Math.PI * 2);
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.moveTo(this.pos.x, this.pos.y);
+                    ctx.lineTo(this.wanderCircleCenter.x, this.wanderCircleCenter.y);
+                    ctx.lineTo(this.wanderTargetPoint.x, this.wanderTargetPoint.y);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                }
+
+                for (const leg of this.legs) {
+                    ctx.strokeStyle = leg.isStepping ? 'rgba(244, 114, 182, 0.5)' : 'rgba(252, 241, 208, 0.18)';
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.arc(leg.idealWorld.x, leg.idealWorld.y, stepThreshold, 0, Math.PI * 2);
+                    ctx.stroke();
+
+                    ctx.strokeStyle = 'rgba(252, 241, 208, 0.35)';
+                    ctx.setLineDash([2, 3]);
+                    ctx.beginPath();
+                    ctx.moveTo(leg.footPos.x, leg.footPos.y);
+                    ctx.lineTo(leg.idealWorld.x, leg.idealWorld.y);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+
+                    ctx.strokeStyle = 'rgba(244, 114, 182, 0.35)';
+                    ctx.beginPath();
+                    ctx.moveTo(leg.anchorWorld.x, leg.anchorWorld.y);
+                    ctx.lineTo(leg.footPos.x, leg.footPos.y);
+                    ctx.stroke();
+
+                    ctx.fillStyle = '#F472B6';
+                    ctx.beginPath();
+                    ctx.arc(leg.kneePos.x, leg.kneePos.y, 3.3, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                const drawArrow = (origin, vec, scale, color) => {
+                    const end = Vec2.add(origin, Vec2.mult(vec, scale));
+                    if (Vec2.dist(origin, end) < 3) return;
+                    const ang = Math.atan2(end.y - origin.y, end.x - origin.x);
+                    ctx.strokeStyle = color;
+                    ctx.fillStyle = color;
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.moveTo(origin.x, origin.y);
+                    ctx.lineTo(end.x, end.y);
+                    ctx.stroke();
+                    const head = 7;
+                    ctx.beginPath();
+                    ctx.moveTo(end.x, end.y);
+                    ctx.lineTo(end.x - head * Math.cos(ang - 0.45), end.y - head * Math.sin(ang - 0.45));
+                    ctx.lineTo(end.x - head * Math.cos(ang + 0.45), end.y - head * Math.sin(ang + 0.45));
+                    ctx.closePath();
+                    ctx.fill();
+                };
+
+                drawArrow(this.pos, this.vel, 0.55, '#38BDF8');
+                drawArrow(this.pos, this.lastSteering, 0.28, '#FB923C');
+                ctx.restore();
+            }
+        }
+
+        window.onload = function () {
+            const canvas = document.getElementById('simulation-canvas');
+            const ctx = canvas.getContext('2d');
+            let width = window.innerWidth;
+            let height = window.innerHeight;
+            let dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+            const spider = new Spider(width * 0.5, height * 0.5, 'tarantula_golias');
+            const pointer = { pos: new Vec2(width * 0.5, height * 0.5), active: false };
+            let showDebug = false;
+            let lastTime = performance.now();
+
+            function resizeCanvas() {
+                width = Math.max(1, window.innerWidth);
+                height = Math.max(1, window.innerHeight);
+                dpr = Math.min(window.devicePixelRatio || 1, 2);
+                canvas.width = Math.floor(width * dpr);
+                canvas.height = Math.floor(height * dpr);
+                canvas.style.width = width + 'px';
+                canvas.style.height = height + 'px';
+                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            }
+            window.addEventListener('resize', resizeCanvas);
+            resizeCanvas();
+
+            function drawBackground() {
+                const bgGrad = ctx.createRadialGradient(
+                    width * 0.5, height * 0.45, Math.min(width, height) * 0.08,
+                    width * 0.5, height * 0.5, Math.max(width, height) * 0.8
+                );
+                bgGrad.addColorStop(0, '#0D1C42');
+                bgGrad.addColorStop(0.65, '#050F3A');
+                bgGrad.addColorStop(1, '#010736');
+                ctx.fillStyle = bgGrad;
+                ctx.fillRect(0, 0, width, height);
+
+                const gridSize = 48;
+                ctx.strokeStyle = 'rgba(252, 241, 208, 0.038)';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                for (let x = (width % gridSize) * 0.5; x < width; x += gridSize) {
+                    ctx.moveTo(x, 0); ctx.lineTo(x, height);
+                }
+                for (let y = (height % gridSize) * 0.5; y < height; y += gridSize) {
+                    ctx.moveTo(0, y); ctx.lineTo(width, y);
+                }
+                ctx.stroke();
+            }
+
+            function drawPointOfInterest(now) {
+                if (!spider.poi) return;
+                const { pos, life, maxLife } = spider.poi;
+                const fade = Math.min(1, (maxLife - life) * 1.5);
+                const pulse = (now * 0.002) % 1;
+                ctx.save();
+                ctx.strokeStyle = `rgba(252, 241, 208, ${(1 - pulse) * 0.45 * fade})`;
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.arc(pos.x, pos.y, 8 + pulse * 26, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.fillStyle = `rgba(252, 241, 208, ${0.9 * fade})`;
+                ctx.beginPath();
+                ctx.arc(pos.x, pos.y, 2.5, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+
+            function animate(now) {
+                const rawDt = (now - lastTime) / 1000;
+                lastTime = now;
+                const dt = Number.isFinite(rawDt) ? Math.max(0, Math.min(rawDt, 0.05)) : 0;
+
+                drawBackground();
+                drawPointOfInterest(now);
+                spider.update(dt, width, height, pointer);
+                spider.draw(ctx, showDebug);
+                requestAnimationFrame(animate);
+            }
+
+            canvas.addEventListener('pointermove', (e) => {
+                pointer.pos.set(e.clientX, e.clientY);
+                pointer.active = true;
+            });
+            canvas.addEventListener('pointerdown', (e) => {
+                pointer.pos.set(e.clientX, e.clientY);
+                pointer.active = true;
+                if (spider.mode === 'autonomous') spider.setPointOfInterest(e.clientX, e.clientY);
+            });
+            canvas.addEventListener('pointerleave', () => { pointer.active = false; });
+
+            document.getElementById('ui-panel').addEventListener('pointerdown', (e) => e.stopPropagation());
+
+            const speciesSelect = document.getElementById('species-select');
+            const speciesDesc = document.getElementById('species-desc');
+            speciesSelect.addEventListener('change', (e) => {
+                spider.setSpecies(e.target.value);
+                speciesDesc.textContent = spider.species.desc;
+            });
+
+            const modeButtons = document.querySelectorAll('.mode-btn');
+            const modeHint = document.getElementById('mode-hint');
+            const hints = {
+                autonomous: 'Clique ou toque na tela para criar um ponto de interesse.',
+                seek: 'Mova o mouse ou o dedo pela tela para guiar a aranha.',
+                flee: 'Aproxime o cursor para fazer a aranha fugir rapidamente.'
+            };
+            modeButtons.forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    modeButtons.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    spider.mode = btn.dataset.mode;
+                    if (spider.mode !== 'autonomous') spider.poi = null;
+                    modeHint.textContent = hints[spider.mode];
+                });
+            });
+
+            document.getElementById('speed-slider').addEventListener('input', (e) => {
+                const val = parseFloat(e.target.value);
+                spider.speedScale = val;
+                document.getElementById('speed-value').textContent = val.toFixed(1) + 'x';
+            });
+            document.getElementById('reach-slider').addEventListener('input', (e) => {
+                const val = parseFloat(e.target.value);
+                spider.reachScale = val;
+                document.getElementById('reach-value').textContent = val.toFixed(2) + 'x';
+            });
+            document.getElementById('debug-toggle').addEventListener('change', (e) => {
+                showDebug = e.target.checked;
+                document.getElementById('debug-legend').classList.toggle('hidden', !showDebug);
+            });
+
+            const toggleCollapseBtn = document.getElementById('toggle-collapse');
+            const panelBody = document.getElementById('panel-body');
+            let isCollapsed = false;
+            toggleCollapseBtn.addEventListener('click', () => {
+                isCollapsed = !isCollapsed;
+                panelBody.classList.toggle('hidden', isCollapsed);
+                toggleCollapseBtn.textContent = isCollapsed ? '▸' : '▾';
+            });
+
+            requestAnimationFrame(animate);
+        };
+    </script>
+</body>
+</html>

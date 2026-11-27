@@ -416,8 +416,16 @@
   overflow: visible;
 }
 
-/* Pivôs anatômicos individuais de patas, abdômen e cefalotórax
-   (sem will-change em cada filho SVG para evitar explosão de camadas GPU) */
+/* Pivôs anatômicos individuais de abdômen, cefalotórax e palpos no sistema de coordenadas do viewBox */
+.aranha-svg .aranha-abdomen,
+.aranha-svg .aranha-cefalotorax,
+.aranha-svg .aranha-palpos,
+.aranha-svg .aranha-olhos-vivos,
+.aranha-svg .golias-quelicera-esq,
+.aranha-svg .golias-quelicera-dir {
+  transform-box: view-box;
+}
+
 .aranha-svg .aranha-abdomen {
   transform-origin: 60px 62px;
 }

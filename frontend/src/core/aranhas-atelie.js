@@ -57,9 +57,80 @@ const AranhasAtelie = (() => {
     }
   };
 
-  // Helper para criar cada pata articulada com pivô exato na junta do cefalotórax
+  // Helper para criar cada pata recortada em 3 partes anatômicas articuladas via Vec2 + SpiderLeg IK:
+  // Parte 1 (Fêmur robusto: ox,oy -> kx,ky) + Junta Patelar (kx,ky) + Parte 2 (Tíbia: kx,ky -> mx,my) + Junta Metatarsal (mx,my) + Parte 3 (Tarso afilado: mx,my -> fx,fy)
   function pata(lado, par, ox, oy, conteudo) {
-    return `<g class="pata-art" data-lado="${lado}" data-par="${par}" style="transform-origin:${ox}px ${oy}px">${conteudo}</g>`;
+    const regexPathPrincipal = /<path\s+d="M([\d.]+)\s+([\d.]+)\s+L([\d.]+)\s+([\d.]+)\s+(L[^"]+)"([^>]*)\/>/;
+    const match = conteudo.match(regexPathPrincipal);
+    if (match) {
+      const [, mOxStr, mOyStr, , , restoDistal, attrs] = match;
+      const mOx = parseFloat(mOxStr) || ox;
+      const mOy = parseFloat(mOyStr) || oy;
+      const todosVertices = Array.from(restoDistal.matchAll(/L([\d.]+)\s+([\d.]+)/g));
+      const ultimoV = todosVertices.length > 0 ? todosVertices[todosVertices.length - 1] : null;
+      const fx = ultimoV ? parseFloat(ultimoV[1]) : mOx + lado * 28;
+      const fy = ultimoV ? parseFloat(ultimoV[2]) : mOy;
+
+      // Calcula a posição anatômica inicial do joelho (kx, ky) e metatarso (mx, my) pela Lei dos Cossenos + Vetor Perpendicular
+      // para que NENHUMA pata jamais nasça ou apareça como uma linha reta!
+      const dx = fx - mOx;
+      const dy = fy - mOy;
+      const dist = Math.max(8, Math.hypot(dx, dy));
+      const L1 = dist * 0.64;
+      const L2 = dist * 0.76;
+      const dirX = dx / dist;
+      const dirY = dy / dist;
+      const bendDir = par <= 1 ? lado : -lado;
+      const perpX = -dirY * bendDir;
+      const perpY = dirX * bendDir;
+      const a = (L1 * L1 - L2 * L2 + dist * dist) / (2 * dist);
+      const hRaw = Math.sqrt(Math.max(4, L1 * L1 - a * a));
+      const h = Math.max(dist * 0.10, Math.min(dist * 0.15, hRaw * 0.42));
+      const kx = mOx + dirX * a + perpX * h;
+      const ky = mOy + dirY * a + perpY * h;
+      const mx = kx + (fx - kx) * 0.56 + perpX * 2.0;
+      const my = ky + (fy - ky) * 0.56 + perpY * 2.0;
+
+      // Extrai stroke-width base para afilar Fêmur (mais robusto) -> Tíbia/Tarso (mais encorpado e visível)
+      const swMatch = attrs.match(/stroke-width="([\d.]+)"/);
+      const swBase = swMatch ? parseFloat(swMatch[1]) : 2.5;
+      const swFemur = (swBase * 1.56).toFixed(2);
+      const swDistal = (swBase * 1.20).toFixed(2);
+      const rKnee = Math.max(1.65, swBase * 0.72).toFixed(2);
+      const rAnkle = Math.max(1.28, swBase * 0.54).toFixed(2);
+      const rFoot = Math.max(1.12, swBase * 0.46).toFixed(2);
+
+      const extras = conteudo.replace(regexPathPrincipal, "").trim();
+      const temAcento = extras.includes("var(--aranha-acento)");
+      const a1x = mOx + (kx - mOx) * 0.45;
+      const a1y = mOy + (ky - mOy) * 0.45;
+      const a2x = mOx + (kx - mOx) * 0.74;
+      const a2y = mOy + (ky - mOy) * 0.74;
+      const b1x = kx + (mx - kx) * 0.28;
+      const b1y = ky + (my - ky) * 0.28;
+      const b2x = kx + (mx - kx) * 0.68;
+      const b2y = ky + (my - ky) * 0.68;
+      const anelFemurSvg = temAcento
+        ? `<path class="pata-anel-femur" d="M${a1x.toFixed(1)} ${a1y.toFixed(1)} L${a2x.toFixed(1)} ${a2y.toFixed(1)}" stroke="var(--aranha-acento)" stroke-width="${(swBase * 1.48).toFixed(2)}" stroke-linecap="round"/>`
+        : "";
+      const anelDistalSvg = temAcento
+        ? `<path class="pata-anel-distal" d="M${b1x.toFixed(1)} ${b1y.toFixed(1)} L${b2x.toFixed(1)} ${b2y.toFixed(1)}" stroke="var(--aranha-acento)" stroke-width="${(swBase * 1.24).toFixed(2)}" stroke-linecap="round"/>`
+        : "";
+
+      return (
+        `<g class="pata-art" data-lado="${lado}" data-par="${par}" data-ox="${mOx}" data-oy="${mOy}" data-kx="${kx.toFixed(1)}" data-ky="${ky.toFixed(1)}" data-fx="${fx}" data-fy="${fy}">` +
+        `<path class="pata-seg-femur" d="M${mOx} ${mOy} L${kx.toFixed(1)} ${ky.toFixed(1)}" stroke-width="${swFemur}"/>` +
+        anelFemurSvg +
+        `<g class="pata-distal" data-kx="${kx.toFixed(1)}" data-ky="${ky.toFixed(1)}">` +
+        `<path class="pata-seg-distal" d="M${kx.toFixed(1)} ${ky.toFixed(1)} L${mx.toFixed(1)} ${my.toFixed(1)} L${fx} ${fy}" stroke-width="${swDistal}"/>` +
+        anelDistalSvg +
+        `<circle class="pata-junta-joelho" cx="${kx.toFixed(1)}" cy="${ky.toFixed(1)}" r="${rKnee}" fill="var(--aranha-corpo)" stroke="currentColor" stroke-width="0.9"/>` +
+        `<circle class="pata-junta-tarso" cx="${mx.toFixed(1)}" cy="${my.toFixed(1)}" r="${rAnkle}" fill="currentColor" stroke="none"/>` +
+        `<circle class="pata-ponta-tarso" cx="${fx}" cy="${fy}" r="${rFoot}" fill="var(--aranha-acento)" stroke="none"/>` +
+        `</g></g>`
+      );
+    }
+    return `<g class="pata-art" data-lado="${lado}" data-par="${par}" data-ox="${ox}" data-oy="${oy}">${conteudo}</g>`;
   }
 
   // Helper para gerar cerdas (setas sensoriais) ao longo de uma polilinha
@@ -276,22 +347,28 @@ const AranhasAtelie = (() => {
     `;
   }
 
-  // Pata hiperdetalhada da Tarântula Golias 2.0 (viewBox 180×180, cerdas em 2 camadas + escópula + garras)
+  // Pata hiperdetalhada da Tarântula Golias 2.0 recortada em 2 partes móveis anatômicas:
+  // Parte 1 (Trocanter + Fêmur + Patela: ox,oy -> kx,ky -> tx,ty, pivô em ox,oy)
+  // Parte 2 (Tíbia + Metatarso + Tarso + Garras: tx,ty -> mx,my -> fx,fy, pivô no joelho tx,ty)
   function pataTarantulaGolias(lado, par, pts) {
     const [ox, oy] = pts[0];
     const [kx, ky] = pts[1];
     const [tx, ty] = pts[2];
     const [mx, my] = pts[3];
     const [fx, fy] = pts[4];
-    const cerdasCurtas = gerarCerdasPolilinha(pts, 2.4, 3.8, 3.3, 0.45, par + 1);
-    const cerdasLongas = gerarCerdasPolilinha(pts, 4.8, 7.6, 6.2, 0.62, par + 5);
+    const ptsFemur = [pts[0], pts[1], pts[2]];
+    const ptsDistal = [pts[2], pts[3], pts[4]];
+    const cerdasFemurCurtas = gerarCerdasPolilinha(ptsFemur, 2.4, 3.8, 3.3, 0.45, par + 1);
+    const cerdasFemurLongas = gerarCerdasPolilinha(ptsFemur, 4.8, 7.6, 6.2, 0.62, par + 5);
+    const cerdasDistalCurtas = gerarCerdasPolilinha(ptsDistal, 2.2, 3.5, 3.3, 0.45, par + 3);
+    const cerdasDistalLongas = gerarCerdasPolilinha(ptsDistal, 4.2, 6.8, 6.2, 0.62, par + 7);
 
-    const p1x = ox + (kx - ox) * 0.84;
-    const p1y = oy + (ky - oy) * 0.84;
-    const p2x = kx + (tx - kx) * 0.22;
-    const p2y = ky + (ty - ky) * 0.22;
-    const j2x = tx + (mx - tx) * 0.16;
-    const j2y = ty + (my - ty) * 0.16;
+    const p1x = kx + (tx - kx) * 0.55;
+    const p1y = ky + (ty - ky) * 0.55;
+    const p2x = tx + (mx - tx) * 0.34;
+    const p2y = ty + (my - ty) * 0.34;
+    const j2x = tx + (mx - tx) * 0.22;
+    const j2y = ty + (my - ty) * 0.22;
     const dtx = fx - mx;
     const dty = fy - my;
     const dlen = Math.max(1, Math.hypot(dtx, dty));
@@ -304,28 +381,26 @@ const AranhasAtelie = (() => {
     const garra2x = fx + (ux * 2.8 - nx * 1.6);
     const garra2y = fy + (uy * 2.8 - ny * 1.6);
 
-    return pata(
-      lado,
-      par,
-      ox,
-      oy,
-      `
-        <path d="${cerdasLongas}" stroke="currentColor" stroke-width="0.95" opacity="0.72" stroke-linecap="round"/>
-        <path d="${cerdasCurtas}" stroke="currentColor" stroke-width="1.05" opacity="0.86" stroke-linecap="round"/>
-        <path d="M${ox} ${oy} L${kx} ${ky}" stroke="currentColor" stroke-width="8.8" stroke-linecap="round"/>
-        <path d="M${ox} ${oy} L${kx} ${ky}" stroke="var(--aranha-corpo)" stroke-width="4.6" stroke-linecap="round"/>
-        <path d="M${ox} ${oy} L${kx} ${ky}" stroke="var(--aranha-acento)" stroke-width="1.15" opacity="0.48" stroke-linecap="round"/>
-        <path d="M${kx} ${ky} L${tx} ${ty}" stroke="currentColor" stroke-width="7.0" stroke-linecap="round"/>
-        <path d="M${kx} ${ky} L${tx} ${ty}" stroke="var(--aranha-corpo)" stroke-width="3.4" stroke-linecap="round"/>
-        <path d="M${tx} ${ty} L${mx} ${my}" stroke="currentColor" stroke-width="5.2" stroke-linecap="round"/>
-        <path d="M${tx} ${ty} L${mx} ${my}" stroke="var(--aranha-corpo)" stroke-width="2.2" stroke-linecap="round"/>
-        <path d="M${mx} ${my} L${fx} ${fy}" stroke="currentColor" stroke-width="4.2" stroke-linecap="round"/>
-        <path d="M${p1x.toFixed(1)} ${p1y.toFixed(1)} L${kx} ${ky} L${p2x.toFixed(1)} ${p2y.toFixed(1)}" stroke="var(--aranha-acento)" stroke-width="3.0" stroke-linecap="round" opacity="0.92"/>
-        <path d="M${tx} ${ty} L${j2x.toFixed(1)} ${j2y.toFixed(1)}" stroke="var(--aranha-acento)" stroke-width="2.2" stroke-linecap="round" opacity="0.78"/>
-        <path d="M${mx} ${my} L${fx} ${fy}" stroke="var(--aranha-acento)" stroke-width="2.1" stroke-linecap="round" opacity="0.7"/>
-        <circle cx="${fx}" cy="${fy}" r="2.3" fill="currentColor" stroke="none"/>
-        <path d="M${fx} ${fy} L${garra1x.toFixed(1)} ${garra1y.toFixed(1)} M${fx} ${fy} L${garra2x.toFixed(1)} ${garra2y.toFixed(1)}" stroke="var(--aranha-acento)" stroke-width="1.15" stroke-linecap="round"/>
-      `
+    return (
+      `<g class="pata-art" data-lado="${lado}" data-par="${par}" data-ox="${ox}" data-oy="${oy}" data-kx="${tx}" data-ky="${ty}" data-fx="${fx}" data-fy="${fy}">` +
+      `<path class="golias-cerdas-femur-l" d="${cerdasFemurLongas}" stroke="currentColor" stroke-width="1.1" opacity="0.76" stroke-linecap="round"/>` +
+      `<path class="golias-cerdas-femur-c" d="${cerdasFemurCurtas}" stroke="currentColor" stroke-width="1.25" opacity="0.9" stroke-linecap="round"/>` +
+      `<path class="golias-femur-borda" d="M${ox} ${oy} L${kx} ${ky} L${tx} ${ty}" stroke="currentColor" stroke-width="11.2" stroke-linecap="round" stroke-linejoin="round"/>` +
+      `<path class="golias-femur-miolo" d="M${ox} ${oy} L${kx} ${ky} L${tx} ${ty}" stroke="var(--aranha-corpo)" stroke-width="6.0" stroke-linecap="round" stroke-linejoin="round"/>` +
+      `<path class="golias-femur-fio" d="M${ox} ${oy} L${kx} ${ky}" stroke="var(--aranha-acento)" stroke-width="1.45" opacity="0.52" stroke-linecap="round"/>` +
+      `<path class="golias-patela-acento" d="M${p1x.toFixed(1)} ${p1y.toFixed(1)} L${tx} ${ty} L${p2x.toFixed(1)} ${p2y.toFixed(1)}" stroke="var(--aranha-acento)" stroke-width="4.2" stroke-linecap="round" opacity="0.94"/>` +
+      `<g class="pata-distal" data-kx="${tx}" data-ky="${ty}">` +
+      `<path class="golias-cerdas-distal-l" d="${cerdasDistalLongas}" stroke="currentColor" stroke-width="1.05" opacity="0.76" stroke-linecap="round"/>` +
+      `<path class="golias-cerdas-distal-c" d="${cerdasDistalCurtas}" stroke="currentColor" stroke-width="1.2" opacity="0.88" stroke-linecap="round"/>` +
+      `<path class="golias-distal-borda" d="M${tx} ${ty} L${mx} ${my}" stroke="currentColor" stroke-width="8.2" stroke-linecap="round"/>` +
+      `<path class="golias-distal-miolo" d="M${tx} ${ty} L${mx} ${my}" stroke="var(--aranha-corpo)" stroke-width="4.0" stroke-linecap="round"/>` +
+      `<path class="golias-tarso-borda" d="M${mx} ${my} L${fx} ${fy}" stroke="currentColor" stroke-width="6.0" stroke-linecap="round"/>` +
+      `<path class="golias-tarso-acento" d="M${mx} ${my} L${fx} ${fy}" stroke="var(--aranha-acento)" stroke-width="3.0" stroke-linecap="round" opacity="0.78"/>` +
+      `<circle class="pata-junta-joelho" cx="${tx}" cy="${ty}" r="4.0" fill="currentColor" stroke="none"/>` +
+      `<circle class="pata-junta-tarso" cx="${mx}" cy="${my}" r="3.1" fill="currentColor" stroke="none"/>` +
+      `<circle class="pata-ponta-tarso" cx="${fx}" cy="${fy}" r="2.9" fill="currentColor" stroke="none"/>` +
+      `<path class="golias-garras" d="M${fx} ${fy} L${garra1x.toFixed(1)} ${garra1y.toFixed(1)} M${fx} ${fy} L${garra2x.toFixed(1)} ${garra2y.toFixed(1)}" stroke="var(--aranha-acento)" stroke-width="1.35" stroke-linecap="round"/>` +
+      `</g></g>`
     );
   }
 
@@ -375,26 +450,26 @@ const AranhasAtelie = (() => {
     return `
       <svg viewBox="0 0 180 180" class="aranha-svg especie-tarantula-golias" aria-hidden="true">
         <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-          ${pataTarantulaGolias(-1, 0, [[73, 64], [47, 44], [30, 26], [20, 14], [14, 6]])}
-          ${pataTarantulaGolias(1, 0, [[107, 64], [133, 44], [150, 26], [160, 14], [166, 6]])}
-          ${pataTarantulaGolias(-1, 1, [[71, 72], [38, 61], [20, 48], [10, 36], [5, 27]])}
-          ${pataTarantulaGolias(1, 1, [[109, 72], [142, 61], [160, 48], [170, 36], [175, 27]])}
-          ${pataTarantulaGolias(-1, 2, [[71, 81], [40, 91], [22, 108], [12, 122], [7, 132]])}
-          ${pataTarantulaGolias(1, 2, [[109, 81], [140, 91], [158, 108], [168, 122], [173, 132]])}
-          ${pataTarantulaGolias(-1, 3, [[74, 88], [49, 116], [35, 142], [26, 159], [20, 171]])}
-          ${pataTarantulaGolias(1, 3, [[106, 88], [131, 116], [145, 142], [154, 159], [160, 171]])}
+          ${pataTarantulaGolias(-1, 0, [[73, 64], [52, 48], [34, 34], [21, 18], [14, 6]])}
+          ${pataTarantulaGolias(1, 0, [[107, 64], [128, 48], [146, 34], [159, 18], [166, 6]])}
+          ${pataTarantulaGolias(-1, 1, [[71, 72], [47, 62], [27, 52], [13, 37], [5, 25]])}
+          ${pataTarantulaGolias(1, 1, [[109, 72], [133, 62], [153, 52], [167, 37], [175, 25]])}
+          ${pataTarantulaGolias(-1, 2, [[71, 81], [46, 89], [27, 103], [14, 120], [7, 134]])}
+          ${pataTarantulaGolias(1, 2, [[109, 81], [134, 89], [153, 103], [166, 120], [173, 134]])}
+          ${pataTarantulaGolias(-1, 3, [[73, 88], [50, 99], [33, 115], [23, 143], [18, 170]])}
+          ${pataTarantulaGolias(1, 3, [[107, 88], [130, 99], [147, 115], [157, 143], [162, 170]])}
         </g>
 
         <g class="aranha-palpos" style="transform-origin:90px 59px" fill="none" stroke-linecap="round" stroke-linejoin="round">
-          <path d="${cerdasPalpos}" stroke="currentColor" stroke-width="0.95" opacity="0.82"/>
-          <path d="M79 59 L66 44 L61 27 L65 14" stroke="currentColor" stroke-width="6.0"/>
-          <path d="M79 59 L66 44 L61 27" stroke="var(--aranha-corpo)" stroke-width="2.8"/>
-          <path d="M70 48 L64 38 M62 30 L63 22" stroke="var(--aranha-acento)" stroke-width="2.4" opacity="0.88"/>
-          <circle cx="65" cy="14" r="2.2" fill="currentColor" stroke="none"/>
-          <path d="M101 59 L114 44 L119 27 L115 14" stroke="currentColor" stroke-width="6.0"/>
-          <path d="M101 59 L114 44 L119 27" stroke="var(--aranha-corpo)" stroke-width="2.8"/>
-          <path d="M110 48 L116 38 M118 30 L117 22" stroke="var(--aranha-acento)" stroke-width="2.4" opacity="0.88"/>
-          <circle cx="115" cy="14" r="2.2" fill="currentColor" stroke="none"/>
+          <path d="${cerdasPalpos}" stroke="currentColor" stroke-width="1.05" opacity="0.85"/>
+          <path d="M79 59 L66 44 L61 27 L65 14" stroke="currentColor" stroke-width="7.6"/>
+          <path d="M79 59 L66 44 L61 27" stroke="var(--aranha-corpo)" stroke-width="3.8"/>
+          <path d="M70 48 L64 38 M62 30 L63 22" stroke="var(--aranha-acento)" stroke-width="2.8" opacity="0.9"/>
+          <circle cx="65" cy="14" r="2.6" fill="currentColor" stroke="none"/>
+          <path d="M101 59 L114 44 L119 27 L115 14" stroke="currentColor" stroke-width="7.6"/>
+          <path d="M101 59 L114 44 L119 27" stroke="var(--aranha-corpo)" stroke-width="3.8"/>
+          <path d="M110 48 L116 38 M118 30 L117 22" stroke="var(--aranha-acento)" stroke-width="2.8" opacity="0.9"/>
+          <circle cx="115" cy="14" r="2.6" fill="currentColor" stroke="none"/>
         </g>
 
         <g class="aranha-abdomen" style="transform-origin:90px 94px">
@@ -515,7 +590,7 @@ const AranhasAtelie = (() => {
       estiloCaca: "papa_salto",
       presasAlvo: ["mosca", "mosquito"],
       comportamentosPausa: ["curiosa", "soneca_espreguica", "grooming", "probing"],
-      movimentos: ["saltinhos", "contorno_card", "espiadinha", "patrulha_borda", "travessia_curva"],
+      movimentos: ["saltinhos", "saltinhos", "saltinhos", "contorno_card", "espiadinha", "patrulha_borda"],
       gerarSvg: svgPapaMoscas
     },
     {
@@ -794,43 +869,55 @@ const AranhasAtelie = (() => {
   }
 
   function svgLagarta() {
-    // Lagarta Gigante (Mandarová / Sphingidae) — 7 segmentos com onda peristáltica real + chifrinho caudal (7 pedaços consumíveis!)
+    // Lagarta Gigante (Mandarová / Sphingidae) — 7 segmentos carnudos sobrepostos com coluna flexível em curva,
+    // patinhas torácicas articuladas, pseudópodes abdominais com ventosas, espiráculos e chifrinho caudal móvel
     const segs = [
-      { y: 44, rx: 14.5, ry: 11, idx: 0, patas: "torax" },
-      { y: 61, rx: 16.5, ry: 12, idx: 1, patas: "torax" },
-      { y: 79, rx: 18.0, ry: 12.5, idx: 2, patas: "pseudo" },
-      { y: 97, rx: 18.2, ry: 12.5, idx: 3, patas: "pseudo" },
-      { y: 115, rx: 17.5, ry: 12, idx: 4, patas: "pseudo" },
-      { y: 132, rx: 15.8, ry: 11.5, idx: 5, patas: "pseudo" },
-      { y: 147, rx: 13.0, ry: 10.5, idx: 6, patas: "cauda" }
+      { y: 44, rx: 14.8, ry: 11.8, idx: 0, patas: "torax" },
+      { y: 61, rx: 16.8, ry: 12.8, idx: 1, patas: "torax" },
+      { y: 79, rx: 18.4, ry: 13.4, idx: 2, patas: "pseudo" },
+      { y: 97, rx: 18.8, ry: 13.5, idx: 3, patas: "pseudo" },
+      { y: 115, rx: 17.8, ry: 13.0, idx: 4, patas: "pseudo" },
+      { y: 132, rx: 16.0, ry: 12.2, idx: 5, patas: "pseudo" },
+      { y: 147, rx: 13.4, ry: 11.0, idx: 6, patas: "cauda" }
     ];
-    const segsSvg = segs.map((s) => {
-      const pExtra =
-        s.patas === "torax"
-          ? `<path d="M${90 - s.rx} ${s.y} L${90 - s.rx - 7} ${s.y - 3} M${90 + s.rx} ${s.y} L${90 + s.rx + 7} ${s.y - 3}" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>`
-          : s.patas === "pseudo"
-            ? `<circle cx="${90 - s.rx - 2.2}" cy="${s.y + 1}" r="3.2" fill="var(--aranha-corpo)" stroke="currentColor" stroke-width="1.8"/><circle cx="${90 + s.rx + 2.2}" cy="${s.y + 1}" r="3.2" fill="var(--aranha-corpo)" stroke="currentColor" stroke-width="1.8"/>`
-            : `<path d="M90 ${s.y + 7} Q94 ${s.y + 17} 90 ${s.y + 24}" fill="none" stroke="var(--aranha-acento)" stroke-width="3.2" stroke-linecap="round"/>`;
-      return `
+    // Renderiza de trás para frente (6 -> 0) para que cada anel anterior se sobreponha organicamente ao seguinte
+    const segsSvg = segs
+      .slice()
+      .reverse()
+      .map((s) => {
+        const pExtra =
+          s.patas === "torax"
+            ? `<path class="lagarta-pata-esq" d="M${90 - s.rx + 1} ${s.y - 1} L${90 - s.rx - 6} ${s.y - 5} L${90 - s.rx - 8.5} ${s.y - 2}" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/>` +
+              `<path class="lagarta-pata-dir" d="M${90 + s.rx - 1} ${s.y - 1} L${90 + s.rx + 6} ${s.y - 5} L${90 + s.rx + 8.5} ${s.y - 2}" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/>`
+            : s.patas === "pseudo"
+              ? `<ellipse class="lagarta-pata-esq" cx="${90 - s.rx - 2.0}" cy="${s.y + 1}" rx="3.8" ry="2.8" fill="var(--aranha-corpo)" stroke="currentColor" stroke-width="1.8"/>` +
+                `<ellipse class="lagarta-pata-dir" cx="${90 + s.rx + 2.0}" cy="${s.y + 1}" rx="3.8" ry="2.8" fill="var(--aranha-corpo)" stroke="currentColor" stroke-width="1.8"/>`
+              : `<path class="lagarta-chifre-cauda" d="M90 ${s.y + 6} Q95 ${s.y + 17} 89.5 ${s.y + 26}" fill="none" stroke="var(--aranha-acento)" stroke-width="3.3" stroke-linecap="round"/>`;
+        return `
         <g class="lagarta-seg pedaco-presa" data-seg="${s.idx}" data-pedaco="${s.idx}" style="transform-origin:90px ${s.y}px">
           ${pExtra}
           <ellipse cx="90" cy="${s.y}" rx="${s.rx}" ry="${s.ry}" fill="var(--aranha-corpo)" stroke="currentColor" stroke-width="2.4"/>
-          <path d="M${90 - s.rx + 4} ${s.y + 2} L${90 - 4} ${s.y - 5} M${90 + s.rx - 4} ${s.y + 2} L${90 + 4} ${s.y - 5}" stroke="var(--aranha-acento)" stroke-width="1.9" stroke-linecap="round" opacity="0.88"/>
-          <circle cx="${90 - s.rx + 5}" cy="${s.y + 1}" r="1.55" fill="currentColor" opacity="0.78"/>
-          <circle cx="${90 + s.rx - 5}" cy="${s.y + 1}" r="1.55" fill="currentColor" opacity="0.78"/>
+          <path d="M${(90 - s.rx * 0.68).toFixed(1)} ${(s.y - s.ry * 0.36).toFixed(1)} Q90 ${(s.y - s.ry * 0.62).toFixed(1)} ${(90 + s.rx * 0.68).toFixed(1)} ${(s.y - s.ry * 0.36).toFixed(1)}" fill="none" stroke="currentColor" stroke-width="0.95" opacity="0.32" stroke-linecap="round"/>
+          <path d="M${90 - s.rx + 4} ${s.y + 3} L${90 - 3.5} ${s.y - 5.5} M${90 + s.rx - 4} ${s.y + 3} L${90 + 3.5} ${s.y - 5.5}" stroke="var(--aranha-acento)" stroke-width="2.0" stroke-linecap="round" opacity="0.9"/>
+          <circle cx="${90 - s.rx + 5.2}" cy="${s.y + 1}" r="1.65" fill="currentColor" opacity="0.82"/>
+          <circle cx="${90 + s.rx - 5.2}" cy="${s.y + 1}" r="1.65" fill="currentColor" opacity="0.82"/>
         </g>
       `;
-    }).join("");
+      })
+      .join("");
 
     return `
       <svg viewBox="0 0 180 180" class="presa-svg presa-lagarta" aria-hidden="true">
         ${segsSvg}
         <g class="lagarta-cabeca pedaco-presa" data-pedaco="0" style="transform-origin:90px 30px">
-          <path d="M84 22 L80 13 M96 22 L100 13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-          <ellipse cx="90" cy="29" rx="12" ry="10.5" fill="var(--aranha-corpo)" stroke="currentColor" stroke-width="2.5"/>
-          <path d="M85 26 Q90 31 95 26" fill="none" stroke="var(--aranha-acento)" stroke-width="1.6" stroke-linecap="round"/>
-          <circle cx="84.5" cy="24.5" r="1.8" fill="currentColor"/>
-          <circle cx="95.5" cy="24.5" r="1.8" fill="currentColor"/>
+          <path class="lagarta-mandibula-esq" d="M84 21 Q80 14 77 11 M86 20 L83 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          <path class="lagarta-mandibula-dir" d="M96 21 Q100 14 103 11 M94 20 L97 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          <ellipse cx="90" cy="29" rx="12.5" ry="10.8" fill="var(--aranha-corpo)" stroke="currentColor" stroke-width="2.5"/>
+          <path d="M90 19 L90 26 M85 27 Q90 32 95 27" fill="none" stroke="var(--aranha-acento)" stroke-width="1.65" stroke-linecap="round"/>
+          <circle cx="84.2" cy="24.5" r="2.0" fill="currentColor"/>
+          <circle cx="95.8" cy="24.5" r="2.0" fill="currentColor"/>
+          <circle cx="83.8" cy="24.0" r="0.7" fill="var(--aranha-brilho-olho)"/>
+          <circle cx="95.4" cy="24.0" r="0.7" fill="var(--aranha-brilho-olho)"/>
         </g>
         <g class="presa-casulo-seda" opacity="0"></g>
       </svg>
@@ -879,7 +966,7 @@ const AranhasAtelie = (() => {
       nome: "Lagarta Gigante",
       porte: "gigante",
       tamanho: 132,
-      velocidadeBase: 28,
+      velocidadeBase: 36,
       voadora: false,
       gerarSvg: svgLagarta
     }
@@ -1669,7 +1756,7 @@ const AranhasAtelie = (() => {
       return null;
     }
 
-    const limite = ignorarFoco ? 4 : MAX_INSTANCIAS[modoAtual] || 0;
+    const limite = ignorarFoco ? Math.max(6, ativas.length + 2) : MAX_INSTANCIAS[modoAtual] || 0;
     if (ativas.length >= limite) return null;
 
     garantirCamada();
@@ -1719,9 +1806,16 @@ const AranhasAtelie = (() => {
     const patas = Array.from(wrap.querySelectorAll(".pata-art")).map((el) => {
       const lado = Number(el.dataset.lado) || 1;
       const par = Number(el.dataset.par) || 0;
+      const ox = Number(el.dataset.ox) || 60;
+      const oy = Number(el.dataset.oy) || 50;
+      const kx = Number(el.dataset.kx) || ox + lado * 15;
+      const ky = Number(el.dataset.ky) || oy;
+      const fx = Number(el.dataset.fx) || kx + lado * 15;
+      const fy = Number(el.dataset.fy) || ky;
       const grupoAlternado = (par % 2 === 0 ? (lado === -1 ? 0 : Math.PI) : (lado === -1 ? Math.PI : 0));
       const faseBase = grupoAlternado + par * 0.32;
-      return { el, lado, par, faseBase, angAtual: 0 };
+      const distalEl = el.querySelector(".pata-distal");
+      return { el, distalEl, lado, par, ox, oy, kx, ky, fx, fy, faseBase, angAtual: 0, angDistalAtual: 0 };
     });
 
     const instancia = {
@@ -1819,10 +1913,14 @@ const AranhasAtelie = (() => {
       cauda3: wrap.querySelector(".lagarto-cauda-3"),
       lingua: wrap.querySelector(".lagarto-lingua"),
       cabecaLagarto: wrap.querySelector(".lagarto-cabeca"),
-      segsLagarta: Array.from(wrap.querySelectorAll(".lagarta-seg")),
+      // Ordena lagarta-seg sempre do índice 0 (tórax) ao 6 (cauda) para a onda peristáltica e curvatura da coluna
+      segsLagarta: Array.from(wrap.querySelectorAll(".lagarta-seg")).sort(
+        (a, b) => (Number(a.dataset.seg) || 0) - (Number(b.dataset.seg) || 0)
+      ),
       cabecaLagarta: wrap.querySelector(".lagarta-cabeca"),
       casuloEl: wrap.querySelector(".presa-casulo-seda"),
       pedacosEls: Array.from(wrap.querySelectorAll(".pedaco-presa")),
+      curvaSpine: 0,
       tempoVida: 0,
       faseMarcha: 0,
       modo: opcoes.modoInicial || "livre", // livre | pousada | alerta | defesa_presa | evadindo | presa_na_teia | capturada | escapando
@@ -2051,20 +2149,30 @@ const AranhasAtelie = (() => {
     // Caso especial 2: Tarântula Golias (Emboscada Terrestre Oportunista com Fios de Alarme!)
     if (especieId === "tarantula_golias") {
       const goliasNaDir = Math.random() < 0.5;
-      const emboscadaX = goliasNaDir ? W * rand(0.62, 0.72) : W * rand(0.28, 0.38);
-      const emboscadaY = H * rand(0.42, 0.68);
-      const margemG = 148;
-      const xGoliasIni = goliasNaDir ? W + margemG * 0.7 : -margemG * 0.7;
+      const emboscadaX = goliasNaDir ? W * rand(0.58, 0.66) : W * rand(0.34, 0.42);
+      const emboscadaY = H * rand(0.42, 0.66);
+      const margemG = 115;
+      const xGoliasIni = goliasNaDir ? W + margemG * 0.65 : -margemG * 0.65;
 
-      // Presa entra do lado oposto rumo à região de caça
-      const alvoPresaX = goliasNaDir ? emboscadaX - rand(115, 165) : emboscadaX + rand(115, 165);
-      const alvoPresaY = Math.max(95, Math.min(H - 95, emboscadaY + rand(-70, 70)));
-      const presa = gerarPresa(tipoPresa || "barata", {
+      // Presa entra rumo à zona de emboscada da Golias (lagarta começa já na borda do palco para o encontro ser imediato e fluido)
+      const alvoPresaX = goliasNaDir ? emboscadaX - rand(95, 135) : emboscadaX + rand(95, 135);
+      const alvoPresaY = Math.max(95, Math.min(H - 95, emboscadaY + rand(-48, 48)));
+      const tipoP = tipoPresa || "barata";
+      const x0Presa =
+        tipoP === "lagarta"
+          ? (goliasNaDir ? Math.max(85, emboscadaX - rand(220, 270)) : Math.min(W - 85, emboscadaX + rand(220, 270)))
+          : tipoP === "lagartinho"
+            ? (goliasNaDir ? Math.max(60, emboscadaX - rand(280, 340)) : Math.min(W - 60, emboscadaX + rand(280, 340)))
+            : undefined;
+      const y0Presa = Math.max(95, Math.min(H - 95, emboscadaY + rand(-65, 65)));
+
+      const presa = gerarPresa(tipoP, {
         daEsquerda: goliasNaDir,
-        y0: Math.max(95, Math.min(H - 95, emboscadaY + rand(-90, 90))),
+        x0: x0Presa,
+        y0: y0Presa,
         alvoX: alvoPresaX,
         alvoY: alvoPresaY,
-        duracaoPouso: 10
+        duracaoPouso: 12
       });
       if (!presa) return null;
 
@@ -2079,7 +2187,9 @@ const AranhasAtelie = (() => {
         return null;
       }
 
-      vincularCaca(aranha, presa, podeEscapar, {
+      // Lagarta e Lagartinho nunca abortam a cena da Golias antes do ataque
+      const goliasPodeEscapar = tipoP === "lagarta" || tipoP === "lagartinho" ? false : podeEscapar;
+      vincularCaca(aranha, presa, goliasPodeEscapar, {
         comTocaFios: true,
         pontoEmboscada: { x: emboscadaX, y: emboscadaY }
       });
@@ -2704,34 +2814,96 @@ const AranhasAtelie = (() => {
       }
     }
 
-    // 4. Lagarta Gigante: onda peristáltica + postura defensiva "Esfinge" + contorção na luta!
+    // 4. Lagarta Gigante: onda peristáltica anterógrada real (cauda -> cabeça) + coluna flexível em curva + postura Esfinge!
     if (id === "lagarta") {
       if (presa.sendoDevoradaPedacos) return;
-      if (movendo) presa.faseMarcha += dt * (presa.modo === "evadindo" ? 8.2 : 5.8);
+      if (movendo) {
+        presa.faseMarcha += dt * (presa.modo === "evadindo" ? 7.8 : 5.4);
+      }
       const emEsfinge = presa.modo === "defesa_presa";
+      const emPausaExploracao = !movendo && presa.pausaSprint > 0 && presa.modo === "livre";
       const emLuta = presa.modo === "capturada" && presa.vibrandoPresa && intensidadeLuta > 0.06;
-      for (let i = 0; i < presa.segsLagarta.length; i++) {
+      const curva = presa.curvaSpine || 0;
+      const nSegs = presa.segsLagarta.length || 7;
+
+      for (let i = 0; i < nSegs; i++) {
         const seg = presa.segsLagarta[i];
+        // u vai de -1 (tórax dianteiro, i=0) a +1 (cauda, i=6)
+        const u = (i - 3) / 3;
+
         if (emEsfinge && i <= 2) {
-          // Arqueia e balança os 3 segmentos dianteiros (postura defensiva Sphingidae!)
-          const balanco = Math.sin(t * 14) * (10 - i * 2.8);
-          seg.style.transform = `translate(${balanco.toFixed(1)}px, ${(3 - i) * 1.4}px) scale(${(1.08 - i * 0.02).toFixed(3)}, 0.88)`;
+          // Postura defensiva Sphingidae ("Esfinge"): ergue e balança vigorosamente o tórax de um lado para o outro!
+          const balanco = Math.sin(t * 14 - i * 0.4) * (13 - i * 3.4);
+          const rotE = Math.sin(t * 14 - i * 0.35) * (18 - i * 4.5);
+          seg.style.transform = `translate(${balanco.toFixed(1)}px, ${((3 - i) * 2.2).toFixed(1)}px) rotate(${rotE.toFixed(1)}deg) scale(${(1.1 - i * 0.02).toFixed(3)}, 0.86)`;
+        } else if (emPausaExploracao && i <= 2) {
+          // Pausa viva de exploração: ergue levemente a frente do corpo e fareja para a esquerda e direita!
+          const tateioLat = Math.sin(t * 5.2 - i * 0.45) * (9.5 - i * 2.8);
+          const rotExpl = Math.sin(t * 5.2 - i * 0.4) * (13 - i * 3.5);
+          const resp = Math.sin(t * 2.6 + i * 0.5) * 0.03;
+          seg.style.transform = `translate(${tateioLat.toFixed(1)}px, ${(-1.5 + i * 0.5).toFixed(1)}px) rotate(${rotExpl.toFixed(1)}deg) scale(${(1.03 + resp).toFixed(3)}, ${(0.97 - resp).toFixed(3)})`;
         } else {
+          // Onda peristáltica viajante da cauda (i=6) até a cabeça (i=0):
+          // Fase atrasada por segmento para que a contração percorra visivelmente todo o corpo!
+          const faseSeg = presa.faseMarcha - (nSegs - 1 - i) * 0.78;
           const onda = movendo
-            ? Math.sin(presa.faseMarcha - (6 - i) * 0.72)
+            ? Math.sin(faseSeg)
             : emLuta
-              ? Math.sin(t * 18 + i * 0.9) * 1.15 * intensidadeLuta
-              : Math.sin(t * 1.8 + i * 0.4) * 0.25;
-          const sx = 1 + onda * 0.085;
-          const sy = 1 - onda * 0.1;
-          const dy = onda * 2.6;
-          const rotC = emLuta ? Math.sin(t * 15 + i) * 8 * intensidadeLuta : 0;
-          seg.style.transform = `translateY(${dy.toFixed(2)}px) rotate(${rotC.toFixed(1)}deg) scale(${sx.toFixed(3)}, ${sy.toFixed(3)})`;
+              ? Math.sin(t * 17 + i * 0.85) * 1.2 * intensidadeLuta
+              : Math.sin(t * 2.1 + i * 0.55) * 0.28;
+          const ondaCos = movendo ? Math.cos(faseSeg) : 0;
+
+          // Quando a onda passa pelo anel: ele avança (-Y), estica longitudinalmente e depois comprime lateralmente (conservação de volume!)
+          const dy = movendo ? -onda * 6.8 - Math.max(0, ondaCos) * 2.4 : onda * 2.2;
+          const sx = 1 - onda * 0.115 + Math.max(0, -onda) * 0.04;
+          const sy = 1 + onda * 0.145;
+
+          // Coluna articulada em curva ("S" suave + curvatura real das manobras): elimina 100% o aspecto de "robozinho" rígido!
+          const arcoCurvaX = (1 - u * u) * curva * 13.5;
+          const serpenteioX = movendo
+            ? Math.sin(presa.faseMarcha * 0.5 - i * 0.65) * (3.8 + (i === 0 || i === 6 ? 1.4 : 0))
+            : emLuta
+              ? Math.sin(t * 16 + i * 0.9) * 9.5 * intensidadeLuta
+              : Math.sin(t * 1.9 + i * 0.6) * 1.1;
+          const dx = arcoCurvaX + serpenteioX;
+
+          const rotCurva = -u * curva * 20;
+          const rotOnda = movendo
+            ? Math.cos(presa.faseMarcha * 0.5 - i * 0.65) * 6.5
+            : emLuta
+              ? Math.sin(t * 15 + i) * 14 * intensidadeLuta
+              : Math.sin(t * 1.9 + i * 0.5) * 1.8;
+          const rotTotal = rotCurva + rotOnda;
+
+          seg.style.transform = `translate(${dx.toFixed(2)}px, ${dy.toFixed(2)}px) rotate(${rotTotal.toFixed(1)}deg) scale(${sx.toFixed(3)}, ${sy.toFixed(3)})`;
         }
       }
+
       if (presa.cabecaLagarta) {
-        const tateio = emEsfinge ? Math.sin(t * 16) * 24 : Math.sin(t * 3.8) * 10;
-        presa.cabecaLagarta.style.transform = `rotate(${tateio.toFixed(1)}deg)`;
+        // A cabeça lidera a curva da coluna, avança com a onda torácica (i=0) e tateia ativamente o caminho!
+        const faseCab = presa.faseMarcha - (nSegs - 1) * 0.78 + 0.55;
+        const ondaCab = movendo ? Math.sin(faseCab) : Math.sin(t * 2.4) * 0.25;
+        const dyCab = emEsfinge
+          ? 4.2
+          : movendo
+            ? -ondaCab * 7.4 - 1.5
+            : -1.0;
+        const dxCab = emEsfinge
+          ? Math.sin(t * 14) * 15
+          : emPausaExploracao
+            ? Math.sin(t * 5.2) * 12.5
+            : movendo
+              ? curva * 9.5 + Math.sin(presa.faseMarcha * 0.5 + 0.4) * 5.2 + Math.sin(t * 4.6) * 2.8
+              : Math.sin(t * 2.8) * 3.2;
+        const rotCab = emEsfinge
+          ? Math.sin(t * 14) * 26
+          : emPausaExploracao
+            ? Math.sin(t * 5.2) * 22
+            : movendo
+              ? curva * 24 + Math.sin(t * 4.6) * 13
+              : Math.sin(t * 3.1) * 9;
+        const escCabY = movendo ? 1 + ondaCab * 0.08 : 1;
+        presa.cabecaLagarta.style.transform = `translate(${dxCab.toFixed(2)}px, ${dyCab.toFixed(2)}px) rotate(${rotCab.toFixed(1)}deg) scale(1, ${escCabY.toFixed(3)})`;
       }
     }
 
@@ -3041,10 +3213,11 @@ const AranhasAtelie = (() => {
             presa.barataPausaTimer = rand(0.26, 0.68);
           } else {
             presa.barataDirAlvo = presa.barataDirAng + (Math.random() < 0.5 ? 1 : -1) * rand(0.65, 1.95);
-            if (pred && pred.caca && pred.caca.fase === "esperando_fios" && presa.barataTempoErrando > 2.4) {
-              const angAlvoFios = Math.atan2(pred.estado.y - presa.y, pred.estado.x - presa.x);
+            if (pred && pred.caca && ["chegando_toca", "armando_fios", "esperando_fios", "congelando_alinhando"].includes(pred.caca.fase)) {
+              const ptAlvo = pred.caca.pontoEmboscada || pred.estado;
+              const angAlvoFios = Math.atan2(ptAlvo.y - presa.y, ptAlvo.x - presa.x);
               const diff = Math.atan2(Math.sin(angAlvoFios - presa.barataDirAng), Math.cos(angAlvoFios - presa.barataDirAng));
-              presa.barataDirAlvo = presa.barataDirAng + diff * rand(0.5, 0.82);
+              presa.barataDirAlvo = presa.barataDirAng + diff * rand(0.58, 0.88);
             }
           }
           presa.barataTrocaDirTimer = rand(0.3, 0.72);
@@ -3191,10 +3364,11 @@ const AranhasAtelie = (() => {
         if (presa.pausaSprint <= 0) {
           presa.sprintRestante = rand(0.58, 1.15);
           presa.curvaturaAng = (Math.random() < 0.5 ? 1 : -1) * rand(0.45, 1.25);
-          // Vira para nova direção natural (ou em direção ao palco/fios da Golias após explorar)
-          if (pred && pred.caca && pred.caca.fase === "esperando_fios" && presa.tempoLivreTotal > 2.2) {
-            const angFios = Math.atan2(pred.estado.y - presa.y, pred.estado.x - presa.x);
-            presa.rumoAng = angFios + rand(-0.45, 0.45);
+          // Vira para nova direção natural (ou em direção ao palco/fios da Golias)
+          if (pred && pred.caca && ["chegando_toca", "armando_fios", "esperando_fios", "congelando_alinhando"].includes(pred.caca.fase)) {
+            const ptAlvo = pred.caca.pontoEmboscada || pred.estado;
+            const angFios = Math.atan2(ptAlvo.y - presa.y, ptAlvo.x - presa.x);
+            presa.rumoAng = angFios + rand(-0.35, 0.35);
           } else {
             presa.rumoAng += (Math.random() < 0.5 ? 1 : -1) * rand(0.55, 1.38);
           }
@@ -3232,39 +3406,52 @@ const AranhasAtelie = (() => {
       }
       animarAnatomiaPresa(presa, dt, movendo);
     } else {
-      // LAGARTA GIGANTE: rastejo peristáltico em curvas orgânicas + pausas tateando com a cabeça!
+      // LAGARTA GIGANTE: rastejo peristáltico vivo em curvas sinuosas + pausas erguendo o tórax e tateando com a cabeça!
       const W = window.innerWidth || 1200;
       const H = window.innerHeight || 800;
       const margem = 92;
       presa.tempoLivreTotal += dt;
 
       if (presa.pausaSprint > 0) {
-        // Pausa de exploração: cabeça balança de um lado para o outro escolhendo nova curva!
+        // Pausa de exploração viva: ergue os anéis dianteiros e balança a cabeça escolhendo a próxima curva!
         presa.pausaSprint -= dt;
         if (presa.pausaSprint <= 0) {
-          presa.sprintRestante = rand(1.6, 2.8);
-          presa.curvaturaAng = (Math.random() < 0.5 ? 1 : -1) * rand(0.28, 0.68);
-          if (pred && pred.caca && pred.caca.fase === "esperando_fios" && presa.tempoLivreTotal > 2.2) {
-            const angFios = Math.atan2(pred.estado.y - presa.y, pred.estado.x - presa.x);
-            presa.rumoAng = angFios + rand(-0.35, 0.35);
+          presa.sprintRestante = rand(2.1, 3.4);
+          presa.curvaturaAng = (Math.random() < 0.5 ? 1 : -1) * rand(0.32, 0.74);
+          if (pred && pred.caca && ["chegando_toca", "armando_fios", "esperando_fios", "congelando_alinhando"].includes(pred.caca.fase)) {
+            const ptAlvo = pred.caca.pontoEmboscada || pred.estado;
+            const angFios = Math.atan2(ptAlvo.y - presa.y, ptAlvo.x - presa.x);
+            presa.rumoAng = angFios + rand(-0.28, 0.28);
           } else {
-            presa.rumoAng += (Math.random() < 0.5 ? 1 : -1) * rand(0.45, 1.05);
+            presa.rumoAng += (Math.random() < 0.5 ? 1 : -1) * rand(0.38, 0.85);
           }
         }
       } else {
         movendo = true;
         presa.sprintRestante -= dt;
         if (presa.sprintRestante <= 0) {
-          presa.pausaSprint = rand(0.68, 1.18);
+          presa.pausaSprint = rand(0.52, 0.88);
         } else {
-          if (presa.x < margem && Math.cos(presa.rumoAng) < 0) presa.rumoAng = rand(-0.65, 0.65);
-          else if (presa.x > W - margem && Math.cos(presa.rumoAng) > 0) presa.rumoAng = Math.PI + rand(-0.65, 0.65);
-          if (presa.y < margem && Math.sin(presa.rumoAng) < 0) presa.rumoAng = Math.PI * 0.5 + rand(-0.65, 0.65);
-          else if (presa.y > H - margem && Math.sin(presa.rumoAng) > 0) presa.rumoAng = -Math.PI * 0.5 + rand(-0.65, 0.65);
+          if (presa.x < margem && Math.cos(presa.rumoAng) < 0) presa.rumoAng = rand(-0.55, 0.55);
+          else if (presa.x > W - margem && Math.cos(presa.rumoAng) > 0) presa.rumoAng = Math.PI + rand(-0.55, 0.55);
+          if (presa.y < margem && Math.sin(presa.rumoAng) < 0) presa.rumoAng = Math.PI * 0.5 + rand(-0.55, 0.55);
+          else if (presa.y > H - margem && Math.sin(presa.rumoAng) > 0) presa.rumoAng = -Math.PI * 0.5 + rand(-0.55, 0.55);
 
-          presa.rumoAng += presa.curvaturaAng * dt;
-          // Pulso peristáltico real: avança mais quando a onda muscular empurra o tórax!
-          const pulsoPerist = 0.45 + Math.max(0, Math.sin(presa.faseMarcha)) * 1.15;
+          // Quando há uma Golias emboscando, guia suavemente a curva da lagarta para passar perto da zona sensorial
+          if (pred && pred.caca && ["chegando_toca", "armando_fios", "esperando_fios"].includes(pred.caca.fase)) {
+            const ptAlvo = pred.caca.pontoEmboscada || pred.estado;
+            const angParaGolias = Math.atan2(ptAlvo.y - presa.y, ptAlvo.x - presa.x);
+            const diffG = Math.atan2(Math.sin(angParaGolias - presa.rumoAng), Math.cos(angParaGolias - presa.rumoAng));
+            presa.rumoAng += diffG * dt * 1.15;
+          }
+
+          // Serpenteio orgânico contínuo ao rastejar
+          const ondaRumo = Math.sin(presa.tempoVida * 1.85) * 0.36;
+          presa.rumoAng += (presa.curvaturaAng * 0.65 + ondaRumo) * dt;
+
+          // Pulso peristáltico real: o corpo desliza para frente quando a onda muscular chega ao tórax!
+          const faseTorax = presa.faseMarcha - 6 * 0.78;
+          const pulsoPerist = 0.38 + Math.pow(Math.max(0, Math.sin(faseTorax) * 0.5 + 0.5), 1.5) * 1.28;
           const velLagarta = presa.def.velocidadeBase * pulsoPerist;
           presa.x += Math.cos(presa.rumoAng) * velLagarta * dt;
           presa.y += Math.sin(presa.rumoAng) * velLagarta * dt;
@@ -3280,9 +3467,13 @@ const AranhasAtelie = (() => {
         }
       }
 
-      if (!pred && presa.tempoLivreTotal > 13.5) {
+      if (!pred && presa.tempoLivreTotal > 14.5) {
         presa.modo = "escapando";
       }
+      // Calcula a curvatura instantânea da coluna para que os 7 segmentos dobrem suavemente nas curvas!
+      const diffAngLag = ((presa.anguloAlvo - presa.angulo + 540) % 360) - 180;
+      const alvoCurvaSpine = Math.max(-1.25, Math.min(1.25, (diffAngLag / 24) + (movendo ? Math.sin(presa.faseMarcha * 0.5) * 0.32 : 0)));
+      presa.curvaSpine = lerp(presa.curvaSpine || 0, alvoCurvaSpine, Math.min(1, dt * 8.5));
       animarAnatomiaPresa(presa, dt, movendo);
     }
 
@@ -3484,12 +3675,12 @@ const AranhasAtelie = (() => {
     // ----------------------------------------------------------------------
     if (c.estilo === "golias_emboscada") {
       if (c.fase === "chegando_toca") {
-        // Entra da borda até o ponto de emboscada terrestre oportunista
+        // Entra da borda até o ponto de emboscada terrestre oportunista (sem cortar antes de chegar no palco!)
         const ex = c.pontoEmboscada.x - st.x;
         const ey = c.pontoEmboscada.y - st.y;
         const ed = Math.hypot(ex, ey);
-        const vel = inst.especie.velocidadeBase * 1.45;
-        if (ed <= 14 || c.tempoFase >= 2.8) {
+        const vel = inst.especie.velocidadeBase * 2.35;
+        if (ed <= 18 || c.tempoFase >= 5.2) {
           c.fase = "armando_fios";
           c.tempoFase = 0;
         } else {
@@ -3501,7 +3692,7 @@ const AranhasAtelie = (() => {
         // ETAPA 1a: Posiciona-se imóvel voltada para a área de vibração (sem desenhar tracejado!)
         flags.andando = false;
         st.anguloAlvo = angParaPresa;
-        if (c.tempoFase >= 0.45) {
+        if (c.tempoFase >= 0.38) {
           c.fase = "esperando_fios";
           c.tempoFase = 0;
         }
@@ -3510,19 +3701,19 @@ const AranhasAtelie = (() => {
         flags.andando = false;
         c.furtiva = true;
 
-        const noRaioSensorial = dist < inst.tamPx * 1.46;
-        if (noRaioSensorial || c.tempoFase >= 6.8) {
+        const noRaioSensorial = dist < inst.tamPx * 1.85;
+        if (noRaioSensorial || c.tempoFase >= 2.35) {
           // Detecção visual 100% por ondas suaves de vibração no solo!
           criarOndaVibracao(p.x, p.y, "solo");
           criarOndaVibracao(st.x, st.y, "solo");
-          c.pulsoFioAlarme = 0.45;
+          c.pulsoFioAlarme = 0.38;
           c.fase = "congelando_alinhando";
           c.tempoFase = 0;
           c.passosAlinhamento = 0;
           c.angAlvoAlinhamento = st.angulo;
         }
       } else if (c.fase === "congelando_alinhando") {
-        // ETAPA 2: Congelamento total (0.42s) → Alinhamento em 3 pequenos ajustes discretos + pressão hidráulica!
+        // ETAPA 2: Congelamento total (0.35s) → Alinhamento em 3 pequenos ajustes discretos + pressão hidráulica!
         flags.andando = false;
         c.furtiva = true;
         if (c.pulsoFioAlarme > 0) {
@@ -3532,12 +3723,12 @@ const AranhasAtelie = (() => {
           }
         }
 
-        if (c.tempoFase < 0.42) {
+        if (c.tempoFase < 0.35) {
           // Congelada completamente imóvel para não assustar a presa
           st.anguloAlvo = st.angulo;
-        } else if (c.tempoFase < 1.35) {
+        } else if (c.tempoFase < 1.15) {
           // Gira o corpo devagar em 3 micro-ajustes discretos até alinhar o cefalotórax com o alvo!
-          const passoAtual = Math.min(3, Math.floor((c.tempoFase - 0.42) / 0.31) + 1);
+          const passoAtual = Math.min(3, Math.floor((c.tempoFase - 0.35) / 0.26) + 1);
           if (passoAtual > c.passosAlinhamento) {
             c.passosAlinhamento = passoAtual;
             const frac = passoAtual / 3;
@@ -3546,13 +3737,13 @@ const AranhasAtelie = (() => {
           st.anguloAlvo = c.angAlvoAlinhamento;
           // Começa a erguer ligeiramente pedipalpos e par I acumulando pressão de hemolinfa!
           flags.acumulandoPressao = true;
-          const pComp = Math.min(1, (c.tempoFase - 0.42) / 0.93);
+          const pComp = Math.min(1, (c.tempoFase - 0.35) / 0.8);
           flags.escalaX = 1 + pComp * 0.045;
           flags.escalaY = 1 - pComp * 0.055;
         } else {
           // Pronta: se presa está na distância ideal, dispara bote hidráulico; senão se aproxima furtivamente!
           c.furtiva = false;
-          const distIdeal = p.def.porte === "gigante" ? 168 : 148;
+          const distIdeal = p.def.porte === "gigante" ? 176 : 152;
           if (dist <= distIdeal) {
             c.fase = "bote_hidraulico";
             c.tempoFase = 0;
@@ -3564,15 +3755,15 @@ const AranhasAtelie = (() => {
           }
         }
       } else if (c.fase === "espreitando") {
-        // Caso a presa tenha se afastado um pouco, faz aproximação curta antes do bote hidráulico
-        const prevT = p.modo === "evadindo" ? 0.35 : 0.12;
+        // Caso a presa esteja mais longe, avança com passo decidido até o alcance do bote hidráulico
+        const prevT = p.modo === "evadindo" ? 0.32 : 0.12;
         const idx = p.x + p.velocidadeX * prevT - st.x;
         const idy = p.y + p.velocidadeY * prevT - st.y;
         const idist = Math.max(1, Math.hypot(idx, idy));
         st.anguloAlvo = (Math.atan2(idy, idx) * 180) / Math.PI + 90;
 
-        const distBote = p.def.porte === "gigante" ? 156 : 134;
-        const vel = inst.especie.velocidadeBase * (p.modo === "evadindo" ? 1.9 : 1.25);
+        const distBote = p.def.porte === "gigante" ? 166 : 142;
+        const vel = inst.especie.velocidadeBase * (p.modo === "evadindo" ? 2.25 : 1.85);
         if (dist <= distBote) {
           c.fase = "armando";
           c.tempoFase = 0;
@@ -3830,8 +4021,9 @@ const AranhasAtelie = (() => {
           flags.paralaxe = true;
           c.congeladaFurtiva = 0.08;
         } else {
-          const vel = inst.especie.velocidadeBase * 0.76;
-          if (dist <= 122) {
+          const vel = inst.especie.velocidadeBase * 0.85;
+          // Alcance de salto longo (~196 px): inicia a preparação do bote de bem mais longe!
+          if (dist <= 196) {
             c.fase = "armando";
             c.tempoFase = 0;
             criarRastroPonto(st.x, st.y, true);
@@ -3845,8 +4037,12 @@ const AranhasAtelie = (() => {
           }
         }
       } else if (c.fase === "armando") {
+        // ANIMAÇÃO DE PREPARAÇÃO PARA PULAR (Salticidae):
+        // Recua levemente como uma mola, achata o corpo, flexiona profundamente os pares traseiros III e IV,
+        // ergue o 1º par dianteiro mirando o alvo e agita rapidamente os pedipalpos antes de disparar!
         flags.andando = false;
         flags.agachando = true;
+        flags.preparandoSalto = true;
         st.anguloAlvo = angParaPresa;
         // Se a mosca decolou durante o agachamento, cancela o salto e volta a rastrear!
         if (p.modo === "evadindo") {
@@ -3855,10 +4051,16 @@ const AranhasAtelie = (() => {
           c.tempoFase = 0;
           return true;
         }
-        const prog = Math.min(1, c.tempoFase / 0.52);
-        flags.escalaX = 1 + prog * 0.1;
-        flags.escalaY = 1 - prog * 0.16;
-        if (c.tempoFase >= 0.52) {
+        const durPrep = 0.48;
+        const prog = Math.min(1, c.tempoFase / durPrep);
+        const recuoMola = Math.sin(prog * Math.PI * 0.85) * 7.5;
+        if (c.pontoSaltoIni && dist > 1) {
+          st.x = c.pontoSaltoIni.x - (dx / dist) * recuoMola;
+          st.y = c.pontoSaltoIni.y - (dy / dist) * recuoMola;
+        }
+        flags.escalaX = 1 + prog * 0.16;
+        flags.escalaY = 1 - prog * 0.22;
+        if (c.tempoFase >= durPrep) {
           if (c.podeEscapar) {
             p.modo = "escapando";
             limparFioCaca(inst);
@@ -3866,25 +4068,31 @@ const AranhasAtelie = (() => {
             encaminharParaSaidaBorda(inst, 1.0, 0.35);
             return false;
           }
+          criarOndaVibracao(st.x, st.y, "solo");
+          c.pontoSaltoIni = { x: st.x, y: st.y };
           c.fase = "bote";
           c.tempoFase = 0;
           c.saltoT = 0;
         }
       } else if (c.fase === "bote") {
+        // SALTO BALÍSTICO LONGO E ULTRA-RÁPIDO (~0.21s para cruzar até 196 px!)
         flags.andando = false;
         flags.noAr = true;
-        c.saltoT = Math.min(1, c.saltoT + dt * 2.9);
+        c.saltoT = Math.min(1, c.saltoT + dt * 4.65);
+        const easeSalto = 1 - Math.pow(1 - c.saltoT, 1.65);
         const arco = Math.sin(c.saltoT * Math.PI);
-        st.x = lerp(c.pontoSaltoIni.x, p.x, c.saltoT);
-        st.y = lerp(c.pontoSaltoIni.y, p.y, c.saltoT) - arco * 18;
-        flags.escalaX = 1 + arco * 0.22;
-        flags.escalaY = 1 + arco * 0.26;
-        flags.sombraExtra = arco * 14;
+        st.x = lerp(c.pontoSaltoIni.x, p.x, easeSalto);
+        st.y = lerp(c.pontoSaltoIni.y, p.y, easeSalto) - arco * 26;
+        // Estica o corpo de forma aerodinâmica na arrancada do salto
+        flags.escalaX = 1 + arco * 0.12;
+        flags.escalaY = 1 + arco * 0.34;
+        flags.sombraExtra = arco * 18;
         if (c.fioPath) {
           c.fioPath.setAttribute("d", `M ${c.pontoSaltoIni.x.toFixed(1)} ${c.pontoSaltoIni.y.toFixed(1)} L ${st.x.toFixed(1)} ${st.y.toFixed(1)}`);
         }
         if (c.saltoT >= 1) {
           limparFioCaca(inst);
+          criarOndaVibracao(p.x, p.y, "impacto");
           c.fase = "contendo";
           c.tempoFase = 0;
           p.modo = "capturada";
@@ -4577,6 +4785,11 @@ const AranhasAtelie = (() => {
         escX = disputaCombate ? 1.06 : 1.035;
         escY = disputaCombate ? 0.92 : 0.95;
         rotAbd = Math.sin(t * (disputaCombate ? 28 : disputaEsgrima ? 17 : 10)) * (disputaCombate ? 5.2 : 2.6);
+      } else if (agachando) {
+        // Preparação para pular da Papa-moscas: achata o abdômen e faz micro-wiggle de mira!
+        escX = 1.12;
+        escY = 0.85;
+        rotAbd = Math.sin(t * 34) * 5.2;
       } else if (emDefesa || armandoBoteGolias || acumulandoPressao) {
         escX = 1.045;
         escY = 0.945;
@@ -4609,6 +4822,11 @@ const AranhasAtelie = (() => {
     if (emDefesa || armandoBoteGolias) {
       rotCefalo = Math.sin(t * 36) * 2.4;
       rotPalpos = Math.sin(t * 38) * 11;
+    } else if (agachando) {
+      // Preparação para pular (Salticidae): pedipalpos vibram rapidamente calibrando a mira do salto!
+      rotCefalo = Math.sin(t * 28) * 3.5;
+      rotPalpos = Math.sin(t * 36) * 15;
+      tyPalpos = Math.sin(t * 36) * 2.6;
     } else if (acumulandoPressao || cortejoCongelar) {
       rotCefalo = 0;
       rotPalpos = cortejoCongelar ? 0 : Math.sin(t * 14) * 5;
@@ -4713,7 +4931,9 @@ const AranhasAtelie = (() => {
 
     for (let i = 0; i < inst.patas.length; i++) {
       const p = inst.patas[i];
+      const ikP = inst.ikPatas && inst.ikPatas[i] ? inst.ikPatas[i] : null;
       let alvoAng = 0;
+      let alvoDistalAng = 0;
 
       if (camuflagemGalhinho) {
         // 3. Postura Tetragnatha: todas as 8 patas alinhadas rente ao eixo do corpo (galhinho imóvel!)
@@ -4737,10 +4957,18 @@ const AranhasAtelie = (() => {
         else if (p.par === 2) alvoAng = p.lado * (-28 + Math.sin(t * 15) * 10);
         else alvoAng = Math.sin(t * 10 + p.faseBase) * 4;
       } else if (cortejoZigueZague || dancaCortejo) {
-        // Fase 2 — 1º par erguido amplo para o alto/lados (silhueta inconfundível) enquanto os outros marcham!
-        if (p.par === 0) alvoAng = p.lado * (-26 + Math.sin(t * 11) * 7);
-        else if (p.par === 2) alvoAng = p.lado * (-10 + Math.sin(t * 12 + p.faseBase) * 8);
-        else alvoAng = Math.sin(inst.fasePassada + p.faseBase) * 11;
+        // Fase 2 — 1º par erguido amplo para o alto/lados (silhueta inconfundível) enquanto os outros caminham via IK!
+        if (p.par === 0) {
+          alvoAng = p.lado * (-26 + Math.sin(t * 11) * 7);
+          alvoDistalAng = p.lado * -14;
+        } else if (p.par === 2) {
+          alvoAng = p.lado * (-10 + Math.sin(t * 12 + p.faseBase) * 8);
+        } else if (ikP) {
+          alvoAng = ikP.angFemurGraus;
+          alvoDistalAng = ikP.angDistalGraus;
+        } else {
+          alvoAng = Math.sin(inst.fasePassada + p.faseBase) * 11;
+        }
       } else if (cortejoTransferencia) {
         // Desfecho A — Macho apoiado suavemente sobre o dorso da fêmea
         alvoAng = p.par <= 1 ? p.lado * -12 : p.lado * 10;
@@ -4770,62 +4998,145 @@ const AranhasAtelie = (() => {
         else if (p.par >= 2) alvoAng = p.lado * -8;
         else alvoAng = p.lado * -5;
       } else if (disputaCombate) {
-        // Engalfinhamento curto: pares I e II travam e empurram com energia; pares traseiros fazem força real!
-        if (p.par === 0) alvoAng = p.lado * (-31 + Math.sin(t * 30 + (p.lado === 1 ? 0 : Math.PI)) * 17);
-        else if (p.par === 1) alvoAng = p.lado * (-20 + Math.cos(t * 26 + (p.lado === 1 ? Math.PI : 0)) * 13);
-        else alvoAng = andando && desloc > 0.02
-          ? Math.sin(inst.fasePassada + p.faseBase) * amp * 0.9 + p.lado * 6
-          : p.lado * 9 + Math.sin(t * 22 + p.faseBase) * 4;
+        // Engalfinhamento curto: pares I e II travam e empurram com energia; pares traseiros apoiam via IK real!
+        if (p.par === 0) {
+          alvoAng = p.lado * (-31 + Math.sin(t * 30 + (p.lado === 1 ? 0 : Math.PI)) * 17);
+          alvoDistalAng = p.lado * (16 + Math.cos(t * 30) * 12);
+        } else if (p.par === 1) {
+          alvoAng = p.lado * (-20 + Math.cos(t * 26 + (p.lado === 1 ? Math.PI : 0)) * 13);
+          alvoDistalAng = p.lado * 12;
+        } else if (ikP) {
+          alvoAng = ikP.angFemurGraus;
+          alvoDistalAng = ikP.angDistalGraus;
+        } else {
+          alvoAng = p.lado * 9;
+        }
       } else if (disputaEsgrima) {
-        // Esgrima de patas dianteiras (Leg-Fencing): toques alternados ágeis no par I, guarda no par II, passos reais atrás!
-        if (p.par === 0) alvoAng = p.lado * (-30 + Math.sin(t * 24 + (p.lado === 1 ? 0 : Math.PI * 0.85)) * 18);
-        else if (p.par === 1) alvoAng = p.lado * (-17 + Math.sin(t * 16 + p.lado) * 7);
-        else alvoAng = andando && desloc > 0.02
-          ? Math.sin(inst.fasePassada + p.faseBase) * amp * 0.88
-          : p.lado * 6;
+        // Esgrima de patas dianteiras (Leg-Fencing): toques alternados ágeis no par I, guarda no par II, passos IK atrás!
+        if (p.par === 0) {
+          alvoAng = p.lado * (-30 + Math.sin(t * 24 + (p.lado === 1 ? 0 : Math.PI * 0.85)) * 18);
+          alvoDistalAng = p.lado * (-12 + Math.cos(t * 24 + (p.lado === 1 ? 0 : Math.PI * 0.85)) * 16);
+        } else if (p.par === 1) {
+          alvoAng = p.lado * (-17 + Math.sin(t * 16 + p.lado) * 7);
+          alvoDistalAng = p.lado * -10;
+        } else if (ikP) {
+          alvoAng = ikP.angFemurGraus;
+          alvoDistalAng = ikP.angDistalGraus;
+        } else {
+          alvoAng = p.lado * 6;
+        }
       } else if (disputaAmeaca) {
-        // Postura de avaliação/ameaça em círculo: 1º par erguido amplo enquanto patas traseiras caminham de verdade!
-        if (p.par === 0) alvoAng = p.lado * (-28 + Math.sin(t * 13 + p.lado * 0.6) * 6);
-        else if (p.par === 1) alvoAng = p.lado * (-16 + Math.sin(t * 11) * 4);
-        else alvoAng = andando && desloc > 0.02
-          ? Math.sin(inst.fasePassada + p.faseBase) * amp * 0.95
-          : p.lado * 5;
+        // Postura de avaliação/ameaça em círculo: 1º par erguido amplo enquanto patas traseiras caminham via IK!
+        if (p.par === 0) {
+          alvoAng = p.lado * (-28 + Math.sin(t * 13 + p.lado * 0.6) * 6);
+          alvoDistalAng = p.lado * -15;
+        } else if (p.par === 1) {
+          alvoAng = p.lado * (-16 + Math.sin(t * 11) * 4);
+          alvoDistalAng = p.lado * -8;
+        } else if (ikP) {
+          alvoAng = ikP.angFemurGraus;
+          alvoDistalAng = ikP.angDistalGraus;
+        } else {
+          alvoAng = p.lado * 5;
+        }
       } else if (mordendoPedaco) {
-        // Puxando e segurando pedaço por pedaço da Lagarta / Lagartinho com os pares I e II!
-        if (p.par === 0) alvoAng = p.lado * (-22 + pulsoMordida * 7.5);
-        else if (p.par === 1) alvoAng = p.lado * (-13 - pulsoMordida * 4.5);
-        else alvoAng = Math.sin(t * 3 + p.faseBase) * 1.8;
+        // Puxando e segurando pedaço por pedaço da Lagarta / Lagartinho com os pares I e II; pares III e IV plantados via IK!
+        if (p.par === 0) {
+          alvoAng = p.lado * (-22 + pulsoMordida * 7.5);
+          alvoDistalAng = p.lado * (14 - pulsoMordida * 8);
+        } else if (p.par === 1) {
+          alvoAng = p.lado * (-13 - pulsoMordida * 4.5);
+          alvoDistalAng = p.lado * 10;
+        } else if (ikP) {
+          alvoAng = ikP.angFemurGraus;
+          alvoDistalAng = ikP.angDistalGraus;
+        } else {
+          alvoAng = Math.sin(t * 3 + p.faseBase) * 1.8;
+        }
       } else if (digestaoSuccao) {
-        // Etapa 6 — Patas dianteiras apoiam suavemente a presa sob as quelíceras durante a sucção
-        if (p.par === 0) alvoAng = p.lado * (-18 + Math.sin(t * 5.2) * 2.5);
-        else if (p.par === 1) alvoAng = p.lado * -10;
-        else alvoAng = Math.sin(t * 2.4 + p.faseBase) * 1.5;
+        // Etapa 6 — Patas dianteiras apoiam suavemente a presa sob as quelíceras durante a sucção; pares III e IV firmes via IK
+        if (p.par === 0) {
+          alvoAng = p.lado * (-18 + Math.sin(t * 5.2) * 2.5);
+          alvoDistalAng = p.lado * 12;
+        } else if (p.par === 1) {
+          alvoAng = p.lado * -10;
+          alvoDistalAng = p.lado * 8;
+        } else if (ikP) {
+          alvoAng = ikP.angFemurGraus;
+          alvoDistalAng = ikP.angDistalGraus;
+        } else {
+          alvoAng = Math.sin(t * 2.4 + p.faseBase) * 1.5;
+        }
       } else if (emDefesa || armandoBoteGolias) {
-        if (p.par === 0) alvoAng = p.lado * (-22 + Math.sin(t * 34 + p.lado) * 4.5);
-        else if (p.par === 1) alvoAng = p.lado * (-14 + Math.sin(t * 30) * 3);
-        else alvoAng = p.lado * 7;
+        if (p.par === 0) {
+          alvoAng = p.lado * (-22 + Math.sin(t * 34 + p.lado) * 4.5);
+          alvoDistalAng = p.lado * -14;
+        } else if (p.par === 1) {
+          alvoAng = p.lado * (-14 + Math.sin(t * 30) * 3);
+          alvoDistalAng = p.lado * -10;
+        } else if (ikP) {
+          alvoAng = ikP.angFemurGraus;
+          alvoDistalAng = ikP.angDistalGraus;
+        } else {
+          alvoAng = p.lado * 7;
+        }
       } else if (contendoPresa) {
-        // Abraça firmemente a presa com os pares dianteiros I e II!
-        if (p.par === 0) alvoAng = p.lado * (-24 + Math.sin(t * 18) * 3.5);
-        else if (p.par === 1) alvoAng = p.lado * (-14 + Math.cos(t * 16) * 2.5);
-        else alvoAng = p.lado * 5;
+        // Abraça firmemente a presa com o 1º par (e 2º par se parada); na Dança da Seda, pares II, III e IV caminham em círculo via IK!
+        if (p.par === 0) {
+          alvoAng = p.lado * (-24 + Math.sin(t * 18) * 3.5);
+          alvoDistalAng = p.lado * 16;
+        } else if (p.par === 1 && !dancaSeda) {
+          alvoAng = p.lado * (-14 + Math.cos(t * 16) * 2.5);
+          alvoDistalAng = p.lado * 12;
+        } else if (ikP) {
+          alvoAng = ikP.angFemurGraus;
+          alvoDistalAng = ikP.angDistalGraus;
+        } else {
+          alvoAng = p.lado * 5;
+        }
       } else if (emboscadaBracos) {
-        // Aranha-Caranguejo: abre bem os pares I e II em "U" de emboscada!
-        if (p.par === 0) alvoAng = p.lado * -22;
-        else if (p.par === 1) alvoAng = p.lado * -16;
-        else alvoAng = p.lado * 4;
+        // Aranha-Caranguejo: abre bem os pares I e II em "U" de emboscada enquanto os pares III e IV caminham via IK!
+        if (p.par === 0) {
+          alvoAng = p.lado * -22;
+          alvoDistalAng = p.lado * 14;
+        } else if (p.par === 1) {
+          alvoAng = p.lado * -16;
+          alvoDistalAng = p.lado * 10;
+        } else if (ikP) {
+          alvoAng = ikP.angFemurGraus;
+          alvoDistalAng = ikP.angDistalGraus;
+        } else {
+          alvoAng = p.lado * 4;
+        }
       } else if (arremessandoSeda) {
         // Tecelã-de-Renda: movimenta rapidamente o 4º par traseiro arremessando seda!
-        if (p.par === 3) alvoAng = p.lado * (14 + Math.sin(t * 24 + (p.lado === 1 ? Math.PI : 0)) * 18);
-        else alvoAng = Math.sin(t * 4 + p.faseBase) * 3;
+        if (p.par === 3) {
+          alvoAng = p.lado * (14 + Math.sin(t * 24 + (p.lado === 1 ? Math.PI : 0)) * 18);
+          alvoDistalAng = p.lado * (-16 + Math.cos(t * 24 + (p.lado === 1 ? Math.PI : 0)) * 16);
+        } else if (ikP) {
+          alvoAng = ikP.angFemurGraus;
+          alvoDistalAng = ikP.angDistalGraus;
+        } else {
+          alvoAng = Math.sin(t * 4 + p.faseBase) * 3;
+        }
       } else if (paralaxe) {
-        // Papa-Moscas congelada na espreita: patas dianteiras alertas e tensas durante a paralaxe!
+        // Papa-Moscas congelada na espreita: patas dianteiras alertas e pares traseiros plantados via IK!
         if (p.par === 0) alvoAng = p.lado * (-10 + Math.sin(t * 7.5) * 3.5);
-        else alvoAng = Math.sin(t * 7.5) * 2.5;
+        else if (ikP) {
+          alvoAng = ikP.angFemurGraus;
+          alvoDistalAng = ikP.angDistalGraus;
+        } else {
+          alvoAng = Math.sin(t * 7.5) * 2.5;
+        }
       } else if (cumprimentando) {
         // Cumprimento tátil: tamborilamento alternado com o 1º par de patas!
         if (p.par === 0) alvoAng = p.lado * (-14 + Math.sin(t * 16 + (p.lado === 1 ? Math.PI : 0)) * 12);
-        else alvoAng = Math.sin(t * 2 + p.faseBase) * 2;
+        else if (ikP) {
+          alvoAng = ikP.angFemurGraus;
+          alvoDistalAng = ikP.angDistalGraus;
+        } else {
+          alvoAng = Math.sin(t * 2 + p.faseBase) * 2;
+        }
       } else if (vibrandoTeia) {
         const baseX = p.par === 0 ? 11 : p.par === 1 ? -14 : p.par === 2 ? 14 : -10;
         alvoAng = p.lado * (baseX + Math.sin(t * 32 + p.par) * 5);
@@ -4837,14 +5148,23 @@ const AranhasAtelie = (() => {
         }
       } else if (agachando) {
         alvoAng = p.par >= 2 ? p.lado * -13 : p.lado * 7;
+        alvoDistalAng = p.par <= 1 ? p.lado * 18 : p.lado * -18;
       } else if (noAr) {
         alvoAng = p.par <= 1 ? p.lado * -16 : p.lado * 12;
-      } else if (andando && desloc > 0.02) {
-        const fatorPar = p.par === 0 || p.par === 3 ? 1.1 : 0.92;
-        const deltaIK = inst.ikPatas && inst.ikPatas[i] ? inst.ikPatas[i].deltaAngGraus * 0.55 : 0;
-        alvoAng = Math.sin(inst.fasePassada + p.faseBase) * amp * fatorPar + deltaIK;
+        alvoDistalAng = p.par <= 1 ? p.lado * -12 : p.lado * 12;
+      } else if (andando || (ikP && ikP.passoT < 1)) {
+        // Locomoção (inclusive giros no próprio eixo) 100% comandada pelo Solver de Cinemática Inversa!
+        if (ikP) {
+          alvoAng = ikP.angFemurGraus;
+          alvoDistalAng = ikP.angDistalGraus;
+        } else {
+          const fatorPar = p.par === 0 || p.par === 3 ? 1.1 : 0.92;
+          alvoAng = Math.sin(inst.fasePassada + p.faseBase) * amp * fatorPar;
+          alvoDistalAng = -alvoAng * 0.42;
+        }
       } else if (inst.estado.tipo === "ballooning") {
         alvoAng = Math.sin(t * 2.2 + p.faseBase) * 5;
+        alvoDistalAng = Math.cos(t * 2.2 + p.faseBase) * 6;
       } else {
         if (inst.comportamentoAtual === "banho_completo") {
           // 4. Higiene completa pata-a-pata: puxa 0-esq → 0-dir → 1-esq → 1-dir até as quelíceras!
@@ -4857,40 +5177,81 @@ const AranhasAtelie = (() => {
           const atual = seq[Math.floor(inst.tempoComportamento / 0.72) % seq.length];
           if (p.par === atual.par && p.lado === atual.lado) {
             alvoAng = p.lado * (-25 + Math.sin(inst.tempoComportamento * 13) * 8);
-          } else {
-            alvoAng = Math.sin(t * 1.3 + p.faseBase) * 1.5;
+            alvoDistalAng = p.lado * 24;
+          } else if (ikP) {
+            alvoAng = ikP.angFemurGraus;
+            alvoDistalAng = ikP.angDistalGraus;
           }
         } else if (inst.comportamentoAtual === "soneca_espreguica") {
           // 5. Soneca encolhida (0-1.6s) → Espreguiçada par I (1.6-2.2s) → par IV (2.2-2.8s)
           const tm = inst.tempoComportamento;
           if (tm < 1.6) {
             alvoAng = p.par <= 1 ? p.lado * 11 : p.lado * -11;
+            alvoDistalAng = p.par <= 1 ? p.lado * 16 : p.lado * -16;
           } else if (tm < 2.2) {
             alvoAng = p.par === 0 ? p.lado * -22 : 0;
+            alvoDistalAng = p.par === 0 ? p.lado * -14 : 0;
           } else {
             alvoAng = p.par === 3 ? p.lado * 20 : 0;
+            alvoDistalAng = p.par === 3 ? p.lado * 14 : 0;
           }
         } else if (inst.comportamentoAtual === "grooming" && p.par === 0) {
           const ladoAtivo = Math.floor(inst.tempoComportamento / 0.85) % 2 === 0 ? -1 : 1;
           alvoAng = p.lado === ladoAtivo
             ? p.lado * (-18 + Math.sin(inst.tempoComportamento * 16) * 7)
-            : p.lado * -3;
+            : (ikP ? ikP.angFemurGraus : p.lado * -3);
+          alvoDistalAng = p.lado === ladoAtivo ? p.lado * 22 : (ikP ? ikP.angDistalGraus : 0);
         } else if (inst.comportamentoAtual === "escovar_cerdas" && p.par === 3) {
           const ladoAtivo = Math.floor(inst.tempoComportamento / 1.05) % 2 === 0 ? -1 : 1;
           alvoAng = p.lado === ladoAtivo
             ? p.lado * (-16 + Math.sin(inst.tempoComportamento * 11) * 7.5)
-            : p.lado * 2;
+            : (ikP ? ikP.angFemurGraus : p.lado * 2);
+          alvoDistalAng = p.lado === ladoAtivo ? p.lado * -20 : (ikP ? ikP.angDistalGraus : 0);
         } else if (inst.comportamentoAtual === "probing" && p.par === 0) {
           alvoAng = Math.sin(inst.tempoComportamento * 4.2 + (p.lado === 1 ? Math.PI : 0)) * 12;
-        } else {
-          alvoAng = Math.sin(t * 1.4 + p.faseBase) * 1.8;
+          alvoDistalAng = -alvoAng * 0.55;
+        } else if (ikP) {
+          // Em repouso, mantém as 8 patas plantadas calmamente na posição real sem qualquer tremor!
+          alvoAng = ikP.angFemurGraus;
+          alvoDistalAng = ikP.angDistalGraus;
         }
       }
 
-      p.angAtual = lerp(p.angAtual, alvoAng, Math.min(1, dt * 15));
-      if (p._angEscrito == null || Math.abs(p.angAtual - p._angEscrito) >= 0.25) {
+      // Se uma postura especial definiu alvoAng mas não definiu alvoDistalAng, articula o joelho de forma orgânica!
+      if (alvoDistalAng === 0 && Math.abs(alvoAng) > 1.5 && (!ikP || !andando)) {
+        alvoDistalAng = -alvoAng * 0.38;
+      }
+
+      // Quando SpiderLeg + Vec2 IK está ativo, os próprios vértices (Coxa -> Joelho -> Tíbia -> Tarso)
+      // já foram recalculados pela Lei dos Cossenos e gravados diretamente no SVG!
+      // Só aplicamos rotação suplementar caso haja um gesto ocioso específico (grooming/banho/soneca).
+      const pivOx = ikP && ikP.anchorSvg ? ikP.anchorSvg.x : p.ox;
+      const pivOy = ikP && ikP.anchorSvg ? ikP.anchorSvg.y : p.oy;
+      const pivKx = ikP && ikP.kneeSvg ? ikP.kneeSvg.x : p.kx;
+      const pivKy = ikP && ikP.kneeSvg ? ikP.kneeSvg.y : p.ky;
+
+      p.angAtual = lerp(p.angAtual, alvoAng, Math.min(1, dt * 18));
+      if (Math.abs(p.angAtual) < 0.12) {
+        if (p._angEscrito !== 0) {
+          p._angEscrito = 0;
+          p.el.removeAttribute("transform");
+        }
+      } else if (p._angEscrito == null || Math.abs(p.angAtual - p._angEscrito) >= 0.18) {
         p._angEscrito = p.angAtual;
-        p.el.style.transform = `rotate(${p.angAtual.toFixed(1)}deg)`;
+        p.el.setAttribute("transform", `rotate(${p.angAtual.toFixed(2)}, ${pivOx.toFixed(1)}, ${pivOy.toFixed(1)})`);
+      }
+
+      if (p.distalEl) {
+        p.angDistalAtual = lerp(p.angDistalAtual || 0, alvoDistalAng, Math.min(1, dt * 20));
+        if (Math.abs(p.angDistalAtual) < 0.12) {
+          if (p._angDistalEscrito !== 0) {
+            p._angDistalEscrito = 0;
+            p.distalEl.removeAttribute("transform");
+          }
+        } else if (p._angDistalEscrito == null || Math.abs(p.angDistalAtual - p._angDistalEscrito) >= 0.18) {
+          p._angDistalEscrito = p.angDistalAtual;
+          p.distalEl.setAttribute("transform", `rotate(${p.angDistalAtual.toFixed(2)}, ${pivKx.toFixed(1)}, ${pivKy.toFixed(1)})`);
+        }
       }
     }
   }
@@ -5938,11 +6299,15 @@ const AranhasAtelie = (() => {
         flags.acumulandoPressao = true;
         st.anguloAlvo = angParaOutro;
       } else if (inter.tipo === "fuga_visual_salto") {
-        // Papa-Moscas: foco instantâneo de longe (0.26s) + salto explosivo para trás/lado + fuga!
+        // Papa-Moscas: preparação agachada carregando mola (0.28s) + salto balístico longo (215 px) e ultra-rápido (0.22s)!
         st.anguloAlvo = angParaOutro;
-        if (inter.tempo < 0.26) {
+        if (inter.tempo < 0.28) {
           flags.andando = false;
-          flags.paralaxe = true;
+          flags.agachando = true;
+          flags.preparandoSalto = true;
+          const pPrep = inter.tempo / 0.28;
+          flags.escalaX = 1 + pPrep * 0.16;
+          flags.escalaY = 1 - pPrep * 0.21;
           st.angulo = lerpAngulo(st.angulo, st.anguloAlvo, Math.min(1, dt * 18));
         } else {
           if (!inter.saltoIniciado) {
@@ -5950,16 +6315,17 @@ const AranhasAtelie = (() => {
             inter.origX = st.x;
             inter.origY = st.y;
             criarRastroPonto(st.x, st.y, true);
+            criarOndaVibracao(st.x, st.y, "solo");
           }
-          const sT = Math.min(1, (inter.tempo - 0.26) / 0.44);
+          const sT = Math.min(1, (inter.tempo - 0.28) / 0.22);
           const arco = Math.sin(sT * Math.PI);
           flags.andando = false;
           flags.noAr = true;
-          flags.escalaX = 1 + arco * 0.2;
-          flags.escalaY = 1 + arco * 0.24;
-          flags.sombraExtra = 10 * arco;
-          st.x = inter.origX + ux * (135 * sT);
-          st.y = inter.origY + uy * (135 * sT);
+          flags.escalaX = 1 + arco * 0.14;
+          flags.escalaY = 1 + arco * 0.34;
+          flags.sombraExtra = 16 * arco;
+          st.x = inter.origX + ux * (215 * sT);
+          st.y = inter.origY + uy * (215 * sT) - arco * 16;
         }
       } else if (inter.tipo === "fuga_ballooning_panico") {
         // Filhote: leve sobressalto antes de decolar pelo vento em ballooning!
@@ -6378,55 +6744,70 @@ const AranhasAtelie = (() => {
         }
       } else {
         let alvoVel = 0.88 + Math.sin(inst.tempoVida * 2.6 + inst.uid) * 0.16;
+        let offsetSaltoY = 0;
+        let recuoMolaPx = 0;
 
-        if (st.tipo === "saltinhos") {
-          if (st.faseSalto === "andando" && st.t >= st.proximoSaltoT && st.t < 0.84) {
+        // Papa-moscas sempre realiza ciclos de preparação + salto longo e veloz durante seus deslocamentos!
+        if (st.tipo === "saltinhos" || inst.especie.id === "papa_moscas") {
+          if (st.faseSalto === "andando" && st.t >= st.proximoSaltoT && st.t < 0.82) {
             st.faseSalto = "agachando";
             st.saltoT = 0;
-            st.proximoSaltoT = st.t + rand(0.18, 0.28);
+            st.ancoraSaltoCriada = false;
+            st.proximoSaltoT = st.t + rand(0.16, 0.24);
           }
 
           if (st.faseSalto === "agachando") {
+            // PREPARAÇÃO PARA PULAR (~0.45s): para, ancora seda, recua como mola, achata o corpo,
+            // flexiona profundamente os pares III e IV e ergue o Par I mirando à frente!
             flags.andando = false;
             flags.agachando = true;
+            flags.preparandoSalto = true;
             alvoVel = 0;
-            st.saltoT += dt * 3.4;
+            st.saltoT += dt * 2.22;
             const p = Math.min(1, st.saltoT);
-            flags.escalaX = 1 + p * 0.09;
-            flags.escalaY = 1 - p * 0.14;
+            if (!st.ancoraSaltoCriada && p >= 0.25) {
+              st.ancoraSaltoCriada = true;
+              criarRastroPonto(st.x, st.y, true);
+            }
+            recuoMolaPx = Math.sin(p * Math.PI * 0.85) * 6.5;
+            flags.escalaX = 1 + p * 0.16;
+            flags.escalaY = 1 - p * 0.22;
             if (st.saltoT >= 1) {
+              criarOndaVibracao(st.x, st.y, "solo");
               st.faseSalto = "no_ar";
               st.saltoT = 0;
             }
           } else if (st.faseSalto === "no_ar") {
+            // SALTO BALÍSTICO LONGO E VELOZ (~0.21s cobrindo grande distância com arco alto!)
             flags.andando = false;
             flags.noAr = true;
-            alvoVel = 2.35;
-            st.saltoT += dt * 2.5;
+            alvoVel = 5.35;
+            st.saltoT += dt * 4.65;
             const arco = Math.sin(Math.min(1, st.saltoT) * Math.PI);
-            flags.escalaX = 1 + arco * 0.18;
-            flags.escalaY = 1 + arco * 0.24;
-            flags.sombraExtra = arco * 12;
+            offsetSaltoY = -arco * 24;
+            flags.escalaX = 1 + arco * 0.12;
+            flags.escalaY = 1 + arco * 0.34;
+            flags.sombraExtra = arco * 17;
             if (st.saltoT >= 1) {
               st.faseSalto = "aterrissando";
               st.saltoT = 0;
             }
           } else if (st.faseSalto === "aterrissando") {
             flags.andando = false;
-            alvoVel = 0.15;
-            st.saltoT += dt * 5.2;
+            alvoVel = 0.12;
+            st.saltoT += dt * 5.8;
             const bounce = Math.sin(Math.min(1, st.saltoT) * Math.PI);
-            flags.escalaX = 1 + bounce * 0.08;
-            flags.escalaY = 1 - bounce * 0.08;
+            flags.escalaX = 1 + bounce * 0.11;
+            flags.escalaY = 1 - bounce * 0.11;
             if (st.saltoT >= 1) {
               st.faseSalto = "andando";
-              st.pausaRestante = rand(0.75, 1.5);
+              st.pausaRestante = rand(0.65, 1.25);
               inst.comportamentoAtual = sortearComportamentoPausa(inst.especie);
             }
           }
         }
 
-        st.velEscalar = lerp(st.velEscalar, alvoVel, Math.min(1, dt * (flags.noAr ? 14 : 6)));
+        st.velEscalar = lerp(st.velEscalar, alvoVel, Math.min(1, dt * (flags.noAr ? 24 : flags.agachando ? 18 : 6)));
         st.t += (dt * st.velEscalar) / st.duracao;
 
         if (!st.pausaFeita && st.faseSalto !== "no_ar" && st.faseSalto !== "agachando" && st.t >= st.pausaT) {
@@ -6440,8 +6821,9 @@ const AranhasAtelie = (() => {
         } else {
           const pos = pontoBezierCubica(st.t, st.p0, st.p1, st.p2, st.p3);
           const tan = derivadaBezierCubica(st.t, st.p0, st.p1, st.p2, st.p3);
-          st.x = pos.x;
-          st.y = pos.y;
+          const lenTan = Math.max(1, Math.hypot(tan.x, tan.y));
+          st.x = pos.x - (tan.x / lenTan) * recuoMolaPx;
+          st.y = pos.y - (tan.y / lenTan) * recuoMolaPx + offsetSaltoY;
           st.anguloAlvo = (Math.atan2(tan.y, tan.x) * 180) / Math.PI + 90;
         }
       }
@@ -6488,7 +6870,9 @@ const AranhasAtelie = (() => {
     const pausaIntencionalBorda =
       (st.tipo === "repouso_teia_canto" && st.fase === "aguardando_em_x" && st.tempoFase < st.duracaoVigilia) ||
       (st.tipo === "espiadinha" && st.fase === "espiando" && st.tempoPausa < st.duracaoPausa) ||
-      (inst.caca && inst.caca.fase === "aguardando_teia" && inst.caca.tempoFase < 14);
+      (inst.caca && inst.caca.fase !== "levando" && (inst.caca.tempoTotal || 0) < 28) ||
+      Boolean(inst.acaoEspecial) ||
+      Boolean(inst.interacao);
     if (pertoDaBorda && desloc < 0.14 && !pausaIntencionalBorda) {
       inst.tempoImovelBorda = (inst.tempoImovelBorda || 0) + dt;
       if (inst.tempoImovelBorda >= 2.1) {
@@ -6582,7 +6966,12 @@ const AranhasAtelie = (() => {
       return;
     }
     if (!ultimoFrameTs) ultimoFrameTs = ts;
-    const dt = Math.min(0.05, Math.max(0.001, (ts - ultimoFrameTs) / 1000));
+    const rawDt = Math.min(0.05, Math.max(0.001, (ts - ultimoFrameTs) / 1000));
+    const speedMult =
+      typeof AranhasCinematicaIK !== "undefined" && typeof AranhasCinematicaIK.obterConfiguracaoRuntime === "function"
+        ? AranhasCinematicaIK.obterConfiguracaoRuntime().speedScale || 1.0
+        : 1.0;
+    const dt = rawDt * speedMult;
     ultimoFrameTs = ts;
 
     if (!document.hidden) {
@@ -6750,8 +7139,9 @@ const AranhasAtelie = (() => {
     for (let i = 0; i < ativas.length; i++) {
       const inst = ativas[i];
       if (inst.fugindo || inst.defesaRestante > 0) continue;
-      // Durante contenção, dança da seda ou digestão, reduz susto acidental para não quebrar a cena
-      if (inst.caca && ["contendo", "contendo_picareta", "danca_da_seda", "digestao_succao", "enrolando_seda"].includes(inst.caca.fase)) continue;
+      // Durante qualquer cena de caça ativa ou ação especial (cortejo, disputa, ecdise, ooteca, orvalho),
+      // protege a cena contra fuga acidental pelo ponteiro do mouse
+      if (inst.caca || inst.acaoEspecial) continue;
 
       const dist = Math.hypot(clientX - inst.estado.x, clientY - inst.estado.y);
       const raioFuga = inst.especie.posturaDefensiva ? 112 : 86;
@@ -6790,9 +7180,16 @@ const AranhasAtelie = (() => {
       if (t) processarPonteiro(t.clientX, t.clientY);
     }, { passive: true });
 
-    // 8. Reação à vibração de cliques na bancada
+    // 8. Reação à vibração de cliques na bancada + Ponto de Interesse (POI) vetorial
     window.addEventListener("pointerdown", (e) => {
-      if (!reagirCursor || ativas.length === 0) return;
+      if (ativas.length === 0) return;
+      if (typeof AranhasCinematicaIK !== "undefined" && typeof AranhasCinematicaIK.definirPontoInteresse === "function") {
+        const tag = (e.target?.tagName || "").toLowerCase();
+        if (!["button", "input", "select", "textarea", "a", "label"].includes(tag)) {
+          AranhasCinematicaIK.definirPontoInteresse(e.clientX, e.clientY);
+        }
+      }
+      if (!reagirCursor) return;
       for (let i = 0; i < ativas.length; i++) {
         const a = ativas[i];
         if (a.fugindo || a.caca || a.acaoEspecial || a.interacao || a.defesaRestante > 0 || a.camuflagemRestante > 0) continue;

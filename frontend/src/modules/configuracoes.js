@@ -1229,6 +1229,44 @@ const Configuracoes = (() => {
       }
     });
 
+    // Controles em tempo real do Motor Vetorial (Vec2) & Cinemática Inversa (IK)
+    document.querySelectorAll("#cfg-aranhas-steering-mode .btn-seg-cfg").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll("#cfg-aranhas-steering-mode .btn-seg-cfg").forEach((b) => b.classList.toggle("ativo", b === btn));
+        const modo = btn.dataset.ikMode || "autonomous";
+        if (typeof AranhasCinematicaIK !== "undefined" && typeof AranhasCinematicaIK.definirModoComportamento === "function") {
+          AranhasCinematicaIK.definirModoComportamento(modo);
+        }
+      });
+    });
+
+    document.getElementById("cfg-aranhas-ik-speed")?.addEventListener("input", (e) => {
+      const v = parseFloat(e.target.value) || 1.0;
+      const lbl = document.getElementById("cfg-aranhas-ik-speed-val");
+      if (lbl) lbl.textContent = `${v.toFixed(1)}x`;
+      if (typeof AranhasCinematicaIK !== "undefined" && typeof AranhasCinematicaIK.definirEscalaVelocidade === "function") {
+        AranhasCinematicaIK.definirEscalaVelocidade(v);
+      }
+    });
+
+    document.getElementById("cfg-aranhas-ik-reach")?.addEventListener("input", (e) => {
+      const v = parseFloat(e.target.value) || 1.0;
+      const lbl = document.getElementById("cfg-aranhas-ik-reach-val");
+      if (lbl) lbl.textContent = `${v.toFixed(2)}x`;
+      if (typeof AranhasCinematicaIK !== "undefined" && typeof AranhasCinematicaIK.definirEscalaAlcance === "function") {
+        AranhasCinematicaIK.definirEscalaAlcance(v);
+      }
+    });
+
+    document.getElementById("cfg-aranhas-ik-debug")?.addEventListener("change", (e) => {
+      const ativo = Boolean(e.target.checked);
+      const leg = document.getElementById("cfg-aranhas-ik-legenda");
+      if (leg) leg.style.display = ativo ? "inline-flex" : "none";
+      if (typeof AranhasCinematicaIK !== "undefined" && typeof AranhasCinematicaIK.definirMostrarDebug === "function") {
+        AranhasCinematicaIK.definirMostrarDebug(ativo);
+      }
+    });
+
     // Cards de Tema
     document.querySelectorAll("#cfg-grade-temas .card-tema-cfg").forEach((card) => {
       card.addEventListener("click", () => {
